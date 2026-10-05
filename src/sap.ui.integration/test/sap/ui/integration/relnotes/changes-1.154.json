@@ -1,7 +1,22 @@
 {
   "1.154.0": {
-    "date": "September 2026",
+    "date": "October 2026",
     "notes": [
+      {
+        "id": "cb9efd2fe80b6fd3723b424ecf98ccf2c8805ec7",
+        "type": "FIX",
+        "text": " sap.ui.integration: Return all items and maxItems in resolved manifest"
+      },
+      {
+        "id": "c0ddb6af6e6c939ee3abe702dc3501d9d59f1332",
+        "type": "FEATURE",
+        "text": " sap.ui.integration.widgets.Card: Show loading placeholder while host context resolves"
+      },
+      {
+        "id": "4737fe3f7141f464646db2d0465322f69c9e6a71",
+        "type": "FIX",
+        "text": " sap.ui.integration: correct length spelling"
+      },
       {
         "id": "8596bc66b89f3f078ed17a4507dc3508e53dbc05",
         "type": "FIX",

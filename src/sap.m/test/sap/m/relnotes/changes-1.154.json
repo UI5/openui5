@@ -1,7 +1,42 @@
 {
   "1.154.0": {
-    "date": "September 2026",
+    "date": "October 2026",
     "notes": [
+      {
+        "id": "19f667c15dba37ee288e61917444a89c80586a79",
+        "type": "FEATURE",
+        "text": " sap.m.Popover: keyboard resizing is now implemented"
+      },
+      {
+        "id": "7fa0b7993690494881f12cf0f4a87757cc979158",
+        "type": "FIX",
+        "text": " We've now fixed the overflow clipping and border-radius issues in generic tile and action tile controls"
+      },
+      {
+        "id": "9228d362f7209d7fad719cf9a15e4b127ee1dab5",
+        "type": "FIX",
+        "text": " sap.m.Dialog: focus outline is fixed for keyboard resize"
+      },
+      {
+        "id": "e7dccb835e9821326096f06b9a7ed86e0fb4ab53",
+        "type": "FEATURE",
+        "text": " sap.m.SegmentedButton: enable enhanced tooltip"
+      },
+      {
+        "id": "b33e096f14a6d04e89a2d7052416946de46bed06",
+        "type": "FIX",
+        "text": " sap.m.ObjectNumber: Unit part is rendered always in Currency mode"
+      },
+      {
+        "id": "4737fe3f7141f464646db2d0465322f69c9e6a71",
+        "type": "FIX",
+        "text": " sap.ui.integration: correct length spelling"
+      },
+      {
+        "id": "295081ebe27baeb54bab794122deb093a4a2a307",
+        "type": "FIX",
+        "text": " sap.m.IconTabFilter: prevent Key User Adaptation of the subsection popover"
+      },
       {
         "id": "ea237cfde91c1d8088b38e578da2763a4217b91b",
         "type": "FEATURE",

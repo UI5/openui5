@@ -1,0 +1,12 @@
+{
+  "1.154.0": {
+    "date": "October 2026",
+    "notes": [
+      {
+        "id": "4737fe3f7141f464646db2d0465322f69c9e6a71",
+        "type": "FIX",
+        "text": " sap.ui.integration: correct length spelling"
+      }
+    ]
+  }
+}

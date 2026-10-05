@@ -1,7 +1,12 @@
 {
   "1.154.0": {
-    "date": "September 2026",
+    "date": "October 2026",
     "notes": [
+      {
+        "id": "f07da40d71604c025cf76ec34f08ab6651d485e8",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: respect sap-ui-fastnavgroup=false CustomData on sections"
+      },
       {
         "id": "3dd204d6decb3fbf73e8b3e1f309e64da8d1288b",
         "type": "FIX",

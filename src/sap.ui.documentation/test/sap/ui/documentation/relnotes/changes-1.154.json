@@ -1,0 +1,12 @@
+{
+  "1.154.0": {
+    "date": "October 2026",
+    "notes": [
+      {
+        "id": "554b38721b3995d5f5f52850e78da6bb8a266c95",
+        "type": "FIX",
+        "text": " Demo Kit: broken links for module-type API events on index pages"
+      }
+    ]
+  }
+}

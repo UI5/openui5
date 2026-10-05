@@ -1,7 +1,12 @@
 {
   "1.154.0": {
-    "date": "September 2026",
+    "date": "October 2026",
     "notes": [
+      {
+        "id": "3bb26ab935ba17428de670815f62a70f7259f869",
+        "type": "FIX",
+        "text": " TooltipEventTrigger: Fixed failing tests on Safari"
+      },
       {
         "id": "ea237cfde91c1d8088b38e578da2763a4217b91b",
         "type": "FEATURE",

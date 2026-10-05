@@ -1,0 +1,22 @@
+{
+  "1.154.0": {
+    "date": "October 2026",
+    "notes": [
+      {
+        "id": "d39cbcd72dbc972ec7e917078bb4f422b4d490e2",
+        "type": "FIX",
+        "text": " sap.f.DynamicPage: Title visibility issue fixed"
+      },
+      {
+        "id": "7cb467db114afba050ece0b7c9d4a3956f5eb67c",
+        "type": "FIX",
+        "text": " sap.f.GridContainer: Sentinel divs now have aria-hidden=\"true\""
+      },
+      {
+        "id": "c0ddb6af6e6c939ee3abe702dc3501d9d59f1332",
+        "type": "FEATURE",
+        "text": " sap.ui.integration.widgets.Card: Show loading placeholder while host context resolves"
+      }
+    ]
+  }
+}

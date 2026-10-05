@@ -1,7 +1,17 @@
 {
   "1.154.0": {
-    "date": "September 2026",
+    "date": "October 2026",
     "notes": [
+      {
+        "id": "c9420596ab018738b11c7fb2af43201b2fd3ffff",
+        "type": "FIX",
+        "text": " FilterField: TAB in typeahead dropdown"
+      },
+      {
+        "id": "dd6414c9de05a6621edb556f133648129153b851",
+        "type": "FEATURE",
+        "text": " MDC.Chart: expose an API for proper setting vizProperties for sap.chart.Chart"
+      },
       {
         "id": "ebc89c23c0c3a0ec8c5eb3d02a3b5215382686e2",
         "type": "FIX",

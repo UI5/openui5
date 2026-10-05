@@ -1,0 +1,12 @@
+{
+  "1.154.0": {
+    "date": "October 2026",
+    "notes": [
+      {
+        "id": "fc167f7cc8b6b17301ea716f59d90fd952fe306a",
+        "type": "FIX",
+        "text": " sap.tnt.NavigationList: correct text highlight alignment"
+      }
+    ]
+  }
+}
