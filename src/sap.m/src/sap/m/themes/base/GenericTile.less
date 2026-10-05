@@ -656,7 +656,7 @@
 
 .TwoByHalf.tileWithAppInfo {
 
-	// Normal Mode TwoByHalf: chip rendered inside sapMGTContent
+	/* Normal Mode TwoByHalf: chip rendered inside sapMGTContent */
 	&:not(.sapMGTIconMode) {
 
 		.sapMGTContent {
@@ -671,7 +671,7 @@
 		}
 	}
 
-	// IconMode TwoByHalf: chip rendered via wrapper (column layout)
+	/* IconMode TwoByHalf: chip rendered via wrapper (column layout) */
 	&.sapMGTIconMode {
 
 		.sapMGTWrapper {
@@ -695,7 +695,7 @@
 		}
 
 		.sapMGTTInfoContainer {
-			// Override global right-align — chip should be left-aligned for IconMode TwoByHalf
+			/* Override global right-align — chip should be left-aligned for IconMode TwoByHalf */
 			justify-content: flex-start;
 			align-items: flex-start;
 		}
@@ -750,7 +750,7 @@
 }
 
 .TwoByHalf.sapMTileSmallPhone.tileWithAppInfo {
-	// Normal Mode TwoByHalf: chip rendered inside sapMGTContent
+	/* Normal Mode TwoByHalf: chip rendered inside sapMGTContent */
 	&:not(.sapMGTIconMode) {
 		.sapMGTSubHdrTxt {
 				margin-top: -5px;
@@ -2868,7 +2868,7 @@ html[data-sap-ui-browser*='ff'] {
 
 .sapMGT.sapMGTTwoByHalf.sapMGTIconMode > :last-child {
 	flex-shrink: 0;
-	margin-left: auto; // push last element to the right
+	margin-left: auto; /* push last element to the right */
 }
 
 .sapMGT.sapMGTTwoByHalf.sapMGTIconMode .sapMGTHdrContent {
