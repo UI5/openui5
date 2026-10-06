@@ -57,6 +57,9 @@ sap.ui.define(["sap/ui/core/Lib", 'sap/ui/core/Renderer', './DateTimeFieldRender
 	DatePickerRenderer.writeInnerAttributes = function(oRm, oDP) {
 		oRm.attr("type", "text");
 		oRm.attr("maxlength", MAX_INPUT_VALUE_LENGTH);
+		// disable the native browser autocomplete suggestions, as they are not
+		// accessible (not announced by screen readers) and do not match the Fiori design
+		oRm.attr("autocomplete", "off");
 		if (oDP._bMobile) {
 			// prevent keyboard in mobile devices
 			oRm.attr("readonly", "readonly");
