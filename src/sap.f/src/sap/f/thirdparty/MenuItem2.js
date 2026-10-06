@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, parametersBundle_css$1, ManagedStyles, Icons, decline, List, ListItemTemplate, ListItemBase, ResponsivePopover, Button, Icon, i18nDefaults) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/List', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/i18n-defaults2'], (function (exports, webcomponentsBase, parametersBundle_css, eventStrict, parametersBundle_css$1, ManagedStyles, Icons, decline, InvisibleMessage, ListItemTemplate, ResponsivePopover, Button, List, Icon, i18nDefaults) { 'use strict';
 
 	const name$1 = "nav-back";
 	const pathData$1 = "M11.723 13.285a.957.957 0 0 1 .277.702c0 .28-.092.514-.277.701a.967.967 0 0 1-.708.312.967.967 0 0 1-.707-.312L4.246 8.67a.723.723 0 0 0-.092-.156.362.362 0 0 0-.046-.077.362.362 0 0 1-.046-.078A1.106 1.106 0 0 1 4 8.016a.22.22 0 0 1 .015-.094.14.14 0 0 0 .016-.062.44.44 0 0 1 .092-.297c.02-.03.041-.067.062-.109.02-.02.03-.036.03-.046 0-.01.01-.026.031-.047.02-.021.03-.042.03-.063l6.032-5.986A.967.967 0 0 1 11.015 1c.267 0 .503.104.708.312.185.187.277.42.277.701a.957.957 0 0 1-.277.702l-4.77 4.802a.889.889 0 0 0 0 .997l4.77 4.771Z";
@@ -48,7 +48,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	var MenuItemGroupCheckMode$1 = MenuItemGroupCheckMode;
 
 	function MenuSeparatorTemplate() {
-	    return (parametersBundle_css.jsx(List.ListItemCustom, { class: "ui5-menu-separator", _forcedAccessibleRole: "separator", disabled: true }));
+	    return (parametersBundle_css.jsx("li", { role: "separator", class: "ui5-menu-separator" }));
 	}
 
 	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
@@ -66,33 +66,14 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	 * @class
 	 * The `ui5-menu-separator` represents a horizontal line to separate menu items inside a `ui5-menu`.
 	 * @constructor
-	 * @extends ListItemBase
+	 * @extends UI5Element
 	 * @implements {IMenuItem}
 	 * @public
 	 * @since 2.0.0
 	 */
-	let MenuSeparator = class MenuSeparator extends ListItemBase.ListItemBase {
+	let MenuSeparator = class MenuSeparator extends webcomponentsBase.b {
 	    get isSeparator() {
 	        return true;
-	    }
-	    get classes() {
-	        return {
-	            main: {
-	                "ui5-menu-separator": true,
-	            },
-	        };
-	    }
-	    /**
-	     * @override
-	     */
-	    get _focusable() {
-	        return false;
-	    }
-	    /**
-	     * @override
-	     */
-	    get _pressable() {
-	        return false;
 	    }
 	};
 	MenuSeparator = __decorate$2([
@@ -147,7 +128,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	 * @since 2.12.0
 	 * @public
 	 */
-	let MenuItemGroup = MenuItemGroup_1 = class MenuItemGroup extends webcomponentsBase.S {
+	let MenuItemGroup = MenuItemGroup_1 = class MenuItemGroup extends webcomponentsBase.b {
 	    constructor() {
 	        super(...arguments);
 	        /**
@@ -486,7 +467,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            ariaKeyShortcuts: this.accessibilityAttributes.ariaKeyShortcuts,
 	            ariaExpanded: this.hasSubmenu ? this.isSubMenuOpen : undefined,
 	            ariaHidden: !!this.additionalText && !!this.accessibilityAttributes.ariaKeyShortcuts ? true : undefined,
-	            ariaChecked: this._markChecked ? true : undefined,
+	            ariaChecked: this._isCheckable ? this._markChecked : undefined,
 	        };
 	        return { ...super._accInfo, ...accInfoSettings };
 	    }
@@ -566,7 +547,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    }
 	    _isEnter(e) {
 	        this._shiftPressed = this._isCheckable && webcomponentsBase.i(e);
-	        return webcomponentsBase.b(e) || webcomponentsBase.i(e);
+	        return webcomponentsBase.b$1(e) || webcomponentsBase.i(e);
 	    }
 	    _onclick(e) {
 	        // Clicks on the endContent slot must not activate the item (which would close the menu).
@@ -638,7 +619,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            this._allMenuItems[0]?.focus();
 	        }
 	        if (this.loading) {
-	            List.p(MenuItem_1.i18nBundle.getText(i18nDefaults.MENU_ITEM_LOADING));
+	            InvisibleMessage.v(MenuItem_1.i18nBundle.getText(i18nDefaults.MENU_ITEM_LOADING));
 	        }
 	        this.fireDecoratorEvent("open");
 	    }
@@ -795,5 +776,6 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	exports.isInstanceOfMenuItem = isInstanceOfMenuItem;
 	exports.isInstanceOfMenuItemGroup = isInstanceOfMenuItemGroup;
 	exports.isInstanceOfMenuSeparator = isInstanceOfMenuSeparator;
+	exports.navBackIcon = navBackIcon;
 
 }));

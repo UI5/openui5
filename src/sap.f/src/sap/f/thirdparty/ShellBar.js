@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/query', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ShellBarItem2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Menu', 'sap/f/thirdparty/List', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/overflow', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ShellBarSpacer', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/information', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/WrappingType', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/ListItemGroup'], (function (exports, webcomponentsBase, eventStrict, query, parametersBundle_css$2, parametersBundle_css, ManagedStyles, Button, ShellBarItem, Icon, ResponsivePopover, Menu, List, search, Icons, overflow, slimArrowDown, parametersBundle_css$1, ListItemBase, ShellBarSpacer, i18nDefaults, AccessibilityTextsHelper, willShowContent, toLowercaseEnumValue, Label, i18nDefaults$1, Tag, information, decline, ListItemTemplate, ValueState, WrappingType, Title, FocusableElements, MenuItem, ListItemGroup) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/event-strict', 'sap/f/thirdparty/query', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/parameters-bundle2.css', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Button2', 'sap/f/thirdparty/ShellBarItem2', 'sap/f/thirdparty/Icon', 'sap/f/thirdparty/ResponsivePopover', 'sap/f/thirdparty/Menu', 'sap/f/thirdparty/List', 'sap/f/thirdparty/ListItemStandard', 'sap/f/thirdparty/search2', 'sap/f/thirdparty/Icons', 'sap/f/thirdparty/overflow', 'sap/f/thirdparty/slim-arrow-down', 'sap/f/thirdparty/parameters-bundle3.css', 'sap/f/thirdparty/ListItemBase', 'sap/f/thirdparty/ShellBarSpacer', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/AccessibilityTextsHelper', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/toLowercaseEnumValue', 'sap/f/thirdparty/Label', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Tag', 'sap/f/thirdparty/information', 'sap/f/thirdparty/decline', 'sap/f/thirdparty/Title', 'sap/f/thirdparty/ValueState', 'sap/f/thirdparty/FocusableElements', 'sap/f/thirdparty/InvisibleMessage', 'sap/f/thirdparty/ListItemTemplate', 'sap/f/thirdparty/MenuItem2', 'sap/f/thirdparty/ListItemGroup', 'sap/f/thirdparty/WrappingType'], (function (exports, webcomponentsBase, eventStrict, query, parametersBundle_css$2, parametersBundle_css, ManagedStyles, Button, ShellBarItem, Icon, ResponsivePopover, Menu, List, ListItemStandard, search, Icons, overflow, slimArrowDown, parametersBundle_css$1, ListItemBase, ShellBarSpacer, i18nDefaults, AccessibilityTextsHelper, willShowContent, toLowercaseEnumValue, Label, i18nDefaults$1, Tag, information, decline, Title, ValueState, FocusableElements, InvisibleMessage, ListItemTemplate, MenuItem, ListItemGroup, WrappingType) { 'use strict';
 
 	function n(e,o){let t=null,l=null;return function(...u){if(l){t=u;return}e(...u),l=setTimeout(()=>{t&&(e(...t),t=null),l=null;},o);}}
 
@@ -86,7 +86,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	}
 	function ShellBarSearchButton() {
 	    const searchAction = this.getAction("search");
-	    return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: !this.hideSearchButton && (parametersBundle_css.jsx(Button.Button, { "data-ui5-stable": searchAction?.stableDomRef, class: "ui5-shellbar-search-button ui5-shellbar-action-button ui5-shellbar-gap-start ui5-shellbar-search-toggle", icon: searchAction?.icon, design: "Transparent", onClick: this.handleSearchButtonClick, tooltip: this.actionsAccessibilityInfo.search.title, "aria-expanded": this.showSearchField, accessibilityAttributes: this.actionsAccessibilityInfo.search.accessibilityAttributes })) }));
+	    return (parametersBundle_css.jsx(parametersBundle_css.Fragment, { children: !this.hideSearchButton && (parametersBundle_css.jsx(Button.Button, { "data-ui5-stable": searchAction?.stableDomRef, class: "ui5-shellbar-search-button ui5-shellbar-action-button ui5-shellbar-gap-start ui5-shellbar-search-toggle", icon: searchAction?.icon, design: "Transparent", onClick: this.handleSearchButtonClick, tooltip: this.actionsAccessibilityInfo.search.title, accessibilityAttributes: this.actionsAccessibilityInfo.search.accessibilityAttributes })) }));
 	}
 
 	function ShellBarLegacyBrandingArea() {
@@ -196,7 +196,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	                                    }, design: "Transparent", onClick: this.handleProfileClick, tooltip: actionsAccInfo.profile.title, accessibilityAttributes: actionsAccInfo.profile.accessibilityAttributes, children: parametersBundle_css.jsx("slot", { name: "profile" }) })), productSwitchAction && (parametersBundle_css.jsx(Button.Button, { "data-ui5-stable": productSwitchAction.stableDomRef, class: {
 	                                        "ui5-shellbar-button-product-switch ui5-shellbar-action-button ui5-shellbar-gap-start": true,
 	                                        "ui5-shellbar-hidden": this.isHidden("products")
-	                                    }, icon: productSwitchAction.icon, design: "Transparent", onClick: this.handleProductSwitchClick, tooltip: actionsAccInfo.products.title, accessibilityAttributes: actionsAccInfo.products.accessibilityAttributes }))] }) })] }), parametersBundle_css.jsx(ResponsivePopover.Popover, { class: "ui5-shellbar-overflow-popover", open: this.overflowPopoverOpen, onClose: this.onPopoverClose, opener: "ui5-shellbar-overflow-button", placement: "Bottom", hideArrow: true, horizontalAlign: this.popoverHorizontalAlign, children: parametersBundle_css.jsx(List.List, { separators: "None", onClick: this.handleOverflowItemClick, children: this.overflowItems.map(item => {
+	                                    }, icon: productSwitchAction.icon, design: "Transparent", onClick: this.handleProductSwitchClick, tooltip: actionsAccInfo.products.title, accessibilityAttributes: actionsAccInfo.products.accessibilityAttributes }))] }) })] }), parametersBundle_css.jsx(ResponsivePopover.Popover, { class: "ui5-shellbar-overflow-popover", open: this.overflowPopoverOpen, onClose: this.onPopoverClose, opener: "ui5-shellbar-overflow-button", placement: "Bottom", hideArrow: true, horizontalAlign: this.popoverHorizontalAlign, accessibleName: actionsAccInfo.overflow.title, children: parametersBundle_css.jsx(List.List, { separators: "None", onClick: this.handleOverflowItemClick, children: this.overflowItems.map(item => {
 	                        if (item.type === "action") {
 	                            const actionData = item.data;
 	                            return (parametersBundle_css.jsx(ShellBarItem.ShellBarItem, { icon: actionData.icon ? `sap-icon://${actionData.icon}` : "", "data-action-id": item.id, count: actionData.count, inOverflow: true, text: this.getActionOverflowText(item.id) }, item.id));
@@ -212,12 +212,12 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 
 	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
 	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
-	var ShellBarPopoverCss = `.ui5-shellbar-menu-popover::part(content),.ui5-shellbar-overflow-popover::part(content){padding:0}.ui5-shellbar-overflow-popover [ui5-li]::part(icon){color:var(--sapList_TextColor)}.ui5-shellbar-overflow-popover ::slotted([ui5-toggle-button]),.ui5-shellbar-overflow-popover ::slotted([ui5-button]){color:var(--sapList_TextColor)}.ui5-shellbar-overflow-popover [ui5-li]::part(title){font-size:var(--sapFontSize)}.ui5-shellbar-overflow-popover [ui5-li]:after{position:relative;width:fit-content;height:1rem;min-width:1rem;background:var(--sapContent_BadgeBackground);border:var(--_ui5_shellbar_button_badge_border);color:var(--sapContent_BadgeTextColor);bottom:calc(100% + .0625rem);left:1.25rem;padding:0 .3125rem;border-radius:.5rem;display:flex;justify-content:center;align-items:center;font-size:var(--sapFontSmallSize);font-family:var(--sapFontFamily);z-index:2;box-sizing:border-box;pointer-events:none}.ui5-shellbar-overflow-popover [ui5-li][data-count]:after{content:attr(data-count)}
+	var ShellBarPopoverCss = `.ui5-shellbar-menu-popover::part(content),.ui5-shellbar-overflow-popover::part(content){padding:0}.ui5-shellbar-overflow-popover [ui5-li]::part(icon){color:var(--sapList_TextColor)}.ui5-shellbar-overflow-popover ::slotted([ui5-toggle-button]),.ui5-shellbar-overflow-popover ::slotted([ui5-button]){color:var(--sapList_TextColor)}.ui5-shellbar-overflow-popover [ui5-li]::part(title){font-size:var(--sapFontSize)}
 `;
 
 	ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => parametersBundle_css.defaultThemeBase);
 	ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s" + "-" + "f" + "i" + "o" + "r" + "i", "sap_horizon", async () => parametersBundle_css$1.defaultTheme, "host");
-	var shellBarLegacyStyles = `.ui5-shellbar-logo{overflow:hidden;cursor:pointer;display:flex;align-items:center}.ui5-shellbar-logo-area,.ui5-shellbar-legacy-branding{overflow:hidden;display:flex;align-items:center;padding:.25rem .5rem .25rem .25rem;box-sizing:border-box;cursor:pointer;background:var(--sapButton_Lite_Background);border:1px solid var(--sapButton_Lite_BorderColor);color:var(--sapShell_TextColor);margin-inline-start:.125rem}.ui5-shellbar-logo:focus,.ui5-shellbar-logo-area:focus{outline:var(--_ui5_shellbar_logo_outline);outline-offset:calc(-1 * var(--sapContent_FocusWidth));border-radius:var(--_ui5_shellbar_logo_border_radius)}.ui5-shellbar-overflow-container>.ui5-shellbar-logo:hover,.ui5-shellbar-logo-area:hover{box-shadow:var(--_ui5_shellbar_button_box_shadow);border-radius:var(--_ui5_shellbar_logo_border_radius)}.ui5-shellbar-logo-area:active:focus{background:var(--sapShell_Active_Background);border:1px solid var(--sapButton_Lite_Active_BorderColor);color:var(--sapShell_Active_TextColor)}::slotted([slot="logo"]){max-height:2rem}::slotted([slot="logo"]):active{pointer-events:none}.ui5-shellbar-headings{display:flex;flex-direction:column;justify-content:center;height:100%;overflow:hidden;margin-inline-start:.25rem}.ui5-shellbar-primary-title,.ui5-shellbar-menu-button-title,.ui5-shellbar-title{display:inline-block;font-family:var(--sapFontSemiboldDuplexFamily);margin:0;font-size:var(--_ui5_shellbar_menu_button_title_font_size);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sapShell_SubBrand_TextColor)}.ui5-shellbar-secondary-title{display:flex;align-items:center;font-size:var(--sapFontSmallSize);color:var(--sapShell_TextColor);font-weight:400;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;text-align:start}.ui5-shellbar-menu-button{white-space:nowrap;overflow:hidden;display:flex;align-items:center;padding:.25rem .5rem;cursor:text;-webkit-user-select:text;-moz-user-select:text;user-select:text;margin-inline-start:.5rem;height:2.25rem;border:.0625rem solid var(--sapButton_Lite_BorderColor);background:var(--sapButton_Lite_Background);outline-color:var(--_ui5_shellbar_logo_outline_color);color:var(--sapShell_TextColor);box-sizing:border-box;border-radius:var(--_ui5_shellbar_button_border_radius);position:relative;font-weight:700}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive{-webkit-user-select:none;-moz-user-select:none;user-select:none;cursor:pointer;background:var(--sapButton_Lite_Background);border:var(--_ui5_shellbar_button_border);color:var(--sapShell_TextColor)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:hover{background:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_TextColor);box-shadow:var(--_ui5_shellbar_button_box_shadow)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active{background:var(--sapShell_Active_Background);border-color:var(--sapButton_Lite_Active_BorderColor);color:var(--_ui5_shellbar_button_active_color);box-shadow:var(--_ui5_shellbar_button_box_shadow_active)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active .ui5-shellbar-menu-button-arrow,.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active .ui5-shellbar-menu-button-title{color:var(--sapShell_Active_TextColor)}:host([desktop]) .ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:focus,.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:focus-visible{outline:var(--_ui5_shellbar_logo_outline);outline-offset:var(--_ui5_shellbar_outline_offset)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive::-moz-focus-inner{border:none}.ui5-shellbar-menu-button .ui5-shellbar-logo:hover{box-shadow:none}.ui5-shellbar-menu-button-arrow{display:inline-block;font-family:var(--sapFontSemiboldDuplexFamily);margin:0;font-size:var(--_ui5_shellbar_menu_button_title_font_size);color:var(--sapShell_SubBrand_TextColor)}.ui5-shellbar-menu-button--interactive .ui5-shellbar-menu-button-arrow{margin-inline-start:.375rem}:host(:not([primary-title])) .ui5-shellbar-menu-button{min-width:2.25rem;justify-content:center}:host(:not([with-logo])) .ui5-shellbar-menu-button{margin-inline-start:0}:host([breakpoint-size="S"]) .ui5-shellbar-menu-button{margin-inline-start:0}
+	var shellBarLegacyStyles = `.ui5-shellbar-logo{overflow:hidden;cursor:pointer;display:flex;align-items:center}.ui5-shellbar-logo-area,.ui5-shellbar-legacy-branding{overflow:hidden;display:flex;align-items:center;padding:.25rem .5rem .25rem .25rem;box-sizing:border-box;cursor:pointer;background:var(--sapButton_Lite_Background);border:1px solid var(--sapButton_Lite_BorderColor);color:var(--sapShell_TextColor);margin-inline-start:.125rem}.ui5-shellbar-logo:focus,.ui5-shellbar-logo-area:focus{outline:var(--_ui5_shellbar_logo_outline);outline-offset:calc(-1 * var(--sapContent_FocusWidth));border-radius:var(--_ui5_shellbar_logo_border_radius)}.ui5-shellbar-overflow-container>.ui5-shellbar-logo:hover,.ui5-shellbar-logo-area:hover{box-shadow:var(--_ui5_shellbar_button_box_shadow);border-radius:var(--_ui5_shellbar_logo_border_radius)}.ui5-shellbar-logo-area:active:focus{background:var(--sapShell_Active_Background);border:1px solid var(--sapButton_Lite_Active_BorderColor);color:var(--sapShell_Active_TextColor)}::slotted([slot="logo"]){max-height:1.875rem;padding-block:.0625rem;padding-inline:.25rem}::slotted([slot="logo"]):active{pointer-events:none}.ui5-shellbar-headings{display:flex;flex-direction:column;justify-content:center;height:100%;overflow:hidden;margin-inline-start:.25rem}.ui5-shellbar-primary-title,.ui5-shellbar-menu-button-title,.ui5-shellbar-title{display:inline-block;font-family:var(--sapFontSemiboldDuplexFamily);margin:0;font-size:var(--_ui5_shellbar_menu_button_title_font_size);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sapShell_SubBrand_TextColor)}.ui5-shellbar-secondary-title{display:flex;align-items:center;font-size:var(--sapFontSmallSize);color:var(--sapShell_TextColor);font-weight:400;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;text-align:start}.ui5-shellbar-menu-button{white-space:nowrap;overflow:hidden;display:flex;align-items:center;padding:.25rem .5rem;cursor:text;-webkit-user-select:text;-moz-user-select:text;user-select:text;margin-inline-start:.5rem;height:2.25rem;border:.0625rem solid var(--sapButton_Lite_BorderColor);background:var(--sapButton_Lite_Background);outline-color:var(--_ui5_shellbar_logo_outline_color);color:var(--sapShell_TextColor);box-sizing:border-box;border-radius:var(--_ui5_shellbar_button_border_radius);position:relative;font-weight:700}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive{-webkit-user-select:none;-moz-user-select:none;user-select:none;cursor:pointer;background:var(--sapButton_Lite_Background);border:var(--_ui5_shellbar_button_border);color:var(--sapShell_TextColor)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:hover{background:var(--sapShell_Hover_Background);border-color:var(--sapButton_Lite_Hover_BorderColor);color:var(--sapShell_TextColor);box-shadow:var(--_ui5_shellbar_button_box_shadow)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active{background:var(--sapShell_Active_Background);border-color:var(--sapButton_Lite_Active_BorderColor);color:var(--_ui5_shellbar_button_active_color);box-shadow:var(--_ui5_shellbar_button_box_shadow_active)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active .ui5-shellbar-menu-button-arrow,.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:active .ui5-shellbar-menu-button-title{color:var(--sapShell_Active_TextColor)}:host([desktop]) .ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:focus,.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive:focus-visible{outline:var(--_ui5_shellbar_logo_outline);outline-offset:var(--_ui5_shellbar_outline_offset)}.ui5-shellbar-menu-button.ui5-shellbar-menu-button--interactive::-moz-focus-inner{border:none}.ui5-shellbar-menu-button .ui5-shellbar-logo:hover{box-shadow:none}.ui5-shellbar-menu-button-arrow{display:inline-block;font-family:var(--sapFontSemiboldDuplexFamily);margin:0;font-size:var(--_ui5_shellbar_menu_button_title_font_size);color:var(--sapShell_SubBrand_TextColor)}.ui5-shellbar-menu-button--interactive .ui5-shellbar-menu-button-arrow{margin-inline-start:.375rem}:host(:not([primary-title])) .ui5-shellbar-menu-button{min-width:2.25rem;justify-content:center}:host(:not([with-logo])) .ui5-shellbar-menu-button{margin-inline-start:0}:host([breakpoint-size="S"]) .ui5-shellbar-menu-button{margin-inline-start:0}
 `;
 
 	/**
@@ -302,7 +302,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            e.preventDefault();
 	            return;
 	        }
-	        if (webcomponentsBase.b(e)) {
+	        if (webcomponentsBase.b$1(e)) {
 	            this.handleLogoClick();
 	        }
 	    }
@@ -391,6 +391,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	    /**
 	     * Auto-collapse/restore search field based on available space.
 	     * Delegates decision logic to SearchController.
+	     * Note: on non-desktop devices (phone/tablet), auto-expand is suppressed — expansion must come from an explicit user tap.
 	     */
 	    autoManageSearchState(hiddenItems, availableSpace) {
 	        if (!this.hasSearchField) {
@@ -408,7 +409,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        if (hiddenItems > 0 && !preventCollapse) {
 	            this.setSearchState(false);
 	        }
-	        else if (availableSpace + this.getSearchButtonSize() > searchFieldWidth) {
+	        else if (ManagedStyles.f$1() && availableSpace + this.getSearchButtonSize() > searchFieldWidth) {
 	            this.setSearchState(true);
 	        }
 	        this.initialRender = false;
@@ -551,7 +552,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        if (hiddenItems > 0 && !preventCollapse) {
 	            this.setSearchState(false);
 	        }
-	        else if (availableSpace + this.getSearchButtonSize() > searchFieldWidth) {
+	        else if (ManagedStyles.f$1() && availableSpace + this.getSearchButtonSize() > searchFieldWidth) {
 	            this.setSearchState(true);
 	        }
 	        this.initialRender = false;
@@ -773,7 +774,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 
 	class ShellBarAccessibility {
 	    getActionsAccessibilityAttributes(defaultTexts, params) {
-	        const { overflowPopoverOpen, accessibilityAttributes } = params;
+	        const { overflowPopoverOpen, accessibilityAttributes, showSearchField } = params;
 	        const overflowExpanded = accessibilityAttributes.overflow?.expanded;
 	        return {
 	            notifications: {
@@ -801,6 +802,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	                title: defaultTexts.search,
 	                accessibilityAttributes: {
 	                    hasPopup: accessibilityAttributes.search?.hasPopup,
+	                    expanded: accessibilityAttributes.search?.expanded !== undefined ? accessibilityAttributes.search.expanded : showSearchField,
 	                },
 	            },
 	            overflow: {
@@ -957,7 +959,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	 * @public
 	 * @since 0.8.0
 	 */
-	let ShellBar = ShellBar_1 = class ShellBar extends webcomponentsBase.S {
+	let ShellBar = ShellBar_1 = class ShellBar extends webcomponentsBase.b {
 	    constructor() {
 	        super(...arguments);
 	        /**
@@ -1461,6 +1463,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	        return this.accessibility.getActionsAccessibilityAttributes(this.texts, {
 	            overflowPopoverOpen: this.overflowPopoverOpen,
 	            accessibilityAttributes: this.accessibilityAttributes,
+	            showSearchField: this.showSearchField,
 	        });
 	    }
 	    get actionsRole() {
@@ -1683,7 +1686,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
 	            ResponsivePopover.Popover,
 	            ShellBarSpacer,
 	            ShellBarItem.ShellBarItem,
-	            ShellBarItem.ListItemStandard,
+	            ListItemStandard.ListItemStandard,
 	            // legacy dependencies
 	            Menu,
 	        ],

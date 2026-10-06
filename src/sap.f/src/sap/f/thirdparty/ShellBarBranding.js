@@ -29,7 +29,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
      * @public
      * @experimental
      */
-    let ShellBarBranding = class ShellBarBranding extends webcomponentsBase.S {
+    let ShellBarBranding = class ShellBarBranding extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**
@@ -68,7 +68,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
             this._activate(e);
         }
         _onkeydown(e) {
-            if (webcomponentsBase.b(e) && !this.href) {
+            if (webcomponentsBase.b$1(e) && !this.href) {
                 e.preventDefault();
                 this._getAnchor()?.click();
             }

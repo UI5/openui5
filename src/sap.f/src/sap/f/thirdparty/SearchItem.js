@@ -6,7 +6,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ListIte
                             parametersBundle_css.jsx(Icon.Icon, { class: "ui5-search-item-icon", name: this.icon }), this.scopeName &&
                             parametersBundle_css.jsx(Tag.Tag, { design: Tag.TagDesign.Set2, colorScheme: "10", children: this.scopeName }), parametersBundle_css.jsxs("div", { class: "ui5-search-item-titles-container", children: [parametersBundle_css.jsx("span", { part: "title", class: "ui5-search-item-text", dangerouslySetInnerHTML: { __html: this._markupText } }), parametersBundle_css.jsx("span", { part: "subtitle", class: "ui5-search-item-description", children: this.description })] }), parametersBundle_css.jsxs("div", { class: "ui5-search-item-actions-container", children: [this.hasActions &&
                                     parametersBundle_css.jsx("div", { class: "ui5-search-item-actions", children: parametersBundle_css.jsx("slot", { name: "actions" }) }), this.deletable &&
-                                    parametersBundle_css.jsx(Button.Button, { class: "ui5-search-item-selected-delete", design: Button.ButtonDesign.Transparent, icon: decline.decline, onClick: this._onDeleteButtonClick, tooltip: this._deleteButtonTooltip, onKeyDown: this._onDeleteButtonKeyDown })] })] }) }) }));
+                                    parametersBundle_css.jsx(Button.Button, { class: "ui5-search-item-selected-delete", design: Button.ButtonDesign.Transparent, icon: decline.declineIcon, onClick: this._onDeleteButtonClick, tooltip: this._deleteButtonTooltip, onKeyDown: this._onDeleteButtonKeyDown })] })] }) }) }));
     }
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -72,7 +72,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ListIte
             super._onkeydown(e);
             // Handle space/enter when focus is within action items
             if (this.getFocusDomRef().matches(":has(:focus-within)")) {
-                if (webcomponentsBase.A(e) || webcomponentsBase.b(e)) {
+                if (webcomponentsBase.A(e) || webcomponentsBase.b$1(e)) {
                     e.preventDefault();
                     return;
                 }
@@ -140,7 +140,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ListIte
             this.fireDecoratorEvent("delete");
         }
         _onDeleteButtonKeyDown(e) {
-            if (webcomponentsBase.A(e) || webcomponentsBase.b(e)) {
+            if (webcomponentsBase.A(e) || webcomponentsBase.b$1(e)) {
                 this.fireDecoratorEvent("delete");
             }
         }

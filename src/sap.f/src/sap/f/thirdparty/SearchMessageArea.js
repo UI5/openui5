@@ -24,7 +24,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/paramet
      * @since 2.9.0
      * @experimental
      */
-    let SearchMessageArea = class SearchMessageArea extends webcomponentsBase.S {
+    let SearchMessageArea = class SearchMessageArea extends webcomponentsBase.b {
     };
     __decorate([
         webcomponentsBase.s()

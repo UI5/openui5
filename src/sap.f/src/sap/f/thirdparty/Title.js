@@ -94,7 +94,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
      * **Note:** Although this slot accepts HTML Elements, it is strongly recommended that you only use text in order to preserve the intended design.
      * @public
      */
-    let Title = class Title extends webcomponentsBase.S {
+    let Title = class Title extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**
