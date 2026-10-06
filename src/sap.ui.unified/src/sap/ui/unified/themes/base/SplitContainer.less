@@ -7,9 +7,6 @@
 /* Base theme                                     */
 /* ============================================== */
 
-/* The animation duration must be in ms so it returns the correct integer value when used with parseInt */
-@_sap_ui_unified_SplitContainer_AnimationDuration: 500ms;
-
 .sapUiUfdSpltCont {
 	overflow: hidden;
 	position: relative;
@@ -20,10 +17,10 @@
 
 .sapUiUfdSpltContAnim .sapUiUfdSpltContCanvas,
 .sapUiUfdSpltContAnim .sapUiUfdSpltContPane {
-	transition: height @_sap_ui_unified_SplitContainer_AnimationDuration ease 0ms,
-				width @_sap_ui_unified_SplitContainer_AnimationDuration ease 0ms,
-				left @_sap_ui_unified_SplitContainer_AnimationDuration ease 0ms,
-				top @_sap_ui_unified_SplitContainer_AnimationDuration ease 0ms;
+	transition: height 500ms ease 0ms,
+				width 500ms ease 0ms,
+				left 500ms ease 0ms,
+				top 500ms ease 0ms;
 }
 
 .sapUiUfdSpltContPane {
