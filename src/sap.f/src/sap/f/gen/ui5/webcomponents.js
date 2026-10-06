@@ -13,7 +13,7 @@ sap.ui.define(
     // export the UI5 metadata along with the package
     pkg["_ui5metadata"] = {
       name: "sap/f/gen/ui5/webcomponents",
-      version: "2.23.2",
+      version: "2.27.2",
       dependencies: ["sap.ui.core"],
       types: [
         "sap.f.gen.ui5.webcomponents.dist.types.AvatarColorScheme",
@@ -102,6 +102,7 @@ sap.ui.define(
         "sap.f.gen.ui5.webcomponents.dist.MultiComboBox.IMultiComboBoxItem",
         "sap.f.gen.ui5.webcomponents.dist.SegmentedButton.ISegmentedButtonItem",
         "sap.f.gen.ui5.webcomponents.dist.Select.IOption",
+        "sap.f.gen.ui5.webcomponents.dist.Select.IOptionGroup",
         "sap.f.gen.ui5.webcomponents.dist.TabContainer.ITab",
         "sap.f.gen.ui5.webcomponents.dist.Table.ITableFeature",
         "sap.f.gen.ui5.webcomponents.dist.Table.ITableGrowing",
@@ -132,6 +133,7 @@ sap.ui.define(
         "sap.f.gen.ui5.webcomponents.dist.ColorPicker",
         "sap.f.gen.ui5.webcomponents.dist.ComboBox",
         "sap.f.gen.ui5.webcomponents.dist.ComboBoxItem",
+        "sap.f.gen.ui5.webcomponents.dist.ComboBoxItemCustom",
         "sap.f.gen.ui5.webcomponents.dist.ComboBoxItemGroup",
         "sap.f.gen.ui5.webcomponents.dist.DatePicker",
         "sap.f.gen.ui5.webcomponents.dist.DateRangePicker",
@@ -148,6 +150,7 @@ sap.ui.define(
         "sap.f.gen.ui5.webcomponents.dist.FormItem",
         "sap.f.gen.ui5.webcomponents.dist.Icon",
         "sap.f.gen.ui5.webcomponents.dist.Input",
+        "sap.f.gen.ui5.webcomponents.dist.InputIcon",
         "sap.f.gen.ui5.webcomponents.dist.Label",
         "sap.f.gen.ui5.webcomponents.dist.Link",
         "sap.f.gen.ui5.webcomponents.dist.List",
@@ -163,10 +166,13 @@ sap.ui.define(
         "sap.f.gen.ui5.webcomponents.dist.MonthPicker",
         "sap.f.gen.ui5.webcomponents.dist.MultiComboBox",
         "sap.f.gen.ui5.webcomponents.dist.MultiComboBoxItem",
+        "sap.f.gen.ui5.webcomponents.dist.MultiComboBoxItemCustom",
         "sap.f.gen.ui5.webcomponents.dist.MultiComboBoxItemGroup",
         "sap.f.gen.ui5.webcomponents.dist.MultiInput",
+        "sap.f.gen.ui5.webcomponents.dist.NumberInput",
         "sap.f.gen.ui5.webcomponents.dist.Option",
         "sap.f.gen.ui5.webcomponents.dist.OptionCustom",
+        "sap.f.gen.ui5.webcomponents.dist.OptionGroup",
         "sap.f.gen.ui5.webcomponents.dist.Panel",
         "sap.f.gen.ui5.webcomponents.dist.Popover",
         "sap.f.gen.ui5.webcomponents.dist.ProgressIndicator",
@@ -1905,6 +1911,16 @@ sap.ui.define(
        */
       Inactive: "Inactive",
       /**
+       * Indicates the list item does not have any active feedback when item is pressed,
+       * but the item can still be selected when a selection mode is active
+       * (via the item body, Space/Enter, or the checkbox/radio).
+       * The &#x60;item-click&#x60; event is not fired for items of this type.
+       *
+       * @private
+       * @ui5-restricted sap.ushell,sap.esh.search.ui
+       */
+      InactiveSelectable: "InactiveSelectable",
+      /**
        * Enables the type of navigation, which is specified to add an arrow at the end of the items and fires navigate-click event.
        *
        * @private
@@ -3343,6 +3359,15 @@ sap.ui.define(
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
     /**
+     * Interface for group containers slotted inside `ui5-select`
+     *
+     * @interface
+     * @name module:sap/f/gen/ui5/webcomponents/dist/Select.IOptionGroup
+     * @ui5-module-override sap/f/gen/ui5/webcomponents IOptionGroup
+     * @private
+     * @ui5-restricted sap.ushell,sap.esh.search.ui
+     */
+    /**
      * Interface for components that may be slotted inside `ui5-tabcontainer` as items
      *
      * **Note:** Use directly `ui5-tab` or `ui5-tab-seprator`. Implementing the interface does not guarantee that the class can work as a tab.
@@ -3376,6 +3401,8 @@ sap.ui.define(
      * Interface for the slotted item in `ui5-toolbar-item`.
      *
      * It could be any HTMLElement or UI5 Web Component with option to specify custom overflow closing events and overflow behavior.
+     * Components that also implement `IToolbarArrowNavProvider` can report their internal navigation boundary
+     * state to the toolbar for caret-aware arrow-key handling.
      *
      * @interface
      * @name module:sap/f/gen/ui5/webcomponents/dist/ToolbarItem.IToolbarItemContent

@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/Illustrations', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/Theme'], (function (exports, Illustrations, i18nDefaults, Theme) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/Illustrations', 'sap/f/thirdparty/i18n-defaults', 'sap/f/thirdparty/ManagedStyles'], (function (exports, Illustrations, i18nDefaults, ManagedStyles) { 'use strict';
 
 	var dialogSvg = `<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" id="sapIllus-Dialog-UnableToUpload">
 <rect y="50" width="160" height="69" rx="12" fill="var(--sapContent_Illustrative_Color20)"/>

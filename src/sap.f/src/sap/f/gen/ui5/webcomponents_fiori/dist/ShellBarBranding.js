@@ -28,7 +28,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.ShellBarBranding",
       {
         metadata: {
-          tag: "ui5-shellbar-branding-a1d68b0e",
+          tag: "ui5-shellbar-branding-77e31d2b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 

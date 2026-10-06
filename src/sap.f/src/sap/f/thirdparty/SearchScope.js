@@ -1,4 +1,4 @@
-sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Theme', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, Theme, Icons) { 'use strict';
+sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/ManagedStyles', 'sap/f/thirdparty/Icons'], (function (webcomponentsBase, ManagedStyles, Icons) { 'use strict';
 
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -17,7 +17,7 @@ sap.ui.define(['sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/Theme',
      * @since 2.9.0
      * @experimental
      */
-    let SearchScope = class SearchScope extends webcomponentsBase.S {
+    let SearchScope = class SearchScope extends webcomponentsBase.b {
         get stableDomRef() {
             return this.getAttribute("stable-dom-ref") || `${this._id}-stable-dom-ref`;
         }

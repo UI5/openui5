@@ -40,7 +40,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents.dist.MenuItem",
       {
         metadata: {
-          tag: "ui5-menu-item-a1d68b0e",
+          tag: "ui5-menu-item-77e31d2b",
 
           namespace: "sap.f.gen.ui5.webcomponents",
 
@@ -179,10 +179,15 @@ sap.ui.define(
             text: { type: "string", mapping: "property" },
             /**
              * Defines the visual indication and behavior of the list items.
-             * Available options are `Active` (by default), `Inactive`, `Detail` and `Navigation`.
+             * Available options are `Active` (by default), `Inactive`, `InactiveSelectable`, `Detail` and `Navigation`.
              *
              * **Note:** When set to `Active` or `Navigation`, the item will provide visual response upon press and hover,
-             * while with type `Inactive` and `Detail` - will not.
+             * while with type `Inactive`, `InactiveSelectable` and `Detail` - will not.
+             *
+             * **Note:** `InactiveSelectable` behaves like `Inactive` (no active press/hover feedback and the
+             * `item-click` event is not fired), but the item can still be selected. Clicking the item body,
+             * pressing Space/Enter, or interacting with the selection component (checkbox in Multi mode, radio
+             * button in Single modes) toggles the selection when the list has a selection mode.
              * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemType
              */
             type: {

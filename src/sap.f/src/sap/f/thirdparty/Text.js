@@ -1,4 +1,4 @@
-sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/Theme'], (function (exports, webcomponentsBase, jsxRuntime, parametersBundle_css, willShowContent, i18nDefaults, Theme) { 'use strict';
+sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdparty/jsx-runtime', 'sap/f/thirdparty/parameters-bundle.css', 'sap/f/thirdparty/willShowContent', 'sap/f/thirdparty/i18n-defaults2', 'sap/f/thirdparty/ManagedStyles'], (function (exports, webcomponentsBase, jsxRuntime, parametersBundle_css, willShowContent, i18nDefaults, ManagedStyles) { 'use strict';
 
     /**
      * Empty Indicator Mode.
@@ -26,8 +26,8 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
                         jsxRuntime.jsx("slot", {}) }) });
     }
 
-    Theme.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
-    Theme.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
+    ManagedStyles.f("@" + "ui5" + "/" + "webcomponents-theming", "sap_horizon", async () => jsxRuntime.defaultThemeBase);
+    ManagedStyles.f("@" + "u" + "i" + "5" + "/" + "w" + "e" + "b" + "c" + "o" + "m" + "p" + "o" + "n" + "e" + "n" + "t" + "s", "sap_horizon", async () => parametersBundle_css.defaultTheme, "host");
     var styles = `:host{max-width:100%;font-size:var(--sapFontSize);font-family:var(--sapFontFamily);color:var(--sapTextColor);line-height:normal;cursor:text;overflow:hidden;display:-webkit-inline-box;-webkit-line-clamp:var(--_ui5_text_max_lines);line-clamp:var(--_ui5_text_max_lines);-webkit-box-orient:vertical;white-space:normal;word-wrap:break-word}:host([max-lines="1"]){word-break:break-all}.empty-indicator-aria-label{position:absolute!important;clip:rect(1px,1px,1px,1px);user-select:none;left:0;top:0;font-size:0}
 `;
 
@@ -66,7 +66,7 @@ sap.ui.define(['exports', 'sap/f/thirdparty/webcomponents-fiori', 'sap/f/thirdpa
      * @public
      * @since 2.0.0
      */
-    let Text = Text_1 = class Text extends webcomponentsBase.S {
+    let Text = Text_1 = class Text extends webcomponentsBase.b {
         constructor() {
             super(...arguments);
             /**

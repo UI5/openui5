@@ -26,7 +26,7 @@ sap.ui.define(
       "sap.f.gen.ui5.webcomponents_fiori.dist.SearchItemGroup",
       {
         metadata: {
-          tag: "ui5-search-item-group-a1d68b0e",
+          tag: "ui5-search-item-group-77e31d2b",
 
           namespace: "sap.f.gen.ui5.webcomponents_fiori",
 
@@ -45,7 +45,7 @@ sap.ui.define(
              */
             headerAccessibleName: { type: "string", mapping: "property" },
             /**
-             * Defines the header text of the <code>ui5-li-group</code>.
+             * Defines the header text of the group.
              */
             headerText: { type: "string", mapping: "property" },
             /**
@@ -71,7 +71,7 @@ sap.ui.define(
 
           aggregations: {
             /**
-             * Defines the items of the <code>ui5-li-group</code>.
+             * Defines the items of the group.
              * @type module:sap/f/gen/ui5/webcomponents/dist/ListItemBase
              */
             items: {
