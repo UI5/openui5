@@ -1141,14 +1141,16 @@ sap.ui.define([
 						if (oParentAggregationOverlay === oAggregationOverlay) {
 							return;
 						}
-						// Re-parent only when the element's live parent matches this aggregation
-						// overlay — otherwise the existing attachment is authoritative.
 						const oChildElement = oChildElementOverlay.getElement();
+						if (!oChildElement || oChildElement.bIsDestroyed) {
+							return;
+						}
+						// The aggregation overlay is the authoritative home
+						// for its overlay. Re-parent unless the overlay is already correctly attached
+						// to the aggregation overlay for this very element and aggregation.
 						if (
-							oChildElement
-							&& !oChildElement.bIsDestroyed
-							&& oChildElement.getParent() === oElement
-							&& oChildElement.sParentAggregationName === sAggregationName
+							oParentAggregationOverlay.getElement() !== oElement
+							|| oParentAggregationOverlay.getAggregationName() !== sAggregationName
 						) {
 							oParentAggregationOverlay.removeAggregation("children", oChildElementOverlay, true);
 							oAggregationOverlay.addChild(oChildElementOverlay, true);
