@@ -419,6 +419,35 @@ sap.ui.define([
 			"jQuery.globalEval from variables should not be resolved");
 	});
 
+	QUnit.test("jQuery.getScript and jQuery._evalUrl should not be resolved", function(assert) {
+		assert.strictEqual(resolveReference("jQuery.getScript"), undefined,
+			"jQuery.getScript should not be resolved");
+		assert.strictEqual(resolveReference("jQuery._evalUrl"), undefined,
+			"jQuery._evalUrl should not be resolved");
+
+		// jQuery.getScript provided via variables should also be blocked
+		var oModule = {
+			loadScript: jQuery.getScript
+		};
+		assert.strictEqual(resolveReference("module.loadScript", {"module": oModule}), undefined,
+			"jQuery.getScript from variables should not be resolved");
+	});
+
+	/**
+	 * @deprecated
+	 */
+	QUnit.test("jQuery.sap.includeScript should not be resolved", function(assert) {
+		assert.strictEqual(resolveReference("jQuery.sap.includeScript"), undefined,
+			"jQuery.sap.includeScript should not be resolved");
+
+		// jQuery.sap.includeScript provided via variables should also be blocked
+		var oModule = {
+			load: jQuery.sap.includeScript
+		};
+		assert.strictEqual(resolveReference("module.load", {"module": oModule}), undefined,
+			"jQuery.sap.includeScript from variables should not be resolved");
+	});
+
 	/**
 	 * @deprecated
 	 */
