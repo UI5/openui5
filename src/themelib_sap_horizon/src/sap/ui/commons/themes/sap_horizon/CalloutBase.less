@@ -5,16 +5,16 @@
 
 .sapUiCltBase {
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 	color: var(--sapContent_ForegroundTextColor);
-	background-color: lighten(@sapUiContentForegroundColor, 10);
-	border: 4px solid lighten(@sapUiContentForegroundColor, 25);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l + 10))';
+	border: 4px solid ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l + 25))';
 	min-width: 40px;
 	min-height: 30px;
 }
 
 .sapUiCltBaseCont {
-	background-color: lighten(@sapUiContentForegroundColor, 10);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l + 10))';
 }
 
 .sapUiCltBaseArr {
@@ -23,7 +23,7 @@
 	height: 20px;
 	margin: 0;
 	padding: 0;
-	background-color: lighten(@sapUiContentForegroundColor, 10);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l + 10))';
 	position: absolute;
 	transform: rotate(45deg);
 	z-index: -1;
