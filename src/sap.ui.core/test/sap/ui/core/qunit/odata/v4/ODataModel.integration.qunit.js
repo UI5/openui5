@@ -30725,12 +30725,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// A context can still be expanded after a side-effects refresh (JIRA: CPOUI5ODATAV4-3284)
 	//
-	// Context#refresh of a single entity is still not allowed if visual grouping is used.
-	// JIRA: CPOUI5ODATAV4-3257
-	//
-	// Context#requestSideEffects for a single entity is still not allowed if visual grouping is
-	// used.
-	// JIRA: CPOUI5ODATAV4-3258
+	// Context#refresh and Context#requestSideEffects for a single entity are allowed if visual
+	// grouping is used. As a result, all subtotals are marked as outdated.
+	// JIRA: CPOUI5ODATAV4-3697
 	//
 	// Test #setKeepAlive w/ messages (JIRA: CPOUI5ODATAV4-3390)
 	// ODM/ODLB#getKeepAlive (w/ messages) (JIRA: CPOUI5ODATAV4-3259)
@@ -30759,6 +30756,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				$select : 'LocalCurrency'
 			}
 		}" threshold="0" visibleRowCount="3">
+	<Text id="isOutdated" text="{= %{@$ui5.context.isOutdated} }"/>
 	<Text id="country" text="{Country}"/>
 	<Text id="id" text="{Id}"/>
 	<Text id="name" text="{Name}"/>
@@ -30780,6 +30778,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					{Country : "C", Currency : "EUR", SalesAmount : "3"}
 				]
 			})
+			.expectChange("isOutdated", [undefined, undefined, undefined])
 			.expectChange("country", ["A", "B", "C"])
 			.expectChange("id", [null, null, null])
 			.expectChange("name", [null, null, null])
@@ -30899,6 +30898,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oContext26.getProperty("Name"), "Foo", "data still available");
 
 		this.expectChange("region", "Modified")
+			.expectChange("isOutdated", [true, true, true])
 			.expectRequest("PATCH BusinessPartners(26)", {
 				payload : {Region : "Modified"}
 			}, oNO_CONTENT);
@@ -30942,6 +30942,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				]
 			})
 			.expectChange("region", "Refreshed")
+			.expectChange("isOutdated", [undefined, undefined, undefined])
 			.expectChange("country", ["A refreshed", "B refreshed", "C refreshed"])
 			.expectChange("salesAmount", ["11", "22", "33"]);
 
@@ -31092,18 +31093,99 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		await this.waitForChanges(assert, "load more items of Country 'A'");
 
-		const sErrorMessage = "Unsupported for data aggregation with groupLevels: " + sODLB
-			+ ": /BusinessPartners";
-		assert.throws(() => {
-			// code under test (JIRA: CPOUI5ODATAV4-3257)
-			oContext26.refresh();
-		}, new Error(sErrorMessage));
+		this.expectChange("id", [null, "26", "24"])
+			.expectChange("name", [null, "Foo", "Baz"])
+			.expectChange("salesAmount", ["1", "61", "20"])
+			.expectChange("currency", []);
 
-		// code under test (JIRA: CPOUI5ODATAV4-3258)
-		await oContext26.requestSideEffects([""]).then(mustFail(assert),
-			function (oError) {
-				assert.strictEqual(oError.message, sErrorMessage);
-			});
+		// code under test
+		this.oView.byId("table").setFirstVisibleRow(0);
+
+		await Promise.all([
+			resolveLater(), // table update takes a moment
+			this.waitForChanges(assert, "scroll to top")
+		]);
+
+		const oContext26Data = {Country : "A", Currency : "EUR", Id : 26,
+			LocalCurrency : "DEM", Name : "Foo", Region : "Region", SalesAmount : "60",
+			myMessages : []};
+		const refresh = (bFirst) => {
+			this.expectRequest("#0 BusinessPartners?"
+					+ "$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount,myMessages"
+					+ "&$filter=Id eq 26", {
+					value : [{...oContext26Data}]
+				})
+				.expectRequest("#0 BusinessPartners"
+					+ "?$apply=groupby((Country),aggregate(SalesAmount,Currency))"
+					+ "&$count=true&$skip=0&$top=3", {
+					"@odata.count" : "26",
+					value : [
+						{Country : "A", Currency : "EUR", SalesAmount : "11"},
+						{Country : "B", Currency : "EUR", SalesAmount : "22"},
+						{Country : "C", Currency : "EUR", SalesAmount : "33"}
+					]
+				});
+			if (bFirst) {
+				// kept-alive element is updated before table is refreshed
+				this.expectChange("region", "Region")
+					.expectChange("salesAmount", [, "60"])
+					.expectChange("country", [, "B", "C"])
+					.expectChange("id", [, null, null])
+					.expectChange("name", [, null, null])
+					.expectChange("salesAmount", ["11", "22", "33"]);
+			} else {
+				this.expectChange("isOutdated", [undefined, undefined, undefined]);
+			}
+
+			return Promise.all([
+				// code under test
+				oListBinding.requestRefresh(),
+				this.waitForChanges(assert, "refresh list")
+			]);
+		};
+
+		await refresh(true);
+
+		this.expectChange("isOutdated", [true, true, true])
+			.expectRequest("BusinessPartners(26)"
+				+ "?$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount"
+				+ ",myMessages",
+				{...oContext26Data});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3697)
+			oContext26.requestRefresh(),
+			this.waitForChanges(assert, "requestRefresh for Id 26 -> subtotals get outdated")
+		]);
+
+		await refresh();
+
+		this.expectChange("isOutdated", [true, true, true])
+			.expectRequest("BusinessPartners(26)"
+				+ "?$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount"
+				+ ",myMessages",
+				{...oContext26Data});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3697)
+			oContext26.requestSideEffects([""]),
+			this.waitForChanges(assert, "requestSideEffects for Id 26 -> subtotals get outdated")
+		]);
+
+		await refresh();
+
+		this.expectChange("isOutdated", [true, true, true])
+			.expectRequest("BusinessPartners(26)?$select=Region", {
+				Region : "Region by requestSideEffects"
+			})
+			.expectChange("region", "Region by requestSideEffects");
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3697)
+			oContext26.requestSideEffects(["Region"]),
+			this.waitForChanges(assert,
+				"requestSideEffects (Region) for Id 26 -> subtotals get outdated")
+		]);
 	});
 
 	//*********************************************************************************************
