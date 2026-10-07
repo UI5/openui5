@@ -38,6 +38,12 @@ sap.ui.define([
 		const oUIArea = oControl && oControl.getUIArea && oControl.getUIArea();
 		if (oUIArea && !oControl._bInvalidationSuppressed) {
 			oControl._bInvalidationSuppressed = oUIArea.suppressInvalidationFor(oControl);
+			// Remember the UIArea on which the suppression was registered. The control may have left this
+			// UIArea by the time the invalidation is resumed (e.g. its Dialog was closed while _onModifications
+			// was still running). As the suppression state is owned by that UIArea instance, the resume must
+			// target the very same instance - re-deriving it via getUIArea() at resume time would miss it and
+			// leave the control suppressed (and thus not rerendered) forever.
+			oControl._oInvalidationSuppressedUIArea = oUIArea;
 		}
 	}
 
@@ -47,10 +53,33 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.Control} oControl
 	 */
 	function resumeInvalidation(oControl) {
-		const oUIArea = oControl && oControl.getUIArea && oControl.getUIArea();
+		const oUIArea = oControl && oControl._oInvalidationSuppressedUIArea;
 		if (oUIArea && oControl._bInvalidationSuppressed) {
 			oUIArea.resumeInvalidationFor(oControl);
 			delete oControl._bInvalidationSuppressed;
+		}
+		delete oControl._oInvalidationSuppressedUIArea;
+	}
+
+	function schedulePendingModification(oControl) {
+		if (!oControl._pPendingModification && oControl._onModifications instanceof Function) {
+			oControl._pPendingModification = (async function runCycle() {
+				try {
+					do {
+						await Engine.getInstance().waitForChanges(oControl);
+						const aAffectedControllerKeys = Engine.getInstance().getTrace(oControl);
+						Engine.getInstance().clearTrace(oControl);
+						Engine.getInstance().fireStateChange(oControl);
+						await oControl._onModifications(aAffectedControllerKeys);
+						resumeInvalidation(oControl);
+					} while (Engine.getInstance().getTrace(oControl)?.length);
+				} catch (oError) {
+					SAPLog.error(`Error during mdc flex handling: ${oError}`);
+					resumeInvalidation(oControl);
+				} finally {
+					delete oControl._pPendingModification;
+				}
+			}());
 		}
 	}
 
@@ -65,19 +94,7 @@ sap.ui.define([
 				}
 			});
 
-			if (!oControl._pPendingModification && oControl._onModifications instanceof Function) {
-				oControl._pPendingModification = Engine.getInstance().waitForChanges(oControl).then(async () => {
-					const aAffectedControllerKeys = Engine.getInstance().getTrace(oControl);
-					Engine.getInstance().clearTrace(oControl);
-					delete oControl._pPendingModification;
-					Engine.getInstance().fireStateChange(oControl);
-					await oControl._onModifications(aAffectedControllerKeys);
-					resumeInvalidation(oControl);
-				}).catch((oError) => {
-					SAPLog.error(`Error during mdc flex handling: ${oError}`);
-					resumeInvalidation(oControl);
-				});
-			}
+			schedulePendingModification(oControl);
 		}
 	}
 
