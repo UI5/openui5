@@ -140,16 +140,8 @@ sap.ui.define([
 	 * @private
 	 */
 	ObjectNumberRenderer.renderText = function(oRm, oON) {
-		var sUnit = oON.getUnit(),
-			bFormattedMode = oON.getDisplayMode() !== ObjectNumberDisplayMode.Default,
-			sNumber = bFormattedMode ? oON._getFormattedNumber() : oON.getNumber();
-
-		/**
-		 * @deprecated as of version 1.16.1
-		 */
-		if (!sUnit) {
-			sUnit = oON.getNumberUnit();
-		}
+		const bFormattedMode = oON.getDisplayMode() !== ObjectNumberDisplayMode.Default,
+			sNumber = oON._getFormattedNumber();
 
 		oRm.openStart("span", oON.getId() + "-number");
 		oRm.class("sapMObjectNumberText");
@@ -159,9 +151,7 @@ sap.ui.define([
 		oRm.openEnd();
 
 		oRm.text(sNumber);
-		if (sUnit !== "" && !bFormattedMode) {
-			oRm.text(" ");
-		}
+		oRm.text(oON._getSpaceSeparator());
 		oRm.close("span");
 	};
 
@@ -178,9 +168,6 @@ sap.ui.define([
 			oRm.openStart("span", oON.getId() + "-unit");
 			oRm.class("sapMObjectNumberUnit");
 			oRm.openEnd();
-			if (sDisplayMode === ObjectNumberDisplayMode.Unit) {
-				oRm.text(oON.constructor.FIGURE_SPACE);
-			}
 			oRm.text(sUnit);
 			oRm.close("span");
 		}
