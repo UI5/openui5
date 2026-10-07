@@ -319,6 +319,11 @@ sap.ui.define(['./util/EnvHelper', "sap/base/util/merge"], function (EnvHelper, 
 				module: "./mixin/DynamicPropertiesMixin.qunit",
 				sinon: true
 			},
+			"DeferredAggregationForwardMixin": {
+				group: "Mixin",
+				module: "./mixin/DeferredAggregationForwardMixin.qunit",
+				sinon: true
+			},
 			"PromiseMixin": {
 				group: "Mixin",
 				module: "./mixin/PromiseMixin.qunit",

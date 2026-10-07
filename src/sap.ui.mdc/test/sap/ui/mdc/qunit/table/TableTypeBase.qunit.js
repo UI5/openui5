@@ -1,11 +1,17 @@
-/* global QUnit */
+/* global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/mdc/Table",
-	"sap/ui/mdc/table/TableTypeBase"
+	"sap/ui/mdc/table/TableTypeBase",
+	"sap/m/library",
+	"sap/ui/mdc/table/utils/Personalization",
+	"sap/ui/qunit/utils/nextUIUpdate"
 ], function(
 	Table,
-	TableTypeBase
+	TableTypeBase,
+	MLibrary,
+	PersonalizationUtils,
+	nextUIUpdate
 ) {
 	"use strict";
 
@@ -43,6 +49,27 @@ sap.ui.define([
 
 	QUnit.test("#getTableStyleClasses", function(assert) {
 		assert.deepEqual(this.oTable.getType().getTableStyleClasses(), []);
+	});
+
+	QUnit.test("#createNoColumnsMessage", async function(assert) {
+		const oOpenSettingsDialogSpy = sinon.stub(PersonalizationUtils, "openSettingsDialog");
+		const oType = this.oTable.getType();
+		const oMessage = oType.createNoColumnsMessage();
+
+		assert.ok(oMessage.isA("sap.m.IllustratedMessage"), "Returns an IllustratedMessage");
+		assert.strictEqual(
+			oMessage.getIllustrationType(),
+			MLibrary.IllustratedMessageType.NoColumnsSet,
+			"illustration type is NoColumnsSet"
+		);
+
+		oMessage.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		oMessage.getAdditionalContent()[0].$().trigger("tap");
+		assert.ok(oOpenSettingsDialogSpy.calledOnceWith(this.oTable), "Pressing button opens settings dialog for the table");
+
+		oOpenSettingsDialogSpy.restore();
+		oMessage.destroy();
 	});
 
 	QUnit.module("Lifecycle of the ManagedObjectModel instance", {
