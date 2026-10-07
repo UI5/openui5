@@ -1159,7 +1159,7 @@ sap.ui.define([
 			}, this)
 		).then(function(aAggregationOverlays) {
 			aAggregationOverlays.forEach(function(oAggregationOverlay) {
-				// Yes, it's possible that during initialization original ElementOverlay dies. TODO: add test case
+				// Yes, it's possible that during initialization original ElementOverlay dies.
 				if (oElementOverlay.bIsDestroyed) {
 					oAggregationOverlay.destroy();
 				} else if (bIsTemplateAggregation) {
