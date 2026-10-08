@@ -11,7 +11,8 @@
   outline: none;
 }
 
-html.sap-desktop .sapMSliderProgress:focus:before {
+html.sap-desktop .sapMSliderProgress:focus:before,
+.sapMSliderProgress:focus-visible:before {
   border: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
   content: "";
   display: block;
