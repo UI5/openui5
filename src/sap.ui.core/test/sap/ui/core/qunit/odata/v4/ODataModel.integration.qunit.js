@@ -29565,6 +29565,194 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 });
 
 	//*********************************************************************************************
+	// Scenario: Data aggregation with visual grouping and a grand total shown at the bottom only. A
+	// new entity is created at the start of the list. The created entity is shown as a groupless
+	// leaf at the very top of the table, above the group levels. The grand total is updated after
+	// the create. Creating another entity at the end of start also works. After expanding and
+	// collapsing a group, the indices of all contexts are still correct.
+	// JIRA: CPOUI5ODATAV4-3683
+	QUnit.test("Data Aggregation: create with visual grouping", async function (assert) {
+		const oModel = this.createAggregationModel({autoExpandSelect : true});
+		const sView = `
+<Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>
+<t:Table id="table" rows="{
+			path : '/BusinessPartners',
+			parameters : {
+				$$aggregation : {
+					aggregate : {
+						SalesNumber : {grandTotal : true, subtotals : true}
+					},
+					grandTotalAtBottomOnly : true,
+					groupLevels : ['Country', 'Id']
+				}
+			}
+		}" threshold="0" visibleRowCount="5">
+	<Text text="{= %{@$ui5.node.isTotal} }"/>
+	<Text text="{= %{@$ui5.node.level} }"/>
+	<Text text="{Country}"/>
+	<Text text="{Id}"/>
+	<Text text="{SalesNumber}"/>
+</t:Table>`;
+
+		this.expectRequest("BusinessPartners?"
+				+ "$apply=concat(aggregate(SalesNumber),groupby((Country),aggregate(SalesNumber))"
+				+ "/concat(aggregate($count as UI5__count),top(5)))", {
+				value : [
+					{SalesNumber : 30},
+					{UI5__count : "2", "UI5__count@odata.type" : "#Decimal"},
+					{Country : "A", SalesNumber : 10},
+					{Country : "B", SalesNumber : 20}
+				]
+			})
+			.expectChange("isOutdatedHeader");
+
+		await this.createView(assert, sView, oModel);
+
+		const oTable = this.oView.byId("table");
+		const oListBinding = oTable.getBinding("rows");
+		checkTable("initial state", assert, oTable, [
+			"/BusinessPartners(Country='A')",
+			"/BusinessPartners(Country='B')",
+			"/BusinessPartners()"
+		], [ // isTotal|level|Country|Id|SalesNumber
+			[true, 1, "A", "", "10"],
+			[true, 1, "B", "", "20"],
+			[true, 0, "", "", "30"]
+		]);
+
+		this.expectChange("isOutdatedHeader", undefined);
+
+		this.oView.byId("isOutdatedHeader").setBindingContext(oListBinding.getHeaderContext());
+
+		await this.waitForChanges(assert, "set header context");
+
+		assert.throws(function () {
+			// code under test
+			oListBinding.create({}, /*bSkipRefresh*/true, /*bAtEnd*/true);
+		}, new Error("Must not create at end when using groupLevels: " + oListBinding));
+
+		this.expectChange("isOutdatedHeader", true)
+			.expectRequest("#0 POST BusinessPartners", {
+				payload : {Id : 3}
+			}, {
+				Country : "A",
+				Id : 3, // Edm.Int16
+				SalesNumber : 5
+			})
+			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+				value : [{SalesNumber : 35}]
+			});
+
+		// code under test
+		const oCreatedContext0 = oListBinding.create({Id : 3}, /*bSkipRefresh*/true);
+
+		await Promise.all([
+			oCreatedContext0.created(),
+			this.waitForChanges(assert, "create at start")
+		]);
+
+		checkTable("after create at start", assert, oTable, [
+			oCreatedContext0,
+			"/BusinessPartners(Country='A')",
+			"/BusinessPartners(Country='B')",
+			"/BusinessPartners()"
+		], [ // isTotal|level|Country|Id|SalesNumber
+			[false, 1, "A", "3", "5"],
+			[true, 1, "A", "", "10"],
+			[true, 1, "B", "", "20"],
+			[true, 0, "", "", "35"]
+		]);
+		assert.strictEqual(oCreatedContext0.getPath(), "/BusinessPartners(3)", "check predicate");
+
+		this.expectRequest("#0 POST BusinessPartners", {
+				payload : {Id : 4}
+			}, {
+				Country : "A",
+				Id : 4, // Edm.Int16
+				SalesNumber : 7
+			})
+			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+				value : [{SalesNumber : 42}]
+			});
+
+		// code under test
+		const oCreatedContext1 = oListBinding.create({Id : 4}, /*bSkipRefresh*/true,
+			/*bAtEnd*/true);
+
+		await Promise.all([
+			oCreatedContext1.created(),
+			this.waitForChanges(assert, "create at end of start")
+		]);
+
+		checkTable("after create at end of start", assert, oTable, [
+			oCreatedContext0,
+			oCreatedContext1,
+			"/BusinessPartners(Country='A')",
+			"/BusinessPartners(Country='B')",
+			"/BusinessPartners()"
+		], [ // isTotal|level|Country|Id|SalesNumber
+			[false, 1, "A", "3", "5"],
+			[false, 1, "A", "4", "7"],
+			[true, 1, "A", "", "10"],
+			[true, 1, "B", "", "20"],
+			[true, 0, "", "", "42"]
+		]);
+		assert.strictEqual(oCreatedContext1.getPath(), "/BusinessPartners(4)", "check predicate");
+
+		const oGroupA = oListBinding.getCurrentContexts()[2];
+
+		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A'"
+				+ "&$select=Country,Id,SalesNumber&$skip=0&$top=5", {
+				"@odata.count" : "1",
+				value : [
+					{Country : "A", Id : 1, SalesNumber : 8}
+					//TODO: return creaded entities
+				]
+			});
+
+		await Promise.all([
+			// code under test
+			oGroupA.expand(),
+			this.waitForChanges(assert, "expand 'A'")
+		]);
+
+		checkTable("after expand 'A'", assert, oTable, [
+			oCreatedContext0,
+			oCreatedContext1,
+			oGroupA,
+			"/BusinessPartners(1)",
+			"/BusinessPartners(Country='B')",
+			"/BusinessPartners()"
+		], [ // isTotal|level|Country|Id|SalesNumber
+			[false, 1, "A", "3", "5"],
+			[false, 1, "A", "4", "7"],
+			[true, 1, "A", "", "10"],
+			[false, 2, "A", "1", "8"],
+			[true, 1, "B", "", "20"]
+		]);
+
+		// code under test
+		oGroupA.collapse();
+
+		await this.waitForChanges(assert, "collapse 'A'");
+
+		checkTable("after collapse 'A'", assert, oTable, [
+			oCreatedContext0,
+			oCreatedContext1,
+			oGroupA,
+			"/BusinessPartners(Country='B')",
+			"/BusinessPartners()"
+		], [ // isTotal|level|Country|Id|SalesNumber
+			[false, 1, "A", "3", "5"],
+			[false, 1, "A", "4", "7"],
+			[true, 1, "A", "", "10"],
+			[true, 1, "B", "", "20"],
+			[true, 0, "", "", "42"]
+		]);
+		assertIndices(assert, oListBinding.getCurrentContexts(), [-2, -1, 0, 1, 2]);
+	});
+
+	//*********************************************************************************************
 	// Scenario: sap.ui.table.Table with aggregation and visual grouping.
 	// Expand and paging in parallel.
 	// JIRA: CPOUI5ODATAV4-336
@@ -30892,11 +31080,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			function (oError) {
 				assert.strictEqual(oError.message, sErrorMessage);
 			});
-
-		assert.throws(function () {
-			// code under test (JIRA: CPOUI5ODATAV4-3350)
-			oListBinding.create({}, /*bSkipRefresh*/true);
-		}, new Error(sErrorMessage));
 	});
 
 	//*********************************************************************************************
