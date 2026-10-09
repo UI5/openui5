@@ -20,17 +20,17 @@
 		}
 		& .sapMNCValue.WithoutMargin {
 			justify-content: flex-start;
-		}	
+		}
 	}
 
 .sapMGTCriticalBorder {
-    height: 100%;
-    width: 0.25rem;
-    position: absolute;
-    left: -1px;
-    top: -1px;
-    border-radius: 0.25rem 0 0 0.25rem;
-    border: 1px solid;
+	height: 100%;
+	width: 0.25rem;
+	position: absolute;
+	left: -1px;
+	top: -1px;
+	border-radius: var(--sapTile_BorderCornerRadius) 0 0 var(--sapTile_BorderCornerRadius);
+	border: 1px solid;
 }
 
 .sapMGTCriticalBorder.Neutral {
@@ -1522,13 +1522,13 @@ html[data-sap-ui-browser*='ff'] {
 	}
 
 	html[data-sap-ui-browser*='ff'] {
-		&.sapMGT.sapMGTHeaderMode > .sapMGTHdrContent .sapMTextMaxLine {
+		&.sapMGT.sapMGTHeaderMode .sapMGTHdrContent .sapMTextMaxLine {
 			max-height: 5.9rem !important;
 		}
 	}
 
 	html[data-sap-ui-browser*='ff'] {
-		&.sapMGT:not(.sapMGTHeaderMode) > .sapMGTHdrContent .sapMTextMaxLine {
+		&.sapMGT:not(.sapMGTHeaderMode) .sapMGTHdrContent .sapMTextMaxLine {
 			max-height: 3.54rem !important;
 		}
 	}
