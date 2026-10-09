@@ -5,12 +5,12 @@
 
 .sapUiAppHdr {
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 	box-shadow: 0 0 8px var(--sapContent_ShadowColor);
-	background-image: linear-gradient(top center, lighten(@sapUiContentForegroundColor, 46), lighten(@sapUiContentForegroundColor, 70));
+	background-image: ~'linear-gradient(top center, hsl(from var(--sapContent_ForegroundColor) h s calc(l + 46%)), hsl(from var(--sapContent_ForegroundColor) h s calc(l + 70%)))';
 	background-position: left top;
 	background-size: 100% 110px;
-	text-shadow: 1px 1px 2px darken(@sapUiContentShadowColor, 20);
+	text-shadow: ~'1px 1px 2px hsl(from var(--sapContent_ShadowColor) h s calc(l - 20%))';
 	color: var(--sapContent_ContrastTextColor);
 	border: 0px solid var(--sapBrandColor);
 	border-top-width: 8px;
@@ -40,6 +40,6 @@
 	vertical-align: top;
 	height: 10px;
 	width: 1px;
-	background-color: lighten(@sapUiContentForegroundBorderColor, 15);
+	background-color: ~'hsl(from var(--sapContent_ForegroundBorderColor) h s calc(l + 15%))';
 	margin: 4px 6px 0 6px;
 }
