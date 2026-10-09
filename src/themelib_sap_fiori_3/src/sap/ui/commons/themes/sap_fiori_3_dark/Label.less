@@ -5,7 +5,7 @@
 
 .sapUiLbl {
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 	color: var(--sapContent_LabelColor);
 }
 
@@ -13,12 +13,12 @@
 	font-size: 20px;
 	font-weight: bold;
 	vertical-align: middle;
-	color: lighten(@sapUiHighlight, 5%);
+	color: ~'hsl(from var(--sapHighlightColor) h s calc(l + 5))';
 }
 
 .sapUiInverted-CTX .sapUiLbl.sapUiLblReqEnd::after,
 .sapUiInverted-CTX .sapUiLbl.sapUiLblRegBeg::before {
-	color: darken(@sapUiHighlight, 18%);
+	color: ~'hsl(from var(--sapHighlightColor) h s calc(l - 18))';
 }
 
 span.sapUiLblIco { /* icon font */
@@ -40,7 +40,7 @@ html[data-sap-ui-browser^='cr'] .sapUiGrid td > .sapUiLbl.sapUiLblReq {
 
 /* required symbol is now left - if indicator is already at begin, don't change it */
 .sapUiInverted-CTX .sapUiLbl.sapUiLblReqEnd::before {
-	color: darken(@sapUiHighlight, 18%);
+	color: ~'hsl(from var(--sapHighlightColor) h s calc(l - 18))';
 }
 
 /* ResponsiveLayout */
