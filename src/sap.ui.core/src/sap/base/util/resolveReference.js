@@ -40,14 +40,17 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 		/**
 		 * @ui5-transform-hint replace-local false
 		 */
-		const bJQueryExtensionBlocklisted = oJQuery && oJQuery.sap && (vValue === oJQuery.sap.globalEval);
+		const bJQueryExtensionBlocklisted = oJQuery && oJQuery.sap && (
+			vValue === oJQuery.sap.globalEval
+			|| vValue === oJQuery.sap.includeScript
+		);
 
 		return bJQueryExtensionBlocklisted
 			// eslint-disable-next-line no-eval
 			|| vValue === eval || vValue === setTimeout || vValue === setInterval
 			|| (globalThis.document && (vValue === globalThis.document.write || vValue === globalThis.document.writeln))
 			|| (globalThis.location && (vValue === globalThis.location.assign || vValue === globalThis.location.replace))
-			|| (oJQuery && (vValue === oJQuery.globalEval));
+			|| (oJQuery && (vValue === oJQuery.globalEval || vValue === oJQuery.getScript || vValue === oJQuery._evalUrl));
 	}
 
 	/**
