@@ -6117,7 +6117,7 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @ui5-experimental-since 1.153
+	 * @ui5-experimental-since 1.154
 	 */
 	thisLib.NumericInputStepModeType = {
 
@@ -6142,7 +6142,7 @@ sap.ui.define([
 	 *
 	 * @enum {string}
 	 * @public
-	 * @ui5-experimental-since 1.153
+	 * @ui5-experimental-since 1.154
 	 */
 	thisLib.NumericInputValidationMode = {
 
