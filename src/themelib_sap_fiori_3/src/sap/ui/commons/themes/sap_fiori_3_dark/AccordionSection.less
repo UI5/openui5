@@ -5,19 +5,19 @@
 
 .sapUiAcdSection {
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 }
 
 .sapUiAcdSectionHdr {
-	color: lighten(@sapUiTextTitle, 6.5);
+	color: ~'hsl(from var(--sapTitleColor) h s calc(l + 6.5))';
 	background-color: var(--sapList_SelectionBackgroundColor);
 	min-height: 27px;
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 	border-bottom: 2px solid var(--sapContent_ForegroundBorderColor);
 }
 
 .sapUiAcdSectionColl .sapUiAcdSectionHdr {
-	background-color: darken(@sapUiContentForegroundColor, 10);
+	background-color:  ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l - 10))';
 }
 
 .sapUiAcdSectionHdr:hover {
@@ -26,8 +26,8 @@
 }
 
 .sapUiAcdSectionDis .sapUiAcdSectionHdr {
-	background-color: darken(@sapUiContentForegroundColor, 10);
-	color: lighten(@sapUiTextTitle, 6.5);
+	background-color:  ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l - 10))';
+	color: ~'hsl(from var(--sapTitleColor) h s calc(l + 6.5))';
 }
 
 .sapUiAcdSectionCont {
