@@ -113,6 +113,40 @@ sap.ui.define([
 		}
 	};
 
+	const oExample3Metric = {
+		"sap.app": {
+			"id": "qunit.analyticscloud.metric"
+		},
+		"sap.card": {
+			"type": "AnalyticsCloud",
+			"configuration": {
+				"parameters": {
+					"metricId": {
+						"value": "2FEAE57EEECA4DE484617D6F9B9528E2"
+					}
+				},
+				"destinations": {
+					"SAC": {
+						"name": "SAC",
+						"defaultUrl": "https://master-fpa135.master.canary.eu10.projectorca.cloud"
+					}
+				}
+			},
+			"content": {
+				"minHeight": "10rem",
+				"sacTenantDestination": "{{destinations.SAC}}",
+				"metric": {
+					"metricId": "{parameters>/metricId/value}"
+				},
+				"options": {
+					"attributes": {
+						"useHostTheme": true
+					}
+				}
+			}
+		}
+	};
+
 	QUnit.module("Widget rendering", {
 		beforeEach: function () {
 			this.fnIncludeScriptStub = sinon.stub(AnalyticsCloudHelper, "_includeScript");
@@ -129,6 +163,9 @@ sap.ui.define([
 							}),
 							renderWidget: sinon.stub(),
 							renderWidgetForJustAsk: sinon.stub()
+						},
+						metrics: {
+							renderMetric: sinon.stub()
 						}
 					}
 				};
@@ -140,6 +177,7 @@ sap.ui.define([
 			this.fnIncludeScriptStub.restore();
 			AnalyticsCloudHelper._pInitialize = null;
 			delete sap.sac.api.widget;
+			delete sap.sac.api.metrics;
 		}
 	});
 
@@ -232,6 +270,38 @@ sap.ui.define([
 		const oHeader2 = oResult2["sap.card"].header;
 		assert.strictEqual(oHeader2.title, "Gross Margin, Quantity sold per City", "Title is correct after second state change.");
 		assert.strictEqual(oHeader2.subTitle, "Year to date", "Subtitle is correct after second state change.");
+
+		// Clean up
+		oCard.destroy();
+	});
+
+	QUnit.test("Creating a card with a metric", async function (assert) {
+		// Arrange
+		const oCard = new Card({
+			manifest: oExample3Metric,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources"
+		});
+
+		// Act
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextCardReadyEvent(oCard);
+		await nextUIUpdate();
+
+		// Assert
+		const fnRenderMetric = sap.sac.api.metrics.renderMetric;
+		assert.ok(fnRenderMetric.calledOnce, "sap.sac.api.metrics.renderMetric was called only once.");
+
+		const oArgs = fnRenderMetric.firstCall.args;
+		assert.strictEqual(oArgs[0], oCard.getCardContent().getId() + "-widgetContainer", "Container id is correct.");
+		assert.strictEqual(oArgs[1].proxy, "https://master-fpa135.master.canary.eu10.projectorca.cloud", "Destination is correct.");
+		assert.strictEqual(oArgs[2], "2FEAE57EEECA4DE484617D6F9B9528E2", "Metric ID is correct.");
+		assert.strictEqual(typeof oArgs[3].renderComplete.onSuccess, "function", "options.renderComplete.onSuccess is a function");
+		assert.strictEqual(typeof oArgs[3].renderComplete.onFailure, "function", "options.renderComplete.onFailure is a function");
+		assert.strictEqual(oArgs[3].attributes.useHostTheme, true, "Metric options are forwarded.");
+
+		oArgs[3].renderComplete.onSuccess();
+		assert.notOk(oCard.getCardContent()._oLastConfig, "Last config is cleared after rendering.");
+		assert.notOk(sap.sac.api.widget.getWidgetInfo.called, "Widget info is not requested for a metric.");
 
 		// Clean up
 		oCard.destroy();
