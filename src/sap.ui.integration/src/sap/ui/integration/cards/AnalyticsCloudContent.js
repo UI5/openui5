@@ -114,7 +114,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Creates Widgets' chart inside the card content.
+	 * Creates Analytics Cloud content inside the card.
 	 */
 	AnalyticsCloudContent.prototype._renderWidget = function () {
 		if (this._bIsBeingDestroyed) {
@@ -143,6 +143,7 @@ sap.ui.define([
 
 		const sContainerId = this._oWidgetContainer.getId();
 		const oWidget = oConfig?.widget;
+		const oMetric = oConfig?.metric;
 		const vInterpretation = oConfig?.interpretation;
 		const oOptions = this._getOptions(oConfig);
 
@@ -162,6 +163,18 @@ sap.ui.define([
 				oWidget.widgetId,
 				oOptions
 			);
+		} else if (oMetric) {
+			if (!sap.sac.api.metrics?.renderMetric) {
+				this._showError("Object sap.sac.api.metrics.renderMetric not found on the page.");
+				return;
+			}
+
+			sap.sac.api.metrics.renderMetric(
+				sContainerId,
+				{ proxy: oConfig.sacTenantDestination },
+				oMetric.metricId,
+				oOptions
+			);
 		} else if (vInterpretation) {
 			sap.sac.api.widget.renderWidgetForJustAsk(
 				sContainerId,
@@ -170,7 +183,7 @@ sap.ui.define([
 				oOptions
 			);
 		} else {
-			this._showError("Required configuration /sap.card/content/widget or /sap.card/content/interpretation was not found or is empty.");
+			this._showError("Required configuration /sap.card/content/widget, /sap.card/content/metric, or /sap.card/content/interpretation was not found or is empty.");
 		}
 	};
 
@@ -203,7 +216,12 @@ sap.ui.define([
 
 		oOptions.attributes = Object.assign({}, oDefaultAttributes, oOptions.attributes);
 
-		oOptions.renderComplete = {
+		const bIsMetric = !oConfig.widget && !!oConfig.metric;
+
+		oOptions.renderComplete = bIsMetric ? {
+			onSuccess: this._onMetricSuccess.bind(this),
+			onFailure: this._onMetricFailure.bind(this)
+		} : {
 			onSuccess: this._onWidgetSuccess.bind(this),
 			onFailure: this._onWidgetFailure.bind(this)
 		};
@@ -244,6 +262,45 @@ sap.ui.define([
 		Log.error(sError, this);
 
 		this._updateWidgetInfo();
+	};
+
+	/**
+	 * Handles successful metric rendering.
+	 */
+	AnalyticsCloudContent.prototype._onMetricSuccess = function () {
+		const sMetricId = this._getResolvedConfiguration()?.metric?.metricId;
+
+		Log.info(`Metric rendered successfully: ${sMetricId}`, this);
+		this._completeMetricRendering();
+	};
+
+	/**
+	 * Handles failed metric rendering.
+	 * @param {Error|Object|string|null} vError The error returned by the metric renderer.
+	 */
+	AnalyticsCloudContent.prototype._onMetricFailure = function (vError) {
+		const sMetricId = this._getResolvedConfiguration()?.metric?.metricId;
+		let sError = `There was a failure in sap.sac.api.metrics.renderMetric with metricId ${sMetricId}.`;
+
+		if (vError instanceof Error) {
+			sError += " " + vError.toString();
+			Log.error(vError.stack);
+		} else if (typeof vError === "object") {
+			sError += " " + JSON.stringify(vError);
+		} else if (vError) {
+			sError += " " + vError;
+		}
+
+		Log.error(sError, this);
+		this._completeMetricRendering();
+	};
+
+	/**
+	 * Completes metric rendering without requesting widget metadata.
+	 */
+	AnalyticsCloudContent.prototype._completeMetricRendering = function () {
+		this._oLastConfig = null;
+		this.getCardInstance().scheduleFireStateChanged();
 	};
 
 	/**
