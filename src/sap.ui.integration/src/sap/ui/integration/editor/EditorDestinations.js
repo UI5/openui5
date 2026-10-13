@@ -159,7 +159,13 @@ sap.ui.define([
 					}, 100);
 					Log.error("sap.ui.integration.editor.Editor: can not get destinations list from '" + oHost.getId() + "'.");
 				});
+			} else {
+				// no host — destinations cannot be loaded
+				oEditor.fireDestinationReady();
 			}
+		} else {
+			// no destinations configured in ADMIN/ALL mode
+			oEditor.fireDestinationReady();
 		}
 	};
 
@@ -167,8 +173,9 @@ sap.ui.define([
 	 * Deletes destination settings if mode is NOT admin or all.
 	 *
 	 * @param {sap.ui.integration.Designtime} oDesigntimeInstance
+	 * @param {sap.ui.integration.editor.Editor} oEditor
 	 */
-	EditorDestinations.deleteDestinationSettings = function (oDesigntimeInstance) {
+	EditorDestinations.deleteDestinationSettings = function (oDesigntimeInstance, oEditor) {
 		var oSettings = oDesigntimeInstance.getSettings();
 		oSettings.form = oSettings.form || {};
 		oSettings.form.items = oSettings.form.items || {};
@@ -179,6 +186,8 @@ sap.ui.define([
 				delete oSettings.form.items[n];
 			}
 		}
+		// no destination UI in this mode
+		oEditor.fireDestinationReady();
 	};
 
 	return EditorDestinations;

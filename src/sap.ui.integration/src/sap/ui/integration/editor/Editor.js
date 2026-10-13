@@ -198,6 +198,7 @@ sap.ui.define([
 				manifestReady: {},
 				fieldReady: {},
 				destinationReady: {},
+				fieldDataReady: {},
 				childTreeDataReady: {},
 				UIReady: {},
 				ready: {}
@@ -248,6 +249,7 @@ sap.ui.define([
 			"request",
 			"getModel"
 		]);
+		this._initReadyState();
 	};
 
 	Editor.prototype.getParameters = function () {
@@ -287,6 +289,58 @@ sap.ui.define([
 	 */
 	Editor.prototype.isFieldReady = function () {
 		return this._fieldReady;
+	};
+
+	/**
+	 * Registers a one-time listener for sEvent and pushes a resolving Promise onto _aReadyPromises.
+	 */
+	Editor.prototype._awaitEvent = function (sEvent) {
+		this._aReadyPromises.push(new Promise((resolve) => {
+			this.attachEventOnce(sEvent, resolve);
+		}));
+	};
+
+	/**
+	 * Initialises the ready-state promise array and wires up the single gate that
+	 * fires the public "ready" event.  Must be called at init and at every re-init
+	 * (setJson / cleanAndReset) so that a stale in-flight promise cannot fire after
+	 * the editor has been reconfigured.
+	 */
+	Editor.prototype._initReadyState = function () {
+		this._aReadyPromises = [];
+		this._aFieldDataReadyPromise = [];
+		this._bDestinationReady = false;
+		var aReadyPromises = this._aReadyPromises;
+		this._awaitEvent("fieldReady");
+		this._awaitEvent("destinationReady");
+		this._awaitEvent("UIReady");
+		this._awaitEvent("fieldDataReady");
+		this._awaitEvent("childTreeDataReady");
+		this.attachEventOnce("destinationReady", () => {
+			this._bDestinationReady = true;
+		});
+		Promise.all(this._aReadyPromises).then(() => {
+			if (aReadyPromises === this._aReadyPromises) {
+				this._onReady();
+			}
+		});
+	};
+
+	/**
+	 * Resets the ready flags and promises.
+	 */
+	Editor.prototype._clearReadyState = function () {
+		this._ready = false;
+		this._fieldReady = false;
+		this._bChildTreeDataFired = false;
+		this._bDestinationReady = false;
+		this._aReadyPromises = [];
+		this._aFieldDataReadyPromise = [];
+	};
+
+	Editor.prototype._onReady = function () {
+		this._ready = true;
+		this.fireReady();
 	};
 
 	Editor.prototype.hasPreview = function() {
@@ -347,6 +401,7 @@ sap.ui.define([
 			}
 			this._aAppliedLayerChanges = vIdOrSettings.manifestChanges;
 
+			this._initReadyState();
 			this.createManifest(vIdOrSettings, bSuppress);
 		}
 	};
@@ -644,6 +699,10 @@ sap.ui.define([
 			this._iZIndex = getHigherZIndex(this.getDomRef());
 			Popup.setInitialZIndex(this._iZIndex);
 		}
+
+		if (this.isFieldReady() && !this.isReady()) {
+			this.fireUIReady();
+		}
 	};
 
 	/**
@@ -668,12 +727,13 @@ sap.ui.define([
 		if (!sDesigntime) {
 			sDesigntime = that._oManifest.get("/" + that.getSection() + "/designtime");
 		}
-		if (!that._oChildTree) {
-			// create Child editors tree if Child editors are defined and tree not created yet
-			var oChildEditors = that._oManifest.get(sConfigurationPath + "/childCards");
-			if (oChildEditors && typeof oChildEditors === "object") {
-				EditorChildTree.createChildTree(that, oChildEditors);
-			}
+		const oChildEditors = that._oManifest.get(sConfigurationPath + "/childCards");
+		const bHasChildEditors = oChildEditors && typeof oChildEditors === "object";
+		if (!that._oChildTree && bHasChildEditors) {
+			EditorChildTree.createChildTree(that, oChildEditors);
+		} else {
+			// no child editors, or the tree already exists
+			that.fireChildTreeDataReady();
 		}
 		//load the designtime control and bundles lazy
 		var	oConfiguration = that._oManifestModel.getProperty(sConfigurationPath),
@@ -718,7 +778,7 @@ sap.ui.define([
 				EditorDestinations.addDestinationSettings(that, oConfiguration, oDesigntime, that._oResourceBundle);
 			} else {
 				//delete destination settings in dt for other modes
-				EditorDestinations.deleteDestinationSettings(oDesigntime);
+				EditorDestinations.deleteDestinationSettings(oDesigntime, that);
 			}
 			//create a settings model
 			that._oSettingsModel = new JSONModel(that._oDesigntimeInstance.getSettings());
@@ -1204,9 +1264,7 @@ sap.ui.define([
 
 		// destory preview
 		this._destoryPreview();
-
-		this._ready = false;
-		this._fieldReady = false;
+		this._clearReadyState();
 	};
 
 	/**

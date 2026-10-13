@@ -449,7 +449,11 @@ sap.ui.define([
 
 	EditorQunitUtils.isDestinationReady = function(oEditor) {
 		return new Promise(function(resolve) {
-			oEditor.attachDestinationReady(function() {
+			if (oEditor._bDestinationReady) {
+				resolve();
+				return;
+			}
+			oEditor.attachEventOnce("destinationReady", function() {
 				resolve();
 			});
 		});
