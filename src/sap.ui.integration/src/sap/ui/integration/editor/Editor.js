@@ -17,9 +17,7 @@ sap.ui.define([
 	"sap/m/Popover",
 	"sap/base/Log",
 	"sap/ui/core/Popup",
-	"sap/ui/dom/includeStylesheet",
 	"sap/base/util/LoaderExtensions",
-	"sap/ui/core/theming/Parameters",
 	"sap/m/MessageStrip",
 	"./Manifest",
 	"./Merger",
@@ -47,9 +45,7 @@ sap.ui.define([
 	Popover,
 	Log,
 	Popup,
-	includeStylesheet,
 	LoaderExtensions,
-	Parameters,
 	MessageStrip,
 	Manifest,
 	Merger,
@@ -1212,6 +1208,7 @@ sap.ui.define([
 		return EditorTranslation.getCurrentLanguageSpecificText(this, sKey);
 	};
 
+	// TODO: check if document.body vars here and in CardPreview can be replaced with inline styles in the renderers, and setHeight/setWidth overrides removed
 	Editor.prototype.setHeight = function(sValue) {
 		if (sValue) {
 			this.setProperty("height", sValue);
@@ -1333,57 +1330,15 @@ sap.ui.define([
 	//map of language strings in their actual language representation, initialized in Editor.init
 	Editor._oLanguages = {};
 
-	//theming from parameters to css valiables if css variables are not turned on
-	//find out if css vars are turned on
-	Editor._appendThemeVars = function () {
-		//if (!window.getComputedStyle(document.documentElement).getPropertyValue('--sapBackgroundColor')) {
-		var aVars = [
-			"sapUiButtonHoverBackground",
-			"sapUiBaseBG",
-			"sapUiContentLabelColor",
-			"sapUiTileSeparatorColor",
-			"sapUiHighlight",
-			"sapUiListSelectionBackgroundColor",
-			"sapUiNegativeText",
-			"sapUiCriticalText",
-			"sapUiPositiveText",
-			"sapUiChartScrollbarBorderColor"
-		];
-		var mParams = Parameters.get({
-			name: aVars,
-			callback: function (_params) {
-			   // this will only be called if params weren’t available synchronously
-			}
-		});
-		if (mParams) {
-			for (var n in mParams) {
-				document.body.style.setProperty("--" + n, mParams[n]);
-			}
-		}
-		//}
-	};
-
 	//initializes global settings
 	Editor.init = function () {
 		this.init = function () { }; //replace self
 
-		//add theming variables if css vars are not turned on
-		Editor._appendThemeVars();
-
-		var sCssURL = sap.ui.require.toUrl("sap.ui.integration.editor.css.Editor".replace(/\./g, "/") + ".css");
-		includeStylesheet(sCssURL);
 		Editor._oLanguages = LoaderExtensions.loadResource("sap/ui/integration/editor/languages.json", {
 			dataType: "json",
 			failOnError: false,
 			async: false
 		});
-	};
-
-	/**
-	 * attach theme changes
-	 */
-	Editor.prototype.onThemeChanged = function () {
-		Editor._appendThemeVars();
 	};
 
 	Editor.init();
