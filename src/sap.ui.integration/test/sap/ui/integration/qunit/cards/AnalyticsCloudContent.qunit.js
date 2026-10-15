@@ -113,6 +113,68 @@ sap.ui.define([
 		}
 	};
 
+	const oExampleGenericRender = {
+		"sap.app": {
+			"id": "qunit.analyticscloud.genericrender"
+		},
+		"sap.card": {
+			"type": "AnalyticsCloud",
+			"configuration": {
+				"parameters": {
+					"metricId": {
+						"value": "2FEAE57EEECA4DE484617D6F9B9528E2"
+					}
+				},
+				"destinations": {
+					"SAC": {
+						"name": "SAC",
+						"defaultUrl": "https://master-fpa135.master.canary.eu10.projectorca.cloud"
+					}
+				}
+			},
+			"content": {
+				"minHeight": "10rem",
+				"sacTenantDestination": "{{destinations.SAC}}",
+				"render": {
+					"api": "metrics.renderMetric",
+					"args": ["{parameters>/metricId/value}"],
+					"completion": "none"
+				},
+				"options": {
+					"attributes": {
+						"useHostTheme": true
+					}
+				}
+			}
+		}
+	};
+
+	const oExampleDisallowedRender = {
+		"sap.app": {
+			"id": "qunit.analyticscloud.disallowedrender"
+		},
+		"sap.card": {
+			"type": "AnalyticsCloud",
+			"configuration": {
+				"destinations": {
+					"SAC": {
+						"name": "SAC",
+						"defaultUrl": "https://master-fpa135.master.canary.eu10.projectorca.cloud"
+					}
+				}
+			},
+			"content": {
+				"minHeight": "10rem",
+				"sacTenantDestination": "{{destinations.SAC}}",
+				"render": {
+					"api": "widget.evalArbitrary",
+					"args": [],
+					"completion": "none"
+				}
+			}
+		}
+	};
+
 	QUnit.module("Widget rendering", {
 		beforeEach: function () {
 			this.fnIncludeScriptStub = sinon.stub(AnalyticsCloudHelper, "_includeScript");
@@ -129,6 +191,9 @@ sap.ui.define([
 							}),
 							renderWidget: sinon.stub(),
 							renderWidgetForJustAsk: sinon.stub()
+						},
+						metrics: {
+							renderMetric: sinon.stub()
 						}
 					}
 				};
@@ -140,6 +205,7 @@ sap.ui.define([
 			this.fnIncludeScriptStub.restore();
 			AnalyticsCloudHelper._pInitialize = null;
 			delete sap.sac.api.widget;
+			delete sap.sac.api.metrics;
 		}
 	});
 
@@ -232,6 +298,59 @@ sap.ui.define([
 		const oHeader2 = oResult2["sap.card"].header;
 		assert.strictEqual(oHeader2.title, "Gross Margin, Quantity sold per City", "Title is correct after second state change.");
 		assert.strictEqual(oHeader2.subTitle, "Year to date", "Subtitle is correct after second state change.");
+
+		// Clean up
+		oCard.destroy();
+	});
+
+	QUnit.test("Creating a card with a generic render descriptor", async function (assert) {
+		// Arrange
+		const oCard = new Card({
+			manifest: oExampleGenericRender,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources"
+		});
+
+		// Act
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextCardReadyEvent(oCard);
+		await nextUIUpdate();
+
+		// Assert — the generic descriptor resolves to sap.sac.api.metrics.renderMetric
+		const fnRenderMetric = sap.sac.api.metrics.renderMetric;
+		assert.ok(fnRenderMetric.calledOnce, "sap.sac.api.metrics.renderMetric was called only once.");
+
+		const oArgs = fnRenderMetric.firstCall.args;
+		assert.strictEqual(oArgs[0], oCard.getCardContent().getId() + "-widgetContainer", "Card supplies the container id.");
+		assert.strictEqual(oArgs[1].proxy, "https://master-fpa135.master.canary.eu10.projectorca.cloud", "Card supplies the proxy destination.");
+		assert.strictEqual(oArgs[2], "2FEAE57EEECA4DE484617D6F9B9528E2", "Bound literal arg (metric id) is forwarded.");
+		assert.strictEqual(typeof oArgs[3].renderComplete.onSuccess, "function", "Card supplies renderComplete.onSuccess.");
+		assert.strictEqual(typeof oArgs[3].renderComplete.onFailure, "function", "Card supplies renderComplete.onFailure.");
+		assert.strictEqual(oArgs[3].attributes.useHostTheme, true, "Card supplies the options.");
+
+		oArgs[3].renderComplete.onSuccess();
+		assert.notOk(oCard.getCardContent()._oLastConfig, "Last config is cleared after rendering.");
+		assert.notOk(sap.sac.api.widget.getWidgetInfo.called, "completion 'none' does not request widget info.");
+
+		// Clean up
+		oCard.destroy();
+	});
+
+	QUnit.test("A render descriptor with a disallowed API is rejected", async function (assert) {
+		// Arrange
+		const oCard = new Card({
+			manifest: oExampleDisallowedRender,
+			baseUrl: "test-resources/sap/ui/integration/qunit/testResources"
+		});
+
+		// Act
+		oCard.placeAt(DOM_RENDER_LOCATION);
+		await nextCardReadyEvent(oCard);
+		await nextUIUpdate();
+
+		// Assert — nothing is invoked; the card errors instead of calling an arbitrary function
+		assert.notOk(sap.sac.api.widget.renderWidget.called, "renderWidget was not called.");
+		assert.notOk(sap.sac.api.widget.renderWidgetForJustAsk.called, "renderWidgetForJustAsk was not called.");
+		assert.notOk(sap.sac.api.metrics.renderMetric.called, "renderMetric was not called.");
 
 		// Clean up
 		oCard.destroy();
