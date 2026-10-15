@@ -23,8 +23,9 @@ sap.ui.define([
 	"sap/ui/layout/BlockLayoutRow",
 	"sap/ui/layout/form/SimpleForm",
 	"sap/ui/layout/library",
-	"sap/ui/layout/form/ResponsiveGridLayout" // provides form layout
-], function(App, Button, CheckBox, Input, Label, mobileLibrary, Link, List, Page, Select, SplitApp, StandardListItem, Text, TextArea, Element, Icon, Item, Title, Device, BlockLayout, BlockLayoutCell, BlockLayoutRow, SimpleForm, layoutLibrary) {
+	"sap/ui/layout/form/ResponsiveGridLayout", // provides form layout
+	"sap/m/PageAccessibleLandmarkInfo"
+], function(App, Button, CheckBox, Input, Label, mobileLibrary, Link, List, Page, Select, SplitApp, StandardListItem, Text, TextArea, Element, Icon, Item, Title, Device, BlockLayout, BlockLayoutCell, BlockLayoutRow, SimpleForm, layoutLibrary, PageAccessibleLandmarkInfo) {
 	"use strict";
 
 	var BackgroundDesign = layoutLibrary.BackgroundDesign;
@@ -227,7 +228,7 @@ sap.ui.define([
 		aDetailPages.push(fnCreatePage(sLayoutType, fnCreateBlockLayout(sLayoutType, sTextLorem)));
 	});
 
-	new SplitApp({
+	const oSplitApp = new SplitApp({
 		id: "block-layout-demo",
 		masterPages: [new Page({
 			title: "Navigation",
@@ -235,5 +236,16 @@ sap.ui.define([
 			content: [new List({items: aMasterPageItems})]
 		})],
 		detailPages: aDetailPages
-	}).placeAt("content");
+	});
+
+	const oOuterApp = new App({ initialPage: "blockLayoutOuterPage" });
+	oOuterApp.addPage(new Page("blockLayoutOuterPage", {
+		title: "BlockLayout Accessibility Test Page",
+		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None", contentRole: "Main", headerRole: "Region", headerLabel: "BlockLayout Accessibility Test Page Header"
+		}),
+		content: [oSplitApp]
+	}));
+	oOuterApp.placeAt("content");
 });

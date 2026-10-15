@@ -7,8 +7,9 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/m/NotificationList",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/App"
-], function(NotificationListItem, coreLibrary, Button, mobileLibrary, MessageToast, JSONModel, NotificationList, Page, App) {
+], function(NotificationListItem, coreLibrary, Button, mobileLibrary, MessageToast, JSONModel, NotificationList, Page, PageAccessibleLandmarkInfo, App) {
 	"use strict";
 
 	// shortcut for sap.m.ButtonType
@@ -168,6 +169,12 @@ sap.ui.define([
 
 	var page = new Page("page", {
 		title: "NotificationItem Accessibility Test Page",
+		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Main",
+			headerRole: "Region", headerLabel: "NotificationListItem Accessibility Test Page Header"
+		}),
 		content: [list]
 	});
 

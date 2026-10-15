@@ -8,8 +8,9 @@ sap.ui.define([
 	"sap/m/Avatar",
 	"sap/m/Button",
 	"sap/ui/core/library",
-	"sap/m/Page"
-], function(App, QuickView, mobileLibrary, QuickViewPage, QuickViewGroup, QuickViewGroupElement, Avatar, Button, coreLibrary, Page) {
+	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo"
+], function(App, QuickView, mobileLibrary, QuickViewPage, QuickViewGroup, QuickViewGroupElement, Avatar, Button, coreLibrary, Page, PageAccessibleLandmarkInfo) {
 	"use strict";
 
 	// shortcut for sap.ui.core.aria.HasPopup
@@ -120,6 +121,11 @@ sap.ui.define([
 	var page = new Page("quickViewPage", {
 		title : "Quick View",
 		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Main",
+			headerRole: "Region", headerLabel: "QuickView Accessibility Test Page Header"
+		}),
 		content : [
 			oSinglePageQuickViewButton,
 			oButton2

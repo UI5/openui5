@@ -3,6 +3,7 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/m/CheckBox",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/SelectDialog",
 	"sap/m/StandardListItem",
 	"sap/m/Toolbar",
@@ -18,6 +19,7 @@ sap.ui.define([
 	Button,
 	CheckBox,
 	Page,
+	PageAccessibleLandmarkInfo,
 	SelectDialog,
 	StandardListItem,
 	Toolbar,
@@ -180,6 +182,13 @@ sap.ui.define([
 
 	var oPage = new Page("page", {
 		title: "SelectDialog Accessibility Test Page",
+		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Main",
+			headerRole: "Region", headerLabel: "SelectDialog Accessibility Test Page Header",
+			footerRole: "Region", footerLabel: "SelectDialog Accessibility Test Page Footer"
+		}),
 		content: [
 			new VBox({
 				items: [

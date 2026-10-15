@@ -3,9 +3,10 @@ sap.ui.define([
 	"sap/m/VBox",
 	"sap/ui/core/HTML",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/App",
 	"sap/ui/integration/ActionDefinition"
-], function(Card, VBox, HTML, Page, App, ActionDefinition) {
+], function(Card, VBox, HTML, Page, PageAccessibleLandmarkInfo, App, ActionDefinition) {
 	"use strict";
 
 	var oListCardInteractive_Manifest = {
@@ -754,6 +755,13 @@ sap.ui.define([
 	});
 
 	var oPage = new Page("myPage", {
+		title: "Card Accessibility Test Page",
+		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Main",
+			headerRole: "Region", headerLabel: "Card Accessibility Test Page Header"
+		}),
 		content: [
 			oListCardInteractive,
 			oListCard,

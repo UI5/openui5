@@ -1,10 +1,11 @@
 sap.ui.define([
 	"sap/m/App",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/VBox",
 	"sap/tnt/InfoLabel",
 	"sap/ui/model/json/JSONModel"
-], function(App, Page, VBox, InfoLabel, JSONModel) {
+], function(App, Page, PageAccessibleLandmarkInfo, VBox, InfoLabel, JSONModel) {
 	"use strict";
 
 	var oData = {
@@ -32,6 +33,12 @@ sap.ui.define([
 
 	var initialPage = new Page("infoLabelPage", {
 		title: "sap.tnt.InfoLabel Control Test Page",
+		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Main",
+			headerRole: "Region", headerLabel: "InfoLabel Accessibility Test Page Header"
+		}),
 		content: [
 			new VBox("vb1", {
 				items: {

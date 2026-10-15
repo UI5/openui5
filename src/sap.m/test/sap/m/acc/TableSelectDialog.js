@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/m/Button",
 	"sap/ui/core/library",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/VBox",
 	"sap/m/App"
 ], function(
@@ -24,6 +25,7 @@ sap.ui.define([
 	Button,
 	coreLibrary,
 	Page,
+	PageAccessibleLandmarkInfo,
 	VBox,
 	App
 ) {
@@ -213,6 +215,12 @@ sap.ui.define([
 	// create the application page
 	var oPage = new Page("page", {
 		title:" TableSelectDialog Acc Test Page",
+		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Main",
+			headerRole: "Region", headerLabel: "TableSelectDialog Accessibility Test Page Header"
+		}),
 		content:[
 			new VBox({
 				items: [

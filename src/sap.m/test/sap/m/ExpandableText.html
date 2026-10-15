@@ -24,7 +24,10 @@
 						controllerName="myController"
 						displayBlock="true">
 				<App>
-					<Page title="Expandable Text">
+					<Page title="Expandable Text" titleLevel="H1">
+						<landmarkInfo>
+							<PageAccessibleLandmarkInfo rootRole="None" contentRole="Main" headerRole="Region" headerLabel="ExpandableText Accessibility Test Page Header"/>
+						</landmarkInfo>
 						<headerContent>
 							<Button text="Focus trap" />
 						</headerContent>
@@ -54,7 +57,7 @@
 						<core:HTML content="&lt;hr/&gt;" />
 						<form:SimpleForm editable="false" layout="ResponsiveGridLayout" columnsL="1">
 							<form:title>
-								<core:Title text="Form: editable='false'" />
+								<core:Title text="Form: editable='false'" level="H2" />
 							</form:title>
 							<Label text="sap.m.Text" />
 							<Text text="Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text" />
@@ -64,7 +67,7 @@
 						<core:HTML content="&lt;hr/&gt;" />
 						<form:SimpleForm editable="true" layout="ResponsiveGridLayout" columnsL="1">
 							<form:title>
-								<core:Title text="Form: editable='true'" />
+								<core:Title text="Form: editable='true'" level="H2" />
 							</form:title>
 							<Label text="sap.m.Text" />
 							<Text text="Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text" />
@@ -77,7 +80,7 @@
 						<ScrollContainer width="100%" height="auto" vertical="false" horizontal="false" class="sapUiSizeCompact">
 							<form:SimpleForm editable="false" layout="ResponsiveGridLayout" columnsL="1" class="sapMShowEmpty-CTX">
 								<form:title>
-									<core:Title text="Form: editable=false, compact" />
+									<core:Title text="Form: editable=false, compact" level="H2" />
 								</form:title>
 								<Label text="sap.m.Text" />
 								<Text text="Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text" />
@@ -91,7 +94,7 @@
 							<core:HTML content="&lt;hr/&gt;" />
 							<form:SimpleForm editable="true" layout="ResponsiveGridLayout" columnsL="1">
 								<form:title>
-									<core:Title text="Form: editable=true, compact" />
+									<core:Title text="Form: editable=true, compact" level="H2" />
 								</form:title>
 								<Label text="sap.m.Text" />
 								<Text text="Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text. Long text" />

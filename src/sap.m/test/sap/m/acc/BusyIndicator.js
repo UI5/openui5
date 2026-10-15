@@ -3,9 +3,10 @@ sap.ui.define([
 	"sap/m/BusyIndicator",
 	"sap/m/CheckBox",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/Toolbar",
 	"sap/m/ToolbarSpacer"
-], function(App, BusyIndicator, CheckBox, Page, Toolbar, ToolbarSpacer) {
+], function(App, BusyIndicator, CheckBox, Page, PageAccessibleLandmarkInfo, Toolbar, ToolbarSpacer) {
 	"use strict";
 
 	var app = new App("myApp", {
@@ -23,6 +24,13 @@ sap.ui.define([
 		}),
 		oPage = new Page("page1", {
 			title: "BusyIndicator Accessibility Test Page",
+			titleLevel: "H1",
+			landmarkInfo: new PageAccessibleLandmarkInfo({
+				rootRole: "None",
+				contentRole: "Main",
+				headerRole: "Region", headerLabel: "BusyIndicator Accessibility Test Page Header",
+				footerRole: "Region", footerLabel: "BusyIndicator Accessibility Test Page Footer"
+			}),
 			content:[
 				busyCSSText
 			],
