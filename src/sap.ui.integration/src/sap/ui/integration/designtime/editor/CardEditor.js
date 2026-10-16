@@ -226,6 +226,7 @@ sap.ui.define([
 		}
 	};
 
+	//TODO: check if we can reuse the EditorDestinations.initDestinations
 	CardEditor.prototype.initDestinations = function (vHost) {
 		this._oDestinationsModel = new JSONModel({});
 		this.setModel(this._oDestinationsModel, "destinations");
