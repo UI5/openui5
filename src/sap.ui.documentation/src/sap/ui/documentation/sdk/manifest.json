@@ -97,7 +97,7 @@
 				"controlAggregation": "detailPages",
 				"bypassed": {
 					"target": [
-						"welcome"
+						"notFound"
 					]
 				},
 				"async": true,

@@ -605,6 +605,12 @@ function (UsageTracker, Localization) {
 		var aPageViews = getPageViewCalls(this.oAddToLogsSpy);
 		assert.strictEqual(aPageViews.length, 2, "only two pageViews emitted (404 is errorPage, not pageView)");
 		assert.strictEqual(aPageViews[1].page.referrer, aPageViews[0].page.url, "B's referrer is A's URL, not the 404 hash");
+
+		var aErrorPages = this.oAddToLogsSpy.args.map(function(args) { return args[0]; }).filter(function(oLog) {
+			return oLog.event === "errorPage";
+		});
+		assert.strictEqual(aErrorPages.length, 1, "exactly one errorPage event emitted for unknown route");
+		assert.strictEqual(aErrorPages[0].error.description, "page not found", "errorPage has description 'page not found'");
 	});
 
 	QUnit.test("page-data-not-found does not advance referrer", function (assert) {
@@ -700,5 +706,99 @@ function (UsageTracker, Localization) {
 		var aPageViews = oAddToLogsSpy.args.map((args) => args[0]).filter((oLog) => oLog.event === "pageView");
 		assert.strictEqual(aPageViews.length, 1, "one pageView emitted");
 		assert.strictEqual(aPageViews[0].page.referrer, sDocReferrer, "PageInfo falls back to document.referrer when no previous URL");
+	});
+
+	QUnit.module("unknown route — single errorPage", {
+		beforeEach: function () {
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
+			this.sandbox = sinon.createSandbox();
+			this.sandbox.stub(this.oTracker, "_composeDefaultPageTitleFromRoute").returns("");
+		},
+		afterEach: function () {
+			this.oTracker.destroy();
+			this.oTracker = null;
+			this.sandbox.restore();
+		}
+	});
+
+	QUnit.test("unknown route produces exactly one errorPage with description 'page not found'", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		this.oTracker.start("testSiteName");
+		oAddToLogsSpy.resetHistory();
+
+		this.oTracker._logRouteNotFound({hash: "/api1"});
+
+		var aErrorPages = oAddToLogsSpy.args.map(function(args) { return args[0]; }).filter(function(oLog) {
+			return oLog.event === "errorPage";
+		});
+		assert.strictEqual(aErrorPages.length, 1, "exactly one errorPage event");
+		assert.strictEqual(aErrorPages[0].error.description, "page not found", "description is 'page not found'");
+	});
+
+	QUnit.test("unknown route does not produce a 'page data not found' errorPage", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		this.oTracker.start("testSiteName");
+		oAddToLogsSpy.resetHistory();
+
+		this.oTracker._logRouteNotFound({hash: "/api1"});
+
+		var aDataNotFound = oAddToLogsSpy.args.map(function(args) { return args[0]; }).filter(function(oLog) {
+			return oLog.event === "errorPage" && oLog.error.description === "page data not found";
+		});
+		assert.strictEqual(aDataNotFound.length, 0, "no 'page data not found' event for unknown route");
+	});
+
+	QUnit.test("replay of bypassed event produces exactly one errorPage with description 'page not found'", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs"),
+			oBypassedEvent = {eventId: "bypassed", hash: "/api1"};
+
+		this.oTracker.start("testSiteName", [oBypassedEvent]);
+
+		var aErrorPages = oAddToLogsSpy.args.map(function(args) { return args[0]; }).filter(function(oLog) {
+			return oLog.event === "errorPage";
+		});
+		assert.strictEqual(aErrorPages.length, 1, "exactly one errorPage replayed for unknown route");
+		assert.strictEqual(aErrorPages[0].error.description, "page not found", "replayed errorPage has description 'page not found'");
+	});
+
+	QUnit.test("replay of bypassed event does not include a _navToWithoutHash companion event", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs"),
+			oBypassedEvent = {eventId: "bypassed", hash: "/api1"};
+
+		this.oTracker.start("testSiteName", [oBypassedEvent]);
+
+		var aDataNotFound = oAddToLogsSpy.args.map(function(args) { return args[0]; }).filter(function(oLog) {
+			return oLog.event === "errorPage" && oLog.error.description === "page data not found";
+		});
+		assert.strictEqual(aDataNotFound.length, 0, "no companion 'page data not found' event in bypass replay");
+	});
+
+	QUnit.test("matched-route-but-data-missing still produces exactly one errorPage with description 'page data not found'", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		this.oTracker.start("testSiteName");
+		this.oTracker._logRouteMatched(oFactory.getRouteMatchEventParameters("apiId"));
+		oAddToLogsSpy.resetHistory();
+
+		this.oTracker._logNavToWithoutHash({viewName: "sap.ui.documentation.sdk.view.NotFound"});
+
+		var aErrorPages = oAddToLogsSpy.args.map(function(args) { return args[0]; }).filter(function(oLog) {
+			return oLog.event === "errorPage";
+		});
+		assert.strictEqual(aErrorPages.length, 1, "exactly one errorPage event");
+		assert.strictEqual(aErrorPages[0].error.description, "page data not found", "description is 'page data not found'");
+	});
+
+	QUnit.test("SampleNotFound path still produces exactly one errorPage event", function (assert) {
+		var oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+		this.oTracker.start("testSiteName");
+		this.oTracker._logRouteMatched(oFactory.getRouteMatchEventParameters("sample"));
+		oAddToLogsSpy.resetHistory();
+
+		this.oTracker._logNavToWithoutHash({viewName: "sap.ui.documentation.sdk.view.SampleNotFound"});
+
+		var aErrorPages = oAddToLogsSpy.args.map(function(args) { return args[0]; }).filter(function(oLog) {
+			return oLog.event === "errorPage";
+		});
+		assert.strictEqual(aErrorPages.length, 1, "exactly one errorPage for SampleNotFound path");
 	});
 });
