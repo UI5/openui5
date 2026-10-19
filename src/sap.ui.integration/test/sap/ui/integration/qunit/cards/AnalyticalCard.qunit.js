@@ -23,10 +23,10 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var DOM_RENDER_LOCATION = "qunit-fixture";
+	const DOM_RENDER_LOCATION = "qunit-fixture";
 	const oRb = Library.getResourceBundleFor("sap.ui.integration");
 
-	var oManifest_AnalyticalCard = {
+	const oManifest_AnalyticalCard = {
 		"sap.app": {
 			"id": "test.cards.analytical.card1"
 		},
@@ -95,7 +95,7 @@ sap.ui.define([
 		}
 	};
 
-	var oManifest_Analytical_WithFeeds = {
+	const oManifest_Analytical_WithFeeds = {
 		"sap.app": {
 			"id": "test.cards.analytical.card3",
 			"type": "card"
@@ -178,7 +178,7 @@ sap.ui.define([
 			}
 		}
 	};
-	var oManifest_Analytical_Url = {
+	const oManifest_Analytical_Url = {
 		"_version": "1.8.0",
 		"sap.app": {
 			"id": "test.cards.analytical.card6",
@@ -236,7 +236,7 @@ sap.ui.define([
 		}
 	};
 
-	var oManifest_Analytical_ChartActions = {
+	const oManifest_Analytical_ChartActions = {
 		"sap.app": {
 			"id": "test.cards.analytical.card7"
 		},
@@ -283,7 +283,7 @@ sap.ui.define([
 		}
 	};
 
-	var oManifest_Analytical_wholeCardAction_NoChartActions = {
+	const oManifest_Analytical_wholeCardAction_NoChartActions = {
 		"sap.app": {
 			"id": "test.cards.analytical.card10"
 		},
@@ -329,7 +329,7 @@ sap.ui.define([
 		}
 	};
 
-	var oManifest_Analytical_wholeCardAction_ChartActions_Chart = {
+	const oManifest_Analytical_wholeCardAction_ChartActions_Chart = {
 		"sap.app": {
 			"id": "test.cards.analytical.card10"
 		},
@@ -384,7 +384,7 @@ sap.ui.define([
 		}
 	};
 
-	var oManifest_Analytical_wholeCardAction_ChartActions_Full = {
+	const oManifest_Analytical_wholeCardAction_ChartActions_Full = {
 		"sap.app": {
 			"id": "test.cards.analytical.card10"
 		},
@@ -440,7 +440,7 @@ sap.ui.define([
 	};
 
 
-	var oManifest_Analytical_Popover = {
+	const oManifest_Analytical_Popover = {
 		"sap.app": {
 			"id": "test.cards.analytical.card8"
 		},
@@ -490,7 +490,7 @@ sap.ui.define([
 		}
 	};
 
-	var oManifest_Analytical_PopoverTooltips = {
+	const oManifest_Analytical_PopoverTooltips = {
 		"sap.app": {
 			"id": "test.cards.analytical.card8"
 		},
@@ -541,7 +541,7 @@ sap.ui.define([
 		}
 	};
 
-	var oManifest_Analytical_Tooltips = {
+	const oManifest_Analytical_Tooltips = {
 		"sap.app": {
 			"id": "test.cards.analytical.card8"
 		},
@@ -580,7 +580,7 @@ sap.ui.define([
 		}
 	};
 
-	var oManifest_Analytical_ChartNavigation = {
+	const oManifest_Analytical_ChartNavigation = {
 		"_version": "1.14.0",
 		"sap.app": {
 			"id": "test.cards.analytical.card9",
@@ -660,7 +660,7 @@ sap.ui.define([
 		}
 	};
 
-	var oManifest_Analytical_TimeAxis = {
+	const oManifest_Analytical_TimeAxis = {
 		"sap.app": {"id": "sap.fe", "type": "card"},
 		"sap.ui": {"technology": "UI5"},
 		"sap.card": {
@@ -767,7 +767,7 @@ sap.ui.define([
 
 	async function testStackedBarChartCreation(oCard, oManifest, assert) {
 		// Arrange
-		var window = {
+		const oWindow = {
 				"start": "firstDataPoint",
 				"end": "lastDataPoint"
 			};
@@ -778,7 +778,7 @@ sap.ui.define([
 		await nextCardReadyEvent(oCard);
 		await nextUIUpdate();
 
-		var oContent = oCard.getAggregation("_content"),
+		const oContent = oCard.getAggregation("_content"),
 			oChart = oContent.getAggregation("_content"),
 			oVizProperites = oChart.getVizProperties(),
 			oDataset = oChart.getDataset();
@@ -789,8 +789,8 @@ sap.ui.define([
 		assert.equal(oVizProperites.legend.visible, true, "Chart should have a legend visible property set to true using binding");
 		assert.equal(oVizProperites.legendGroup.layout.position, "bottom", "Chart should have a legend position property set to bottom");
 		assert.equal(oVizProperites.legendGroup.layout.alignment, "center", "Chart should have a legend alignment property set to center");
-		assert.equal(oVizProperites.plotArea.window.end, window.end, "Chart should have a plotAreas window property set to this window object");
-		assert.equal(oVizProperites.plotArea.window.start, window.start, "Chart should have a plotAreas window property set to this window object");
+		assert.equal(oVizProperites.plotArea.window.end, oWindow.end, "Chart should have a plotAreas window property set to this window object");
+		assert.equal(oVizProperites.plotArea.window.start, oWindow.start, "Chart should have a plotAreas window property set to this window object");
 		assert.equal(oVizProperites.plotArea.dataLabel.visible, true, "Chart should have a plotArea.datalabel.visible set to true");
 		assert.equal(oVizProperites.plotArea.dataLabel.showTotal, false, "Chart should have a plotArea.datalabel.showTotal set to false");
 		assert.equal(oVizProperites.categoryAxis.title.visible, false, "Chart should have a categoryAxis.title.visible set to false");
@@ -810,6 +810,148 @@ sap.ui.define([
 		assert.strictEqual(oDataset.getDimensions()[0].getBindingInfo("value").binding.getPath(), "Week", "Dimension has expected value.");
 		assert.strictEqual(oDataset.getDimensions()[0].getBindingInfo("displayValue").binding.getPath(), "WeekDisplay", "Dimension has expected displayValue.");
 	}
+
+	const oManifest_Analytical_EmptyData = {
+		"sap.app": {
+			"id": "test.cards.analytical.emptydata"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"header": {
+				"title": "Empty Data Card"
+			},
+			"content": {
+				"chartType": "StackedBar",
+				"measureAxis": "valueAxis",
+				"dimensionAxis": "categoryAxis",
+				"data": {
+					"json": {
+						"list": []
+					},
+					"path": "/list"
+				},
+				"dimensions": [{"label": "Weeks", "value": "{Week}"}],
+				"measures": [{"label": "Revenue", "value": "{Revenue}"}]
+			}
+		}
+	};
+
+	const oManifest_Analytical_NoChartType = {
+		"sap.app": {
+			"id": "test.cards.analytical.nocharttype"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"header": {
+				"title": "No ChartType Card"
+			},
+			"content": {
+				"data": {
+					"json": [{"Revenue": 100}]
+				},
+				"dimensions": [{"name": "Rev", "value": "{Revenue}"}],
+				"measures": [{"name": "Revenue", "value": "{Revenue}"}],
+				"feeds": [{"uid": "valueAxis", "type": "Measure", "values": ["Revenue"]}]
+			}
+		}
+	};
+
+	const oManifest_Analytical_OnlyMeasures = {
+		"sap.app": {
+			"id": "test.cards.analytical.onlymeasures"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"header": {
+				"title": "Only Measures Card"
+			},
+			"content": {
+				"chartType": "bubble",
+				"data": {
+					"json": [{"Revenue": 100, "Cost": 50}]
+				},
+				"measures": [
+					{"name": "Revenue", "value": "{Revenue}"},
+					{"name": "Cost", "value": "{Cost}"}
+				],
+				"feeds": [
+					{"uid": "valueAxis", "type": "Measure", "values": ["Revenue"]},
+					{"uid": "valueAxis2", "type": "Measure", "values": ["Cost"]}
+				]
+			}
+		}
+	};
+
+	const oManifest_Analytical_PopoverNoActions = {
+		"sap.app": {
+			"id": "test.cards.analytical.popovernoactions"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"content": {
+				"chartType": "Donut",
+				"measureAxis": "size",
+				"dimensionAxis": "color",
+				"dimensions": [{"label": "Store Name", "value": "{Store Name}"}],
+				"measures": [{"label": "Revenue", "value": "{Revenue}"}],
+				"popover": {
+					"active": true
+				},
+				"data": {
+					"json": [{"Store Name": "24-Seven", "Revenue": 345292.06}]
+				}
+			}
+		}
+	};
+
+	const oManifest_Analytical_OnlyDimensions = {
+		"sap.app": {
+			"id": "test.cards.analytical.onlydimensions"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"content": {
+				"chartType": "bubble",
+				"data": {
+					"json": [{"Week": "CW14"}]
+				},
+				"dimensions": [{"name": "Weeks", "value": "{Week}"}],
+				"feeds": [{"uid": "color", "type": "Dimension", "values": ["Weeks"]}]
+			}
+		}
+	};
+
+	const oManifest_Analytical_NonRootPath = {
+		"sap.app": {
+			"id": "test.cards.analytical.nonrootpath"
+		},
+		"sap.card": {
+			"type": "Analytical",
+			"content": {
+				"chartType": "Line",
+				"data": {
+					"json": {
+						"items": [
+							{"Week": "CW14", "Revenue": 431000.22},
+							{"Week": "CW15", "Revenue": 494000.30}
+						]
+					},
+					"path": "/items"
+				},
+				"actionableArea": "Chart",
+				"actions": [{
+					"type": "Navigation",
+					"parameters": {"url": "https://www.sap.com?week={Week}"}
+				}],
+				"dimensions": [{"name": "Weeks", "value": "{Week}"}],
+				"measures": [{"name": "Revenue", "value": "{Revenue}"}],
+				"feeds": [
+					{"uid": "categoryAxis", "type": "Dimension", "values": ["Weeks"]},
+					{"uid": "valueAxis", "type": "Measure", "values": ["Revenue"]}
+				]
+			}
+		}
+	};
 
 	return Library.load("sap.viz").then(function () {
 		QUnit.module("Init");
@@ -949,7 +1091,7 @@ sap.ui.define([
 			await nextCardReadyEvent(this.oCard);
 			await nextUIUpdate();
 
-			var oContent = this.oCard.getCardContent(),
+			const oContent = this.oCard.getCardContent(),
 				oChart = oContent.getAggregation("_content");
 
 			assert.ok(oChart.getDomRef(), "Chart should be rendered");
@@ -975,7 +1117,7 @@ sap.ui.define([
 			await nextCardReadyEvent(this.oCard);
 			await nextUIUpdate();
 
-			var oContent = this.oCard.getCardContent(),
+			const oContent = this.oCard.getCardContent(),
 				oChart = oContent.getAggregation("_content");
 
 			assert.strictEqual(oChart.getDataset().getDimensions()[0].getDataType(), "date", "dataType is correctly set");
@@ -989,7 +1131,7 @@ sap.ui.define([
 
 		QUnit.test("'chartProperties' are correctly merged into the 'vizProperties'", function (assert) {
 			// Arrange
-			var oConfiguration = {
+			const oConfiguration = {
 				legend: {
 					visible: true
 				},
@@ -1006,7 +1148,7 @@ sap.ui.define([
 			};
 
 			// Act
-			var oVizProperties = AnalyticalContent.prototype._getVizProperties.call(null, oConfiguration);
+			const oVizProperties = AnalyticalContent.prototype._getVizProperties.call(null, oConfiguration);
 
 			// Assert
 			assert.strictEqual(oVizProperties.title.text, oConfiguration.chartProperties.title.text, "Text should be taken from the 'chartProperties'");
@@ -1031,7 +1173,7 @@ sap.ui.define([
 
 		QUnit.test("Analytical Card should be actionable - url", async function (assert) {
 			// Arrange
-			var oActionSpy = sinon.spy(CardActions, "fireAction"),
+			const oActionSpy = sinon.spy(CardActions, "fireAction"),
 				oStubOpenUrl = sinon.stub(NavigationAction.prototype, "execute").callsFake(function () {});
 
 			// Act
@@ -1040,7 +1182,7 @@ sap.ui.define([
 			await nextCardReadyEvent(this.oCard);
 			await nextUIUpdate();
 
-			var oCardLContent = this.oCard.getCardContent(),
+			const oCardLContent = this.oCard.getCardContent(),
 				oCardHeader = this.oCard.getCardHeader();
 
 			// Assert
@@ -1063,7 +1205,7 @@ sap.ui.define([
 
 		QUnit.test("Analytical Card should not be actionable", async function (assert) {
 			// Arrange
-			var oActionSpy = sinon.spy(CardActions, "fireAction"),
+			const oActionSpy = sinon.spy(CardActions, "fireAction"),
 				oStubOpenUrl = sinon.stub(NavigationAction.prototype, "execute").callsFake(function () {});
 
 			this.oCard.setManifest(oManifest_AnalyticalCard);
@@ -1071,7 +1213,7 @@ sap.ui.define([
 			await nextCardReadyEvent(this.oCard);
 			await nextUIUpdate();
 
-			var oCardContent = this.oCard.getCardContent(),
+			const oCardContent = this.oCard.getCardContent(),
 				oCardHeader = this.oCard.getCardHeader();
 
 			// Assert
@@ -1098,7 +1240,7 @@ sap.ui.define([
 
 			await nextCardReadyEvent(this.oCard);
 
-			var oCardContent = this.oCard.getCardContent();
+			const oCardContent = this.oCard.getCardContent();
 
 			// Assert
 			assert.notOk(oCardContent.$().hasClass("sapFCardSectionClickable"), "Content area shouldn't have class 'sapFCardSectionClickable'");
@@ -1419,7 +1561,7 @@ sap.ui.define([
 
 			await nextCardReadyEvent(this.oCard);
 
-			var oCardContent = this.oCard.getCardContent();
+			const oCardContent = this.oCard.getCardContent();
 
 			await new Promise((resolve) => {
 				oCardContent.getAggregation("_content").attachEventOnce("renderComplete", resolve);
@@ -1433,7 +1575,7 @@ sap.ui.define([
 			assert.strictEqual(document.activeElement, this.oCard.getDomRef(), "Card should be focused");
 
 			// Focus on the chart's svg
-			var oSvg = oCardContent.getDomRef().querySelector("svg");
+			const oSvg = oCardContent.getDomRef().querySelector("svg");
 			oSvg.focus();
 			await nextUIUpdate();
 
@@ -1451,7 +1593,7 @@ sap.ui.define([
 
 			await nextCardReadyEvent(this.oCard);
 
-			var oCardContent = this.oCard.getCardContent();
+			const oCardContent = this.oCard.getCardContent();
 
 			await new Promise((resolve) => {
 				oCardContent.getAggregation("_content").attachEventOnce("renderComplete", resolve);
@@ -1465,7 +1607,7 @@ sap.ui.define([
 			assert.strictEqual(document.activeElement, this.oCard.getDomRef(), "Card should be focused");
 
 			// Focus on the chart's svg
-			var oSvg = this.oCard.getCardContent().getDomRef().querySelector("svg");
+			const oSvg = this.oCard.getCardContent().getDomRef().querySelector("svg");
 			oSvg.focus();
 			await nextUIUpdate();
 
@@ -1481,7 +1623,7 @@ sap.ui.define([
 
 			await nextCardReadyEvent(this.oCard);
 
-			var oCardContent = this.oCard.getCardContent();
+			const oCardContent = this.oCard.getCardContent();
 
 			await new Promise((resolve) => {
 				oCardContent.getAggregation("_content").attachEventOnce("renderComplete", resolve);
@@ -1495,7 +1637,7 @@ sap.ui.define([
 			assert.strictEqual(document.activeElement, this.oCard.getDomRef(), "Card should be focused");
 
 			// Focus on the chart's svg
-			var oSvg = oCardContent.getDomRef().querySelector("svg");
+			const oSvg = oCardContent.getDomRef().querySelector("svg");
 			oSvg.focus();
 			await nextUIUpdate();
 
@@ -1526,7 +1668,7 @@ sap.ui.define([
 
 			await nextCardReadyEvent(this.oCard);
 
-			var oCardContent = this.oCard.getCardContent();
+			const oCardContent = this.oCard.getCardContent();
 			// Assert
 			assert.notOk(oCardContent._getVizProperties(oCardContent.getConfiguration()).interaction.noninteractiveMode, "Chart itself should be interactive");
 		});
@@ -1598,13 +1740,13 @@ sap.ui.define([
 
 			await nextCardReadyEvent(this.oCard);
 
-			var oCardContent = this.oCard.getCardContent();
+			const oCardContent = this.oCard.getCardContent();
 			// Assert
 			assert.ok(oCardContent._getVizProperties(oCardContent.getConfiguration()).interaction.noninteractiveMode, "Chart itself should not be interactive");
 		});
 
 		QUnit.test("When there is Popover and Tooltip set, the error is logged", async function (assert) {
-			var oLogSpy = this.spy(Log, "error");
+			const oLogSpy = this.spy(Log, "error");
 
 			// Act
 			this.oCard.setManifest(oManifest_Analytical_PopoverTooltips);
@@ -1888,6 +2030,260 @@ sap.ui.define([
 			assert.strictEqual(oMockSvg.getAttribute("tabindex"), "0", "SVG tabindex should be set to 0");
 			assert.strictEqual(oMockSvg.getAttribute("focusable"), "true", "SVG focusable should be set to true");
 			assert.notOk(oMockSvg.classList.contains("sapUiIntegrationAnalyticalForcePointer"), "SVG should not have the clickable class when card is not interactive");
+		});
+
+		QUnit.module("Coverage - productized features", {
+			beforeEach: function () {
+				this.oCard = new Card({
+					width: "400px",
+					height: "600px",
+					baseUrl: "test-resources/sap/ui/integration/qunit/testResources/"
+				});
+				this.oCard.placeAt(DOM_RENDER_LOCATION);
+			},
+			afterEach: function () {
+				if (this.oCard) {
+					this.oCard.destroy();
+					this.oCard = null;
+				}
+			}
+		});
+
+		QUnit.test("applyConfiguration - missing chartType logs error", async function (assert) {
+			// Arrange
+			const oLogSpy = this.spy(Log, "error");
+
+			// Act
+			this.oCard.setManifest(oManifest_Analytical_NoChartType);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert - no chart is created when chartType is absent
+			const oCardContent = this.oCard.getCardContent();
+			assert.ok(
+				oLogSpy.calledWith(sinon.match(/"sap.card".content.chartType is mandatory property./)),
+				"Error is logged when chartType is missing"
+			);
+			assert.notOk(oCardContent.getAggregation("_content"), "No chart aggregation when chartType is missing");
+		});
+
+		QUnit.test("createLoadingPlaceholder - minHeight from manifest is used", function (assert) {
+			// Arrange
+			const oContent = new AnalyticalContent();
+			const oConfiguration = { chartType: "StackedBar", minHeight: "300px" };
+
+			// Act
+			const oPlaceholder = oContent.createLoadingPlaceholder(oConfiguration);
+
+			// Assert
+			assert.strictEqual(oPlaceholder.getMinHeight(), "300px", "Placeholder minHeight matches manifest value");
+
+			oPlaceholder.destroy();
+			oContent.destroy();
+		});
+
+		QUnit.test("createLoadingPlaceholder - default minHeight when not in manifest", function (assert) {
+			// Arrange
+			const oContent = new AnalyticalContent();
+			const oConfiguration = { chartType: "StackedBar" };
+
+			// Act
+			const oPlaceholder = oContent.createLoadingPlaceholder(oConfiguration);
+
+			// Assert
+			assert.strictEqual(oPlaceholder.getMinHeight(), "14rem", "Placeholder uses default minHeight when not specified");
+
+			oPlaceholder.destroy();
+			oContent.destroy();
+		});
+
+		QUnit.test("onDataChanged - empty data shows no-data message", async function (assert) {
+			// Act
+			this.oCard.setManifest(oManifest_Analytical_EmptyData);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert - blocking message is set with the no-data title
+			const oCardContent = this.oCard.getCardContent();
+			const oBlockingMessage = oCardContent.getBlockingMessage();
+			const sNoDataText = oRb.getText("CARD_NO_ITEMS_ERROR_LISTS");
+			assert.ok(oBlockingMessage, "A blocking message is shown for empty dataset");
+			assert.strictEqual(oBlockingMessage.title, sNoDataText, "No-data message title matches expected text");
+		});
+
+		QUnit.test("getFocusDomRef - returns chart element, falls back to content DOM when .v-m-root absent", async function (assert) {
+			// Act
+			this.oCard.setManifest(oManifest_AnalyticalCard);
+			await nextCardReadyEvent(this.oCard);
+
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+
+			// Wait for the chart's .v-m-root SVG to be rendered
+			await new Promise(function (resolve) {
+				if (oChart.getDomRef() && oChart.getDomRef().querySelector(".v-m-root")) {
+					resolve();
+				} else {
+					oChart.attachEventOnce("renderComplete", function () {
+						nextUIUpdate().then(resolve);
+					});
+				}
+			});
+
+			// Assert - with .v-m-root present, getFocusDomRef returns a DOM element
+			// .v-m-root is an SVGElement, not HTMLElement — use Element as the base interface
+			const oVmRoot = oChart.getDomRef().querySelector(".v-m-root");
+			assert.ok(oVmRoot, "Chart rendered with .v-m-root element");
+			assert.ok(oCardContent.getFocusDomRef() instanceof Element, "getFocusDomRef returns a DOM element when chart is rendered");
+
+			// Act - remove .v-m-root so querySelector returns null and the fallback branch runs
+			oVmRoot.remove();
+
+			// Assert - falls back to the content's own DOM ref
+			assert.strictEqual(
+				oCardContent.getFocusDomRef(),
+				oCardContent.getDomRef(),
+				"getFocusDomRef falls back to content DOM when .v-m-root is absent"
+			);
+		});
+
+		QUnit.test("Chart with measures only (no dimensions) builds a dataset", async function (assert) {
+			// Act
+			this.oCard.setManifest(oManifest_Analytical_OnlyMeasures);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+			assert.ok(oChart, "Chart is created even without dimensions");
+			assert.strictEqual(oChart.getDataset().getDimensions().length, 0, "Dataset has no dimension definitions");
+			assert.ok(oChart.getDataset().getMeasures().length > 0, "Dataset has measure definitions");
+		});
+
+		QUnit.test("Popover card survives manifest re-apply (refresh)", async function (assert) {
+			// Arrange - load card with popover
+			this.oCard.setManifest(oManifest_Analytical_Popover);
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Act - refresh triggers re-apply of manifest, calling _attachPopover again
+			this.oCard.refresh();
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert - card still renders correctly after popover re-attach
+			const oCardContent = this.oCard.getCardContent();
+			assert.ok(oCardContent.getDomRef(), "Card content renders after popover re-attach");
+			assert.ok(oCardContent.getAggregation("_content"), "Chart aggregation still present after re-attach");
+		});
+
+		QUnit.test("Non-interactive ListItem chart contributes its label to card aria-describedby", async function (assert) {
+			// Arrange - non-interactive chart (no actions/popover) as ListItem
+			this.oCard.setManifest(oManifest_AnalyticalCard);
+			this.oCard.setSemanticRole("ListItem");
+			await nextCardReadyEvent(this.oCard);
+
+			const oCardContent = this.oCard.getCardContent();
+
+			await new Promise(function (resolve) {
+				oCardContent.getAggregation("_content").attachEventOnce("renderComplete", resolve);
+			});
+			await nextUIUpdate();
+
+			// Assert - the card picks up the chart's label into aria-describedby
+			const oSvg = oCardContent.getDomRef().querySelector("svg");
+			const sChartLabelId = oSvg.getAttribute("aria-labelledby");
+			const sDescribedBy = this.oCard.getDomRef().getAttribute("aria-describedby");
+			assert.ok(sChartLabelId, "Chart SVG exposes an aria-labelledby");
+			assert.ok(
+				sDescribedBy && sDescribedBy.split(" ").indexOf(sChartLabelId) > -1,
+				"Card aria-describedby includes the chart label id"
+			);
+		});
+
+		QUnit.test("createLoadingPlaceholder - overflow mode uses minHeight 0", function (assert) {
+			// Arrange
+			const oContent = new AnalyticalContent();
+			oContent.setOverflowWithShowMore(true);
+			const oConfiguration = { chartType: "StackedBar", minHeight: "300px" };
+
+			// Act
+			const oPlaceholder = oContent.createLoadingPlaceholder(oConfiguration);
+
+			// Assert
+			assert.strictEqual(oPlaceholder.getMinHeight(), "0", "Placeholder minHeight is 0 in overflow mode");
+
+			oPlaceholder.destroy();
+			oContent.destroy();
+		});
+
+		QUnit.test("Popover without actionsStrip keeps chart interactive", async function (assert) {
+			// Act
+			const pReady = nextCardReadyEvent(this.oCard);
+			this.oCard.setManifest(oManifest_Analytical_PopoverNoActions);
+			await pReady;
+			await nextUIUpdate();
+
+			// Assert - card loads fine, chart is interactive (popover active)
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+			assert.ok(oChart, "Chart created with popover and no actionsStrip");
+			assert.notOk(
+				oChart.getVizProperties().interaction.noninteractiveMode,
+				"Chart is interactive when popover is active"
+			);
+		});
+
+		QUnit.test("Chart with dimensions only (no measures) builds a dataset", async function (assert) {
+			// Act
+			const pReady = nextCardReadyEvent(this.oCard);
+			this.oCard.setManifest(oManifest_Analytical_OnlyDimensions);
+			await pReady;
+			await nextUIUpdate();
+
+			// Assert
+			const oCardContent = this.oCard.getCardContent();
+			const oChart = oCardContent.getAggregation("_content");
+			assert.ok(oChart, "Chart created with only dimensions");
+			assert.ok(oChart.getDataset().getDimensions().length > 0, "Dataset has dimension definitions");
+			assert.strictEqual(oChart.getDataset().getMeasures().length, 0, "Dataset has no measure definitions");
+		});
+
+		QUnit.test("Navigation from chart with non-root data path resolves context", async function (assert) {
+			// Arrange
+			const pReady = nextCardReadyEvent(this.oCard);
+			this.oCard.setManifest(oManifest_Analytical_NonRootPath);
+			await pReady;
+			await nextUIUpdate();
+
+			const oContent = this.oCard.getCardContent();
+			const oChart = oContent.getAggregation("_content");
+			const oStubOpenUrl = this.stub(window, "open").callsFake(function () {});
+
+			// Act - non-root path (/items) → context path = /items/0
+			oChart.fireSelectData({
+				data: [{
+					target: {
+						__data__: {
+							"_context_row_number": 0,
+							"Week": "CW14",
+							"Revenue": 431000.22
+						}
+					},
+					data: {
+						"_context_row_number": 0,
+						"Week": "CW14",
+						"Revenue": 431000.22
+					}
+				}]
+			});
+			await nextUIUpdate();
+
+			// Assert - URL resolved from non-root context path /items/0
+			assert.ok(oStubOpenUrl.calledOnce, "Navigation triggered for non-root path data");
+			const sUrl = oStubOpenUrl.getCall(0).args[0];
+			assert.ok(sUrl.indexOf("week=CW14") > -1, "Navigation URL resolves data at non-root path");
 		});
 
 	}).catch(function () {
