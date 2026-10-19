@@ -27,6 +27,9 @@ sap.ui.define([
 	"sap/ui/core/date/UI5Date",
 	"sap/ui/core/CustomData",
 	// load all required calendars in advance
+	"sap/ui/core/Lib",
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/core/date/Buddhist",
 	"sap/ui/core/date/Gregorian",
 	"sap/ui/core/date/Islamic",
@@ -56,7 +59,10 @@ sap.ui.define([
 	jQuery,
 	oCore,
 	UI5Date,
-	CustomData
+	CustomData,
+	Lib,
+	TooltipEnablement,
+	nextUIUpdate
 ) {
 
 	"use strict";
@@ -159,12 +165,8 @@ sap.ui.define([
 	  var $NextBtn = jQuery("#Cal1--Head-next");
 	  var prevTabindex = $PrevBtn.attr("tabindex");
 	  var nextTabindex = $NextBtn.attr("tabindex");
-	  var prevTitle = $PrevBtn.attr("title");
-	  var nextTitle = $NextBtn.attr("title");
 	  var nextAriaLabel = $NextBtn.attr("aria-label");
 	  var prevAriaLabel = $PrevBtn.attr("aria-label");
-	  var nextAriaDescription = $NextBtn.attr("aria-description");
-	  var prevAriaDescription = $PrevBtn.attr("aria-description");
 	  var nextAriaShortCuts = $NextBtn.attr("aria-keyshortcuts");
 	  var prevAriaShortCuts = $PrevBtn.attr("aria-keyshortcuts");
 
@@ -172,14 +174,8 @@ sap.ui.define([
 	  assert.ok($NextBtn.length, "Next month button exists");
 	  assert.equal(prevTabindex, "0", "Previous month button is focusable (tabindex=0)");
 	  assert.equal(nextTabindex, "0", "Next month button is focusable (tabindex=0)");
-	  assert.ok(prevTitle && prevTitle.length > 0, "Previous month button has a tooltip");
-	  assert.ok(nextTitle && nextTitle.length > 0, "Next month button has a tooltip");
-	  assert.equal(prevTitle, "Previous Month (Pageup)", "Previous month button has correct tooltip");
-	  assert.equal(nextTitle, "Next Month (Pagedown)", "Next month button has correct tooltip");
 	  assert.equal(prevAriaLabel, "Previous Month", "Previous month button has correct aria-label");
 	  assert.equal(nextAriaLabel, "Next Month", "Next month button has correct aria-label");
-	  assert.equal(prevAriaDescription, "Previous Month", "Previous month button has correct aria-description");
-	  assert.equal(nextAriaDescription, "Next Month", "Next month button has correct aria-description");
 	  assert.equal(prevAriaShortCuts, "Pageup", "Previous month button has correct aria-keyshortcuts");
 	  assert.equal(nextAriaShortCuts, "Pagedown", "Next month button has correct aria-keyshortcuts");
 	});
@@ -3779,4 +3775,139 @@ sap.ui.define([
 		// clean
 		oCalendar.destroy();
 	});
+
+	// ----------------------------------------------------------------
+	// Calendar — Initialization
+	// ----------------------------------------------------------------
+	QUnit.module("Calendar — TooltipEnablement — Initialization", {
+		beforeEach: function() {
+			this.oFlagStub = this.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+		},
+		afterEach: function() {
+			this.oCal.destroy();
+		}
+	});
+
+	QUnit.test("_oTooltipRoot is not set when feature flag is off", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(false);
+
+		// Act
+		this.oCal = new Calendar();
+
+		// Assert
+		assert.notOk(this.oCal._oTooltipRoot,
+			"_oTooltipRoot is falsy when the feature flag is off");
+	});
+
+	QUnit.test("_oTooltipRoot is created when feature flag is on", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+
+		// Act
+		this.oCal = new Calendar();
+
+		// Assert
+		assert.ok(this.oCal._oTooltipRoot instanceof TooltipEnablement,
+			"_oTooltipRoot is a TooltipEnablement instance when the feature flag is on");
+	});
+
+	// ----------------------------------------------------------------
+	// Calendar — exit — lifecycle cleanup
+	// ----------------------------------------------------------------
+	QUnit.module("Calendar — TooltipEnablement — exit — lifecycle cleanup", {
+		beforeEach: function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oCal = new Calendar();
+		}
+		// no afterEach — each test destroys the calendar itself
+	});
+
+	QUnit.test("destroy() calls destroy on _oTooltipRoot and nulls the reference", function(assert) {
+		// Prepare
+		const oDestroySpy = this.spy(this.oCal._oTooltipRoot, "destroy");
+
+		// Act
+		this.oCal.destroy();
+
+		// Assert
+		assert.ok(oDestroySpy.calledOnce,
+			"destroy() was called on _oTooltipRoot during calendar exit");
+		assert.strictEqual(this.oCal._oTooltipRoot, null,
+			"_oTooltipRoot is set to null during exit so no dangling references remain");
+	});
+
+	// ----------------------------------------------------------------
+	// Calendar — DOM rendering
+	// ----------------------------------------------------------------
+	QUnit.module("Calendar — TooltipEnablement — DOM rendering", {
+		beforeEach: async function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oCal = new Calendar("cal-te", {
+				tooltip: "My Calendar",
+				initialFocusedDate: UI5Date.getInstance(2024, 0, 1)
+			});
+			this.oCal.placeAt("content");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oCal.destroy();
+		}
+	});
+
+	QUnit.test("invisible tooltip span is rendered in the DOM with the Calendar tooltip text", function(assert) {
+		// Prepare
+		const sExpectedId = this.oCal.getId() + "-invisibleTooltip";
+
+		// Act
+		const oSpan = document.getElementById(sExpectedId);
+
+		// Assert
+		assert.ok(oSpan, "invisible tooltip span is present in the Calendar DOM");
+		assert.strictEqual(oSpan.textContent, "My Calendar",
+			"invisible tooltip span text matches the calendar tooltip property");
+	});
+
+	QUnit.test("invisible tooltip span has role=tooltip", function(assert) {
+		// Prepare
+		const sExpectedId = this.oCal.getId() + "-invisibleTooltip";
+
+		// Act
+		const oSpan = document.getElementById(sExpectedId);
+
+		// Assert
+		assert.strictEqual(oSpan.getAttribute("role"), "tooltip",
+			"invisible tooltip span has role=tooltip");
+	});
+
+	QUnit.test("Calendar root element has aria-describedby pointing to the invisible tooltip span", function(assert) {
+		// Prepare
+		const sExpectedId = this.oCal._oTooltipRoot.getInvisibleTooltipId();
+
+		// Act
+		const sDescribedBy = this.oCal.getDomRef().getAttribute("aria-describedby");
+
+		// Assert
+		assert.ok(sDescribedBy && sDescribedBy.includes(sExpectedId),
+			"Calendar root aria-describedby includes the invisible tooltip span id");
+	});
+
+	QUnit.test("invisible tooltip span id uses the default -invisibleTooltip suffix", function(assert) {
+		// Prepare
+		const sExpectedId = this.oCal.getId() + "-invisibleTooltip";
+
+		// Assert
+		assert.strictEqual(this.oCal._oTooltipRoot.getInvisibleTooltipId(), sExpectedId,
+			"invisible tooltip span id uses the default -invisibleTooltip suffix");
+	});
+
+	QUnit.test("textProvider returns empty string when tooltip is empty", function(assert) {
+		// Prepare
+		this.oCal.setTooltip("");
+
+		// Assert
+		assert.strictEqual(this.oCal._oTooltipRoot._resolveText(), "",
+			"textProvider returns empty string when the calendar has no tooltip");
+	});
+
 });

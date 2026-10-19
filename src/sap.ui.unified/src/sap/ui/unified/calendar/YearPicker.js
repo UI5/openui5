@@ -20,7 +20,8 @@ sap.ui.define([
 	"sap/ui/core/date/UI5Date",
 	"./YearPickerRenderer",
 	"sap/ui/events/KeyCodes",
-	"sap/ui/thirdparty/jquery"
+	"sap/ui/thirdparty/jquery",
+	"sap/ui/core/tooltip/TooltipEnablement"
 ], function(
 	Formatting,
 	CalendarType,
@@ -38,7 +39,8 @@ sap.ui.define([
 	UI5Date,
 	YearPickerRenderer,
 	KeyCodes,
-	jQuery
+	jQuery,
+	TooltipEnablement
 ) {
 	"use strict";
 
@@ -177,6 +179,14 @@ sap.ui.define([
 
 		this._oMinDate = CalendarUtils._minDate(this._getPrimaryCalendarType());
 		this._oMaxDate = CalendarUtils._maxDate(this._getPrimaryCalendarType());
+
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			this._oTooltipRoot = new TooltipEnablement(this, {
+				textProvider: () => this.getTooltip_AsString() || "",
+				domRefProvider: () => this.getDomRef(),
+				focusDomRefProvider: () => this.getDomRef()
+			});
+		}
 		this._bSpacePressed = false;
 		this._bPressedEscapeOrShift = false;
 	};
@@ -197,6 +207,11 @@ sap.ui.define([
 				oDateRange.destroy();
 			});
 			this._aMPSelectedDates = undefined;
+		}
+
+		if (this._oTooltipRoot) {
+			this._oTooltipRoot.destroy();
+			this._oTooltipRoot = null;
 		}
 	};
 

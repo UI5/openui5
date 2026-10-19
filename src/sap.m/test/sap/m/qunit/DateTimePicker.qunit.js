@@ -28,6 +28,8 @@ sap.ui.define([
 	"sap/ui/model/odata/type/DateTimeWithTimezone",
 	"sap/ui/model/odata/type/DateTimeOffset",
 	// load all required calendars in advance
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/core/ShortcutHintsMixin",
 	"sap/ui/core/date/Islamic"
 ], function(
 	Localization,
@@ -56,7 +58,9 @@ sap.ui.define([
 	ManagedObjectObserver,
 	UI5Date,
 	DateTimeWithTimezone,
-	DateTimeOffset
+	DateTimeOffset,
+	TooltipEnablement,
+	ShortcutHintsMixin
 ) {
 	"use strict";
 
@@ -1981,6 +1985,88 @@ sap.ui.define([
 
 		// Cleanup
 		oDTP.destroy();
+	});
+
+	const oRB = Library.getResourceBundleFor("sap.m");
+
+	// ----------------------------------------------------------------
+	// DateTimePicker — Initialization
+	// ----------------------------------------------------------------
+	QUnit.module("DateTimePicker — TooltipEnablement — Initialization", {
+		beforeEach: function() {
+			this.oFlagStub = this.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+		},
+		afterEach: function() {
+			this.oPicker.destroy();
+		}
+	});
+
+	QUnit.test("_oIconTooltipEnablement is not set when feature flag is off", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(false);
+
+		// Act
+		this.oPicker = new DateTimePicker();
+
+		// Assert
+		assert.notOk(this.oPicker._oIconTooltipEnablement,
+			"_oIconTooltipEnablement is falsy when the feature flag is off");
+	});
+
+	QUnit.test("_oIconTooltipEnablement is created when feature flag is on", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+
+		// Act
+		this.oPicker = new DateTimePicker();
+
+		// Assert
+		assert.ok(this.oPicker._oIconTooltipEnablement instanceof TooltipEnablement,
+			"_oIconTooltipEnablement is a TooltipEnablement instance (inherited from DatePicker)");
+	});
+
+	// ----------------------------------------------------------------
+	// DateTimePicker — DOM rendering
+	// ----------------------------------------------------------------
+	QUnit.module("DateTimePicker — TooltipEnablement — DOM rendering", {
+		beforeEach: async function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oPicker = new DateTimePicker("dtp-te");
+			this.oPicker.placeAt("qunit-fixture");
+			await nextUIUpdate(this.clock);
+		},
+		afterEach: async function() {
+			this.oPicker.destroy();
+			await nextUIUpdate(this.clock);
+		}
+	});
+
+	QUnit.test("invisible tooltip id uses the default -invisibleTooltip suffix", function(assert) {
+		// Prepare
+		const sExpectedId = this.oPicker.getId() + "-invisibleTooltip";
+
+		// Assert
+		assert.strictEqual(this.oPicker._oIconTooltipEnablement.getInvisibleTooltipId(), sExpectedId,
+			"invisible tooltip id uses the default -invisibleTooltip suffix");
+	});
+
+	QUnit.test("no native title attribute on the calendar icon element", function(assert) {
+		// Prepare
+		const oIconDom = this.oPicker.getDomRef().querySelector(".sapUiIcon");
+
+		// Assert
+		assert.strictEqual(oIconDom.getAttribute("title"), null,
+			"native title attribute is suppressed on the icon");
+	});
+
+	QUnit.test("textProvider returns the open-picker i18n text with shortcut hint when enabled", function(assert) {
+		// Prepare
+		const oIcon = this.oPicker.getAggregation("_endIcon")[0];
+
+		// Assert
+		assert.strictEqual(this.oPicker._oIconTooltipEnablement._resolveText(),
+			ShortcutHintsMixin.getTooltipWithShortcut(oIcon, oRB.getText("OPEN_PICKER_TEXT")),
+			"textProvider resolves to the OPEN_PICKER_TEXT combined with the F4 shortcut hint");
 	});
 
 });

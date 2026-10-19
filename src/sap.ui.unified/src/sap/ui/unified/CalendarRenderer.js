@@ -43,6 +43,10 @@ sap.ui.define(["sap/ui/core/Lib"],
 				roledescription: oCal._oSpecialDatesControlOrigin ? "" : rb.getText("CALENDAR_DIALOG")
 			};
 
+		if (oCal._oTooltipRoot) {
+			mAccProps.describedby = { value: oCal._oTooltipRoot.getInvisibleTooltipId(), append: true };
+		}
+
 		oRm.openStart("div", oCal);
 		oRm.class("sapUiCal");
 		if (aMonths.length > 1) {
@@ -51,7 +55,7 @@ sap.ui.define(["sap/ui/core/Lib"],
 
 		oRm.accessibilityState(oCal, mAccProps);
 
-		if (sTooltip) {
+		if (sTooltip && !oCal._oTooltipRoot) {
 			oRm.attr("title", sTooltip);
 		}
 
@@ -68,6 +72,10 @@ sap.ui.define(["sap/ui/core/Lib"],
 			this.addAttributes(oRm, oCal);
 		}
 		oRm.openEnd();
+
+		if (oCal._oTooltipRoot) {
+			oCal._oTooltipRoot.renderInvisibleTooltip(oRm);
+		}
 
 		var oHeader = oCal.getAggregation("header");
 		oRm.renderControl(oHeader);

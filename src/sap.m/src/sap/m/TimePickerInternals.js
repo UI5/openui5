@@ -15,7 +15,9 @@ sap.ui.define([
 	"./library",
 	"./Button",
 	"sap/ui/core/date/UI5Date",
-	"./TimePickerInternalsRenderer"
+	"./TimePickerInternalsRenderer",
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/core/InvisibleText"
 ],
 	function(
 		Formatting,
@@ -30,7 +32,9 @@ sap.ui.define([
 		library,
 		Button,
 		UI5Date,
-		TimePickerInternalsRenderer
+		TimePickerInternalsRenderer,
+		TooltipEnablement,
+		InvisibleText
 	) {
 		"use strict";
 
@@ -167,6 +171,10 @@ sap.ui.define([
 			if (this._oNowButton) {
 				this._oNowButton.destroy();
 				this._oNowButton = null;
+			}
+			if (this._oNowButtonInvisibleText) {
+				this._oNowButtonInvisibleText.destroy();
+				this._oNowButtonInvisibleText = null;
 			}
 		};
 
@@ -589,15 +597,27 @@ sap.ui.define([
 		 */
 		TimePickerInternals.prototype._getCurrentTimeButton = function() {
 			if (!this._oNowButton) {
+				const sNowTooltip = this._oResourceBundle.getText("TIMEPICKER_TOOLTIP_NOW");
+
 				this._oNowButton = new Button(this.getId() + "-now", {
 					icon: "sap-icon://present",
-					tooltip: this._oResourceBundle.getText("TIMEPICKER_TOOLTIP_NOW"),
+					tooltip: TooltipEnablement.isEnhancedTooltipEnabled() ? undefined : sNowTooltip,
 					type: ButtonType.Transparent,
 					visible: false,
 					press: function () {
 						this._setTimeValues(UI5Date.getInstance());
 					}.bind(this)
 				}).addStyleClass("sapMTPNow");
+
+				if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+					this._oNowButton._disableTooltipEnablement();
+					this._oNowButton._getTooltip = function() { return ""; };
+					this._oNowButtonInvisibleText = new InvisibleText(
+						this.getId() + "-now-tooltip",
+						{ text: sNowTooltip }
+					);
+					this._oNowButton.addAriaDescribedBy(this._oNowButtonInvisibleText.getId());
+				}
 			}
 			return this._oNowButton;
 		};

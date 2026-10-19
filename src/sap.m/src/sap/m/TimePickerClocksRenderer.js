@@ -59,6 +59,9 @@ sap.ui.define([], function() {
 
 			for (iIndex = 0; iIndex < aButtons.length; iIndex++) {
 				oRm.renderControl(aButtons[iIndex]);
+				if (aButtons[iIndex]._oInvisibleTooltip) {
+					oRm.renderControl(aButtons[iIndex]._oInvisibleTooltip);
+				}
 				if (aSeparators[iIndex]) {
 					oRm.openStart("span");
 					oRm.attr("aria-hidden", "true");
@@ -69,6 +72,9 @@ sap.ui.define([], function() {
 			}
 
 			oRm.renderControl(oControl._getCurrentTimeButton());
+			if (oControl._oNowButtonInvisibleText) {
+				oRm.renderControl(oControl._oNowButtonInvisibleText);
+			}
 
 			oRm.close("div"); // buttons wrapper
 

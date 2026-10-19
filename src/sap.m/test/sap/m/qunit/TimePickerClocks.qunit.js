@@ -6,8 +6,10 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/ui/thirdparty/jquery",
-	"sap/ui/core/date/UI5Date"
-], function(TimePickerClocks, TimePickerInternals, Element, KeyCodes, nextUIUpdate, jQuery, UI5Date) {
+	"sap/ui/core/date/UI5Date",
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/core/InvisibleText"
+], function(TimePickerClocks, TimePickerInternals, Element, KeyCodes, nextUIUpdate, jQuery, UI5Date, TooltipEnablement, InvisibleText) {
 	"use strict";
 
 	QUnit.module("API", {
@@ -1156,18 +1158,17 @@ sap.ui.define([
 				'clock': oRB.getText("TIMEPICKER_CLOCK_DIAL_LABEL")
 			};
 
-		//assert
 		assert.equal(oHoursButtonDom.getAttribute("role"), "spinbutton", "Hours button has proper role attribute");
 		assert.equal(oHoursButtonDom.getAttribute("aria-valuetext"), "9 " + oLabels['hours'], "Hours button has proper aria-valuetext attribute");
-		assert.equal(oHoursButtonDom.getAttribute("title"), oLabels['hours'], "Hours button has proper tooltip");
+		assert.equal(document.getElementById(this.oTPC._getHoursButton().getId() + "-tooltip").textContent, oLabels['hours'], "Hours button has proper tooltip text");
 
 		assert.equal(oMinutesButtonDom.getAttribute("role"), "spinbutton", "Minutes button has proper role attribute");
 		assert.equal(oMinutesButtonDom.getAttribute("aria-valuetext"), "15 " + oLabels["minutes"], "Minutes button has proper aria-valuetext attribute");
-		assert.equal(oMinutesButtonDom.getAttribute("title"), oLabels["minutes"], "Minutes button has proper tooltip");
+		assert.equal(document.getElementById(this.oTPC._getMinutesButton().getId() + "-tooltip").textContent, oLabels["minutes"], "Minutes button has proper tooltip text");
 
 		assert.equal(oSecondsButtonDom.getAttribute("role"), "spinbutton", "Seconds button has proper role attribute");
 		assert.equal(oSecondsButtonDom.getAttribute("aria-valuetext"), "33 " + oLabels["seconds"], "Hours button has proper aria-valuetext attribute");
-		assert.equal(oSecondsButtonDom.getAttribute("title"), oLabels["seconds"], "Seconds button has proper tooltip");
+		assert.equal(document.getElementById(this.oTPC._getSecondsButton().getId() + "-tooltip").textContent, oLabels["seconds"], "Seconds button has proper tooltip text");
 
 		assert.equal(this.oTPC._getFormatButton().getDomRef().getAttribute("title"), oLabels["ampm"], "AM/PM segmented button has proper tooltip");
 
@@ -1205,6 +1206,336 @@ sap.ui.define([
 		// cleanup
 		document.body.removeChild(iframe);
 		iframe = null;
+	});
+
+	// ----------------------------------------------------------------
+	// TooltipEnablement — ToggleSpinButton title attribute
+	// ----------------------------------------------------------------
+	QUnit.module("TooltipEnablement — ToggleSpinButton title attribute", {
+		beforeEach: function() {
+			this.oFlagStub = this.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+		},
+		afterEach: function() {
+			this.oTPC.destroy();
+			this.oTPC = null;
+		}
+	});
+
+	QUnit.test("ToggleSpinButton has native title attribute when enhanced tooltip is disabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(false);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "HH:mm:ss",
+			value: "09:15:33"
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oHoursButtonDom = this.oTPC._getHoursButton().getDomRef();
+		var sExpectedLabel = this.oTPC._oResourceBundle.getText("TIMEPICKER_LBL_HOURS");
+
+		// Assert
+		assert.strictEqual(oHoursButtonDom.getAttribute("title"), sExpectedLabel,
+			"Hours ToggleSpinButton has title attribute when enhanced tooltip is off");
+	});
+
+	QUnit.test("ToggleSpinButton has no native title attribute when enhanced tooltip is enabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "HH:mm:ss",
+			value: "09:15:33"
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oHoursButtonDom = this.oTPC._getHoursButton().getDomRef();
+
+		// Assert
+		assert.strictEqual(oHoursButtonDom.getAttribute("title"), null,
+			"Hours ToggleSpinButton has no title attribute when enhanced tooltip is on");
+	});
+
+	// ----------------------------------------------------------------
+	// TooltipEnablement — Now button
+	// ----------------------------------------------------------------
+	QUnit.module("TooltipEnablement — Now button", {
+		beforeEach: function() {
+			this.oFlagStub = this.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+		},
+		afterEach: function() {
+			if (this.oTPC) {
+				this.oTPC.destroy();
+				this.oTPC = null;
+			}
+		}
+	});
+
+	QUnit.test("Now button has native title when enhanced tooltip is disabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(false);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "HH:mm:ss",
+			value: "09:15:33",
+			showCurrentTimeButton: true
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oNowButton = this.oTPC._getCurrentTimeButton();
+		var sExpected = this.oTPC._oResourceBundle.getText("TIMEPICKER_TOOLTIP_NOW");
+
+		// Assert
+		assert.strictEqual(oNowButton.getTooltip(), sExpected,
+			"Now button tooltip property is set when enhanced tooltip is off");
+		assert.strictEqual(this.oTPC._oNowButtonInvisibleText, undefined,
+			"No InvisibleText is created when enhanced tooltip is off");
+	});
+
+	QUnit.test("Now button has no tooltip property and no title when enhanced tooltip is enabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "HH:mm:ss",
+			value: "09:15:33",
+			showCurrentTimeButton: true
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oNowButton = this.oTPC._getCurrentTimeButton();
+		var oNowDom = oNowButton.getDomRef();
+
+		// Assert
+		assert.strictEqual(oNowButton.getTooltip(), null,
+			"Now button tooltip property is null when enhanced tooltip is on");
+		assert.strictEqual(oNowDom.getAttribute("title"), null,
+			"Now button DOM has no title attribute when enhanced tooltip is on");
+	});
+
+	QUnit.test("InvisibleText is created for Now button when enhanced tooltip is enabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "HH:mm:ss",
+			value: "09:15:33",
+			showCurrentTimeButton: true
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oInvisibleText = this.oTPC._oNowButtonInvisibleText;
+		var sExpected = this.oTPC._oResourceBundle.getText("TIMEPICKER_TOOLTIP_NOW");
+
+		// Assert
+		assert.ok(oInvisibleText instanceof InvisibleText,
+			"_oNowButtonInvisibleText is an InvisibleText instance");
+		assert.strictEqual(oInvisibleText.getText(), sExpected,
+			"InvisibleText has the correct 'Now' tooltip text");
+	});
+
+	QUnit.test("Now button aria-describedby references the InvisibleText when enhanced tooltip is enabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "HH:mm:ss",
+			value: "09:15:33",
+			showCurrentTimeButton: true
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oNowButton = this.oTPC._getCurrentTimeButton();
+		var oInvisibleText = this.oTPC._oNowButtonInvisibleText;
+
+		// Assert
+		assert.ok(oNowButton.getAriaDescribedBy().indexOf(oInvisibleText.getId()) !== -1,
+			"Now button aria-describedby includes the InvisibleText id");
+	});
+
+	QUnit.test("InvisibleText for Now button is rendered in the DOM when enhanced tooltip is enabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "HH:mm:ss",
+			value: "09:15:33",
+			showCurrentTimeButton: true
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oInvisibleText = this.oTPC._oNowButtonInvisibleText;
+		var oDom = document.getElementById(oInvisibleText.getId());
+
+		// Assert
+		assert.ok(oDom, "InvisibleText span is present in the DOM");
+		assert.ok(oDom.classList.contains("sapUiInvisibleText"),
+			"InvisibleText span has the sapUiInvisibleText CSS class");
+	});
+
+	QUnit.test("InvisibleText for Now button is destroyed on exit when enhanced tooltip is enabled", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "HH:mm:ss",
+			value: "09:15:33",
+			showCurrentTimeButton: true
+		});
+
+		// Trigger lazy creation
+		this.oTPC._getCurrentTimeButton();
+		var oInvisibleText = this.oTPC._oNowButtonInvisibleText;
+		var oDestroySpy = this.spy(oInvisibleText, "destroy");
+
+		// Act
+		this.oTPC.destroy();
+		this.oTPC = null;
+
+		// Assert
+		assert.ok(oDestroySpy.calledOnce, "InvisibleText destroy() was called during exit");
+	});
+
+	// ----------------------------------------------------------------
+	// TooltipEnablement — AM/PM SegmentedButton
+	// ----------------------------------------------------------------
+	QUnit.module("TooltipEnablement — AM/PM SegmentedButton", {
+		beforeEach: function() {
+			this.oFlagStub = this.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+		},
+		afterEach: function() {
+			this.oTPC.destroy();
+			this.oTPC = null;
+		}
+	});
+
+	QUnit.test("AM/PM button has native title when enhanced tooltip is disabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(false);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "hh:mm:ss a",
+			value: "09:15:33 AM"
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oFormatButton = this.oTPC._getFormatButton();
+		var sExpected = this.oTPC._oResourceBundle.getText("TIMEPICKER_AMPM_BUTTON_TOOLTIP");
+
+		// Assert
+		assert.strictEqual(oFormatButton.getDomRef().getAttribute("title"), sExpected,
+			"AM/PM SegmentedButton root has title attribute when enhanced tooltip is off");
+		assert.notOk(oFormatButton._oInvisibleTooltip,
+			"No _oInvisibleTooltip is created when enhanced tooltip is off");
+	});
+
+	QUnit.test("AM/PM button has no native title when enhanced tooltip is enabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "hh:mm:ss a",
+			value: "09:15:33 AM"
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oFormatButton = this.oTPC._getFormatButton();
+
+		// Assert
+		assert.strictEqual(oFormatButton.getDomRef().getAttribute("title"), null,
+			"AM/PM SegmentedButton root has no title attribute when enhanced tooltip is on");
+	});
+
+	QUnit.test("InvisibleText is created for AM/PM button when enhanced tooltip is enabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "hh:mm:ss a",
+			value: "09:15:33 AM"
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oFormatButton = this.oTPC._getFormatButton();
+		var oInvisibleTooltip = oFormatButton._oInvisibleTooltip;
+		var sExpected = this.oTPC._oResourceBundle.getText("TIMEPICKER_AMPM_BUTTON_TOOLTIP");
+
+		// Assert
+		assert.ok(oInvisibleTooltip instanceof InvisibleText,
+			"_oInvisibleTooltip is an InvisibleText instance");
+		assert.strictEqual(oInvisibleTooltip.getText(), sExpected,
+			"InvisibleText has the correct AM/PM tooltip text");
+	});
+
+	QUnit.test("AM/PM button aria-describedby references the InvisibleText when enhanced tooltip is enabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "hh:mm:ss a",
+			value: "09:15:33 AM"
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oFormatButton = this.oTPC._getFormatButton();
+		var oInvisibleTooltip = oFormatButton._oInvisibleTooltip;
+
+		// Assert
+		assert.ok(oFormatButton.getAriaDescribedBy().indexOf(oInvisibleTooltip.getId()) !== -1,
+			"AM/PM button aria-describedby includes the InvisibleText id");
+	});
+
+	QUnit.test("InvisibleText for AM/PM button is rendered in the DOM when enhanced tooltip is enabled", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "hh:mm:ss a",
+			value: "09:15:33 AM"
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		var oFormatButton = this.oTPC._getFormatButton();
+		var oDom = document.getElementById(oFormatButton._oInvisibleTooltip.getId());
+
+		// Assert
+		assert.ok(oDom, "InvisibleText span for AM/PM is present in the DOM");
+		assert.ok(oDom.classList.contains("sapUiInvisibleText"),
+			"InvisibleText span has the sapUiInvisibleText CSS class");
+	});
+
+	QUnit.test("InvisibleText for AM/PM button is destroyed when controls are recreated", async function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		this.oTPC = new TimePickerClocks({
+			displayFormat: "hh:mm:ss a",
+			value: "09:15:33 AM"
+		});
+		this.oTPC.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		var oFormatButton = this.oTPC._getFormatButton();
+		var oInvisibleTooltip = oFormatButton._oInvisibleTooltip;
+		var oDestroySpy = this.spy(oInvisibleTooltip, "destroy");
+
+		// Act — changing displayFormat triggers _destroyControls + _createControls
+		this.oTPC.setDisplayFormat("hh:mm a");
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(oDestroySpy.calledOnce,
+			"InvisibleText for AM/PM is destroyed when controls are recreated");
 	});
 
 });
