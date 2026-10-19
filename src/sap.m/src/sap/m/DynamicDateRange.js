@@ -916,7 +916,15 @@ sap.ui.define([
 		 */
 		DynamicDateRange.prototype.toDates = function(oValue) {
 			var sKey = oValue.operator;
-			return this.getOption(sKey).toDates(oValue, this.getCalendarWeekNumbering());
+			return this.getOption(sKey).toDates(oValue, this._getCalendarWeekNumbering());
+		};
+
+		DynamicDateRange.prototype._getCalendarWeekNumbering = function() {
+			if (this.isPropertyInitial("calendarWeekNumbering")) {
+				return;
+			}
+
+			return this.getCalendarWeekNumbering();
 		};
 
 		/**
@@ -1131,7 +1139,7 @@ sap.ui.define([
 		 * @private
 		 */
 		DynamicDateRange.prototype._addSuggestionItem = function(oSuggestValue) {
-			var aValueDates = this.toDates(oSuggestValue, this.getCalendarWeekNumbering());
+			var aValueDates = this.toDates(oSuggestValue, this._getCalendarWeekNumbering());
 			var aResultingDates = [];
 			for (var i = 0; i < aValueDates.length; i++) {
 				aResultingDates[i] = aValueDates[i];
@@ -1244,7 +1252,7 @@ sap.ui.define([
 		};
 
 		DynamicDateRange.prototype._toDatesString = function(oValue) {
-			var aValueDates = this.toDates(oValue, this.getCalendarWeekNumbering());
+			var aValueDates = this.toDates(oValue, this._getCalendarWeekNumbering());
 			var aDates = [];
 			for (var i = 0; i < aValueDates.length; i++) {
 				aDates[i] = aValueDates[i];
@@ -1521,7 +1529,7 @@ sap.ui.define([
 				sFormattedDates,
 				sSelectedOptionKey;
 
-			var aValueDates = this.toDates(oOutputValue, this.getCalendarWeekNumbering());
+			var aValueDates = this.toDates(oOutputValue, this._getCalendarWeekNumbering());
 
 			if (!oOutputValue || !oOutputValue.operator || !this.getOption(oOutputValue.operator)) {
 				return;
@@ -1816,7 +1824,7 @@ sap.ui.define([
 
 		DynamicDateRange.prototype._applyValue = function() {
 			this._oOutput = this._oSelectedOption.getValueHelpOutput(this);
-			var aValueDates = this.toDates(this._oOutput, this.getCalendarWeekNumbering());
+			var aValueDates = this.toDates(this._oOutput, this._getCalendarWeekNumbering());
 			for (var i = 0; i < aValueDates.length; i++) {
 				if (this._oOutput.values[i] instanceof Date && aValueDates[i] instanceof UniversalDate) {
 					this._oOutput.values[i] = aValueDates[i].getJSDate();
