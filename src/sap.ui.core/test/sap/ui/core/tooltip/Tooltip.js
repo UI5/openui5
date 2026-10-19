@@ -20,6 +20,8 @@ sap.ui.require([
 	const { FakeButton, FakeText, FakeLink, PlainButton } = FakeControls;
 	const PlacementType = mLibrary.PlacementType;
 	const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
+	const PopoverHorizontalAlign = coreLibrary.popover.PopoverHorizontalAlign;
+	const PopoverVerticalAlign = coreLibrary.popover.PopoverVerticalAlign;
 	const LONG_TOOLTIP = "This is a noticeably longer tooltip text used to verify wrapping behavior.";
 	const VERY_LONG_TOOLTIP =
 		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra hendrerit convallis. " +
@@ -59,6 +61,12 @@ sap.ui.require([
 			placement: mSettings.placement,
 			delay: mSettings.delay !== undefined ? mSettings.delay : 500
 		});
+		if (mSettings.horizontalAlign) {
+			oTooltip.setHorizontalAlign(mSettings.horizontalAlign);
+		}
+		if (mSettings.verticalAlign) {
+			oTooltip.setVerticalAlign(mSettings.verticalAlign);
+		}
 		oControl.addEventDelegate({
 			onAfterRendering: function () {
 				const oDomRef = oControl.getDomRef();
@@ -94,6 +102,13 @@ sap.ui.require([
 			pair("Bottom:", withPlacement(new PlainButton({ text: "Bottom" }), { text: "Bottom", placement: PopoverPlacement.Bottom })),
 			pair("Begin:", withPlacement(new PlainButton("placeLeft", { text: "Begin" }), { text: "Begin", placement: PopoverPlacement.Begin })),
 			pair("End:", withPlacement(new PlainButton("placeRight", { text: "End" }), { text: "End", placement: PopoverPlacement.End }))
+		]),
+		new Label({ text: "Placement combined with cross-axis alignment (hover to open):" }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			pair("Bottom + Begin:", withPlacement(new PlainButton({ text: "Bottom/Begin" }), { text: "Bottom placement, Begin aligned", placement: PopoverPlacement.Bottom, horizontalAlign: PopoverHorizontalAlign.Begin })),
+			pair("Bottom + End:", withPlacement(new PlainButton({ text: "Bottom/End" }), { text: "Bottom placement, End aligned", placement: PopoverPlacement.Bottom, horizontalAlign: PopoverHorizontalAlign.End })),
+			pair("End + Top:", withPlacement(new PlainButton({ text: "End/Top" }), { text: "End placement, Top aligned", placement: PopoverPlacement.End, verticalAlign: PopoverVerticalAlign.Top })),
+			pair("End + Bottom:", withPlacement(new PlainButton({ text: "End/Bottom" }), { text: "End placement, Bottom aligned", placement: PopoverPlacement.End, verticalAlign: PopoverVerticalAlign.Bottom }))
 		])
 	]);
 
@@ -151,6 +166,109 @@ sap.ui.require([
 			vtButton("vtLong", "Long text", LONG_TOOLTIP, PopoverPlacement.Bottom),
 			vtButton("vtVeryLong", "Very long text", VERY_LONG_TOOLTIP, PopoverPlacement.Bottom),
 			new Button("vtClose", { text: "Close", press: () => oVtTooltip.close(0) }).addStyleClass("sapUiTinyMarginBottom")
+		])
+	]);
+
+	// --- Cross-axis alignment: horizontalAlign / verticalAlign (deterministic, for visual testing) ---
+	// A deliberately oversized anchor makes the cross-axis alignment visible: the
+	// tooltip is much narrower/shorter than the anchor, so Begin/End/Top/Bottom
+	// land on clearly different edges, and Stretch sizes the tooltip to the anchor.
+	const oAlignAnchor = new VBox("vtAlignAnchor", {
+		width: "22rem",
+		height: "8rem",
+		justifyContent: "Center",
+		alignItems: "Center",
+		items: [new Text({ text: "Alignment anchor (22rem x 8rem)" })]
+	});
+	oAlignAnchor.addEventDelegate({
+		onAfterRendering: function () {
+			const oStyle = oAlignAnchor.getDomRef().style;
+			oStyle.border = "1px dashed currentColor";
+			oStyle.borderRadius = "0.25rem";
+		}
+	});
+
+	const oAlignTooltip = new Tooltip("vtAlignTooltip", { text: SHORT_TOOLTIP });
+
+	function alignButton(sId, sLabel, sPlacement, sHorizontalAlign, sVerticalAlign) {
+		return new Button(sId, {
+			text: sLabel,
+			press: function () {
+				oAlignTooltip.setPlacement(sPlacement);
+				oAlignTooltip.setHorizontalAlign(sHorizontalAlign);
+				oAlignTooltip.setVerticalAlign(sVerticalAlign);
+				oAlignTooltip.openBy(oAlignAnchor, 0);
+			}
+		}).addStyleClass("sapUiTinyMarginEnd sapUiTinyMarginBottom");
+	}
+
+	const oAlignPanel = panel("Cross-axis alignment: horizontalAlign / verticalAlign (deterministic, for visual testing)", [
+		new Text({
+			text: "Alignment only applies to the CROSS axis of the resolved placement. " +
+				"horizontalAlign drives the Top/Bottom placements, verticalAlign the Begin/End ones — " +
+				"the property for the other axis is ignored. Begin/End are locale-relative (mirrored in RTL). " +
+				"Stretch pins the near edge and sizes the tooltip to the anchor on that axis."
+		}).addStyleClass("sapUiTinyMarginBottom"),
+		new HBox({ justifyContent: "Center", items: [oAlignAnchor] }).addStyleClass("sapUiMediumMarginTop sapUiMediumMarginBottom").setWidth("100%"),
+		new Label({ text: "horizontalAlign (placement Bottom):" }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			alignButton("vtAlignHCenter", "Center", PopoverPlacement.Bottom, PopoverHorizontalAlign.Center, PopoverVerticalAlign.Center),
+			alignButton("vtAlignHBegin", "Begin", PopoverPlacement.Bottom, PopoverHorizontalAlign.Begin, PopoverVerticalAlign.Center),
+			alignButton("vtAlignHEnd", "End", PopoverPlacement.Bottom, PopoverHorizontalAlign.End, PopoverVerticalAlign.Center),
+			alignButton("vtAlignHStretch", "Stretch", PopoverPlacement.Bottom, PopoverHorizontalAlign.Stretch, PopoverVerticalAlign.Center)
+		]),
+		new Label({ text: "verticalAlign (placement End):" }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			alignButton("vtAlignVCenter", "Center", PopoverPlacement.End, PopoverHorizontalAlign.Center, PopoverVerticalAlign.Center),
+			alignButton("vtAlignVTop", "Top", PopoverPlacement.End, PopoverHorizontalAlign.Center, PopoverVerticalAlign.Top),
+			alignButton("vtAlignVBottom", "Bottom", PopoverPlacement.End, PopoverHorizontalAlign.Center, PopoverVerticalAlign.Bottom),
+			alignButton("vtAlignVStretch", "Stretch", PopoverPlacement.End, PopoverHorizontalAlign.Center, PopoverVerticalAlign.Stretch)
+		]),
+		new Label({ text: "Long text (alignment with a wrapping tooltip):" }).addStyleClass("sapUiTinyMarginBottom"),
+		row([
+			new Button("vtAlignLongText", {
+				text: "Use long text",
+				press: () => oAlignTooltip.setText(LONG_TOOLTIP)
+			}).addStyleClass("sapUiTinyMarginEnd sapUiTinyMarginBottom"),
+			new Button("vtAlignShortText", {
+				text: "Use short text",
+				press: () => oAlignTooltip.setText(SHORT_TOOLTIP)
+			}).addStyleClass("sapUiTinyMarginEnd sapUiTinyMarginBottom"),
+			new Button("vtAlignClose", { text: "Close", press: () => oAlignTooltip.close(0) }).addStyleClass("sapUiTinyMarginBottom")
+		])
+	]);
+
+	// --- Edge-aligned wrapping: very long text with no room on the aligned side ---
+	// The anchors sit at the very start / end of the page, so an edge-pinned
+	// alignment has almost no room towards the direction it grows into. The
+	// tooltip must wrap within that remaining space instead of overflowing the
+	// viewport or being pulled back (which would silently break the alignment).
+	const oWrapEndAnchor = new PlainButton("vtWrapEndAnchor", { text: "Anchor at page end" });
+	const oWrapStartAnchor = new PlainButton("vtWrapStartAnchor", { text: "Anchor at page start" });
+	const oWrapTooltip = new Tooltip("vtWrapTooltip", { text: VERY_LONG_TOOLTIP, placement: PopoverPlacement.Bottom });
+
+	function wrapButton(sId, sLabel, oAnchor, sHorizontalAlign) {
+		return new Button(sId, {
+			text: sLabel,
+			press: function () {
+				oWrapTooltip.setPlacement(PopoverPlacement.Bottom);
+				oWrapTooltip.setHorizontalAlign(sHorizontalAlign);
+				oWrapTooltip.openBy(oAnchor, 0);
+			}
+		}).addStyleClass("sapUiTinyMarginEnd sapUiTinyMarginBottom");
+	}
+
+	const oWrapPanel = panel("Edge-aligned wrapping: very long text with no room on the aligned side", [
+		new Text({
+			text: "The anchors below are pushed to the page start / end. Begin alignment pins the tooltip's start edge to the anchor's start edge and grows towards the end — on the end-anchored button there is barely any room left there, so the long text has to wrap into it. End alignment is the mirror case on the start-anchored button. In both cases the tooltip must stay docked to the aligned edge and must not overflow the viewport."
+		}).addStyleClass("sapUiTinyMarginBottom"),
+		new HBox({ justifyContent: "End", items: [oWrapEndAnchor] }).addStyleClass("sapUiSmallMarginBottom").setWidth("100%"),
+		new HBox({ justifyContent: "Start", items: [oWrapStartAnchor] }).addStyleClass("sapUiSmallMarginBottom").setWidth("100%"),
+		row([
+			wrapButton("vtWrapBegin", "End anchor + Begin (flips)", oWrapEndAnchor, PopoverHorizontalAlign.Begin),
+			wrapButton("vtWrapEnd", "Start anchor + End (flips)", oWrapStartAnchor, PopoverHorizontalAlign.End),
+			wrapButton("vtWrapCenter", "End anchor + Center (reference)", oWrapEndAnchor, PopoverHorizontalAlign.Center),
+			new Button("vtWrapClose", { text: "Close", press: () => oWrapTooltip.close(0) }).addStyleClass("sapUiTinyMarginBottom")
 		])
 	]);
 
@@ -426,6 +544,8 @@ sap.ui.require([
 					oDelayPanel,
 					oApiPanel,
 					oVtPanel,
+					oAlignPanel,
+					oWrapPanel,
 					oFlipPanel,
 					oDialogPanel,
 					oTextPanel,

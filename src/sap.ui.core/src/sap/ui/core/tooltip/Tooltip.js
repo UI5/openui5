@@ -14,7 +14,6 @@ sap.ui.define([
 	"sap/ui/core/popover/PopoverFlipMode",
 	"sap/ui/core/tooltip/TooltipManager",
 	"sap/ui/core/library",
-	"sap/base/i18n/Localization",
 	"./TooltipRenderer"
 ],
 	function(
@@ -28,13 +27,18 @@ sap.ui.define([
 		PopoverFlipMode,
 		TooltipManager,
 		coreLibrary,
-		Localization,
 		TooltipRenderer
 	) {
 		"use strict";
 
 		// shortcut for sap.ui.core.popover.PopoverPlacement
 		const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
+
+		// shortcut for sap.ui.core.popover.PopoverHorizontalAlign
+		const PopoverHorizontalAlign = coreLibrary.popover.PopoverHorizontalAlign;
+
+		// shortcut for sap.ui.core.popover.PopoverVerticalAlign
+		const PopoverVerticalAlign = coreLibrary.popover.PopoverVerticalAlign;
 
 		/**
 		* Constructor for a new Tooltip.
@@ -87,6 +91,28 @@ sap.ui.define([
 					},
 
 					/**
+					 * Defines the horizontal alignment of the tooltip relative to its target.
+					 *
+					 * <b>Note:</b> Only takes effect when the tooltip is placed above or below its target,
+					 * that is, for the <code>Top</code> and <code>Bottom</code> placements.
+					 * @since 1.155
+					 */
+					horizontalAlign: {
+						type: "sap.ui.core.popover.PopoverHorizontalAlign", group: "Behavior", defaultValue: PopoverHorizontalAlign.Center
+					},
+
+					/**
+					 * Defines the vertical alignment of the tooltip relative to its target.
+					 *
+					 * <b>Note:</b> Only takes effect when the tooltip is placed at the start or end of its target,
+					 * that is, for the <code>Begin</code> and <code>End</code> placements.
+					 * @since 1.155
+					 */
+					verticalAlign: {
+						type: "sap.ui.core.popover.PopoverVerticalAlign", group: "Behavior", defaultValue: PopoverVerticalAlign.Center
+					},
+
+					/**
 					 * Defines the delay in milliseconds after which the tooltip will be shown.
 					 * <b>Note:</b> The delay of show/dismiss Tooltip only applies on mouse and keyboard focus.
 					 * With gesture from touch and keyboard shortcut, the tooltip will be displayed / dismissed immediately.
@@ -118,29 +144,12 @@ sap.ui.define([
 		// Base gap the tooltip keeps from the within-area edge.
 		const EDGE_MARGIN_PX = 10;
 
-		// Positioning clamp/class helpers expect a LOGICAL side (they re-derive
-		// physical via RTL, as sap.m.Popover feeds them). The tooltip resolves a
-		// physical side, so swap Left<->Right in RTL before calling them.
-		function toLogicalSide(sSide) {
-			if (!Localization.getRTL()) {
-				return sSide;
-			}
-
-			if (sSide === PopoverPhysicalSide.Left) {
-				return PopoverPhysicalSide.Right;
-			}
-
-			if (sSide === PopoverPhysicalSide.Right) {
-				return PopoverPhysicalSide.Left;
-			}
-
-			return sSide;
-		}
-
 		Tooltip.prototype.init = function () {
 			this._sCalcedPos = null;
 			this._bIsOpen = false;
 			this._bOpenRequested = false;
+			this._sEffectiveHAlign = null;
+			this._sEffectiveVAlign = null;
 
 			this.attachAfterClose(() => {
 				TooltipManager.deregister(this);
@@ -207,18 +216,47 @@ sap.ui.define([
 				// DOM, re-anchor, and return — the setPosition below triggers a
 				// second _applyPosition pass where _bPosResolved is true.
 				if (!oTooltip._bPosResolved && oTooltip._oHostForArrow) {
-					const sSide = oTooltip._resolveSide(oTooltip._oHostForArrow);
+					// Stretch narrows the box on the cross axis, which makes the text
+					// wrap and changes its extent on the MAIN axis too (a stretched-narrow
+					// tooltip is taller). The side must be resolved from the box at its
+					// stretched size, so apply the Stretch cap BEFORE resolving. The
+					// requested placement already fixes the stretch axis (Top/Bottom
+					// stretch width, Begin/End stretch height) and the MoreSpace flip
+					// never crosses axes, so a provisional side off the requested
+					// placement is enough to pick the right axis here.
+					const sPlacement = oTooltip.getPlacement();
+					const bVerticalPlacement = sPlacement === PopoverPlacement.Top || sPlacement === PopoverPlacement.Bottom;
+					oTooltip._applyStretchSize(bVerticalPlacement ? PopoverPhysicalSide.Bottom : PopoverPhysicalSide.Left);
+
+					// Resolve the side and the effective cross-axis alignment in one
+					// measured call; the alignment flips away from a cramped growth
+					// direction. Cache both for the sizing / anchor / arrow steps.
+					const oResolved = oTooltip._resolvePlacementAndAlign();
+					const sSide = oResolved.side;
 					oTooltip._sCalcedPos = sSide;
+					oTooltip._sEffectiveHAlign = oResolved.horizontalAlign;
+					oTooltip._sEffectiveVAlign = oResolved.verticalAlign;
 					oTooltip._applyPlacementClass();
+					// Re-apply with the resolved side so the anchor measures the final
+					// box: the pre-pass above already stretched the same axis, this
+					// keeps the two in sync when the effective alignment is now known.
+					oTooltip._applyStretchSize(sSide);
+					// Wrap an edge-aligned tooltip before docking — the dock must
+					// measure the box at the width/height it will actually have.
+					oTooltip._applyAlignedSizeCaps(sSide);
 
 					const oAnchor = Positioning.computeAnchor({
 						side: sSide,
 						arrowSize: oTooltip._arrowProtrusion,
-						mirror: false
+						mirror: false,
+						horizontalAlign: oResolved.horizontalAlign,
+						verticalAlign: oResolved.verticalAlign
 					});
 
 					oTooltip._bPosResolved = true;
 					this.setPosition(oAnchor.my, oAnchor.at, oTooltip._oHostForArrow, oAnchor.offset, "none");
+					oTooltip._fitIntoWithinArea();
+					oTooltip._positionArrow();
 					return;
 				}
 
@@ -227,8 +265,6 @@ sap.ui.define([
 
 			this._oPopup.attachOpened(function () {
 				this._bIsOpen = true;
-				this._fitIntoWithinArea();
-				this._positionArrow();
 				this._bindDomEvents();
 				this.fireAfterOpen();
 			}, this);
@@ -236,6 +272,8 @@ sap.ui.define([
 				this._bIsOpen = false;
 				this._bOpenRequested = false;
 				this._bPosResolved = false;
+				this._sEffectiveHAlign = null;
+				this._sEffectiveVAlign = null;
 				this._clearTimeouts();
 				this.fireAfterClose();
 			}, this);
@@ -295,15 +333,30 @@ sap.ui.define([
 			if (Object.hasOwn(PopoverPhysicalSide, sSide)) {
 				// Logical class: build-mirrored library-RTL.css re-flips it to the
 				// correct physical edge.
-				oDomRef.classList.add("sapUiCoreTooltip-" + toLogicalSide(sSide));
+				oDomRef.classList.add("sapUiCoreTooltip-" + Positioning.toLogicalSide(sSide));
 			}
 		};
 
-		Tooltip.prototype._resolveSide = function (oHostElement) {
-			return Positioning.resolvePlacement({
+		/**
+		 * Resolves the placement side and the effective cross-axis alignment for this
+		 * open from the measured tooltip DOM via
+		 * {@link sap.ui.core.popover.Positioning.resolvePlacementAndAlign}.
+		 *
+		 * The side is picked with {@link sap.ui.core.popover.PopoverFlipMode.MoreSpace};
+		 * the alignment on that side's cross axis flips to its opposite when the tooltip
+		 * does not fit in its growth direction and the other side has more room. The
+		 * caller caches the returned alignments so the sizing, docking, anchor and arrow
+		 * steps all agree on the same side.
+		 *
+		 * @returns {{side: sap.ui.core.popover.PopoverPhysicalSide, horizontalAlign: sap.ui.core.popover.PopoverHorizontalAlign, verticalAlign: sap.ui.core.popover.PopoverVerticalAlign}}
+		 *   The resolved side and the effective alignments for both axes
+		 * @private
+		 */
+		Tooltip.prototype._resolvePlacementAndAlign = function () {
+			return Positioning.resolvePlacementAndAlign({
 				placement: this.getPlacement(),
 				flipMode: PopoverFlipMode.MoreSpace,
-				openerRef: oHostElement,
+				openerRef: this._oHostForArrow,
 				popoverRef: this.getDomRef(),
 				withinAreaRef: Popup.getWithinAreaDomRef(),
 				margin: {
@@ -312,8 +365,180 @@ sap.ui.define([
 					bottom: EDGE_MARGIN_PX,
 					left: EDGE_MARGIN_PX
 				},
-				arrowSize: this._arrowProtrusion
+				arrowSize: this._arrowProtrusion,
+				horizontalAlign: this.getHorizontalAlign(),
+				verticalAlign: this.getVerticalAlign(),
+				edgeMargin: EDGE_MARGIN_PX
 			});
+		};
+
+		// Effective cross-axis alignments resolved for the current open (flip applied).
+		// Fall back to the raw properties before _resolvePlacementAndAlign has run.
+		Tooltip.prototype._getEffectiveHorizontalAlign = function () {
+			return this._sEffectiveHAlign || this.getHorizontalAlign();
+		};
+
+		Tooltip.prototype._getEffectiveVerticalAlign = function () {
+			return this._sEffectiveVAlign || this.getVerticalAlign();
+		};
+
+		/**
+		 * Sets the tooltip size to match its opener on the cross axis when
+		 * the alignment is <code>Stretch</code>.
+		 *
+		 * The cross axis depends on the resolved side: horizontal for <code>Top</code>/<code>Bottom</code>
+		 * (driven by <code>horizontalAlign</code>), vertical for <code>Left</code>/<code>Right</code> (driven
+		 * by <code>verticalAlign</code>). Any size from a previous open is reset
+		 * first, since the side may have changed.
+		 *
+		 * @param {sap.ui.core.popover.PopoverPhysicalSide} sSide The resolved side.
+		 * @private
+		 */
+		Tooltip.prototype._applyStretchSize = function (sSide) {
+			const oDomRef = this.getDomRef();
+			const oHost = this._oHostForArrow;
+
+			if (!oDomRef) {
+				return;
+			}
+
+			oDomRef.style.width = "";
+			oDomRef.style.height = "";
+
+			if (!oHost) {
+				return;
+			}
+
+			const oHostRect = oHost.getBoundingClientRect();
+			const bVerticalSide = sSide === PopoverPhysicalSide.Top || sSide === PopoverPhysicalSide.Bottom;
+
+			if (bVerticalSide) {
+				if (this._getEffectiveHorizontalAlign() === PopoverHorizontalAlign.Stretch) {
+					oDomRef.style.width = oHostRect.width + "px";
+				}
+			} else if (this._getEffectiveVerticalAlign() === PopoverVerticalAlign.Stretch) {
+				oDomRef.style.height = oHostRect.height + "px";
+			}
+		};
+
+		/**
+		 * Size limit imposed by a cross-axis alignment that is tied to the opener.
+		 * Thin wrapper over {@link sap.ui.core.popover.Positioning.computeAlignedMaxSize}
+		 * that feeds the tooltip's opener, within-area, alignment and edge margin.
+		 *
+		 * @param {sap.ui.core.popover.PopoverPhysicalSide} sSide The resolved side.
+		 * @returns {{maxWidth: (number|undefined), maxHeight: (number|undefined)}}
+		 *   The limit for the cross axis, empty for the centered alignments.
+		 * @private
+		 */
+		Tooltip.prototype._computeAlignedMaxSize = function (sSide) {
+			return Positioning.computeAlignedMaxSize({
+				side: sSide,
+				openerRef: this._oHostForArrow,
+				withinAreaRef: Popup.getWithinAreaDomRef(),
+				horizontalAlign: this._getEffectiveHorizontalAlign(),
+				verticalAlign: this._getEffectiveVerticalAlign(),
+				edgeMargin: EDGE_MARGIN_PX
+			});
+		};
+
+		/**
+		 * Indicates whether the cross axis is tied to the opener rather than centered on it.
+		 * Thin wrapper around {@link sap.ui.core.popover.Positioning.isCrossAxisOpenerBound}.
+		 *
+		 * Such a tooltip owns its cross-axis position: it was docked to an opener
+		 * edge (or sized to the opener) on purpose, and
+		 * {@link #_computeAlignedMaxSize} already caps it so it cannot leave the
+		 * within-area. The generic clamp knows nothing about the alignment, so
+		 * letting it run would re-pin the box to the screen edge and silently undo
+		 * the alignment.
+		 *
+		 * @param {sap.ui.core.popover.PopoverPhysicalSide} sSide The resolved side.
+		 * @returns {boolean} Whether the cross-axis clamp must be skipped
+		 * @private
+		 */
+		Tooltip.prototype._hasOpenerBoundCrossAxis = function (sSide) {
+			return Positioning.isCrossAxisOpenerBound({
+				side: sSide,
+				horizontalAlign: this._getEffectiveHorizontalAlign(),
+				verticalAlign: this._getEffectiveVerticalAlign()
+			});
+		};
+
+		// Moves the box by fDelta px along the axis spanned by sNear/sFar, reusing
+		// whichever of the two offsets the Popup's dock actually set — sFar grows
+		// against the delta, hence the sign flip.
+		function shiftAlong(oDomRef, sNear, sFar, fDelta) {
+			if (oDomRef.style[sNear] !== "") {
+				oDomRef.style[sNear] = (parseFloat(oDomRef.style[sNear]) + fDelta) + "px";
+			} else if (oDomRef.style[sFar] !== "") {
+				oDomRef.style[sFar] = (parseFloat(oDomRef.style[sFar]) - fDelta) + "px";
+			}
+		}
+
+		/**
+		 * Re-docks the opener-bound cross axis to the opener's live rect.
+		 *
+		 * The delta math lives in
+		 * {@link sap.ui.core.popover.Positioning.computeCrossAxisDockDelta}. This
+		 * method applies the returned delta to whichever of the two cross-axis offsets
+		 * the Popup's dock actually set, using {@link shiftAlong}.
+		 *
+		 * @param {sap.ui.core.popover.PopoverPhysicalSide} sSide The resolved side.
+		 * @private
+		 */
+		Tooltip.prototype._dockCrossAxis = function (sSide) {
+			const oDomRef = this.getDomRef();
+			const oHost = this._oHostForArrow;
+
+			if (!oDomRef || !oHost) {
+				return;
+			}
+
+			const oDock = Positioning.computeCrossAxisDockDelta({
+				side: sSide,
+				openerRef: oHost,
+				popoverRef: oDomRef,
+				withinAreaRef: Popup.getWithinAreaDomRef(),
+				horizontalAlign: this._getEffectiveHorizontalAlign(),
+				verticalAlign: this._getEffectiveVerticalAlign(),
+				edgeMargin: EDGE_MARGIN_PX
+			});
+
+			if (!oDock) {
+				return;
+			}
+
+			shiftAlong(oDomRef, oDock.near, oDock.far, oDock.delta);
+		};
+
+		/**
+		 * Applies the alignment size limit before the Popup docks the tooltip, so
+		 * the dock measures the already-wrapped box. <code>_fitIntoWithinArea</code>
+		 * folds the same limit in again after the open.
+		 *
+		 * @param {sap.ui.core.popover.PopoverPhysicalSide} sSide The resolved side.
+		 * @private
+		 */
+		Tooltip.prototype._applyAlignedSizeCaps = function (sSide) {
+			const oDomRef = this.getDomRef();
+
+			if (!oDomRef) {
+				return;
+			}
+
+			oDomRef.style.maxWidth = "";
+			oDomRef.style.maxHeight = "";
+
+			const oAligned = this._computeAlignedMaxSize(sSide);
+
+			if (typeof oAligned.maxWidth === "number") {
+				oDomRef.style.maxWidth = Math.max(oAligned.maxWidth, 0) + "px";
+			}
+
+			if (typeof oAligned.maxHeight === "number") {
+				oDomRef.style.maxHeight = Math.max(oAligned.maxHeight, 0) + "px";
+			}
 		};
 
 		/**
@@ -389,7 +614,9 @@ sap.ui.define([
 			const oAnchor = Positioning.computeAnchor({
 				side: sProvisionalSide,
 				arrowSize: this._arrowProtrusion,
-				mirror: false
+				mirror: false,
+				horizontalAlign: this.getHorizontalAlign(),
+				verticalAlign: this.getVerticalAlign()
 			});
 
 			this._oPopup.setPosition(oAnchor.my, oAnchor.at, oHost, oAnchor.offset, "none");
@@ -426,18 +653,35 @@ sap.ui.define([
 				left: EDGE_MARGIN_PX
 			};
 
-			// Cap before clamp: the clamp reads the box rect, so
-			// the box must already be shrunk to fit — else it can't be pulled on-screen.
-			const oBoxMax = Positioning.computeMaxContentSize({
+			// Cap before clamp: the clamp reads the box rect, so the box must already
+			// be shrunk to fit — else it can't be pulled on-screen. computeFittedMaxSize
+			// folds the within-area cap with the opener-bound alignment cap (the box may
+			// only grow away from the edge it is docked to, or must match the opener for
+			// Stretch), returning the raw aligned values so a genuine alignment cap can
+			// be told apart from the within-area cap.
+			const oLogicalSide = Positioning.toLogicalSide(this._sCalcedPos);
+			const oFitted = Positioning.computeFittedMaxSize({
 				margin: oMargins,
 				withinAreaRef: oWithinRef,
-				side: toLogicalSide(this._sCalcedPos),
+				side: oLogicalSide,
 				openerRef: this._oHostForArrow,
-				arrowSize: this._arrowProtrusion
+				arrowSize: this._arrowProtrusion,
+				horizontalAlign: this._getEffectiveHorizontalAlign(),
+				verticalAlign: this._getEffectiveVerticalAlign(),
+				edgeMargin: EDGE_MARGIN_PX
 			});
+			const iMaxWidth = oFitted.maxWidth;
+			const iMaxHeight = oFitted.maxHeight;
 
-			if (oBoxMax.maxWidth < oDomRef.getBoundingClientRect().width) {
-				oDomRef.style.maxWidth = oBoxMax.maxWidth + "px";
+			// An aligned cap is applied unconditionally: the current width is a
+			// shrink-to-fit result of wherever the Popup docked the box, so it is no
+			// evidence that the cap is unnecessary.
+			if (oFitted.alignedWidth !== undefined || iMaxWidth < oDomRef.getBoundingClientRect().width) {
+				oDomRef.style.maxWidth = Math.max(iMaxWidth, 0) + "px";
+			}
+
+			if (oFitted.alignedHeight !== undefined) {
+				oDomRef.style.maxHeight = Math.max(iMaxHeight, 0) + "px";
 			}
 
 			// Cap root + scroll container so a too-tall tooltip scrolls. Cap on content
@@ -445,17 +689,20 @@ sap.ui.define([
 			if (oContRef) {
 				const oCs = window.getComputedStyle(oDomRef);
 				const iPadY = parseFloat(oCs.paddingTop) + parseFloat(oCs.paddingBottom);
-				const iContMax = Positioning.computeMaxContentSize({
-					margin: oMargins,
-					withinAreaRef: oWithinRef,
-					side: toLogicalSide(this._sCalcedPos),
-					openerRef: this._oHostForArrow,
-					arrowSize: this._arrowProtrusion,
-					reservedHeight: iPadY
-				}).maxHeight;
+				const iContMax = Math.min(
+					Positioning.computeMaxContentSize({
+						margin: oMargins,
+						withinAreaRef: oWithinRef,
+						side: oLogicalSide,
+						openerRef: this._oHostForArrow,
+						arrowSize: this._arrowProtrusion,
+						reservedHeight: iPadY
+					}).maxHeight,
+					Math.max(iMaxHeight - iPadY, 0)
+				);
 
 				if (oContRef.scrollHeight > iContMax) {
-					oDomRef.style.maxHeight = oBoxMax.maxHeight + "px";
+					oDomRef.style.maxHeight = Math.max(iMaxHeight, 0) + "px";
 					oContRef.style.maxHeight = iContMax + "px";
 				}
 			}
@@ -467,12 +714,23 @@ sap.ui.define([
 				hasVerticalScrollbar: false,
 				margin: oMargins,
 				withinAreaRef: oWithinRef,
-				side: toLogicalSide(this._sCalcedPos),
+				side: oLogicalSide,
 				openerRef: this._oHostForArrow,
 				arrowSize: this._arrowProtrusion
 			});
 
+			// The clamp is alignment-blind: on the cross axis it would pin an
+			// opener-bound tooltip to the screen edge and undo the alignment. The cap
+			// above already keeps that axis inside the within-area, so drop it there
+			// and keep the Popup's dock.
+			const aCrossAxis = Positioning.computeCrossAxisEdges(this._sCalcedPos);
+			const bKeepCrossAxis = this._hasOpenerBoundCrossAxis(this._sCalcedPos);
+
 			["top", "bottom", "left", "right"].forEach((sSide) => {
+				if (bKeepCrossAxis && aCrossAxis.includes(sSide)) {
+					return;
+				}
+
 				const vValue = oPosition[sSide];
 				if (typeof vValue === "number") {
 					oDomRef.style[sSide] = vValue + "px";
@@ -480,6 +738,10 @@ sap.ui.define([
 					oDomRef.style[sSide] = "";
 				}
 			});
+
+			// Last, so it corrects the final box: the caps above resized it after the
+			// Popup docked it.
+			this._dockCrossAxis(this._sCalcedPos);
 		};
 
 		// Sets the arrow's offset along the tooltip edge so it points at the opener.
@@ -504,7 +766,10 @@ sap.ui.define([
 				arrowWidth: this._arrowContainerSize,
 				arrowHeight: this._arrowContainerSize,
 				// small inset so the clamp band doesn't collapse on short tooltips
-				cornerInset: ARROW_CORNER_INSET_PX
+				cornerInset: ARROW_CORNER_INSET_PX,
+				// Begin/End (Top/Bottom) pin the arrow to the aligned corner.
+				horizontalAlign: this._getEffectiveHorizontalAlign(),
+				verticalAlign: this._getEffectiveVerticalAlign()
 			});
 
 			// Reset offsets from a prior open (possibly on another side / direction).

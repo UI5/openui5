@@ -12,6 +12,11 @@ sap.ui.define([
 ], function(createAndAppendDiv, nextUIUpdate, Tooltip, Button, coreLibrary, Positioning, Device, TooltipManager, Localization) {
 	"use strict";
 	const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
+	const PopoverHorizontalAlign = coreLibrary.popover.PopoverHorizontalAlign;
+	const PopoverVerticalAlign = coreLibrary.popover.PopoverVerticalAlign;
+	// Mirrors EDGE_MARGIN_PX in sap/ui/core/tooltip/Tooltip.js — the gap the
+	// tooltip keeps from the within-area edge.
+	const EDGE_MARGIN_PX = 10;
 	createAndAppendDiv("content");
 
 	// Minimal stand-in for the sap.ui.core.Popup the control wraps. The control
@@ -88,17 +93,26 @@ sap.ui.define([
 		assert.strictEqual(this.oTooltip.getText(), "", "text");
 		assert.strictEqual(this.oTooltip.getPlacement(), PopoverPlacement.Top, "placement");
 		assert.strictEqual(this.oTooltip.getDelay(), 500, "delay");
+		assert.strictEqual(this.oTooltip.getHorizontalAlign(), PopoverHorizontalAlign.Center, "horizontalAlign");
+		assert.strictEqual(this.oTooltip.getVerticalAlign(), PopoverVerticalAlign.Center, "verticalAlign");
 	});
 
-	QUnit.test("_resolveSide forwards the placement and MoreSpace flip mode", function(assert) {
-		const oTooltip = new Tooltip({ placement: PopoverPlacement.Begin });
-		const oStub = sinon.stub(Positioning, "resolvePlacement").returns("Left");
-		const oHost = document.createElement("div");
-		oTooltip._resolveSide(oHost);
-		assert.strictEqual(oStub.calledOnce, true, "resolvePlacement called");
+	QUnit.test("_resolvePlacementAndAlign forwards the placement, MoreSpace flip mode and alignments", function(assert) {
+		const oTooltip = new Tooltip({
+			placement: PopoverPlacement.Begin,
+			horizontalAlign: PopoverHorizontalAlign.End,
+			verticalAlign: PopoverVerticalAlign.Bottom
+		});
+		const oStub = sinon.stub(Positioning, "resolvePlacementAndAlign").returns({
+			side: "Left", horizontalAlign: PopoverHorizontalAlign.End, verticalAlign: PopoverVerticalAlign.Bottom
+		});
+		oTooltip._resolvePlacementAndAlign();
+		assert.strictEqual(oStub.calledOnce, true, "resolvePlacementAndAlign called");
 		const oArg = oStub.firstCall.args[0];
 		assert.strictEqual(oArg.placement, PopoverPlacement.Begin, "placement forwarded");
 		assert.strictEqual(oArg.flipMode, "MoreSpace", "MoreSpace flip mode");
+		assert.strictEqual(oArg.horizontalAlign, PopoverHorizontalAlign.End, "horizontalAlign forwarded");
+		assert.strictEqual(oArg.verticalAlign, PopoverVerticalAlign.Bottom, "verticalAlign forwarded");
 		oStub.restore();
 		oTooltip.destroy();
 	});
@@ -116,9 +130,22 @@ sap.ui.define([
 		this.oTooltip.setText("Hi");
 		this.oTooltip.setPlacement(PopoverPlacement.Bottom);
 		this.oTooltip.setDelay(1000);
+		this.oTooltip.setHorizontalAlign(PopoverHorizontalAlign.End);
+		this.oTooltip.setVerticalAlign(PopoverVerticalAlign.Bottom);
 		assert.strictEqual(this.oTooltip.getText(), "Hi");
 		assert.strictEqual(this.oTooltip.getPlacement(), PopoverPlacement.Bottom);
 		assert.strictEqual(this.oTooltip.getDelay(), 1000);
+		assert.strictEqual(this.oTooltip.getHorizontalAlign(), PopoverHorizontalAlign.End);
+		assert.strictEqual(this.oTooltip.getVerticalAlign(), PopoverVerticalAlign.Bottom);
+	});
+
+	QUnit.test("alignment properties reject unknown values", function(assert) {
+		assert.throws(function() {
+			this.oTooltip.setHorizontalAlign("Nope");
+		}.bind(this), "horizontalAlign is type-checked against the enum");
+		assert.throws(function() {
+			this.oTooltip.setVerticalAlign("Nope");
+		}.bind(this), "verticalAlign is type-checked against the enum");
 	});
 
 	QUnit.module("init");
@@ -946,11 +973,11 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("clears left/right/top/bottom before docking", function(assert) {
+	QUnit.test("clears stale position before docking", function(assert) {
 		// Wire up the real _applyPosition override.
 		this.oTooltip._ensurePopup();
 		this.oTooltip._oHostForArrow = this.oStub.getDomRef();
-		this.oTooltip._bPosResolved = false; // first pass: clear, resolve side, re-anchor, return
+		this.oTooltip._bPosResolved = false; // first pass: clear, resolve side, re-anchor, re-dock
 
 		const oDomRef = this.oTooltip.getDomRef();
 		// Simulate stale inline position from a previous open.
@@ -963,10 +990,14 @@ sap.ui.define([
 		sinon.stub(this.oTooltip._oPopup, "getOpenState").returns("OPEN");
 		this.oTooltip._oPopup._applyPosition({});
 
-		assert.strictEqual(oDomRef.style.left, "", "left cleared");
-		assert.strictEqual(oDomRef.style.right, "", "right cleared");
-		assert.strictEqual(oDomRef.style.top, "", "top cleared");
-		assert.strictEqual(oDomRef.style.bottom, "", "bottom cleared");
+		// The first pass wipes the stale offsets, then re-docks the box via
+		// _fitIntoWithinArea — so the offsets now hold freshly-computed values, not
+		// the stale ones. Assert the stale values did not leak through rather than
+		// that the offsets stayed empty.
+		assert.notStrictEqual(oDomRef.style.left, "123px", "stale left did not leak through");
+		assert.notStrictEqual(oDomRef.style.right, "45px", "stale right did not leak through");
+		assert.notStrictEqual(oDomRef.style.top, "67px", "stale top did not leak through");
+		assert.notStrictEqual(oDomRef.style.bottom, "89px", "stale bottom did not leak through");
 	});
 
 	// Aborted opens (close-before-open, selection guard) must not leak into the manager registry.
@@ -1034,4 +1065,709 @@ sap.ui.define([
 		assert.ok(this.fnDeregisterSpy.calledWith(this.oTooltip),
 			"afterClose event triggered TooltipManager.deregister");
 	});
+
+	// ---------------------------------------------------------------------------
+	// Cross-axis alignment: horizontalAlign / verticalAlign
+	// ---------------------------------------------------------------------------
+
+	QUnit.module("Alignment is forwarded to Positioning", {
+		beforeEach: function() {
+			this.oTooltip = new Tooltip({
+				text: "Hi",
+				delay: 0,
+				horizontalAlign: PopoverHorizontalAlign.End,
+				verticalAlign: PopoverVerticalAlign.Bottom
+			});
+			this.stub = makeStub();
+			this.oPopup = stubPopup(this.oTooltip);
+		},
+		afterEach: async function() {
+			this.oTooltip._clearTimeouts();
+			this.oTooltip.destroy();
+			removeStub(this.stub);
+			// "_positionArrow forwards ..." renders the tooltip. Destroying a
+			// rendered control leaves a pending rendering task on the fake clock;
+			// draining it here keeps it from deadlocking the next module's
+			// nextUIUpdate().
+			await this.clock.tickAsync(2000);
+		}
+	});
+
+	QUnit.test("_doOpen forwards both alignments to computeAnchor", function(assert) {
+		const oSpy = sinon.spy(Positioning, "computeAnchor");
+		this.oTooltip._ensurePopup();
+
+		this.oTooltip._doOpen(this.stub);
+
+		assert.ok(oSpy.calledOnce, "computeAnchor called");
+		const oArg = oSpy.firstCall.args[0];
+		assert.strictEqual(oArg.horizontalAlign, PopoverHorizontalAlign.End, "horizontalAlign forwarded");
+		assert.strictEqual(oArg.verticalAlign, PopoverVerticalAlign.Bottom, "verticalAlign forwarded");
+		oSpy.restore();
+	});
+
+	QUnit.test("_positionArrow forwards both alignments to computeArrowOffset", async function(assert) {
+		this.oTooltip.placeAt("content");
+		await nextUIUpdate(this.clock);
+		this.oTooltip._oHostForArrow = this.stub.getDomRef();
+		this.oTooltip._sCalcedPos = "Bottom";
+
+		const oSpy = sinon.spy(Positioning, "computeArrowOffset");
+		this.oTooltip._positionArrow();
+
+		assert.ok(oSpy.calledOnce, "computeArrowOffset called");
+		const oArg = oSpy.firstCall.args[0];
+		assert.strictEqual(oArg.horizontalAlign, PopoverHorizontalAlign.End, "horizontalAlign forwarded");
+		assert.strictEqual(oArg.verticalAlign, PopoverVerticalAlign.Bottom, "verticalAlign forwarded");
+		oSpy.restore();
+	});
+
+	QUnit.module("_applyStretchSize", {
+		beforeEach: function() {
+			this.oStub = makeStub();
+			// Give the opener a deterministic size.
+			Object.assign(this.oStub.getDomRef().style, {width: "180px", height: "60px"});
+			// The alignment is passed to the constructor: changing it with a setter
+			// on an already rendered tooltip would schedule a re-render that the
+			// fake clock in afterEach would have to drain.
+			this.render = async function(mSettings) {
+				this.oTooltip = new Tooltip(Object.assign({text: "Hi"}, mSettings));
+				this.oTooltip.placeAt("content");
+				await nextUIUpdate(this.clock);
+				this.oTooltip._oHostForArrow = this.oStub.getDomRef();
+				return this.oTooltip.getDomRef();
+			}.bind(this);
+		},
+		afterEach: async function() {
+			this.oTooltip.destroy();
+			removeStub(this.oStub);
+			await this.clock.tickAsync(2000);
+		}
+	});
+
+	QUnit.test("Stretch on a vertical side sizes the tooltip to the opener width", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.Stretch});
+
+		this.oTooltip._applyStretchSize("Bottom");
+
+		assert.strictEqual(oDomRef.style.width, "180px", "width taken from the opener");
+		assert.strictEqual(oDomRef.style.height, "", "height untouched on a vertical side");
+	});
+
+	QUnit.test("Stretch on a horizontal side sizes the tooltip to the opener height", async function(assert) {
+		const oDomRef = await this.render({verticalAlign: PopoverVerticalAlign.Stretch});
+
+		this.oTooltip._applyStretchSize("Left");
+
+		assert.strictEqual(oDomRef.style.height, "60px", "height taken from the opener");
+		assert.strictEqual(oDomRef.style.width, "", "width untouched on a horizontal side");
+	});
+
+	QUnit.test("the alignment of the other axis is ignored", async function(assert) {
+		// Stretch on the vertical axis must not size a Top/Bottom-placed tooltip.
+		const oDomRef = await this.render({verticalAlign: PopoverVerticalAlign.Stretch});
+
+		this.oTooltip._applyStretchSize("Top");
+
+		assert.strictEqual(oDomRef.style.width, "", "no width for a vertical side driven by verticalAlign");
+		assert.strictEqual(oDomRef.style.height, "", "no height either");
+	});
+
+	QUnit.test("a non-Stretch alignment leaves the size alone", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.Begin});
+
+		this.oTooltip._applyStretchSize("Bottom");
+
+		assert.strictEqual(oDomRef.style.width, "", "no width set");
+		assert.strictEqual(oDomRef.style.height, "", "no height set");
+	});
+
+	QUnit.test("a size from a previous open is reset first", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.Center});
+		// Previous open stretched the tooltip.
+		oDomRef.style.width = "999px";
+		oDomRef.style.height = "999px";
+
+		this.oTooltip._applyStretchSize("Bottom");
+
+		assert.strictEqual(oDomRef.style.width, "", "stale width cleared");
+		assert.strictEqual(oDomRef.style.height, "", "stale height cleared");
+	});
+
+	QUnit.module("_computeAlignedMaxSize", {
+		beforeEach: function() {
+			this.oStub = makeStub();
+			// Pin the opener so its rect is stable and known.
+			Object.assign(this.oStub.getDomRef().style, {
+				position: "fixed", top: "100px", left: "300px", width: "180px", height: "60px"
+			});
+			this.oHostRect = this.oStub.getDomRef().getBoundingClientRect();
+			this.render = async function(mSettings) {
+				this.oTooltip = new Tooltip(Object.assign({text: "Hi"}, mSettings));
+				this.oTooltip.placeAt("content");
+				await nextUIUpdate(this.clock);
+				this.oTooltip._oHostForArrow = this.oStub.getDomRef();
+				return this.oTooltip.getDomRef();
+			}.bind(this);
+		},
+		afterEach: async function() {
+			this.oTooltip.destroy();
+			removeStub(this.oStub);
+			await this.clock.tickAsync(2000);
+		}
+	});
+
+	QUnit.test("Begin leaves only the room towards the end of the viewport", async function(assert) {
+		await this.render({horizontalAlign: PopoverHorizontalAlign.Begin});
+
+		const oMax = this.oTooltip._computeAlignedMaxSize("Bottom");
+
+		assert.strictEqual(
+			oMax.maxWidth,
+			document.documentElement.clientWidth - this.oHostRect.left - EDGE_MARGIN_PX,
+			"measured from the opener's left edge to the right bound"
+		);
+		assert.strictEqual(oMax.maxHeight, undefined, "no height limit on a vertical side");
+	});
+
+	QUnit.test("End leaves only the room towards the start of the viewport", async function(assert) {
+		await this.render({horizontalAlign: PopoverHorizontalAlign.End});
+
+		const oMax = this.oTooltip._computeAlignedMaxSize("Top");
+
+		assert.strictEqual(
+			oMax.maxWidth,
+			this.oHostRect.right - EDGE_MARGIN_PX,
+			"measured from the left bound to the opener's right edge"
+		);
+	});
+
+	QUnit.test("Begin pins the right edge in RTL", async function(assert) {
+		await this.render({horizontalAlign: PopoverHorizontalAlign.Begin});
+		const oRtl = sinon.stub(Localization, "getRTL").returns(true);
+
+		assert.strictEqual(
+			this.oTooltip._computeAlignedMaxSize("Bottom").maxWidth,
+			this.oHostRect.right - EDGE_MARGIN_PX,
+			"Begin measures towards the left bound in RTL"
+		);
+
+		oRtl.restore();
+	});
+
+	QUnit.test("End pins the left edge in RTL", async function(assert) {
+		await this.render({horizontalAlign: PopoverHorizontalAlign.End});
+		const oRtl = sinon.stub(Localization, "getRTL").returns(true);
+
+		assert.strictEqual(
+			this.oTooltip._computeAlignedMaxSize("Bottom").maxWidth,
+			document.documentElement.clientWidth - this.oHostRect.left - EDGE_MARGIN_PX,
+			"End measures towards the right bound in RTL"
+		);
+
+		oRtl.restore();
+	});
+
+	QUnit.test("Top limits the height on a horizontal side", async function(assert) {
+		await this.render({verticalAlign: PopoverVerticalAlign.Top});
+
+		assert.strictEqual(
+			this.oTooltip._computeAlignedMaxSize("Right").maxHeight,
+			document.documentElement.clientHeight - this.oHostRect.top - EDGE_MARGIN_PX,
+			"Top measures down from the opener's top edge"
+		);
+	});
+
+	QUnit.test("Bottom limits the height on a horizontal side", async function(assert) {
+		await this.render({verticalAlign: PopoverVerticalAlign.Bottom});
+
+		assert.strictEqual(
+			this.oTooltip._computeAlignedMaxSize("Left").maxHeight,
+			this.oHostRect.bottom - EDGE_MARGIN_PX,
+			"Bottom measures up from the opener's bottom edge"
+		);
+	});
+
+	QUnit.test("Center imposes no limit", async function(assert) {
+		await this.render({
+			horizontalAlign: PopoverHorizontalAlign.Center,
+			verticalAlign: PopoverVerticalAlign.Center
+		});
+
+		assert.deepEqual(this.oTooltip._computeAlignedMaxSize("Bottom"), {}, "on a vertical side");
+		assert.deepEqual(this.oTooltip._computeAlignedMaxSize("Left"), {}, "on a horizontal side");
+	});
+
+	QUnit.test("Stretch limits to the opener's own extent", async function(assert) {
+		await this.render({
+			horizontalAlign: PopoverHorizontalAlign.Stretch,
+			verticalAlign: PopoverVerticalAlign.Stretch
+		});
+
+		// The theme caps the tooltip at max-width: 17rem. A stretched tooltip must
+		// match its opener instead, so the limit is reported as the opener's extent
+		// and overrides the theme cap rather than letting it shrink the box.
+		assert.deepEqual(
+			this.oTooltip._computeAlignedMaxSize("Bottom"),
+			{maxWidth: this.oHostRect.width},
+			"on a vertical side the limit is the opener's width"
+		);
+		assert.deepEqual(
+			this.oTooltip._computeAlignedMaxSize("Left"),
+			{maxHeight: this.oHostRect.height},
+			"on a horizontal side the limit is the opener's height"
+		);
+	});
+
+	QUnit.test("no opener yields no limit", async function(assert) {
+		await this.render({horizontalAlign: PopoverHorizontalAlign.Begin});
+		this.oTooltip._oHostForArrow = null;
+
+		assert.deepEqual(this.oTooltip._computeAlignedMaxSize("Bottom"), {}, "nothing to measure against");
+	});
+
+	QUnit.test("_applyAlignedSizeCaps writes the limit to the DOM and resets a stale one", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.Begin});
+		oDomRef.style.maxWidth = "999px";
+		oDomRef.style.maxHeight = "999px";
+
+		this.oTooltip._applyAlignedSizeCaps("Bottom");
+
+		assert.strictEqual(
+			oDomRef.style.maxWidth,
+			(document.documentElement.clientWidth - this.oHostRect.left - EDGE_MARGIN_PX) + "px",
+			"max-width applied"
+		);
+		assert.strictEqual(oDomRef.style.maxHeight, "", "stale max-height cleared");
+	});
+
+	QUnit.test("_applyAlignedSizeCaps clears the cap for a centered alignment", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.Center});
+		oDomRef.style.maxWidth = "999px";
+
+		this.oTooltip._applyAlignedSizeCaps("Bottom");
+
+		assert.strictEqual(oDomRef.style.maxWidth, "", "cap removed for a centered alignment");
+	});
+
+	QUnit.module("_hasOpenerBoundCrossAxis", {
+		beforeEach: function() {
+			this.check = function(mSettings, sSide) {
+				const oTooltip = new Tooltip(mSettings);
+				const bResult = oTooltip._hasOpenerBoundCrossAxis(sSide);
+				oTooltip.destroy();
+				return bResult;
+			};
+		}
+	});
+
+	QUnit.test("only a centered cross axis leaves the clamp in charge", function(assert) {
+		// The cross axis of a vertical side is horizontal, and vice versa — the
+		// alignment of the *other* axis must not influence the answer.
+		[PopoverHorizontalAlign.Begin, PopoverHorizontalAlign.End, PopoverHorizontalAlign.Stretch]
+			.forEach((sAlign) => {
+				assert.ok(this.check({horizontalAlign: sAlign}, "Bottom"),
+					"horizontalAlign " + sAlign + " owns the cross axis of a vertical side");
+				assert.notOk(this.check({horizontalAlign: sAlign}, "Left"),
+					"horizontalAlign " + sAlign + " is ignored on a horizontal side");
+			});
+
+		[PopoverVerticalAlign.Top, PopoverVerticalAlign.Bottom, PopoverVerticalAlign.Stretch]
+			.forEach((sAlign) => {
+				assert.ok(this.check({verticalAlign: sAlign}, "Right"),
+					"verticalAlign " + sAlign + " owns the cross axis of a horizontal side");
+				assert.notOk(this.check({verticalAlign: sAlign}, "Top"),
+					"verticalAlign " + sAlign + " is ignored on a vertical side");
+			});
+
+		assert.notOk(this.check({}, "Bottom"), "the default Center leaves a vertical side to the clamp");
+		assert.notOk(this.check({}, "Left"), "the default Center leaves a horizontal side to the clamp");
+	});
+
+	QUnit.module("_dockCrossAxis", {
+		beforeEach: function() {
+			this.oStub = makeStub();
+			Object.assign(this.oStub.getDomRef().style, {
+				position: "fixed", top: "100px", left: "300px", width: "180px", height: "60px"
+			});
+
+			this.render = async function(mSettings) {
+				this.oTooltip = new Tooltip(Object.assign({text: "Hi"}, mSettings));
+				this.oTooltip.placeAt("content");
+				await nextUIUpdate(this.clock);
+				this.oTooltip._oHostForArrow = this.oStub.getDomRef();
+
+				const oDomRef = this.oTooltip.getDomRef();
+				// Mimic the Popup's dock: absolute, offsets owned by the "left"/"top"
+				// pair, deliberately off the opener so the correction is measurable.
+				Object.assign(oDomRef.style, {position: "fixed", left: "0px", top: "0px", width: "50px", height: "20px"});
+				return oDomRef;
+			}.bind(this);
+		},
+		afterEach: async function() {
+			this.oTooltip.destroy();
+			removeStub(this.oStub);
+			await this.clock.tickAsync(2000);
+		}
+	});
+
+	QUnit.test("Begin pulls the tooltip's left edge onto the opener's left edge", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.Begin});
+
+		this.oTooltip._dockCrossAxis("Bottom");
+
+		assert.strictEqual(Math.round(oDomRef.getBoundingClientRect().left), 300, "left edges meet");
+	});
+
+	QUnit.test("End pulls the tooltip's right edge onto the opener's right edge", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.End});
+
+		this.oTooltip._dockCrossAxis("Bottom");
+
+		assert.strictEqual(Math.round(oDomRef.getBoundingClientRect().right), 480, "right edges meet");
+	});
+
+	QUnit.test("Stretch docks the start edge, like Begin", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.Stretch});
+
+		this.oTooltip._dockCrossAxis("Bottom");
+
+		assert.strictEqual(Math.round(oDomRef.getBoundingClientRect().left), 300, "left edges meet");
+	});
+
+	QUnit.test("verticalAlign Top/Bottom dock the matching horizontal edge", async function(assert) {
+		let oDomRef = await this.render({verticalAlign: PopoverVerticalAlign.Top});
+		this.oTooltip._dockCrossAxis("Right");
+		assert.strictEqual(Math.round(oDomRef.getBoundingClientRect().top), 100, "top edges meet");
+
+		this.oTooltip.destroy();
+		oDomRef = await this.render({verticalAlign: PopoverVerticalAlign.Bottom});
+		this.oTooltip._dockCrossAxis("Right");
+		assert.strictEqual(Math.round(oDomRef.getBoundingClientRect().bottom), 160, "bottom edges meet");
+	});
+
+	QUnit.test("the offsets the dock did not use are left alone", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.End});
+		// The Popup docks with only one offset per axis; "right" must stay untouched
+		// so the box keeps reacting to its content.
+		oDomRef.style.right = "";
+
+		this.oTooltip._dockCrossAxis("Bottom");
+
+		assert.strictEqual(oDomRef.style.right, "", "the unused offset stays unset");
+		assert.notStrictEqual(oDomRef.style.left, "0px", "the used offset carries the correction");
+	});
+
+	QUnit.test("a centered cross axis is not touched", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.Center});
+
+		this.oTooltip._dockCrossAxis("Bottom");
+
+		assert.strictEqual(oDomRef.style.left, "0px", "the clamp keeps ownership of a centered axis");
+	});
+
+	QUnit.test("no opener leaves the position untouched", async function(assert) {
+		const oDomRef = await this.render({horizontalAlign: PopoverHorizontalAlign.Begin});
+		this.oTooltip._oHostForArrow = null;
+
+		this.oTooltip._dockCrossAxis("Bottom");
+
+		assert.strictEqual(oDomRef.style.left, "0px", "nothing to dock against");
+	});
+
+
+	QUnit.module("Alignment on tooltip DOM", {
+		beforeEach: async function() {
+			// A wide, tall anchor: the tooltip is much smaller on both axes, so
+			// each alignment lands on a clearly different edge.
+			this.oButton = new Button({text: "Anchor"});
+			this.oButton.placeAt("content");
+			await nextUIUpdate(this.clock);
+			Object.assign(this.oButton.getDomRef().style, {
+				position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+				width: "320px", height: "160px"
+			});
+		},
+		afterEach: async function() {
+			if (this.oTooltip) {
+				this.oTooltip.destroy();
+			}
+			this.oButton.destroy();
+			await this.clock.tickAsync(2000);
+		}
+	});
+
+	QUnit.test("horizontalAlign Begin docks the tooltip's left edge to the opener's left edge", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: "Hi", placement: PopoverPlacement.Bottom, delay: 0,
+			horizontalAlign: PopoverHorizontalAlign.Begin
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+		assert.ok(Math.abs(oTipRect.left - oBtnRect.left) <= 2,
+			"left edges aligned (" + oTipRect.left + " vs " + oBtnRect.left + ")");
+		assert.ok(oTipRect.right < oBtnRect.right, "the tooltip is narrower, so it does not reach the opener's right edge");
+	});
+
+	QUnit.test("horizontalAlign End docks the tooltip's right edge to the opener's right edge", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: "Hi", placement: PopoverPlacement.Bottom, delay: 0,
+			horizontalAlign: PopoverHorizontalAlign.End
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+		assert.ok(Math.abs(oTipRect.right - oBtnRect.right) <= 2,
+			"right edges aligned (" + oTipRect.right + " vs " + oBtnRect.right + ")");
+		assert.ok(oTipRect.left > oBtnRect.left, "the tooltip does not reach the opener's left edge");
+	});
+
+	QUnit.test("horizontalAlign Center keeps the tooltip centered on the opener", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: "Hi", placement: PopoverPlacement.Bottom, delay: 0,
+			horizontalAlign: PopoverHorizontalAlign.Center
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+		const fTipCenter = oTipRect.left + oTipRect.width / 2;
+		const fBtnCenter = oBtnRect.left + oBtnRect.width / 2;
+		assert.ok(Math.abs(fTipCenter - fBtnCenter) <= 2,
+			"centers aligned (" + fTipCenter + " vs " + fBtnCenter + ")");
+	});
+
+	QUnit.test("horizontalAlign Stretch sizes the tooltip to the opener width", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: "Hi", placement: PopoverPlacement.Bottom, delay: 0,
+			horizontalAlign: PopoverHorizontalAlign.Stretch
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+		assert.ok(Math.abs(oTipRect.width - oBtnRect.width) <= 2,
+			"widths match (" + oTipRect.width + " vs " + oBtnRect.width + ")");
+		assert.ok(Math.abs(oTipRect.left - oBtnRect.left) <= 2, "and it starts at the opener's left edge");
+	});
+
+	QUnit.test("verticalAlign Top docks the tooltip's top edge to the opener's top edge", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: "Hi", placement: PopoverPlacement.End, delay: 0,
+			verticalAlign: PopoverVerticalAlign.Top
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+		assert.ok(Math.abs(oTipRect.top - oBtnRect.top) <= 2,
+			"top edges aligned (" + oTipRect.top + " vs " + oBtnRect.top + ")");
+	});
+
+	QUnit.test("verticalAlign Bottom docks the tooltip's bottom edge to the opener's bottom edge", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: "Hi", placement: PopoverPlacement.End, delay: 0,
+			verticalAlign: PopoverVerticalAlign.Bottom
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+		assert.ok(Math.abs(oTipRect.bottom - oBtnRect.bottom) <= 2,
+			"bottom edges aligned (" + oTipRect.bottom + " vs " + oBtnRect.bottom + ")");
+	});
+
+	QUnit.test("verticalAlign Stretch sizes the tooltip to the opener height", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: "Hi", placement: PopoverPlacement.End, delay: 0,
+			verticalAlign: PopoverVerticalAlign.Stretch
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+		assert.ok(Math.abs(oTipRect.height - oBtnRect.height) <= 2,
+			"heights match (" + oTipRect.height + " vs " + oBtnRect.height + ")");
+	});
+
+	QUnit.test("the alignment of the other axis does not move the tooltip", async function(assert) {
+		// verticalAlign must be ignored for a Bottom placement.
+		this.oTooltip = new Tooltip({
+			text: "Hi", placement: PopoverPlacement.Bottom, delay: 0,
+			verticalAlign: PopoverVerticalAlign.Bottom
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+		const fTipCenter = oTipRect.left + oTipRect.width / 2;
+		const fBtnCenter = oBtnRect.left + oBtnRect.width / 2;
+		assert.ok(Math.abs(fTipCenter - fBtnCenter) <= 2, "still centered — the default horizontalAlign applies");
+		assert.ok(oTipRect.top >= oBtnRect.bottom - 1, "and still below the opener");
+	});
+
+	QUnit.test("the arrow is pinned to the aligned corner, not to the opener's center", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: "Hi", placement: PopoverPlacement.Bottom, delay: 0,
+			horizontalAlign: PopoverHorizontalAlign.Begin
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oDomRef = this.oTooltip.getDomRef();
+		const oArrow = oDomRef.querySelector(".sapUiCoreTooltipArrow");
+		const oTipRect = oDomRef.getBoundingClientRect();
+		const oArrowRect = oArrow.getBoundingClientRect();
+
+		// The opener is far wider than the tooltip, so an opener-centered arrow
+		// would sit at the tooltip's far (right) end. Begin must keep it near the
+		// tooltip's left corner instead.
+		assert.ok(oArrowRect.left - oTipRect.left < oTipRect.width / 2,
+			"arrow sits in the left half of the tooltip");
+	});
+
+	QUnit.module("Edge-aligned wrapping", {
+		beforeEach: async function() {
+			this.oButton = new Button({text: "Anchor"});
+			this.oButton.placeAt("content");
+			await nextUIUpdate(this.clock);
+			// Push the anchor against the right edge: a Begin-aligned tooltip would
+			// grow towards the right, where there is almost no room left.
+			Object.assign(this.oButton.getDomRef().style, {
+				position: "fixed", top: "50%", right: "20px", width: "120px"
+			});
+			this.sLong = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ".repeat(8);
+		},
+		afterEach: async function() {
+			if (this.oTooltip) {
+				this.oTooltip.destroy();
+			}
+			this.oButton.destroy();
+			await this.clock.tickAsync(2000);
+		}
+	});
+
+	QUnit.test("Begin against the right edge flips to End so the long text grows into the free side", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: this.sLong, placement: PopoverPlacement.Bottom, delay: 0,
+			horizontalAlign: PopoverHorizontalAlign.Begin
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oDomRef = this.oTooltip.getDomRef();
+		const oTipRect = oDomRef.getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+
+		assert.strictEqual(this.oTooltip._getEffectiveHorizontalAlign(), PopoverHorizontalAlign.End,
+			"the cramped Begin alignment is flipped to End");
+		assert.ok(oDomRef.style.maxWidth, "a max-width is applied");
+		assert.ok(Math.round(oTipRect.left) >= 0,
+			"the tooltip stays inside the viewport (" + oTipRect.left + " >= 0)");
+		assert.ok(Math.abs(oTipRect.right - oBtnRect.right) <= 2,
+			"it now docks its right edge to the opener's right edge and grows left");
+		assert.ok(oTipRect.height > 0, "the tooltip is rendered");
+	});
+
+	QUnit.test("the mirrored case: End against the left edge flips to Begin", async function(assert) {
+		Object.assign(this.oButton.getDomRef().style, {right: "", left: "20px"});
+
+		this.oTooltip = new Tooltip({
+			text: this.sLong, placement: PopoverPlacement.Bottom, delay: 0,
+			horizontalAlign: PopoverHorizontalAlign.End
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oDomRef = this.oTooltip.getDomRef();
+		const oTipRect = oDomRef.getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+
+		assert.strictEqual(this.oTooltip._getEffectiveHorizontalAlign(), PopoverHorizontalAlign.Begin,
+			"the cramped End alignment is flipped to Begin");
+		assert.ok(oDomRef.style.maxWidth, "a max-width is applied");
+		assert.ok(Math.round(oTipRect.right) <= document.documentElement.clientWidth,
+			"the tooltip stays inside the viewport");
+		assert.ok(Math.abs(oTipRect.left - oBtnRect.left) <= 2,
+			"it now docks its left edge to the opener's left edge and grows right");
+	});
+
+	QUnit.test("a short Begin tooltip against the right edge keeps its alignment (no flip)", async function(assert) {
+		// The anchor still sits against the right edge, but the content is short
+		// enough to fit in the room left towards the end — so Begin is honoured.
+		this.oTooltip = new Tooltip({
+			text: "Hi", placement: PopoverPlacement.Bottom, delay: 0,
+			horizontalAlign: PopoverHorizontalAlign.Begin
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+
+		assert.strictEqual(this.oTooltip._getEffectiveHorizontalAlign(), PopoverHorizontalAlign.Begin,
+			"a fitting tooltip is not flipped");
+		assert.ok(Math.abs(oTipRect.left - oBtnRect.left) <= 2,
+			"the left edges still match");
+	});
+
+	QUnit.test("a centered alignment is not capped by the aligned-edge limit", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: "Short", placement: PopoverPlacement.Bottom, delay: 0,
+			horizontalAlign: PopoverHorizontalAlign.Center
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		assert.strictEqual(this.oTooltip.getDomRef().style.maxWidth, "",
+			"no aligned-edge cap for a centered short tooltip");
+	});
+
+	// Regression: with Stretch the side used to be chosen from the tooltip's
+	// natural (wide, short) box, then the box was narrowed to the opener width —
+	// the wrapped text made it much taller, so a Bottom placement that "fit"
+	// before stretching no longer did, and the tooltip scrolled below instead of
+	// flipping above. The side must now be resolved from the already-stretched box.
+	QUnit.module("Stretch flips the side using the stretched (wrapped) size", {
+		beforeEach: async function() {
+			this.oButton = new Button({text: "x"});
+			this.oButton.placeAt("content");
+			await nextUIUpdate(this.clock);
+			// A narrow opener near the bottom edge: once the Stretch tooltip is
+			// narrowed to this width, the long text wraps to several lines and no
+			// longer fits in the small space below.
+			Object.assign(this.oButton.getDomRef().style, {
+				position: "fixed", left: "40px", bottom: "80px", width: "48px", height: "24px"
+			});
+			this.sLong = "Lorem ipsum dolor sit amet, consectetur adipiscing.";
+		},
+		afterEach: async function() {
+			if (this.oTooltip) {
+				this.oTooltip.destroy();
+			}
+			this.oButton.destroy();
+			await this.clock.tickAsync(2000);
+		}
+	});
+
+	QUnit.test("Bottom + horizontalAlign Stretch flips above a narrow bottom-edge opener", async function(assert) {
+		this.oTooltip = new Tooltip({
+			text: this.sLong, placement: PopoverPlacement.Bottom, delay: 0,
+			horizontalAlign: PopoverHorizontalAlign.Stretch
+		});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		const oDomRef = this.oTooltip.getDomRef();
+		const oTipRect = oDomRef.getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+
+		assert.strictEqual(this.oTooltip._sCalcedPos, "Top",
+			"the stretched box no longer fits below, so the side flips to Top");
+		assert.ok(oTipRect.bottom <= oBtnRect.top + 1,
+			"the tooltip sits above the opener");
+
+		// With plenty of room above, the content fits without scrolling.
+		const oContRef = oDomRef.querySelector(".sapUiCoreTooltipCont");
+		assert.ok(oContRef.scrollHeight <= oContRef.clientHeight + 1,
+			"the content is not forced to scroll (" + oContRef.scrollHeight + " <= " + oContRef.clientHeight + ")");
+	});
 });
+
