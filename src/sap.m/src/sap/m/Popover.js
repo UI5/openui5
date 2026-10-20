@@ -1198,43 +1198,31 @@ sap.ui.define([
 			}
 
 			this.oPopup._applyPosition(this.oPopup._oLastPosition, true);
-			this._includeScrollWidth();
+			this._updateScrollbarGutterClass();
 		};
 
-		/**
-		 * Adjusts the content width based on how the browser handles layouting and scrollbar inclusion
-		 *
-		 * @private
-		 */
-		Popover.prototype._includeScrollWidth = function () {
+		Popover.prototype._updateScrollbarGutterClass = function () {
 			if (this.isDestroyed()) {
 				return;
 			}
 
-			var sContentWidth = this._getActualContentWidth(),
-				$popover = this.$(),
-				iMaxWidth = Math.floor(window.innerWidth * 0.9), //90% of the max screen size
-				$popoverContent = this.$('cont');
+			// Toggle the class that reserves scrollbar-gutter space only when a vertical
+			// scrollbar is actually present, so the gutter is not reserved when content fits.
+			this.$().toggleClass("sapMPopoverVerticalScrollIncluded", this._hasVerticalScrollbar());
+		};
 
-			if (!$popoverContent[0]) {
-				return;
-			}
+		/**
+		 * Checks whether the scroll section currently has a vertical scrollbar.
+		 *
+		 * @returns {boolean} Whether a vertical scrollbar is present
+		 * @private
+		 */
+		Popover.prototype._hasVerticalScrollbar = function () {
+			const oContentDomRef = this.getDomRef("cont");
 
-			// BrowserScrollbar modifies Safari to display "classic" scrollbars.
-			// In Safari, classic scrollbars occupy space that could otherwise be used by content, possibly causing content truncation.
-			// This workaround aims to expand the content width to prevent truncation.
-			if (Device.system.desktop && Device.browser.safari) {
-				var bHasVerticalScrollbar = $popoverContent[0].clientHeight < $popoverContent[0].scrollHeight;
-
-				if (bHasVerticalScrollbar &&					// - there is a vertical scroll
-					(!sContentWidth || sContentWidth === 'auto') &&	// - when the developer hasn't set it explicitly
-					$popoverContent.width() < iMaxWidth) {		// - if the popover hasn't reached a threshold size
-
-					$popover.addClass("sapMPopoverVerticalScrollIncluded");
-				} else {
-					$popover.removeClass("sapMPopoverVerticalScrollIncluded");
-				}
-			}
+			return this.getVerticalScrolling() && !this._forceDisableScrolling
+				&& !!oContentDomRef
+				&& oContentDomRef.scrollHeight > oContentDomRef.clientHeight;
 		};
 
 		/**
@@ -2145,7 +2133,7 @@ sap.ui.define([
 
 			setTimeout(function () {
 				$Ref.css("opacity", 1);
-				that._includeScrollWidth();
+				that._updateScrollbarGutterClass();
 				setTimeout(() => {
 					if (!that.oPopup || that.oPopup.getOpenState() !== OpenState.OPENING) {
 						return;
