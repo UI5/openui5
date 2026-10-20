@@ -14,9 +14,6 @@
 			<h1 id="overview">
 				Card Micro Charts
 			</h1>
-			<div class="messageStripWarning">
-				Experimental feature since version 1.80. The API may change.
-			</div>
 			<p>
 				Micro Charts help you to visualize information in a compact non-interactive manner. They are used to
 				display changes in the data or provide tracking at a glance.
@@ -69,13 +66,23 @@
 			</div>
 
 			<h2 id="bullet">Bullet Micro Chart</h2>
-			<img src="../../images/microChart_bullet.png" alt="Stacked Bar chart">
+			<div class="microChartImgPair">
+				<figure class="microChartFigure">
+					<div class="microChartImgLabel">In Header</div>
+					<img src="../../images/microChart_bullet.png" alt="Bullet chart in a card header">
+				</figure>
+				<figure class="microChartFigure">
+					<div class="microChartImgLabel">In List Item</div>
+					<img src="../../images/microChart_bullet_list.png" alt="Bullet chart in a list item">
+				</figure>
+			</div>
 			<div id="bulletProperties" class="boldBlock">Properties</div>
 			<div class="tableWrapper">
 				<table>
 					<tr>
 						<th>Property</th>
 						<th>Type</th>
+						<th>Default Value</th>
 						<th>Required</th>
 						<th>Description</th>
 						<th>Schema Version</th>
@@ -84,14 +91,25 @@
 					<tr>
 						<td>value</td>
 						<td>float</td>
+						<td></td>
 						<td>Yes</td>
 						<td>The actual value.</td>
 						<td>1.24</td>
 						<td>1.80</td>
 					</tr>
 					<tr>
+						<td>size</td>
+						<td><a href="#sizeApi">Size</a></td>
+						<td>"Responsive"</td>
+						<td>No</td>
+						<td>The <a href="#size">size</a> of the chart.</td>
+						<td>1.68</td>
+						<td>1.155</td>
+					</tr>
+					<tr>
 						<td>color</td>
 						<td><a data-demokit-href="#/api/sap.m.ValueColor" target="_blank">sap.m.ValueColor</a></td>
+						<td>"Neutral"</td>
 						<td>No</td>
 						<td>The color of the chart.</td>
 						<td>1.24</td>
@@ -100,6 +118,7 @@
 					<tr>
 						<td>displayValue</td>
 						<td>string</td>
+						<td></td>
 						<td>No</td>
 						<td>The value, which is displayed next to the chart.</td>
 						<td>1.24</td>
@@ -108,6 +127,7 @@
 					<tr>
 						<td>maxValue</td>
 						<td>float</td>
+						<td></td>
 						<td>No</td>
 						<td>The maximum value.</td>
 						<td>1.24</td>
@@ -116,6 +136,7 @@
 					<tr>
 						<td>minValue</td>
 						<td>float</td>
+						<td></td>
 						<td>No</td>
 						<td>The minimum value.</td>
 						<td>1.24</td>
@@ -124,6 +145,7 @@
 					<tr>
 						<td>target</td>
 						<td>float</td>
+						<td></td>
 						<td>No</td>
 						<td>The target value.</td>
 						<td>1.24</td>
@@ -132,6 +154,7 @@
 					<tr>
 						<td>thresholds</td>
 						<td><a href="#thresholdApi">Threshold[]</a></td>
+						<td></td>
 						<td>No</td>
 						<td>The thresholds of the chart.</td>
 						<td>1.24</td>
@@ -146,6 +169,7 @@
 					<tr>
 						<th>Property</th>
 						<th>Type</th>
+						<th>Default Value</th>
 						<th>Required</th>
 						<th>Description</th>
 						<th>Schema Version</th>
@@ -154,6 +178,7 @@
 					<tr>
 						<td>value</td>
 						<td>float</td>
+						<td></td>
 						<td>Yes</td>
 						<td>The value of the threshold.</td>
 						<td>1.24</td>
@@ -162,6 +187,7 @@
 					<tr>
 						<td>color</td>
 						<td><a data-demokit-href="#/api/sap.m.ValueColor" target="_blank">sap.m.ValueColor</a></td>
+						<td>"Neutral"</td>
 						<td>No</td>
 						<td>The color of the threshold.</td>
 						<td>1.24</td>
@@ -170,8 +196,20 @@
 				</table>
 			</div>
 			<h2 id="stackedBar">StackedBar Micro Chart</h2>
-			<img src="../../images/microChart_stackedBar.png" alt="Stacked Bar chart">
+			<div class="microChartImgPair">
+				<figure class="microChartFigure">
+					<div class="microChartImgLabel">In Header</div>
+					<img src="../../images/microChart_stackedBar.png" alt="Stacked Bar chart in a card header">
+				</figure>
+				<figure class="microChartFigure">
+					<div class="microChartImgLabel">In List Item</div>
+					<img src="../../images/microChart_stackedBar_list.png" alt="Stacked Bar chart in a list item">
+				</figure>
+			</div>
 			<p><b>Note:</b> For this type of chart a legend is also displayed in the card.</p>
+			<p><b>Note:</b> The <a href="#size">size</a> property is not supported for this chart. Size <code>S</code>
+				and size <code>Responsive</code> result in the same size within the space available in the card. If the
+				property is passed, it is ignored and an error is logged in the console.</p>
 			<div id="stackedBarProperties" class="boldBlock">Properties</div>
 			<div class="tableWrapper">
 				<table>
@@ -229,6 +267,7 @@
 					<tr>
 						<th>Property</th>
 						<th>Type</th>
+						<th>Default Value</th>
 						<th>Required</th>
 						<th>Description</th>
 						<th>Schema Version</th>
@@ -237,6 +276,7 @@
 					<tr>
 						<td>value</td>
 						<td>float</td>
+						<td></td>
 						<td>Yes</td>
 						<td>The value of the bar.</td>
 						<td>1.24</td>
@@ -245,6 +285,7 @@
 					<tr>
 						<td>color</td>
 						<td><a data-demokit-href="#/api/sap.m.ValueColor" target="_blank">sap.m.ValueColor</a></td>
+						<td></td>
 						<td>No</td>
 						<td>The color of the bar.</td>
 						<td>1.24</td>
@@ -253,14 +294,17 @@
 					<tr>
 						<td>displayValue</td>
 						<td>string</td>
+						<td></td>
 						<td>No</td>
-						<td>The display value of the bar.</td>
+						<td>The display value of the bar. <b>Note:</b> Due to space restrictions, the value is not displayed
+							inside the bar, but only in the tooltip.</td>
 						<td>1.24</td>
 						<td>1.80</td>
 					</tr>
 					<tr>
 						<td>legendTitle</td>
 						<td>string</td>
+						<td></td>
 						<td>No</td>
 						<td>Title, which will be displayed in the legend.</td>
 						<td>1.24</td>
@@ -270,21 +314,504 @@
 			</div>
 
 			<h2 id="column">Column Micro Chart</h2>
-			<p>
-				For reference see this <a href="../../../index.html#/explore/microCharts/columnChart" target="_parent">sample in the Explore section</a>.
-			</p>
+			<img src="../../images/microChart_column.png" alt="Column chart">
+			<div id="columnProperties" class="boldBlock">Properties</div>
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Type</th>
+						<th>Default Value</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td>columns</td>
+						<td><a href="#columnApi">Column[]</a></td>
+						<td></td>
+						<td>Yes</td>
+						<td>The columns of the micro chart. Can be a static array or a binding info with <code>path</code> and <code>template</code>.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>size</td>
+						<td><a href="#sizeApi">Size</a></td>
+						<td>"Responsive"</td>
+						<td>No</td>
+						<td>The <a href="#size">size</a> of the chart.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>leftTopLabel</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The top label on the left side of the chart.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>leftBottomLabel</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The bottom label on the left side of the chart.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>rightTopLabel</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The top label on the right side of the chart.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>rightBottomLabel</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The bottom label on the right side of the chart.</td>
+						<td>1.124</td>
+					</tr>
+				</table>
+			</div>
+
+			<div id="columnApi" class="boldBlock">Column</div>
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Type</th>
+						<th>Default Value</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td>value</td>
+						<td>float</td>
+						<td></td>
+						<td>Yes</td>
+						<td>The value of the column.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>color</td>
+						<td><a data-demokit-href="#/api/sap.m.ValueColor" target="_blank">sap.m.ValueColor</a></td>
+						<td>"Neutral"</td>
+						<td>No</td>
+						<td>The color of the column.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>label</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The label of the column.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>displayValue</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The value, which is displayed as a text for the column.</td>
+						<td>1.124</td>
+					</tr>
+				</table>
+			</div>
+
 			<h2 id="harveyBall">HarveyBall Micro Chart</h2>
-			<p>
-				For reference see this <a href="../../../index.html#/explore/microCharts/harveyBallChart" target="_parent">sample in the Explore section</a>.
-			</p>
+			<img src="../../images/microChart_harveyBall.png" alt="Harvey Ball chart">
+			<div id="harveyBallProperties" class="boldBlock">Properties</div>
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Type</th>
+						<th>Default Value</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td>fraction</td>
+						<td>float</td>
+						<td></td>
+						<td>Yes</td>
+						<td>The fraction value, shown as a colored slice.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>total</td>
+						<td>float</td>
+						<td></td>
+						<td>Yes</td>
+						<td>The total value of the chart.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>size</td>
+						<td><a href="#sizeApi">Size</a></td>
+						<td>"Responsive"</td>
+						<td>No</td>
+						<td>The <a href="#size">size</a> of the chart.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>color</td>
+						<td><a data-demokit-href="#/api/sap.m.ValueColor" target="_blank">sap.m.ValueColor</a></td>
+						<td>"Neutral"</td>
+						<td>No</td>
+						<td>The color of the fraction slice.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>fractionScale</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The scaling suffix appended to the fraction value.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>totalScale</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The scaling suffix appended to the total value.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>showTotal</td>
+						<td>boolean</td>
+						<td>false</td>
+						<td>No</td>
+						<td>Defines whether the total value is shown.</td>
+						<td>1.155</td>
+					</tr>
+					<tr>
+						<td>fractionLabel</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The label displayed for the fraction. Overrides the default label.</td>
+						<td>1.124</td>
+					</tr>
+				</table>
+			</div>
+
 			<h2 id="line">Line Micro Chart</h2>
+			<img src="../../images/microChart_line.png" alt="Line chart">
 			<p>
-				For reference see this <a href="../../../index.html#/explore/microCharts/lineChart" target="_parent">sample in the Explore section</a>.
+				<b>Note:</b> The label properties (<code>leftTopLabel</code>, <code>leftBottomLabel</code>,
+				<code>rightTopLabel</code>, <code>rightBottomLabel</code>) and the <code>showPoints</code> property work
+				only with <a href="#size">size</a> <code>S</code>. They are not visible with size <code>Responsive</code>.
 			</p>
+			<div id="lineProperties" class="boldBlock">Properties</div>
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Type</th>
+						<th>Default Value</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td>lines</td>
+						<td><a href="#lineApi">Line[]</a></td>
+						<td></td>
+						<td>No</td>
+						<td>The lines of the micro chart. Can be a static array or a binding info with <code>path</code> and <code>template</code>. Use either <code>lines</code> or <code>points</code>.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>points</td>
+						<td><a href="#linePointApi">Point[]</a></td>
+						<td></td>
+						<td>No</td>
+						<td>The points of a single line. Can be a static array or a binding info with <code>path</code> and <code>template</code>. Use either <code>lines</code> or <code>points</code>.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>size</td>
+						<td><a href="#sizeApi">Size</a></td>
+						<td>"Responsive"</td>
+						<td>No</td>
+						<td>The <a href="#size">size</a> of the chart.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>color</td>
+						<td><a data-demokit-href="#/api/sap.m.ValueColor" target="_blank">sap.m.ValueColor</a></td>
+						<td>"Neutral"</td>
+						<td>No</td>
+						<td>The color of the line. Used as a fallback when a line does not define its own color.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>threshold</td>
+						<td>float</td>
+						<td>0</td>
+						<td>No</td>
+						<td>The threshold value, displayed as a horizontal line.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>showThresholdLine</td>
+						<td>boolean</td>
+						<td>true</td>
+						<td>No</td>
+						<td>Defines whether the threshold line is displayed. Only visible with <a href="#size">size</a> <code>S</code>.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>maxXValue</td>
+						<td>float</td>
+						<td></td>
+						<td>No</td>
+						<td>The maximum value of the X axis.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>minXValue</td>
+						<td>float</td>
+						<td></td>
+						<td>No</td>
+						<td>The minimum value of the X axis.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>maxYValue</td>
+						<td>float</td>
+						<td></td>
+						<td>No</td>
+						<td>The maximum value of the Y axis.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>minYValue</td>
+						<td>float</td>
+						<td></td>
+						<td>No</td>
+						<td>The minimum value of the Y axis.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>leftTopLabel</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The top label on the left side of the chart. Only visible with <a href="#size">size</a> <code>S</code>.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>leftBottomLabel</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The bottom label on the left side of the chart. Only visible with <a href="#size">size</a> <code>S</code>.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>rightTopLabel</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The top label on the right side of the chart. Only visible with <a href="#size">size</a> <code>S</code>.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>rightBottomLabel</td>
+						<td>string</td>
+						<td></td>
+						<td>No</td>
+						<td>The bottom label on the right side of the chart. Only visible with <a href="#size">size</a> <code>S</code>.</td>
+						<td>1.124</td>
+					</tr>
+				</table>
+			</div>
+
+			<div id="lineApi" class="boldBlock">Line</div>
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Type</th>
+						<th>Default Value</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td>points</td>
+						<td><a href="#linePointApi">Point[]</a></td>
+						<td></td>
+						<td>Yes</td>
+						<td>The points of the line. Can be a static array or a binding info with <code>path</code> and <code>template</code>.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>color</td>
+						<td><a data-demokit-href="#/api/sap.m.ValueColor" target="_blank">sap.m.ValueColor</a></td>
+						<td>"Neutral"</td>
+						<td>No</td>
+						<td>The color of the line.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>lineType</td>
+						<td>string</td>
+						<td>"Solid"</td>
+						<td>No</td>
+						<td>The type of the line, for example <code>Solid</code> or <code>Dotted</code>.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>showPoints</td>
+						<td>boolean</td>
+						<td>false</td>
+						<td>No</td>
+						<td>Defines whether the points of the line are shown. Only visible with <a href="#size">size</a> <code>S</code>.</td>
+						<td>1.124</td>
+					</tr>
+				</table>
+			</div>
+
+			<div id="linePointApi" class="boldBlock">Point</div>
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Type</th>
+						<th>Default Value</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td>x</td>
+						<td>float</td>
+						<td></td>
+						<td>Yes</td>
+						<td>The value on the X axis.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>y</td>
+						<td>float</td>
+						<td></td>
+						<td>Yes</td>
+						<td>The value on the Y axis.</td>
+						<td>1.124</td>
+					</tr>
+				</table>
+			</div>
+
 			<h2 id="radial">Radial Micro Chart</h2>
+			<img src="../../images/microChart_radial.png" alt="Radial chart">
+			<div id="radialProperties" class="boldBlock">Properties</div>
 			<p>
-				For reference see this <a href="../../../index.html#/explore/microCharts/radialChart" target="_parent">sample in the Explore section</a>.
+				The displayed percentage can be provided directly via <code>percentage</code>, or calculated by the
+				chart from <code>fraction</code> and <code>total</code>.
 			</p>
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Type</th>
+						<th>Default Value</th>
+						<th>Required</th>
+						<th>Description</th>
+						<th>Since</th>
+					</tr>
+					<tr>
+						<td>percentage</td>
+						<td>float</td>
+						<td></td>
+						<td>No</td>
+						<td>The percentage shown by the chart. Alternative to providing <code>fraction</code> and <code>total</code>.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>fraction</td>
+						<td>float</td>
+						<td></td>
+						<td>No</td>
+						<td>The fraction value. Used together with <code>total</code> to calculate the percentage.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>total</td>
+						<td>float</td>
+						<td></td>
+						<td>No</td>
+						<td>The total value. Used together with <code>fraction</code> to calculate the percentage.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>size</td>
+						<td><a href="#sizeApi">Size</a></td>
+						<td>"Responsive"</td>
+						<td>No</td>
+						<td>The <a href="#size">size</a> of the chart.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>color</td>
+						<td><a data-demokit-href="#/api/sap.m.ValueColor" target="_blank">sap.m.ValueColor</a></td>
+						<td>"Neutral"</td>
+						<td>No</td>
+						<td>The color of the completed part of the chart.</td>
+						<td>1.124</td>
+					</tr>
+					<tr>
+						<td>showPercentageSymbol</td>
+						<td>boolean</td>
+						<td>true</td>
+						<td>No</td>
+						<td>Defines whether the percentage symbol is shown.</td>
+						<td>1.124</td>
+					</tr>
+				</table>
+			</div>
+
+			<h2 id="size">Sizing</h2>
+			<p>
+				Most chart types expose a <code>size</code> property of type <a href="#sizeApi">Size</a>. Only the values
+				<code>S</code> and <code>Responsive</code> are supported. The other values of
+				<a data-demokit-href="#/api/sap.m.Size" target="_blank">sap.m.Size</a> are not supported, because they
+				do not fit well in the available space in the card. If an unsupported value is provided, the chart falls
+				back to <code>Responsive</code> and an error is logged in the console.
+			</p>
+			<p>
+				<b>Note:</b> <code>size: "S"</code> is available only for charts in the card header. It is not supported
+				for charts in list items, where it is ignored and an error is logged in the console.
+			</p>
+
+			<div id="sizeApi" class="boldBlock">Size</div>
+			<div class="tableWrapper">
+				<table>
+					<tr>
+						<th>Value</th>
+						<th>Description</th>
+					</tr>
+					<tr>
+						<td>"Responsive"</td>
+						<td>The default. Prioritizes the size of the chart graphic itself and may not leave space for all
+							labels. The labels remain available in the tooltip of the chart.</td>
+					</tr>
+					<tr>
+						<td>"S"</td>
+						<td>A fixed small size. Leaves space for the labels of the chart, so label-related properties are
+							visible. Available only for charts in the card header.</td>
+					</tr>
+				</table>
+			</div>
 
 			<h2 id="examples">Examples</h2>
 			<p>Example of a List card with Bullet micro charts:</p>

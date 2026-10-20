@@ -14,9 +14,7 @@
 			"state": "Critical"
 		},
 		"chart": {
-			"total": 200,
-			"percentage": 65,
-			"fraction": 65
+			"percentage": 65
 		}
 	},
 	"items": [

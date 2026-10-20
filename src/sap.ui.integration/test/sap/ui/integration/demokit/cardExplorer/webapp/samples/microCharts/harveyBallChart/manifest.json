@@ -64,7 +64,6 @@
 				"total": "{chart/total}",
 				"totalScale": "{chart/totalScale}",
 				"showTotal": true,
-				"percentage": "{chart/percentage}",
 				"fraction": "{chart/fraction}",
 				"fractionScale": "{chart/fractionScale}"
 			}

@@ -62,7 +62,6 @@
 					"template": {
 						"color": "{color}",
 						"lineType": "{type}",
-						"showPoints": true,
 						"points": {
 							"path": "Points",
 							"template": {

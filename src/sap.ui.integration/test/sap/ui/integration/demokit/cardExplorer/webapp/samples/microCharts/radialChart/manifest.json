@@ -61,10 +61,8 @@
 				"size": "S",
 				"type": "Radial",
 				"color": "{state}",
-				"total": "{chart/total}",
 				"showPercentageSymbol": true,
-				"percentage": "{chart/percentage}",
-				"fraction": "{chart/fraction}"
+				"percentage": "{chart/percentage}"
 			}
 		},
 		"content": {

@@ -4286,37 +4286,27 @@
       }
     },
     "MicroChart": {
-      "description": "[Experimental] Describes MicroChart attributes",
+      "description": "Describes the attributes of the MicroChart",
       "oneOf": [
-        {
-          "$ref": "#/$defs/MicroChart.Generic"
-        },
         {
           "$ref": "#/$defs/MicroChart.Bullet"
         },
         {
           "$ref": "#/$defs/MicroChart.StackedBar"
+        },
+        {
+          "$ref": "#/$defs/MicroChart.Line"
+        },
+        {
+          "$ref": "#/$defs/MicroChart.Column"
+        },
+        {
+          "$ref": "#/$defs/MicroChart.HarveyBall"
+        },
+        {
+          "$ref": "#/$defs/MicroChart.Radial"
         }
       ]
-    },
-    "MicroChart.Generic": {
-      "type": "object",
-      "additionalProperties": true,
-      "required": [
-        "type"
-      ],
-      "properties": {
-        "type": {
-          "description": "Represents the type of the MicroChart",
-          "type": "string",
-          "enum": [
-            "Line",
-            "Column",
-            "HarveyBall",
-            "Radial"
-          ]
-        }
-      }
     },
     "MicroChart.Bullet": {
       "type": "object",
@@ -4329,6 +4319,21 @@
           "description": "Represents the type of the MicroChart",
           "type": "string",
           "const": "Bullet"
+        },
+        "size": {
+          "description": "The size of the chart. Only 'S' and 'Responsive' are supported",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "S",
+                "Responsive"
+              ]
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
         },
         "value": {
           "description": "The actual value shown as a colored horizontal bar",
@@ -4522,6 +4527,569 @@
               "$ref": "#/$defs/simpleBinding"
             }
           ]
+        }
+      }
+    },
+    "MicroChart.Line": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "description": "Represents the type of the MicroChart",
+          "type": "string",
+          "const": "Line"
+        },
+        "size": {
+          "description": "The size of the chart. Only 'S' and 'Responsive' are supported",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "S",
+                "Responsive"
+              ]
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "color": {
+          "description": "The color of the line. Used as a fallback when the line does not define its own color",
+          "type": "string",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Enums.ValueColor"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "maxXValue": {
+          "description": "The maximum value of the X axis",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "minXValue": {
+          "description": "The minimum value of the X axis",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "maxYValue": {
+          "description": "The maximum value of the Y axis",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "minYValue": {
+          "description": "The minimum value of the Y axis",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "threshold": {
+          "description": "The threshold value, displayed as a horizontal line",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "showThresholdLine": {
+          "description": "Defines whether the threshold line is displayed. Only visible with size 'S'",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "leftTopLabel": {
+          "description": "The top label on the left side of the chart",
+          "type": "string"
+        },
+        "leftBottomLabel": {
+          "description": "The bottom label on the left side of the chart",
+          "type": "string"
+        },
+        "rightTopLabel": {
+          "description": "The top label on the right side of the chart",
+          "type": "string"
+        },
+        "rightBottomLabel": {
+          "description": "The bottom label on the right side of the chart",
+          "type": "string"
+        },
+        "points": {
+          "description": "The points of the chart. Can be a static array or a binding info with 'path' and 'template'",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/MicroChart.Line.Point"
+              }
+            },
+            {
+              "$ref": "#/$defs/MicroChart.Line.Points.Binding"
+            }
+          ]
+        },
+        "lines": {
+          "description": "The lines of the chart. Can be a static array or a binding info with 'path' and 'template'",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/MicroChart.Line.Line"
+              }
+            },
+            {
+              "$ref": "#/$defs/MicroChart.Line.Lines.Binding"
+            }
+          ]
+        },
+        "visible": {
+          "description": "Represents the visibility of the chart",
+          "$ref": "#/$defs/visibility"
+        }
+      }
+    },
+    "MicroChart.Line.Point": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "description": "The value on the X axis",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "y": {
+          "description": "The value on the Y axis",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        }
+      }
+    },
+    "MicroChart.Line.Points.Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "template"
+      ],
+      "properties": {
+        "path": {
+          "description": "The binding path to the points data",
+          "type": "string"
+        },
+        "template": {
+          "description": "The template used for each point",
+          "$ref": "#/$defs/MicroChart.Line.Point"
+        }
+      }
+    },
+    "MicroChart.Line.Line": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "description": "The color of the line",
+          "type": "string",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Enums.ValueColor"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "showPoints": {
+          "description": "Defines whether the points of the line are shown",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "lineType": {
+          "description": "The type of the line (for example 'Solid' or 'Dotted')",
+          "type": "string"
+        },
+        "points": {
+          "description": "The points of the line. Can be a static array or a binding info with 'path' and 'template'",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/MicroChart.Line.Point"
+              }
+            },
+            {
+              "$ref": "#/$defs/MicroChart.Line.Points.Binding"
+            }
+          ]
+        }
+      }
+    },
+    "MicroChart.Line.Lines.Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "template"
+      ],
+      "properties": {
+        "path": {
+          "description": "The binding path to the lines data",
+          "type": "string"
+        },
+        "template": {
+          "description": "The template used for each line",
+          "$ref": "#/$defs/MicroChart.Line.Line"
+        }
+      }
+    },
+    "MicroChart.Column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "description": "Represents the type of the MicroChart",
+          "type": "string",
+          "const": "Column"
+        },
+        "size": {
+          "description": "The size of the chart. Only 'S' and 'Responsive' are supported",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "S",
+                "Responsive"
+              ]
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "leftTopLabel": {
+          "description": "The top label on the left side of the chart",
+          "type": "string"
+        },
+        "leftBottomLabel": {
+          "description": "The bottom label on the left side of the chart",
+          "type": "string"
+        },
+        "rightTopLabel": {
+          "description": "The top label on the right side of the chart",
+          "type": "string"
+        },
+        "rightBottomLabel": {
+          "description": "The bottom label on the right side of the chart",
+          "type": "string"
+        },
+        "columns": {
+          "description": "The columns of the chart. Can be a static array or a binding info with 'path' and 'template'",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/MicroChart.Column.Column"
+              }
+            },
+            {
+              "$ref": "#/$defs/MicroChart.Column.Columns.Binding"
+            }
+          ]
+        },
+        "visible": {
+          "description": "Represents the visibility of the chart",
+          "$ref": "#/$defs/visibility"
+        }
+      }
+    },
+    "MicroChart.Column.Column": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "description": "The color of the column",
+          "type": "string",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Enums.ValueColor"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "label": {
+          "description": "The label of the column",
+          "type": "string"
+        },
+        "displayValue": {
+          "description": "The value, which will be displayed as a text for the column",
+          "type": "string"
+        },
+        "value": {
+          "description": "The actual value of the column",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        }
+      }
+    },
+    "MicroChart.Column.Columns.Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "template"
+      ],
+      "properties": {
+        "path": {
+          "description": "The binding path to the columns data",
+          "type": "string"
+        },
+        "template": {
+          "description": "The template used for each column",
+          "$ref": "#/$defs/MicroChart.Column.Column"
+        }
+      }
+    },
+    "MicroChart.HarveyBall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "description": "Represents the type of the MicroChart",
+          "type": "string",
+          "const": "HarveyBall"
+        },
+        "size": {
+          "description": "The size of the chart. Only 'S' and 'Responsive' are supported",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "S",
+                "Responsive"
+              ]
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "color": {
+          "description": "The color of the fraction slice",
+          "type": "string",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Enums.ValueColor"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "total": {
+          "description": "The total value of the chart",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "totalScale": {
+          "description": "The scaling suffix appended to the total value",
+          "type": "string"
+        },
+        "showTotal": {
+          "description": "Defines whether the total value is shown",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "fraction": {
+          "description": "The fraction value shown as a colored slice",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "fractionScale": {
+          "description": "The scaling suffix appended to the fraction value",
+          "type": "string"
+        },
+        "fractionLabel": {
+          "description": "The label displayed for the fraction. Overrides the default label",
+          "type": "string"
+        },
+        "visible": {
+          "description": "Represents the visibility of the chart",
+          "$ref": "#/$defs/visibility"
+        }
+      }
+    },
+    "MicroChart.Radial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "description": "Represents the type of the MicroChart",
+          "type": "string",
+          "const": "Radial"
+        },
+        "size": {
+          "description": "The size of the chart. Only 'S' and 'Responsive' are supported",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "S",
+                "Responsive"
+              ]
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "color": {
+          "description": "The color of the completed part of the chart",
+          "type": "string",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Enums.ValueColor"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "total": {
+          "description": "The total value of the chart. Used together with 'fraction' to calculate the percentage",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "fraction": {
+          "description": "The fraction value. Used together with 'total' to calculate the percentage",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "percentage": {
+          "description": "The percentage shown by the chart. Alternative to providing 'total' and 'fraction'",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "showPercentageSymbol": {
+          "description": "Defines whether the percentage symbol is shown",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
+        "visible": {
+          "description": "Represents the visibility of the chart",
+          "$ref": "#/$defs/visibility"
         }
       }
     },
