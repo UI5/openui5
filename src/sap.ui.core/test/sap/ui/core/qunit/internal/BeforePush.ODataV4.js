@@ -90,7 +90,6 @@ sap.ui.define([
 	const mName2Sandbox = {
 		"AnalyzeTravel_RAP" : false,
 		"Ancestry" : false,
-		"CreateInline" : true,
 		"DataAggregation_CAP" : false,
 		"DataAggregation_RAP" : false,
 		"FlatDataAggregation" : false,
