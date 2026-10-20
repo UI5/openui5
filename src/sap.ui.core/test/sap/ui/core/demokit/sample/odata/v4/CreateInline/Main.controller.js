@@ -21,6 +21,15 @@ sap.ui.define([
 				bDescending : undefined
 			});
 			this.getView().setModel(this.oUIModel, "ui");
+
+			this.getView().attachEventOnce("modelContextChange", () => {
+				const oBinding = this.byId("salesOrderList").getBinding("items");
+				this.byId("salesOrdersTitle").setBindingContext(oBinding.getHeaderContext());
+				oBinding.attachCreateActivate(this.onActivate, this);
+				oBinding.attachEventOnce("dataReceived", function (oEvent) {
+					this._createInactiveRow(oEvent.getSource());
+				}, this);
+			});
 		},
 
 		_getActivateMessage : function (oContext) {
@@ -29,24 +38,6 @@ sap.ui.define([
 			return Messaging.getMessageModel().getData().find(function (oMessage) {
 				return oMessage.getTargets().includes(sTarget);
 			});
-		},
-
-		onBeforeRendering : function () {
-			const oBinding = this.byId("salesOrderList").getBinding("items");
-
-			// Guard against duplicate initialization: skip re-attaching the listeners and
-			// re-creating the inactive row if the view re-renders. This is a best practice; a
-			// re-render does not actually occur in this sample app, but the guard is required for
-			// controllers whose view can re-render.
-			if (!this._isFirstRow(oBinding)) {
-				return;
-			}
-
-			this.byId("salesOrdersTitle").setBindingContext(oBinding.getHeaderContext());
-			oBinding.attachCreateActivate(this.onActivate, this);
-			oBinding.attachEventOnce("dataReceived", function (oEvent) {
-				this._createInactiveRow(oEvent.getSource());
-			}, this);
 		},
 
 		_isFirstRow : function (oBinding) {
