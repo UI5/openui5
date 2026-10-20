@@ -29611,12 +29611,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Data aggregation with visual grouping and a grand total shown at the bottom only. A
 	// new entity is created at the start of the list. The created entity is shown as a groupless
 	// leaf at the very top of the table, above the group levels. The grand total is updated after
-	// the create. Creating another (inactive) entity at the end of start also works. The $count is
-	// increased when created entities are persisted. After expanding and collapsing a group, the
-	// indices of all contexts are still correct. When changing the groupLevels via #setAggregation,
-	// an inactive element remains in the creation area on top while the created persisted entries
-	// are moved into their server positions.
+	// the create. Creating another (inactive) entity at the end of start also works. After
+	// expanding and collapsing a group, the indices of all contexts are still correct. When
+	// changing the groupLevels via #setAggregation, an inactive element remains in the creation
+	// area on top while the created persisted entries are moved into their server positions.
 	// JIRA: CPOUI5ODATAV4-3683
+	//
+	// The $count is maintained on the client side: it is increased when a (non-inactive) entity is
+	// created, and decreased again if that creation is canceled. An inactive entity is not counted
+	// until it is activated; removing an inactive entity leaves the count unchanged.
+	// JIRA: CPOUI5ODATAV4-3711
 	QUnit.test("Data Aggregation: create with visual grouping", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -29687,6 +29691,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}, new Error("Must not create at end when using groupLevels: " + oListBinding));
 
 		this.expectChange("isOutdatedHeader", true)
+			.expectChange("count", "3")
 			.expectRequest("#0 POST BusinessPartners", {
 				payload : {Id : 3}
 			}, {
@@ -29694,11 +29699,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				Id : 3, // Edm.Int16
 				SalesNumber : 5
 			})
-			.expectRequest("#0 BusinessPartners/$count", 3)
 			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
 				value : [{SalesNumber : 35}]
-			})
-			.expectChange("count", "3");
+			});
 
 		// code under test
 		const oCreatedContext0 = oListBinding.create({Id : 3}, /*bSkipRefresh*/true);
@@ -29741,18 +29744,17 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[false, true, 0, "", "", "35"]
 		]);
 
-		this.expectRequest("#0 POST BusinessPartners", {
+		this.expectChange("count", "4")
+			.expectRequest("#0 POST BusinessPartners", {
 				payload : {Id : 4}
 			}, {
 				Country : "A",
 				Id : 4, // Edm.Int16
 				SalesNumber : 7
 			})
-			.expectRequest("#0 BusinessPartners/$count", 4)
 			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
 				value : [{SalesNumber : 42}]
-			})
-			.expectChange("count", "4");
+			});
 
 		await Promise.all([
 			// code under test
@@ -29827,6 +29829,28 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[false, true, 0, "", "", "42"]
 		]);
 		assertIndices(assert, oListBinding.getCurrentContexts(), [-2, -1, 0, 1, 2]);
+
+		this.expectChange("count", "5")
+			.expectChange("count", "4");
+
+		const oActiveToDelete = oListBinding.create({}, /*bSkipRefresh*/true);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3711)
+			oListBinding.resetChanges(),
+			checkCanceled(assert, oActiveToDelete.created()),
+			this.waitForChanges(assert, "reset active creation before submit")
+		]);
+
+		const oInactiveToDelete = oListBinding.create({}, /*bSkipRefresh*/true, /*bAtEnd*/true,
+			/*bInactive*/true);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3711)
+			oInactiveToDelete.delete(),
+			checkCanceled(assert, oInactiveToDelete.created()),
+			this.waitForChanges(assert, "delete inactive creation") // ensure $count was not changed
+		]);
 
 		// code under test
 		const oCreatedContext2 = oListBinding.create({Country : "C"}, /*bSkipRefresh*/true,

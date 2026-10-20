@@ -2041,7 +2041,6 @@ sap.ui.define([
 			oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation),
 			oError = new Error(),
 			oGroupLock = {
-				getGroupId : mustBeMocked,
 				getUnlockedCopy : mustBeMocked
 			};
 
@@ -2056,7 +2055,6 @@ sap.ui.define([
 		}
 		this.mock(this.oRequestor).expects("buildQueryString")
 			.withExactArgs("/~", {}, false, false, false).returns("?~query~");
-		this.mock(oGroupLock).expects("getGroupId").withExactArgs().returns("~sGroupId~");
 		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
 			.returns("~oGroupLockCopy~");
 		this.mock(this.oRequestor).expects("request")
@@ -2119,13 +2117,11 @@ sap.ui.define([
 	}
 }].forEach(function (oFixture, i) {
 	[false, true].forEach((bDataAggregation) => {
-		[false, true].forEach((bInactive) => {
-	const sTitle = "readCount: #" + i + ", D.A.: " + bDataAggregation + ", bInactive: " + bInactive;
-	if (bDataAggregation && oFixture.$filter) {
-		return; // avoid "Unsupported system query option: $filter"
-	}
+		if (bDataAggregation && oFixture.$filter) {
+			return; // avoid "Unsupported system query option: $filter"
+		}
 
-	QUnit.test(sTitle, function (assert) {
+	QUnit.test("readCount: #" + i + ", D.A.: " + bDataAggregation, function (assert) {
 		var oAggregation = bDataAggregation ? {
 				aggregate : {},
 				group : {},
@@ -2137,8 +2133,6 @@ sap.ui.define([
 			},
 			oCache,
 			oGroupLock = {
-				getGroupId : mustBeMocked,
-				getOwner : mustBeMocked,
 				getUnlockedCopy : mustBeMocked
 			},
 			mQueryOptions = {
@@ -2169,16 +2163,10 @@ sap.ui.define([
 		this.mock(this.oRequestor).expects("buildQueryString")
 			.withExactArgs("/~", oFixture.mExpectedQueryOptions, false, false, bDataAggregation)
 			.returns("?~query~");
-		this.mock(oGroupLock).expects("getGroupId").withExactArgs()
-			.returns(bInactive ? "$inactive.$auto" : "~sGroupId~");
-		this.mock(oGroupLock).expects("getOwner").exactly(bInactive ? 1 : 0).withExactArgs()
-			.returns("~owner~");
-		this.mock(this.oRequestor).expects("lockGroup").exactly(bInactive ? 1 : 0)
-			.withExactArgs("$auto", "~owner~").returns("~oGroupLock4Request~");
-		this.mock(oGroupLock).expects("getUnlockedCopy").exactly(bInactive ? 0 : 1).withExactArgs()
-			.returns("~oGroupLock4Request~");
+		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
+			.returns("~oGroupLockCopy~");
 		this.mock(this.oRequestor).expects("request")
-			.withExactArgs("GET", "~/$count?~query~", "~oGroupLock4Request~").resolves(42);
+			.withExactArgs("GET", "~/$count?~query~", "~oGroupLockCopy~").resolves(42);
 
 		// code under test
 		oResult = oCache.readCount(oGroupLock);
@@ -2196,7 +2184,6 @@ sap.ui.define([
 			assert.strictEqual(fnResolve.args[0][0], 42);
 		});
 	});
-		});
 	});
 });
 
@@ -7048,6 +7035,7 @@ sap.ui.define([
 			});
 		assert.strictEqual(oCache.bUnifiedCache, false);
 		oCache.oCountPromise = oCountPromise;
+		const oGroupLock = {getGroupId : mustBeMocked};
 		const oGroupLevelCache = {
 				create : mustBeMocked,
 				setEmpty : mustBeMocked
@@ -7093,17 +7081,23 @@ sap.ui.define([
 		const oPostBody = {};
 		const oCollectionCache = bInFirstLevel ? oCache.oFirstLevel : oGroupLevelCache;
 		let bNodePropertyCompleted = false;
-		oCacheMock.expects("createCountPromise").exactly(oCountPromise ? 1 : 0).withExactArgs(true)
+		oCacheMock.expects("createCountPromise")
+			.exactly(!bAtEndOfCreated && oCountPromise ? 1 : 0).withExactArgs(true)
 			.callsFake(() => {
 				oCache.oCountPromise = {
 					$restore : sinon.spy()
 				};
 			});
+		this.mock(oGroupLock).expects("getGroupId")
+			.exactly(bAtEndOfCreated && oCountPromise ? 1 : 0).withExactArgs()
+			.returns("~sGroupId~");
+		oCacheMock.expects("addToCount").exactly(bAtEndOfCreated && oCountPromise ? 1 : 0)
+			.withExactArgs(1);
 		const fnSubmitCallback = sinon.spy();
 		let fnNewSubmitCallback;
 		let oAdditionalPromise;
 		this.mock(oCollectionCache).expects("create")
-			.withExactArgs("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
+			.withExactArgs(sinon.match.same(oGroupLock), "~oPostPathPromise~", "~sPath~",
 				"~sTransientPredicate~", {bar : "~bar~", foo : "~foo~"}, bAtEndOfCreated,
 				"~fnErrorCallback~", sinon.match.func, sinon.match.func, sinon.match.func)
 			.callsFake(function () {
@@ -7140,7 +7134,8 @@ sap.ui.define([
 						const iRankCallCount = iCallCount && iRank ? 1 : 0;
 						const oRankExpectation = that.mock(oCache).expects("requestRank")
 							.exactly(iCallCount)
-							.withExactArgs(sinon.match.same(oEntityData), "~oGroupLock~")
+							.withExactArgs(sinon.match.same(oEntityData),
+								sinon.match.same(oGroupLock))
 							.callsFake(function () {
 								Promise.resolve().then(function () {
 									assert.ok(oRankExpectation.called, "both called in sync");
@@ -7151,7 +7146,8 @@ sap.ui.define([
 							});
 						oNodeExpectation = that.mock(oCache).expects("requestNodeProperty")
 							.exactly(bAtEndOfCreated ? 0 : 1)
-							.withExactArgs(sinon.match.same(oEntityData), "~oGroupLock~", true)
+							.withExactArgs(sinon.match.same(oEntityData),
+								sinon.match.same(oGroupLock), true)
 							.returns(new Promise(function (resolve0) {
 								setTimeout(function () {
 									bNodePropertyCompleted = true;
@@ -7208,7 +7204,7 @@ sap.ui.define([
 		oCacheMock.expects("adjustDescendantCount").never();
 
 		// code under test
-		const oResult = oCache.create("~oGroupLock~", "~oPostPathPromise~", "~sPath~",
+		const oResult = oCache.create(oGroupLock, "~oPostPathPromise~", "~sPath~",
 			"~sTransientPredicate~", oEntityData, bAtEndOfCreated, "~fnErrorCallback~",
 			fnSubmitCallback);
 
@@ -7238,7 +7234,9 @@ sap.ui.define([
 				"('ABC')" : oEntityData
 			});
 			assert.strictEqual(bNodePropertyCompleted, !bAtEndOfCreated);
-			if (oCountPromise) {
+			if (bAtEndOfCreated) {
+				assert.strictEqual(oCache.oCountPromise, oCountPromise, "unchanged");
+			} else if (oCountPromise) {
 				assert.ok(oCache.oCountPromise.$restore.notCalled, "not yet restored");
 			} else {
 				assert.strictEqual(oCache.oCountPromise, undefined);
@@ -7254,11 +7252,12 @@ sap.ui.define([
 			oHelperMock.expects("removeByPath")
 				.withExactArgs(sinon.match.same(oCache.mPostRequests),
 					"~sTransientPredicate~", sinon.match.same(oEntityData));
+			oCacheMock.expects("addToCount").exactly(bAtEndOfCreated ? 1 : 0).withExactArgs(-1);
 
 			// code under test
 			fnCancelCallback();
 
-			if (oCountPromise) {
+			if (!bAtEndOfCreated && oCountPromise) {
 				assert.ok(oCache.oCountPromise.$restore.calledOnceWithExactly(), "restored");
 			}
 			assert.deepEqual(oCache.aElements.$byPredicate, {
@@ -7282,10 +7281,10 @@ sap.ui.define([
 			const oRequestorMock = that.mock(oCache.oRequestor);
 			oRequestorMock.expects("getModelInterface").withExactArgs().returns(oModelInterface);
 			let oReadCountExpectation = oCacheMock.expects("readCount")
-				.withExactArgs("~oGroupLock~")
+				.withExactArgs(sinon.match.same(oGroupLock))
 				.returns(undefined); // no count needs to be read
 			let oReadGrandTotalExpectation = oCacheMock.expects("readGrandTotal")
-				.withExactArgs("~oGroupLock~")
+				.withExactArgs(sinon.match.same(oGroupLock))
 				.returns(undefined); // no grand total needs to be read
 
 			// code under test
@@ -7302,14 +7301,14 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(oReadCountError));
 			const oReadCountPromise = oCountPromise && Promise.reject(oReadCountError);
 			oReadCountExpectation = oCacheMock.expects("readCount")
-				.withExactArgs("~oGroupLock~")
+				.withExactArgs(sinon.match.same(oGroupLock))
 				.returns(oReadCountPromise);
 			const oReadGrandTotalError = new Error("~readGrandTotalError~");
 			oModelImplementationMock.expects("reportError")
 				.withExactArgs(sinon.match.same(oReadGrandTotalError));
 			const oReadGrandTotalPromise = Promise.reject(oReadGrandTotalError);
 			oReadGrandTotalExpectation = oCacheMock.expects("readGrandTotal")
-				.withExactArgs("~oGroupLock~")
+				.withExactArgs(sinon.match.same(oGroupLock))
 				.returns(oReadGrandTotalPromise);
 
 			// code under test - count / grand total need to be read
@@ -7554,6 +7553,78 @@ sap.ui.define([
 	});
 			});
 		});
+	});
+});
+
+	//*********************************************************************************************
+[false, true].forEach(function (bInactive) {
+	[false, true].forEach(function (bStillInactive) {
+		const sTitle = "create: D.A., $count on client side, then cancel, inactive = " + bInactive
+			+ ", still inactive when being canceled = " + bStillInactive;
+		if (!bInactive && bStillInactive) {
+			return; // an active creation cannot be inactive when cancelled
+		}
+
+	QUnit.test(sTitle, function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			aggregate : {},
+			group : {},
+			groupLevels : ["a"]
+		});
+		oCache.oCountPromise = "~oCountPromise~";
+		const oEntityData = {};
+		const oGroupLock = {
+			getGroupId : mustBeMocked
+		};
+		const oHelperMock = this.mock(_Helper);
+		oHelperMock.expects("addByPath")
+			.withExactArgs(sinon.match.same(oCache.mPostRequests), "~sTransientPredicate~",
+				sinon.match.same(oEntityData));
+		this.mock(oGroupLock).expects("getGroupId").withExactArgs()
+			.returns(bInactive ? "$inactive.$auto" : "~sGroupId~");
+		const oCacheMock = this.mock(oCache);
+		oCacheMock.expects("addToCount").exactly(bInactive ? 0 : 1).withExactArgs(1);
+		let fnCancelCallback;
+		this.mock(oCache.oFirstLevel).expects("create")
+			.withExactArgs(sinon.match.same(oGroupLock), "~oPostPathPromise~", "~sPath~",
+				"~sTransientPredicate~", sinon.match.same(oEntityData), false, "~fnErrorCallback~",
+				sinon.match.func, sinon.match.func, sinon.match.func)
+			.callsFake(function () {
+				fnCancelCallback = arguments[8];
+				if (bStillInactive) { // would be set via #create on group level cache
+					oEntityData["@$ui5.context.isInactive"] = true;
+				}
+				_Helper.setPrivateAnnotation(oEntityData, "predicate", "('ABC')");
+				return SyncPromise.resolve();
+			});
+		this.mock(_AggregationHelper).expects("setAnnotations")
+			.withExactArgs(sinon.match.same(oEntityData), undefined, false, 1);
+		oCacheMock.expects("addElements")
+			.withExactArgs(sinon.match.same(oEntityData), 0,
+				sinon.match.same(oCache.oFirstLevel), undefined);
+		oHelperMock.expects("removeByPath")
+			.withExactArgs(sinon.match.same(oCache.mPostRequests), "~sTransientPredicate~",
+				sinon.match.same(oEntityData));
+		oHelperMock.expects("updateTransientPaths")
+			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "~sTransientPredicate~",
+				"('ABC')");
+
+		// code under test
+		const oResult = oCache.create(oGroupLock, "~oPostPathPromise~", "~sPath~",
+			"~sTransientPredicate~", oEntityData, /*bAtEndOfCreated*/false, "~fnErrorCallback~",
+			"~fnSubmitCallback~");
+
+		assert.strictEqual(oResult.getResult(), oEntityData);
+		assert.strictEqual(oCache.aElements.$byPredicate["('ABC')"], oEntityData);
+
+		oHelperMock.expects("removeByPath")
+			.withExactArgs(sinon.match.same(oCache.mPostRequests), "~sTransientPredicate~",
+				sinon.match.same(oEntityData));
+		oCacheMock.expects("addToCount").exactly(bStillInactive ? 0 : 1).withExactArgs(-1);
+
+		// code under test
+		fnCancelCallback();
+	});
 	});
 });
 
@@ -9754,16 +9825,49 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("setInactive", function () {
+	QUnit.test("addToCount", function (assert) {
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
-			hierarchyQualifier : "X"
+			groupLevels : ["a"]
 		});
-		this.mock(oCache.oFirstLevel).expects("setInactive")
-			.withExactArgs("~sPath~", "~bInactive~", sinon.match.same(oCache.mChangeListeners));
+		oCache.oCountPromise = SyncPromise.resolve(10);
+		this.mock(_Helper).expects("fireChange")
+			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "./$count", 7)
+			.callsFake(function () {
+				// the count promise is replaced before the listeners are notified
+				assert.strictEqual(oCache.oCountPromise.getResult(), 7);
+			});
 
 		// code under test
-		oCache.setInactive("~sPath~", "~bInactive~");
+		oCache.addToCount(-3);
 	});
+
+	//*********************************************************************************************
+	QUnit.test("addToCount: nothing to do", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			groupLevels : ["a"]
+		});
+		this.mock(_Helper).expects("fireChange").never();
+
+		// code under test
+		oCache.addToCount(1);
+
+		assert.strictEqual(oCache.oCountPromise, undefined, "unchanged");
+	});
+
+	//*********************************************************************************************
+[false, true].forEach(function (bInactive) {
+	QUnit.test("setInactive: bInactive=" + bInactive, function () {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {}, {
+			groupLevels : ["a"]
+		});
+		this.mock(oCache.oFirstLevel).expects("setInactive")
+			.withExactArgs("~sPath~", bInactive, sinon.match.same(oCache.mChangeListeners));
+		this.mock(oCache).expects("addToCount").exactly(bInactive ? 0 : 1).withExactArgs(1);
+
+		// code under test
+		oCache.setInactive("~sPath~", bInactive);
+	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("createCountPromise", function (assert) {
