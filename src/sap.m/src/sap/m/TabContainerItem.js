@@ -117,12 +117,12 @@ sap.ui.define(['sap/ui/core/Element',
 		}});
 
 		TabContainerItem.prototype.init = function() {
-			var oTabStripItem = new TabStripItem();
+			const oTabStripItem = new TabStripItem();
 			this.setAssociation("_tabStripItem", oTabStripItem, true);
 		};
 
 		TabContainerItem.prototype.exit = function() {
-			var oTabStripItem = this._getTabStripItem();
+			const oTabStripItem = this._getTabStripItem();
 			if (oTabStripItem) {
 				oTabStripItem.destroy();
 			}
@@ -155,11 +155,11 @@ sap.ui.define(['sap/ui/core/Element',
 		 * @public
 		 */
 		TabContainerItem.prototype.setIcon = function(sIcon, bSuppressRendering) {
-			var mProperties,
-				aCssClasses = ['sapMTabContIcon'],
-				oImage = this.getAggregation("_image"),
-				sImgId = this.getId() + "-img",
-				bDecorative = !!(this.getName() || this.getAdditionalText());
+			let mProperties;
+			const aCssClasses = ['sapMTabContIcon'];
+			let oImage = this.getAggregation("_image");
+			const sImgId = `${this.getId()}-img`;
+			const bDecorative = !!(this.getName() || this.getAdditionalText());
 
 			if (!sIcon) {
 				this.setProperty("icon", sIcon, bSuppressRendering);
@@ -223,12 +223,12 @@ sap.ui.define(['sap/ui/core/Element',
 
 		// Override customData getters/setters to forward the customData added to TabContainerItem to the internal TabStripItem
 		["addCustomData", "getCustomData", "destroyCustomData", "indexOfCustomData",
-		 "insertCustomData", "removeAllCustomData", "removeCustomData", "data"].forEach(function(sName){
+		 "insertCustomData", "removeAllCustomData", "removeCustomData", "data"].forEach((sName) => {
 			TabContainerItem.prototype[sName] = function() {
-				var oTabStripItem = this._getTabStripItem();
+				const oTabStripItem = this._getTabStripItem();
 				if (oTabStripItem && oTabStripItem[sName]) {
-					var res = oTabStripItem[sName].apply(oTabStripItem, arguments);
-					return res === oTabStripItem ? this : res;
+					const oRes = oTabStripItem[sName].apply(oTabStripItem, arguments);
+					return oRes === oTabStripItem ? this : oRes;
 				}
 			};
 		});

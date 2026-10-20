@@ -7,7 +7,7 @@ sap.ui.define(["./library", "sap/ui/core/Item", "sap/ui/base/ManagedObject", "sa
 		"use strict";
 
 		// shortcut for sap.m.ButtonType
-		var ButtonType = library.ButtonType;
+		const ButtonType = library.ButtonType;
 
 		/**
 		 * Constructor for a new <code>TabStripItem</code>.
@@ -203,7 +203,7 @@ sap.ui.define(["./library", "sap/ui/core/Item", "sap/ui/base/ManagedObject", "sa
 		 * @override
 		 */
 		TabStripItem.prototype.init = function () {
-			var oButton = new AccButton({
+			const oButton = new AccButton({
 				type: ButtonType.Transparent,
 				icon: IconPool.getIconURI("decline"),
 				tooltip: Library.getResourceBundleFor("sap.m").getText("TABSTRIP_ITEM_CLOSE_BTN"),
@@ -249,11 +249,11 @@ sap.ui.define(["./library", "sap/ui/core/Item", "sap/ui/base/ManagedObject", "sa
 		};
 
 		TabStripItem.prototype.setIcon = function(sIcon, bSuppressRendering) {
-			var mProperties,
-				aCssClasses = ['sapMTabContIcon'],
-				oImage = this.getAggregation("_image"),
-				sImgId = this.getId() + "-img",
-				bDecorative = !!(this.getText() || this.getAdditionalText());
+			let mProperties;
+			const aCssClasses = ['sapMTabContIcon'];
+			let oImage = this.getAggregation("_image");
+			const sImgId = `${this.getId()}-img`;
+			const bDecorative = !!(this.getText() || this.getAdditionalText());
 
 			if (!sIcon) {
 				this.setProperty("icon", sIcon, bSuppressRendering);
