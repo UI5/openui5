@@ -44,11 +44,13 @@
 			display: block !important; /* otherwise will be overwritten by icon css rules in RTL */
 			position: absolute;
 			width: 100%;
-			font-size: 1rem;
-			line-height: var(--_sap_ui_table_CheckBox_SizeCozy);
-			bottom: ~"calc((var(--_sap_ui_table_ColumnHeaderHeight) - var(--_sap_ui_table_CheckBox_SizeCozy)) / 2)";
+			font-size: var(--_sap_ui_table_CheckBox_Size);
+			line-height: var(--_sap_ui_table_CheckBox_Size);
+			bottom: ~"calc((var(--_sap_ui_table_ColumnHeaderHeight) - var(--_sap_ui_table_CheckBox_Size)) / 2)";
 
 			.sapUiSizeCozy & {
+				font-size: var(--_sap_ui_table_CheckBox_SizeCozy);
+				line-height: var(--_sap_ui_table_CheckBox_SizeCozy);
 				bottom: ~"calc((var(--_sap_ui_table_ColumnHeaderHeightCozy) - var(--_sap_ui_table_CheckBox_SizeCozy)) / 2)";
 			}
 
