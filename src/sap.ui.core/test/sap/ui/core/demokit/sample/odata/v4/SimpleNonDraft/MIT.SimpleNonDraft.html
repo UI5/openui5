@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style type="text/css">
+			body {font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;}
+		</style>
+		<title>Manual Integration Test: Simple Non-Draft CRUD</title>
+	</head>
+	<body>
+		<h1>Manual Integration Test: Simple Non-Draft CRUD</h1>
+		<h2>DESCRIPTION</h2>
+		Test the simple create, delete and modify operations (without draft handling) on
+		sales orders using an OData V4 binding with a deferred update group
+		(<code>updateGroupId</code> <code>update</code>). A new sales order is created via a
+		dialog; all changes are collected locally and are only sent to the back end when the
+		<code>Save</code> button is pressed (<code>submitBatch</code>), or discarded when
+		the <code>Cancel</code> button is pressed (<code>resetChanges</code>). The toolbar
+		<code>Save</code> and <code>Cancel</code> buttons are always enabled and give
+		feedback via a message toast, including when there are no pending changes. Verify
+		that the create dialog, note modification and deletion behave correctly, that
+		<code>Cancel</code> reverts every pending change, and that <code>Save</code>
+		persists them in a single batch. The toolbar also offers a <code>Refresh</code>
+		button which reloads the data from the back end, but is blocked by a message box
+		while there are pending changes; it is only possible once all pending changes have
+		been discarded.
+		<h2>PREPARATION</h2>
+		To check console errors open the developer tools before starting the application and
+		check with each step, that there are no errors and warnings.
+		<h3>Testing with mock data</h3>
+		Start the application (this is the <code>realOData=false</code> case, served by a
+		mock server):
+		<a href="../../../common/index.html?component=odata.v4.SimpleNonDraft">
+			SimpleNonDraft</a>
+		<br>
+		<b>Note:</b> The mock server responds almost instantly. To observe the view's busy
+		state during the save operation, append <code>&autoRespondAfter=1000</code> (delay
+		per mock response in milliseconds) to the URL:
+		<a href="../../../common/index.html?component=odata.v4.SimpleNonDraft&autoRespondAfter=1000">
+			SimpleNonDraft (delayed mock responses)</a>
+		<h3>Testing with real data</h3>
+		To run against the real EPM back-end service (requires an SAP-internal reverse proxy
+		that routes <code>/sap/opu/odata4/...</code> to the back end) append
+		<code>&realOData=true</code> to the URL:
+		<a href="../../../common/index.html?component=odata.v4.SimpleNonDraft&realOData=true">
+			SimpleNonDraft (realOData=true)</a>
+		<h2>REALIZE and CHECK</h2>
+
+		<h3>Scenario 1: Initial Load and Empty-State Feedback</h3>
+		<ol>
+			<li>Open the application URL from the <em>Testing with mock data</em>
+				section above.</li>
+			<li><b>Check:</b> The table contains the two sales orders provided by the
+				mock server: <code>0500000000</code> and
+				<code>0500000001</code>.</li>
+			<li>While there are no pending changes, press the <code>Save</code> button
+				in the toolbar.</li>
+			<li><b>Check:</b> A message toast appears with the text
+				<code>No changes to save</code>. The view does not turn busy and no
+				request is sent to the back end.</li>
+			<li>Press the <code>Cancel</code> button in the toolbar.</li>
+			<li><b>Check:</b> A message toast appears with the text
+				<code>No changes to cancel</code>. The table stays unchanged and no
+				request is sent to the back end.</li>
+		</ol>
+
+		<h3>Scenario 2: Create Dialog - Cancel Discards the Transient Row</h3>
+		<ol>
+			<li>Press the <code>Create</code> button in the toolbar.</li>
+			<li><b>Check:</b> A dialog titled <code>Create New Sales Order</code> opens
+				with an empty, required <code>Buyer ID</code> input, a required
+				<code>Currency</code> input defaulting to <code>EUR</code>, and the
+				buttons <code>Confirm</code> (emphasized) and
+				<code>Cancel</code>.</li>
+			<li><b>Check:</b> An empty transient row has already been prepended at the
+				top of the table — the <code>create</code> call adds it immediately,
+				before the dialog is confirmed.</li>
+			<li>Press the <code>Cancel</code> button inside the dialog.</li>
+			<li><b>Check:</b> The dialog closes and the transient row is removed again,
+				leaving the two original rows. Pressing the toolbar
+				<code>Cancel</code> now shows <code>No changes to cancel</code>,
+				confirming no residual pending changes.</li>
+		</ol>
+
+		<h3>Scenario 3: Rollback Flow - Create, Modify and Delete, then Cancel</h3>
+		<ol>
+			<li>Press <code>Create</code>, enter <code>0100000001</code> into the
+				<code>Buyer ID</code> input, leave <code>Currency</code> at
+				<code>EUR</code> and press <code>Confirm</code>.</li>
+			<li><b>Check:</b> The dialog closes and the transient row stays at the top,
+				showing <code>(0100000001)</code> in the <code>Buyer</code> column
+				(the company name is only resolved after saving) and
+				<code>EUR</code> as <code>Currency</code>; its
+				<code>Sales Order ID</code>, <code>Gross Amount</code> and
+				<code>Lifecycle Status</code> cells are still empty.</li>
+			<li>In the row of sales order <code>0500000000</code>, set the
+				<code>Note</code> to <code>Modified note</code>.</li>
+			<li><b>Check:</b> The entered text stays in the <code>Note</code> cell.</li>
+			<li>Select sales order <code>0500000001</code>.</li>
+			<li><b>Check:</b> The <code>Delete</code> button becomes enabled.</li>
+			<li>Press the <code>Delete</code> button.</li>
+			<li><b>Check:</b> Sales order <code>0500000001</code> disappears from the
+				table immediately and the <code>Delete</code> button becomes
+				disabled again (no row is selected anymore).</li>
+			<li>Press the <code>Cancel</code> button in the toolbar.</li>
+			<li><b>Check:</b> A message toast appears with the text
+				<code>Changes have been canceled</code>.</li>
+			<li><b>Check:</b> The transient created row is removed, the
+				<code>Note</code> of <code>0500000000</code> reverts to its original
+				value, and <code>0500000001</code> reappears — the table is back to
+				the baseline from Scenario 1 and no request was sent to the back
+				end.</li>
+		</ol>
+
+		<h3>Scenario 4: Persist Flow - Same Preparation, then Save</h3>
+		<ol>
+			<li>Repeat the preparation from Scenario 3: press <code>Create</code>, enter
+				<code>0100000001</code> and press <code>Confirm</code>; set the
+				<code>Note</code> of <code>0500000000</code> to
+				<code>Modified note</code>; then select and <code>Delete</code>
+				sales order <code>0500000001</code>.</li>
+			<li>Press the <code>Refresh</code> button in the toolbar while the create,
+				note and delete changes are still pending.</li>
+			<li><b>Check:</b> A message box (<code>MessageBox.alert</code>) appears with
+				the text <code>Refresh not possible with pending changes</code>.
+				Dismiss it by pressing <code>OK</code>; the pending changes are
+				kept.</li>
+			<li>Press the <code>Save</code> button in the toolbar.</li>
+			<li><b>Check:</b> The view is shown busy briefly while the batch request is
+				in flight. Use the <code>autoRespondAfter</code> URL parameter (see
+				PREPARATION) to slow the mock responses down enough to observe the
+				busy state.</li>
+			<li><b>Check:</b> A message toast appears with the text
+				<code>Changes have been saved</code>.</li>
+			<li><b>Check:</b> The created row now shows the server-assigned
+				<code>Sales Order ID</code> which is <code>0500000002</code>, the
+				company name <code>Becker Berlin</code> next to buyer ID
+				<code>0100000001</code>, a <code>Gross Amount</code> of
+				<code>0.00</code>, the <code>Currency</code> is <code>EUR</code> and
+				the <code>Lifecycle Status</code> is <code>New</code>.</li>
+			<li><b>Check:</b> The modified note on <code>0500000000</code> is kept and
+				<code>0500000001</code> does not reappear — all three changes were
+				persisted in a single batch.</li>
+			<li>Press the <code>Refresh</code> button in the toolbar.</li>
+			<li><b>Check:</b> A message toast appears with the text
+				<code>Data refreshed</code>. All data and modifications persist, but
+				the row order changes: the created sales order
+				<code>0500000002</code>, which was shown at the top before the
+				refresh, now moves to the bottom of the table because the server
+				returns it as the last entity. The modified <code>Note</code> on
+				<code>0500000000</code> is still shown, and <code>0500000001</code>
+				remains deleted and does not reappear.</li>
+		</ol>
+
+		<h3>Scenario 5: Save Flow - Back-End Error on Create</h3>
+		<ol>
+			<li>Press <code>Create</code>, enter an invalid <code>Buyer ID</code> such
+				as <code>123</code> (no business partner exists for this key), leave
+				<code>Currency</code> at <code>EUR</code> and press
+				<code>Confirm</code>.</li>
+			<li><b>Check:</b> The dialog closes and the transient row stays at the top
+				of the table showing <code>(123)</code> in the <code>Buyer</code>
+				column.</li>
+			<li>Press the <code>Save</code> button in the toolbar.</li>
+			<li><b>Check:</b> The back end rejects the creation. An error popup
+				(<code>MessageBox.error</code>) appears describing the actual
+				back-end error, i.e. with the text
+				<code>Business Partner with key '123' does not exist</code>. No
+				<code>Changes have been saved</code> message toast is shown.</li>
+			<li><b>Check:</b> After closing the popup, the invalid row is still present
+				at the top of the table as a pending change — the view is no longer
+				busy.</li>
+			<li>Select the invalid row and press the <code>Delete</code> button to
+				discard the failed creation.</li>
+			<li><b>Check:</b> The invalid row disappears from the table. Pressing the
+				toolbar <code>Cancel</code> now shows
+				<code>No changes to cancel</code>, confirming no residual pending
+				changes remain, and the table is back to the previous state.</li>
+		</ol>
+
+	</body>
+</html>
