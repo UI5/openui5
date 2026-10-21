@@ -103,6 +103,8 @@ sap.ui.define([
 		"sap.ui.comp.valuehelpdialog.ValueHelpDialog",
 		// destruction fails
 		"sap.ui.mdc.Chart",
+		// abstract base of sap.ui.mdc.List and sap.ui.mdc.Table, cannot be instantiated standalone
+		"sap.ui.mdc.ListTableBase",
 		"sap.chart.Chart",
 		"sap.makit.Chart",
 		"sap.makit.CombinationChart",

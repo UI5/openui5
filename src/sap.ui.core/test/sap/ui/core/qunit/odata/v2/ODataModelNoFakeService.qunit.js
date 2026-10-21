@@ -4761,7 +4761,8 @@ sap.ui.define([
 				mChangedEntities : mChangedEntities,
 				oMetadata : {
 					_getEntityTypeByPath : function () {},
-					_getNavPropertyRefInfo : function () {}
+					_getNavPropertyRefInfo : function () {},
+					_getPropertyMetadata : function () {}
 				},
 				_getObject : function () {},
 				_resolveGroup : function () {},
@@ -4785,6 +4786,9 @@ sap.ui.define([
 		this.mock(oModel.oMetadata).expects("_getEntityTypeByPath")
 			.withExactArgs("/~key")
 			.returns("~oEntityType");
+		this.mock(oModel.oMetadata).expects("_getPropertyMetadata")
+			.withExactArgs("~oEntityType", "foo")
+			.returns({type : "Edm.String"});
 		this.mock(oModel.oMetadata).expects("_getNavPropertyRefInfo")
 			.withExactArgs("~oEntityType", "foo")
 			.returns(null);
@@ -4798,6 +4802,43 @@ sap.ui.define([
 		});
 
 		assert.deepEqual(oModel.mChangedEntities, {});
+	});
+
+	//*********************************************************************************************
+	["Edm.Decimal", "~not decimal~"].forEach(function (sType) {
+		QUnit.test("_updateChangedEntity: compare complex type " + sType + " values", function (assert) {
+			const mChangedEntities = {
+				"~key" : {SalesOrder : {Amount : "130"}}
+			};
+			const oModel = {
+				mChangedEntities : mChangedEntities,
+				oMetadata : {
+					_getEntityTypeByPath() { return "~oEntityType"; },
+					_getNavPropertyRefInfo() {},
+					_getPropertyMetadata() {}
+				},
+				_getObject(sPath, vContext, bOriginal) { return bOriginal ? {} : mChangedEntities["~key"]; },
+				_resolveGroup() { return {groupId : "~group"}; },
+				abortInternalRequest() {},
+				isLaundering() { return false; },
+				removeInternalMetadata() { return {deepPath : "~deepPath"}; }
+			};
+
+			this.mock(oModel.oMetadata).expects("_getPropertyMetadata")
+				.withExactArgs("~oEntityType", "SalesOrder/Amount")
+				.returns({type : sType});
+			this.mock(ODataUtils).expects("compare")
+				.withExactArgs("130", "130.00", true/*bAsDecimal*/)
+				.exactly(sType === "Edm.Decimal" ? 1 : 0)
+				.returns(0);
+
+			// code under test
+			ODataModel.prototype._updateChangedEntity.call(oModel, "~key", {
+				SalesOrder : {Amount : "130.00"}
+			});
+
+			assert.strictEqual("~key" in oModel.mChangedEntities, sType !== "Edm.Decimal");
+		});
 	});
 
 	//*********************************************************************************************

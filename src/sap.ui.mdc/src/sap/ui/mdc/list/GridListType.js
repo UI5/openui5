@@ -131,7 +131,7 @@ sap.ui.define([
 	 * @protected
 	 */
 	GridListType.prototype.updateListByProperty = function(sProperty, vValue) {
-		const oLayout = this.getInnerList()?.getCustomLayout();
+		const oLayout = this.getInnerControl()?.getCustomLayout();
 		if (sProperty === "boxMinWidth") {
 			oLayout?.setBoxMinWidth(vValue);
 		} else if (sProperty === "boxWidth") {
@@ -291,7 +291,7 @@ sap.ui.define([
 	 * @protected
 	 */
 	GridListType.prototype.updateItemActions = function() {
-		const oInnerList = this.getInnerList();
+		const oInnerList = this.getInnerControl();
 		const oList = this.getList();
 
 		if (!oInnerList || !oList) {
