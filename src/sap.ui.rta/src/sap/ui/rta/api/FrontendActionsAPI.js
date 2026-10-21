@@ -281,6 +281,7 @@ sap.ui.define([
 				frontendAction("saveAndReloadApp", FrontendActionsAPI.saveAndReloadApp),
 				frontendAction("saveAndActivateChanges", FrontendActionsAPI.saveAndActivateChanges),
 				frontendAction("getApplicationInfo", FrontendActionsAPI.getApplicationInfo),
+				frontendAction("stopRTA", FrontendActionsAPI.stopRTA),
 				frontendAction("cleanup", FrontendActionsAPI.cleanup)
 			];
 			return aBoundActions;
@@ -727,6 +728,58 @@ sap.ui.define([
 				Log.info("FrontendActionsAPI: getApplicationInfo returning", JSON.stringify(oResult));
 				return oResult;
 			}
+		},
+
+		/**
+		 * Stops the running Runtime Adaptation session the same way the toolbar Exit action does
+		 * (prompting to save unsaved changes where applicable). Resolves once RTA has stopped; the
+		 * cached instance is cleared by RTA's own <code>stop</code> listener.
+		 *
+		 * Note: <code>RuntimeAuthoring.prototype.stop</code> always resolves — it swallows user-cancel
+		 * and technical errors internally. Success is therefore detected by checking whether the
+		 * <code>"stop"</code> event fired (which clears <code>oRta</code>), not by catching a rejection.
+		 *
+		 * @returns {Promise<sap.ui.rta.util.ai.FrontendActionResult>} Success envelope, or a
+		 *   not-started / failure envelope.
+		 * @private
+		 * @ui5-restricted sap.ui.rta
+		 */
+		async stopRTA() {
+			Log.info("FrontendActionsAPI: stopRTA called");
+			if (!oRta) {
+				return notStartedResult();
+			}
+			await oRta.stop(false, false, false);
+			// oRta is cleared by the "stop" event listener if and only if stop succeeded.
+			// If the user cancelled the unsaved-changes prompt or an internal error occurred,
+			// stop() still resolves but oRta remains set.
+			if (oRta !== undefined) {
+				const oResult = FrontendActionResult.failure(
+					FrontendActionError.ErrorCodes.GENERIC_ERROR,
+					"RTA did not stop (user may have cancelled or an internal error occurred)"
+				);
+				Log.info("FrontendActionsAPI: stopRTA returning", JSON.stringify(oResult));
+				return oResult;
+			}
+			const oResult = FrontendActionResult.success(true);
+			Log.info("FrontendActionsAPI: stopRTA returning", JSON.stringify(oResult));
+			return oResult;
+		},
+
+		async waitForPendingActions() {
+			if (!oRta) {
+				return notStartedResult();
+			}
+			await oRta.waitForPendingActions();
+			return FrontendActionResult.success(true);
+		},
+
+		async waitForCommandExecutionResult() {
+			if (!oRta) {
+				return notStartedResult();
+			}
+			await oRta.waitForCommandExecutionResult();
+			return FrontendActionResult.success(true);
 		},
 
 		// Called by the agent at conversation end — whether the turn ended in

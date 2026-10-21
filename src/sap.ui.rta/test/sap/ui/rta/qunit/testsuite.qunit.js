@@ -774,6 +774,17 @@ sap.ui.define([
 					only: ["sap/ui/rta/toolbar/Adaptation"]
 				}
 			},
+			"testing/TestAutomationAPI": {
+				group: "Testing",
+				ui5: {
+					resourceroots: {
+						"sap.ui.rta.qunit": "test-resources/sap/ui/rta/qunit/"
+					}
+				},
+				coverage: {
+					only: ["sap/ui/rta/testing/TestAutomationAPI"]
+				}
+			},
 			"toolbar/Base": {
 				group: "Toolbar",
 				coverage: {
