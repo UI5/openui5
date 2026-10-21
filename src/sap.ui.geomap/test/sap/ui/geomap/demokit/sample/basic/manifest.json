@@ -1,0 +1,52 @@
+{
+	"_version": "2.0.0",
+	"sap.app": {
+		"id": "sap.ui.geomap.sample.basic",
+		"type": "application",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"title": "Application 'sap.ui.geomap.sample.basic'"
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"handleValidation": true,
+		"rootView": "sap.ui.geomap.sample.basic.Main",
+		"resources": {
+			"css": [
+				{
+					"uri": "style.css"
+				}
+			]
+		},
+		"dependencies": {
+			"minUI5Version": "2.0.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.ui.geomap": {}
+			}
+		},
+		"config": {
+			"sample": {
+				"files": [
+					"manifest.json",
+					"Component.js",
+					"Main.controller.js",
+					"Main.view.xml",
+					"osm.json"
+				],
+				"settings": {
+					"stretch": true
+				}
+			}
+		}
+	}
+}

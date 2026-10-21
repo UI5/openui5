@@ -70,6 +70,8 @@ sap.ui.define([
 		"sap.ui.core.mvc.XMLView",
 		"sap.ui.core.mvc.View",
 		"sap.m.internal.NumericInput",
+		// abstract base of sap.ui.mdc.List and sap.ui.mdc.Table, cannot be instantiated standalone
+		"sap.ui.mdc.ListTableBase",
 		// setting an invalid type crashes and only leaks a picker control because of this
 		"sap.m.DateTimeInput",
 		"sap.m.FacetFilterItem",

@@ -7,12 +7,13 @@ sap.ui.define([], function() {
 			page: "test-resources/{name}/qunit/testsuite.qunit.html"
 		},
 		tests: {
+			"sap/html": {},
 			"sap/ui/codeeditor": {},
 			"sap/ui/core": {},
 			"sap/ui/documentation/sdk": {},
 			"sap/ui/dt": {},
 			"sap/ui/fl": {},
-			"sap/html": {},
+			"sap/ui/geomap": {},
 			"sap/ui/mdc": {},
 			"sap/ui/integration": {},
 			"sap/ui/layout": {},

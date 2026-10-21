@@ -80,7 +80,7 @@ PanelRenderer.renderHeader = function (oRm, oControl) {
 		oHeaderTBar = oControl.getHeaderToolbar(),
 		sHeaderClass;
 
-	oRm.openStart("div");
+	oRm.openStart("div", oControl.getId() + "-heading");
 	oRm.class("sapMPanelHeadingDiv");
 
 	if (bIsStickyPanel) {
