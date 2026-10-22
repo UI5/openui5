@@ -1561,11 +1561,89 @@ sap.ui.define([
 		 * @public
 		 */
 		isUsedForGrandTotal : function (aPaths, mAggregate) {
+			return _AggregationHelper.isUsedForTotals("grandTotal", aPaths, mAggregate);
+		},
+
+		/**
+		 * Tells whether any property affected by the given side-effects paths determines the
+		 * visual grouping, i.e. is a group level property or an additionally requested property
+		 * of a group level but not a leaf level.
+		 *
+		 * @param {string[]} aPaths
+		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
+		 *   changed due to an update or side effects of a previous update, see
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
+		 * @param {object} oAggregation
+		 *   An object holding the information needed for data aggregation but no recursive
+		 *   hierarchy; see {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}
+		 * @returns {boolean}
+		 *   Whether any property affected by the given side-effects paths determines the visual
+		 *   grouping
+		 *
+		 * @public
+		 */
+		isUsedForGroupLevels : function (aPaths, oAggregation) {
+			// _AggregationHelper.isAffected returns true if "*" is in aPaths independent of
+			// the given aggregation, so check first whether there are group levels
+			return oAggregation.groupLevels.length > 0 && _AggregationHelper.isAffected({
+					aggregate : {},
+					// only groups that are used for visual grouping have to be considered
+					group : oAggregation.groupLevels.reduce((oGroup, sGroup) => {
+						oGroup[sGroup] = oAggregation.group[sGroup];
+						return oGroup;
+					}, /*oGroup*/{})
+				}, /*aFilters*/[], aPaths);
+		},
+
+		/**
+		 * Tells whether visual grouping is used and any property affected by the given side-effects
+		 * paths is used to compute subtotals.
+		 *
+		 * @param {string[]} aPaths
+		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
+		 *   changed due to an update or side effects of a previous update, see
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
+		 * @param {object} oAggregation
+		 *   An object holding the information needed for data aggregation but no recursive
+		 *   hierarchy; see {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}
+		 * @returns {boolean}
+		 *   Whether visual grouping is used and any property affected by the given side-effects
+		 *   paths is used to compute subtotals
+		 *
+		 * @public
+		 */
+		isUsedForSubtotals : function (aPaths, oAggregation) {
+			return oAggregation.groupLevels.length > 0
+				&& _AggregationHelper.isUsedForTotals("subtotals", aPaths, oAggregation.aggregate);
+		},
+
+		/**
+		 * Tells whether any property affected by the given side-effects paths is used to compute
+		 * either subtotals or the grandTotal.
+		 *
+		 * @param {"subtotals"|"grandTotal"} sWhich
+		 *   Whether subtotals or the grandTotal shall be considered
+		 * @param {string[]} aPaths
+		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
+		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
+		 *   changed due to an update or side effects of a previous update, see
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
+		 * @param {object} [mAggregate]
+		 *   A map from aggregatable property names/aliases to details objects
+		 * @returns {boolean}
+		 *   Whether any property affected by the given side-effects paths is used to compute
+		 *   subtotals or grandTotal
+		 *
+		 * @private
+		 */
+		isUsedForTotals : function (sWhich, aPaths, mAggregate) {
 			if (mAggregate) {
 				const bWithWildcard = aPaths.includes("*");
 				for (const [sAlias, oDetails] of Object.entries(mAggregate)) {
-					if (oDetails.grandTotal
-						&& (bWithWildcard
+					if (oDetails[sWhich]
+							&& (bWithWildcard
 							|| aPaths.includes(sAlias) || aPaths.includes(oDetails.unit))) {
 						return true;
 					}
