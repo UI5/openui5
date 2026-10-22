@@ -1,0 +1,3 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">
+	<Button id="innerBtn" text="Inner" />
+</mvc:View>
