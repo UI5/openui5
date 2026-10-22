@@ -63,6 +63,11 @@ sap.ui.define(
             "REGEX": /^(sapui5|openui5)([a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?\.hana\.ondemand\.com$/
         };
 
+        const SAP_SUBDOMAIN = {
+            // matches any hostname under the .sap TLD containing "sapui5" (e.g. abc.sapui5.foo.sap, abcsapui5.foo.sap)
+            "REGEX": /^[a-zA-Z0-9.-]*sapui5[a-zA-Z0-9.-]*\.[a-zA-Z0-9-]+\.sap$/
+        };
+
         // shorthand for TrustArc constants
         const oCookieCategories = TRUST_ARC.CATEGORIES,
             oCategoryDecisionType = TRUST_ARC.CONSENT_DECISION.FOR_CATEGORY,
@@ -369,7 +374,7 @@ sap.ui.define(
 
         var CookiesConsentManager = {
             create: function (oComponent, oConfig) {
-                if (this._configIncludesUsageTracking()) {
+                if (this._configIncludesUsageTracking() || this._checkHostnameIsOwnDomain()) {
                     return new ThirdPartyConsentManager(oComponent, oConfig);
                 } else {
                     return new DefaultConsentManager(oComponent, oConfig);
@@ -392,6 +397,11 @@ sap.ui.define(
             _checkHostnameIsTracked: function (sHostname) {
                 return TRACKED_HOSTNAMES.LIST.includes(sHostname) ||
                     TRACKED_HOSTNAMES.REGEX.test(sHostname);
+            },
+
+            _checkHostnameIsOwnDomain: function (sHostname) {
+                sHostname = sHostname || new URI(window.location.href).hostname();
+                return SAP_SUBDOMAIN.REGEX.test(sHostname);
             }
         };
 
