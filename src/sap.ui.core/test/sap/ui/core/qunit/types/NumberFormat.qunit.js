@@ -5021,25 +5021,19 @@ sap.ui.define([
 
 		// code under test
 		assert.throws(() => {
-			NumberFormat.checkDecimalPadding({decimalPadding: "foo"}, false);
-		}, new Error("Unsupported format option: 'decimalPadding' cannot be used with an integer or percent"
-				+ " instance of sap.ui.core.format.NumberFormat"));
-
-		// code under test
-		assert.throws(() => {
-			NumberFormat.checkDecimalPadding({decimalPadding: 2}, true, true);
+			NumberFormat.checkDecimalPadding({decimalPadding: 2}, true);
 		}, new Error("The format option 'decimalPadding' can only be used if the format option "
 				+ "'showMeasure' is set to false"));
 
 		// code under test
 		assert.throws(() => {
-			NumberFormat.checkDecimalPadding({decimalPadding: 5, showMeasure: false, style: "short"}, true, true);
+			NumberFormat.checkDecimalPadding({decimalPadding: 5, showMeasure: false, style: "short"}, true);
 		}, new Error("The format option 'decimalPadding' can only be used if the format option "
 				+ "'style' is not set to 'short' or 'long'"));
 
 		// code under test
 		assert.throws(() => {
-			NumberFormat.checkDecimalPadding({decimalPadding: 5, showMeasure: false, style: "long"}, true, true);
+			NumberFormat.checkDecimalPadding({decimalPadding: 5, showMeasure: false, style: "long"}, true);
 		}, new Error("The format option 'decimalPadding' can only be used if the format option "
 				+ "'style' is not set to 'short' or 'long'"));
 	});
@@ -5051,25 +5045,15 @@ sap.ui.define([
 		sGetter: "getFloatInstance",
 		sType: "float"
 	}, {
-		aCheckDecimalPaddingArgs: [false],
-		oDefaultOptions: NumberFormat.oDefaultIntegerFormat,
-		sGetter: "getIntegerInstance",
-		sType: "integer"
-	}, {
-		aCheckDecimalPaddingArgs: [true, true],
+		aCheckDecimalPaddingArgs: [true],
 		oDefaultOptions: NumberFormat.oDefaultUnitFormat,
 		sGetter: "getUnitInstance",
 		sType: "unit"
 	}, {
-		aCheckDecimalPaddingArgs: [true, true],
+		aCheckDecimalPaddingArgs: [true],
 		oDefaultOptions: NumberFormat.oDefaultCurrencyFormat,
 		sGetter: "getCurrencyInstance",
 		sType: "currency"
-	}, {
-		aCheckDecimalPaddingArgs: [false],
-		oDefaultOptions: NumberFormat.oDefaultPercentFormat,
-		sGetter: "getPercentInstance",
-		sType: "percent"
 	}].forEach(({aCheckDecimalPaddingArgs, oDefaultOptions, sGetter, sType}) => {
 		QUnit.test(sGetter, function (assert) {
 			this.mock(NumberFormat).expects("checkDecimalPadding").withExactArgs("~oOptions", ...aCheckDecimalPaddingArgs);
