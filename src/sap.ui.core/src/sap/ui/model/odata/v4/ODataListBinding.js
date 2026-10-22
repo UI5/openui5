@@ -1364,7 +1364,7 @@ sap.ui.define([
 		that.setOutdated("delete");
 
 		return oContext.doDelete(oGroupLock, sEditUrl, sPath, oETagEntity, this,
-			function (iIndex, iOffset) {
+			function (iIndex, iOffset, bCountChanged) {
 				if (iIndex !== undefined) {
 					// An entity can only be deleted when its key predicate is known. So we can be
 					// sure to have key predicates and the contexts are related to entities and not
@@ -1396,6 +1396,8 @@ sap.ui.define([
 				} else if (iOffset > 0) { // trying to reinsert an element w/o index
 					bReset = true;
 					fnUndelete();
+				} else if (bCountChanged) {
+					that.oHeaderContext.setOutdated(true);
 				} else if (that.bLengthFinal && !bDoNotRequestCount) {
 					const bDataAggregation = _Helper.isDataAggregation(that.mParameters);
 					const iOldCount = bDataAggregation && that.getCount();

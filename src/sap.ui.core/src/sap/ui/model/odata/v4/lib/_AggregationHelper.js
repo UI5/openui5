@@ -1689,6 +1689,43 @@ sap.ui.define([
 		},
 
 		/**
+		 * Recursively searches the given node inside any private "spliced" annotation of any of the
+		 * given array's elements. If found, removes it from that array and shifts the rank (aka.
+		 * $skip index) of all siblings (nodes or placeholders) after it by -1.
+		 *
+		 * @param {object} oDeleted
+		 *   An (unaggregated) leaf node that has been deleted on the server
+		 * @param {object[]} [aElements]
+		 *   An array of elements
+		 * @returns {boolean}
+		 *   Whether the node has been found
+		 *
+		 * @public
+		 */
+		removeFromSpliced : function (oDeleted, aElements) {
+			return aElements?.some((oElement, iIndex) => {
+				if (oElement === oDeleted) {
+					const oParentCache = _Helper.getPrivateAnnotation(oDeleted, "parent");
+					for (let i = iIndex + 1; i < aElements.length; i += 1) { // Note: no OOP w/ D.A.
+						const oSibling = aElements[i];
+						if (_Helper.getPrivateAnnotation(oSibling, "parent") === oParentCache) {
+							const iRank = _Helper.getPrivateAnnotation(oSibling, "rank");
+							_Helper.setPrivateAnnotation(oSibling, "rank", iRank - 1);
+						} else {
+							break; // Note: leaf level siblings are a single block
+						}
+					}
+					aElements.splice(iIndex, 1);
+
+					return true;
+				}
+
+				return _AggregationHelper.removeFromSpliced(oDeleted,
+					_Helper.getPrivateAnnotation(oElement, "spliced"));
+			}) ?? false;
+		},
+
+		/**
 		 * Removes any potential "UI5grand__" prefix from the given grand totals.
 		 *
 		 * @param {object} oGrandTotal - A grand total element
