@@ -6,7 +6,7 @@
 	<copyright>${copyright}</copyright>
 	<version>${version}</version>
 
-	<documentation>SAPUI5 library with Geomap controls.</documentation>
+	<documentation>SAPUI5 library of map visualization controls based on the Geomap web component. The library provides declarative support for points, lines, polygons, raster and vector sources, and standard map UI controls.</documentation>
 
 	<dependencies>
 		<dependency>
