@@ -2188,38 +2188,52 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-[{
-	hierarchyQualifier : "X"
-}, {
-	aggregate : {},
-	group : {},
-	// Note: a single group level would define the leaf level (JIRA: CPOUI5ODATAV4-2755)
-	groupLevels : ["a", "b"]
-}].forEach(function (oAggregation, i) {
-	QUnit.test("requestCount: unsupported #" + i, function (assert) {
-		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
+	QUnit.test("requestCount: unsupported", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
+			hierarchyQualifier : "X"
+		});
+		this.mock(oCache).expects("createCountPromise").never();
+		this.mock(oCache).expects("readCount").never();
+		this.mock(oCache.oFirstLevel).expects("requestCount").never();
 
 		assert.throws(function () {
 			// code under test
 			oCache.requestCount("~oGroupLock~");
-		}, new Error("Unsupported with recursive hierarchy or groupLevels"));
+		}, new Error("Unsupported with recursive hierarchy"));
 	});
-});
 
 	//*********************************************************************************************
-[[], ["a"]].forEach(function (aGroupLevels) { // both equivalent: last group level = leaf level
-	[false, true].forEach(function (bFilter) {
-		[false, true].forEach(function (bSearch) {
-			[undefined, false, true].forEach(function (bGrandTotalAtBottomOnly) {
-	const sTitle = "requestCount: filter=" + bFilter + ", search=" + bSearch
-		+ ", grandTotalAtBottomOnly=" + bGrandTotalAtBottomOnly;
+	QUnit.test("requestCount: oCountPromise", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
+			groupLevels : ["a"] // last group level = leaf level
+		});
+		oCache.oCountPromise = "~oOldCountPromise~";
+		const oCreateCountPromiseExpectation
+			= this.mock(oCache).expects("createCountPromise").withExactArgs();
+		this.mock(oCache).expects("readCount").withExactArgs("~oGroupLock~")
+			.callsFake(() => {
+				assert.ok(oCreateCountPromiseExpectation.calledOnce);
+				// actually done by #createCountPromise, but simplifies check of timing
+				oCache.oCountPromise = "~oNewCountPromise~";
+			});
+		this.mock(oCache.oFirstLevel).expects("requestCount").never();
+
+		// code under test
+		assert.strictEqual(oCache.requestCount("~oGroupLock~"), "~oNewCountPromise~");
+	});
+
+	//*********************************************************************************************
+[false, true].forEach(function (bFilter) {
+	[false, true].forEach(function (bSearch) {
+		const sTitle = "requestCount: filter=" + bFilter + ", search=" + bSearch;
 
 	QUnit.test(sTitle, async function (assert) {
 		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
-			aggregate : {foo : {grandTotal : true}},
-			grandTotalAtBottomOnly : bGrandTotalAtBottomOnly,
-			groupLevels : aGroupLevels
+			groupLevels : ["a"], // last group level = leaf level
+			...(bSearch && {search : "search"})
 		});
+		this.mock(oCache).expects("createCountPromise").never();
+		this.mock(oCache).expects("readCount").never();
 		oCache.oFirstLevel.mQueryOptions = Object.freeze({
 			"sap-client" : "123",
 			...(bFilter && {$$filterBeforeAggregate : "filter"}),
@@ -2229,10 +2243,6 @@ sap.ui.define([
 			$orderby : "orderby",
 			$select : "select"
 		});
-		if (bSearch) {
-			oCache.oAggregation.search = "search";
-		}
-
 		this.mock(oCache.oFirstLevel).expects("requestCount")
 			.withExactArgs("~oGroupLock~", {
 				"sap-client" : "123",
@@ -2248,8 +2258,6 @@ sap.ui.define([
 		// code under test
 		assert.strictEqual(await oCache.requestCount("~oGroupLock~"), 42);
 	});
-			});
-		});
 	});
 });
 
