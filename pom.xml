@@ -116,8 +116,8 @@
 		<sap.ui5.eslint.tools.version>0.0.6</sap.ui5.eslint.tools.version>
 		<!-- ESLint version (for all OpenUI5 projects) -->
 		<sap.openui5.eslintnode.version>7.32.0</sap.openui5.eslintnode.version>
-		<sap.openui5.eslintnode.node.version>18.20.4</sap.openui5.eslintnode.node.version>
-		<sap.openui5.eslintnode.npm.version>8.1.0</sap.openui5.eslintnode.npm.version>
+		<sap.openui5.eslintnode.node.version>24.22.1</sap.openui5.eslintnode.node.version>
+		<sap.openui5.eslintnode.npm.version>11.19.1</sap.openui5.eslintnode.npm.version>
 	</properties>
 
 
