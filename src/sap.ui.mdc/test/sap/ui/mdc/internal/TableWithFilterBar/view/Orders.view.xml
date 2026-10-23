@@ -63,7 +63,7 @@
 						<mdc:typeahead>
 							<mdcvh:Popover >
 								<mdcvc:MTable id="FH1-Pop-Cont" keyPath="OrderNo" >
-									<Table items='{path : "/Orders", length: 10}' width="30rem" mode="MultiSelect">
+									<Table id="FH1-Pop-Cont-Table" items='{path : "/Orders", length: 10, suspended: true}' width="30rem" mode="MultiSelect">
 										<columns>
 											<Column>
 												<header>
@@ -162,7 +162,7 @@
 						<mdc:typeahead>
 							<mdcvh:Popover id="VH-ID-Pop">
 								<mdcvc:MTable id="VH-ID-Pop-Cont" keyPath="ID" descriptionPath="OrderNo" >
-									<Table id="VH-ID-Pop-Cont-Table" items='{path : "/Orders", length: 10}' width="30rem" mode="MultiSelect">
+									<Table id="VH-ID-Pop-Cont-Table" items='{path : "/Orders", length: 10, suspended: true}' width="30rem" mode="MultiSelect">
 										<columns>
 											<Column>
 												<header>
@@ -228,8 +228,8 @@
 					<mdc:ValueHelp id="FH-Currency"
 						delegate='\{"name": "sap/ui/v4demo/delegate/ValueHelp.delegate", "payload": \{\}\}'>
 						<mdc:typeahead>
-							<mdcvh:Popover>
-								<mdcvc:FixedList items="{/Currencies}" useAsValueHelp="true">
+							<mdcvh:Popover id="FH-Currency-Pop">
+								<mdcvc:FixedList id="FH-Currency-Pop-FL" items='{path: "/Currencies", suspended: true}' useAsValueHelp="true">
 									<mdcvc:FixedListItem key="{code}" text="{descr}" additionalText="{code}"/>
 								</mdcvc:FixedList>
 							</mdcvh:Popover>

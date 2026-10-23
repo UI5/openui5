@@ -131,9 +131,9 @@
 						id="IOFFVHCountry"
 						delegate='\{"name": "sap/ui/v4demo/delegate/ValueHelp.delegate", "payload": \{\}\}'>
 						<mdc:typeahead>
-							<mdcvh:Popover >
-								<mdcvc:MTable  keyPath="code"	descriptionPath="descr">
-									<Table items="{path: '/Countries'}" width="30rem" mode="MultiSelect">
+							<mdcvh:Popover id="IOFFVHCountry-Pop">
+								<mdcvc:MTable id="IOFFVHCountry-Pop-MTable" keyPath="code"	descriptionPath="descr">
+									<Table id="IOFFVHCountry-Pop-MTable-Table" items="{path: '/Countries', suspended: true}" width="30rem" mode="MultiSelect">
 										<columns>
 											<Column>
 												<Label text="Country"></Label>
@@ -164,9 +164,9 @@
 										   \{"contentId":"container-v4demo---authors--regionsTypeAhead", "path":"country_code"\}]
 						\}\}'>
 						<mdc:typeahead>
-							<mdcvh:Popover>
+							<mdcvh:Popover id="IOFFVHRegion-Pop">
 								<mdcvc:MTable id="regionsTypeAhead" keyPath="code" descriptionPath="text" >
-									<Table items="{path: '/Regions', length: 10, parameters: {$select: 'country_code'}}" width="30rem" mode="MultiSelect">
+									<Table id="regionsTypeAhead-Table" items="{path: '/Regions', length: 10, parameters: {$select: 'country_code'}, suspended: true}" width="30rem" mode="MultiSelect">
 										<columns>
 											<Column>
 												<Label text="Region"></Label>
@@ -190,16 +190,16 @@
 							</mdcvh:Popover>
 						</mdc:typeahead>
 						<mdc:dialog>
-							<mdcvh:Dialog title="Regions">
-								<mdcvc:MTable id="regions" keyPath="code" descriptionPath="text" >
-									<mdcvc:filterBar>
+							<mdcvh:Dialog id="IOFFVHRegion-Dia" title="Regions">
+								<mdcvc:MTable id="IOFFVHRegion-Dia-MTable" keyPath="code" descriptionPath="text" >
+									<mdcvc:filterBar id="IOFFVHRegion-Dia-MTable-FB">
 										<mdcvh:FilterBar id="regionsVHFilterbar" liveMode="false" delegate='\{"name": "delegates/GenericVhFilterBarDelegate", "payload": \{"collectionName": ""\}\}' >
 											<mdc:FilterField delegate='\{"name": "delegates/odata/v4/FieldBaseDelegate", "payload": \{\}\}' id="VHFFBTextFFCountry" label="Country" editMode="Editable" display="ValueDescription" dataType="sap.ui.model.odata.type.String" width="100%" conditions="{$filters>/conditions/country_code}" propertyKey="country_code" valueHelp="IOFFVHCountry">
 											</mdc:FilterField>
 										</mdcvh:FilterBar>
 									</mdcvc:filterBar>
 
-									<Table items="{path: '/Regions', parameters: {$select: 'country_code', $count: true}}" width="100%" growing="true" growingScrollToLoad="true" growingThreshold="20" mode="MultiSelect">
+									<Table id="IOFFVHRegion-Dia-MTable-Table" items="{path: '/Regions', parameters: {$select: 'country_code', $count: true}, suspended: true}" width="100%" growing="true" growingScrollToLoad="true" growingThreshold="20" mode="MultiSelect">
 										<columns>
 											<Column>
 												<Label text="Region"></Label>
@@ -235,7 +235,7 @@
 						<mdc:typeahead>
 							<mdcvh:Popover>
 								<mdcvc:MTable id="regionsFH" keyPath="code" descriptionPath="text" >
-									<Table items="{path: '/Regions', parameters: {$select: 'country_code'}}" growing="true" growingScrollToLoad="true" growingThreshold="20" width="30rem" mode="MultiSelect">
+									<Table id="regionsFH-Table" items="{path: '/Regions', parameters: {$select: 'country_code'}, suspended: true}" growing="true" growingScrollToLoad="true" growingThreshold="20" width="30rem" mode="MultiSelect">
 										<columns>
 											<Column>
 												<Label text="Region"/>
@@ -278,7 +278,7 @@
 						<mdc:typeahead>
 							<mdcvh:Popover>
 							<mdcvc:MTable id="citiesTypeAhead" keyPath="city" descriptionPath="text" >
-								<Table items="{path: '/Cities', length: 10, parameters: {$select: ['country_code', 'region_code']}}" width="30rem" mode="MultiSelect">
+								<Table id="citiesTypeAhead-Table" items="{path: '/Cities', length: 10, parameters: {$select: ['country_code', 'region_code']}, suspended: true}" width="30rem" mode="MultiSelect">
 									<columns>
 										<Column>
 											<Label text="City"></Label>
@@ -315,7 +315,7 @@
 									</mdcvh:FilterBar>
 								</mdcvc:filterBar>
 
-								<Table items="{path: '/Cities', parameters: {$select: ['country_code', 'region_code'], $count: true}}" width="100%" growing="true" growingScrollToLoad="true" growingThreshold="20" mode="MultiSelect">
+								<Table id="cities-Table" items="{path: '/Cities', parameters: {$select: ['country_code', 'region_code'], $count: true}, suspended: true}" width="100%" growing="true" growingScrollToLoad="true" growingThreshold="20" mode="MultiSelect">
 									<columns>
 										<Column>
 											<Label text="City"></Label>
@@ -441,7 +441,7 @@
 						<mdcvc:MTable id="VHGenre-TypeAhead" keyPath="code" descriptionPath="title"
 							useAsValueHelp="false">
 							<Table id="VHGenre-mTable1"
-								items='{path : "/Genres", length: 10, parameters: {$select: "classification_code"}}'
+								items='{path : "/Genres", length: 10, parameters: {$select: "classification_code"}, suspended: true}'
 								width="{= ${device>/system/phone} ? '100%' : '30rem'}" mode="MultiSelect">
 								<columns>
 									<Column width="10rem">
