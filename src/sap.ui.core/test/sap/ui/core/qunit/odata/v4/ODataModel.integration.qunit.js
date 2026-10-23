@@ -341,7 +341,7 @@ sap.ui.define([
 			const oElement = aElements.$byPredicate[sPredicate];
 			strictEqual(aElements.includes(oElement) || isKeepAlive(oListBinding, sPredicate),
 				true,
-				`$byPredicate[${sPredicate}] in aElements or kept alive`, oElement);
+				`$byPredicate[${sPredicate}] in aElements`, oElement);
 			strictEqual(_Helper.getPrivateAnnotation(oElement, "predicate"), sPredicate,
 				`unknown predicate ${sPredicate}`, oElement);
 			const oGroupLevelCache = _Helper.getPrivateAnnotation(oElement, "parent");
@@ -32605,7 +32605,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[true, true, 1, "B", "", "", "20"]
 		], 12);
 		assert.deepEqual(oListBinding.getCurrentContexts()[2].getObject(), {
-			"@$ui5.context.isOutdated" : true,
+			"@$ui5.context.isOutdated" : true, // has to be contained in the node's object
 			"@$ui5.node.isExpanded" : false,
 			"@$ui5.node.isTotal" : true,
 			"@$ui5.node.level" : 2,
@@ -37697,7 +37697,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			});
 
 			that.expectRequest("EMPLOYEES('0')?sap-client=123"
-					+ "&$select=__CT__FAKE__Message/__FAKE__Messages", {
+					+ "&$select=ID,__CT__FAKE__Message/__FAKE__Messages", {
+					ID : "0",
 					// special handling due to side-effect
 					__CT__FAKE__Message : {
 						__FAKE__Messages : [{

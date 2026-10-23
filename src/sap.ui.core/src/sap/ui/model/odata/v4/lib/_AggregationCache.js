@@ -963,8 +963,8 @@ sap.ui.define([
 					if (aSpliced.$stale && !mKeptElementPredicates[sPredicate]) {
 						that.turnIntoPlaceholder(oElement, sPredicate);
 					} else {
-						that.aElements.$byPredicate[sPredicate] = oElement;
 						that.updateSubtotalsOutdatedAnnotation(oElement);
+						that.aElements.$byPredicate[sPredicate] = oElement;
 						const sTransientPredicate
 							= _Helper.getPrivateAnnotation(oElement, "transientPredicate");
 						if (sTransientPredicate) {
@@ -1463,9 +1463,12 @@ sap.ui.define([
 		}
 
 		const mQueryOptions = _Helper.clone({...this.mQueryOptions, ...this.mLateExpandSelect});
-		const iIndex = mQueryOptions.$select.indexOf(this.oAggregation.$NodeProperty);
-		if (iIndex >= 0) {
-			mQueryOptions.$select.splice(iIndex, 1);
+		const sNodeProperty = this.oAggregation.$NodeProperty;
+		const isKeyProperty = () => _Helper.getKeyPropertyPaths(this.getTypes()[this.sMetaPath])
+			.includes(sNodeProperty);
+		const iIndex = mQueryOptions.$select.indexOf(sNodeProperty);
+		if (iIndex >= 0 && !isKeyProperty()) {
+			mQueryOptions.$select.splice(iIndex, 1); // Note: do NOT remove key properties!
 		}
 
 		return mQueryOptions;
@@ -3199,7 +3202,7 @@ sap.ui.define([
 	 *   Whether this element is a (sub)total
 	 * @param {sap.ui.model.odata.v4.lib._AggregationCache} oAggregationCache
 	 *   The aggregation cache instance, used to get the meta path for the aggregation cache's
-	 *   collection of elements and the current outdated state of the subtotals
+	 *   collection of elements
 	 * @param {object} oElement
 	 *   The element for which to calculate the key predicate
 	 * @param {object} mTypeForMetaPath
