@@ -190,15 +190,15 @@ sap.ui.define(['sap/ui/geomap/thirdparty/webcomponents', 'sap/ui/geomap/thirdpar
             this._selectionStyles = oConfig.selectionStyles;
             this._selectionModes = oConfig.selectionModes;
             this._adapter = new Geomap.i({ map: this.map });
-            this._terraDraw = new Geomap.to({
+            this._terraDraw = new Geomap.eo({
                 adapter: this._adapter,
-                modes: [new Geomap.bt({ ...this._selectionStyles.freehand, ...this._selectionModes }),
+                modes: [new Geomap.Gt({ ...this._selectionStyles.freehand, ...this._selectionModes }),
                     new Geomap.ve({ ...this._selectionStyles.rectangle, ...this._selectionModes }),
-                    new Geomap.vt({ ...this._selectionStyles.circle, ...this._selectionModes }),
-                    new Geomap.me({ ...this._selectionStyles.polygon, ...this._selectionModes }),
-                    new Geomap.oe({ ...this._selectionStyles.linestring, ...this._selectionModes }),
-                    new Geomap.ze({ ...this._selectionStyles.select, ...this._selectionModes }),
-                    new Geomap.pe({ ...this._selectionStyles.point, ...this._selectionModes })],
+                    new Geomap._t({ ...this._selectionStyles.circle, ...this._selectionModes }),
+                    new Geomap.fe({ ...this._selectionStyles.polygon, ...this._selectionModes }),
+                    new Geomap.ne({ ...this._selectionStyles.linestring, ...this._selectionModes }),
+                    new Geomap.He({ ...this._selectionStyles.select, ...this._selectionModes }),
+                    new Geomap.ge({ ...this._selectionStyles.point, ...this._selectionModes })],
             });
             this._terraDraw.on("finish", (id, context) => {
                 const snapshot = this._terraDraw.getSnapshot();

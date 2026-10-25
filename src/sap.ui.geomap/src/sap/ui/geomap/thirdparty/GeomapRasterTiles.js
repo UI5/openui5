@@ -63,7 +63,7 @@ sap.ui.define(['sap/ui/geomap/thirdparty/webcomponents', 'sap/ui/geomap/thirdpar
         updateSource() {
         }
         connectToDraw(draw) {
-            if (this.draw instanceof Geomap.to) {
+            if (this.draw instanceof Geomap.eo) {
                 return;
             }
             this.draw = draw;
