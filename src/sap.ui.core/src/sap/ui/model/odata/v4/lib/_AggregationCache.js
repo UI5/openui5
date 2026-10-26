@@ -296,6 +296,22 @@ sap.ui.define([
 	};
 
 	/**
+	 * Adjusts the count of leaves by the given delta on the client side and notifies the listeners.
+	 * Nothing to do if <code>this.mQueryOptions.$count</code> is not set.
+	 *
+	 * @param {number} iDelta - The delta
+	 *
+	 * @private
+	 */
+	_AggregationCache.prototype.addToCount = function (iDelta) {
+		if (this.oCountPromise) {
+			const iCount = this.oCountPromise.getResult() + iDelta;
+			this.oCountPromise = SyncPromise.resolve(iCount);
+			_Helper.fireChange(this.mChangeListeners, "./$count", iCount);
+		}
+	};
+
+	/**
 	 * Adjusts the (limited) descendant count at all ancestors of the given element which must be
 	 * part of <code>this.oFirstLevel</code>, handles placeholders. Makes the parent a leaf if its
 	 * descendant count becomes 0 and reverts that if its descendant count was 0 before (the latter
@@ -574,10 +590,17 @@ sap.ui.define([
 		_Helper.addByPath(this.mPostRequests, sTransientPredicate, oEntityData);
 		let iIndex = aElements.indexOf(oParentNode) + 1; // 0 w/o oParentNode :-)
 		if (this.oCountPromise) {
-			// create a new count promise early, that a synchronous call to
-			// oHeaderContext.requestProperty("$count") waits until the creation was successful or
-			// has been cancelled; cancellation of the creation will restore the old count promise
-			this.createCountPromise(true);
+			if (this.oAggregation.hierarchyQualifier) {
+				// Recursive hierarchy reads "$count" from the server.
+				// Create a new count promise early so that a synchronous call to
+				// oHeaderContext.requestProperty("$count") waits until the creation was successful
+				// or has been cancelled; cancellation restores the old count promise.
+				this.createCountPromise(true);
+			} else if (!oGroupLock.getGroupId().startsWith("$inactive.")) {
+				// Data aggregation maintains "$count" on the client side, no additional GET.
+				// The "$count" increases synchronously, #readCount has no effect anymore.
+				this.addToCount(1);
+			}
 		}
 		const fnOldSubmitCallback = fnSubmitCallback;
 		fnSubmitCallback = () => {
@@ -589,7 +612,11 @@ sap.ui.define([
 		const oPromise = oCache.create(oGroupLock, oPostPathPromise, sPath, sTransientPredicate,
 			oEntityData, bAtEndOfCreated, fnErrorCallback, fnSubmitCallback, /*onCancel*/() => {
 				_Helper.removeByPath(this.mPostRequests, sTransientPredicate, oEntityData);
-				this.oCountPromise?.$restore();
+				if (this.oAggregation.hierarchyQualifier) {
+					this.oCountPromise?.$restore();
+				} else if (!oEntityData["@$ui5.context.isInactive"]) {
+					this.addToCount(-1);
+				}
 				if (this.oAggregation.createInPlace) {
 					return;
 				}
@@ -2171,12 +2198,8 @@ sap.ui.define([
 				+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, false,
 					bSortSystemQueryOptions);
 
-			const sGroupId = oGroupLock.getGroupId();
-			const oGroupLock4Request = sGroupId.startsWith("$inactive.")
-				? this.oRequestor.lockGroup(sGroupId.slice(10), oGroupLock.getOwner())
-				: oGroupLock.getUnlockedCopy();
-
-			return this.oRequestor.request("GET", sResourcePathWithQuery, oGroupLock4Request)
+			return this.oRequestor.request("GET", sResourcePathWithQuery,
+					oGroupLock.getUnlockedCopy())
 				.then((iCount) => { // Note: iCount is already of type number here
 					fnResolve(iCount);
 					_Helper.fireChange(this.mChangeListeners, "./$count", iCount);
@@ -2974,6 +2997,9 @@ sap.ui.define([
 	 */
 	_AggregationCache.prototype.setInactive = function (sPath, bInactive) {
 		this.oFirstLevel.setInactive(sPath, bInactive, this.mChangeListeners);
+		if (!bInactive) {
+			this.addToCount(1);
+		}
 	};
 
 	/**
