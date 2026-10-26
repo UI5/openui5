@@ -12,6 +12,7 @@ sap.ui.define([
 	"sap/ui/core/Popup",
 	"sap/m/Dialog",
 	"sap/m/DialogAccessibleLandmarkInfo",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/Bar",
 	"sap/m/SearchField",
 	"sap/ui/core/HTML",
@@ -53,6 +54,7 @@ sap.ui.define([
 	Popup,
 	Dialog,
 	DialogAccessibleLandmarkInfo,
+	PageAccessibleLandmarkInfo,
 	Bar,
 	SearchField,
 	HTML,
@@ -1954,6 +1956,100 @@ sap.ui.define([
 		assert.strictEqual(this.getRegion(".sapMDialogHeader").getAttribute("aria-label"), "My header", "Header has custom label");
 		assert.strictEqual(this.oDialog.getDomRef("cont").getAttribute("aria-label"), "My content", "Content has custom label");
 		assert.strictEqual(this.getRegion(".sapMDialogFooter").getAttribute("aria-label"), "My footer", "Footer has custom label");
+	});
+
+	QUnit.test("Empty or unset landmark labels fall back to the predefined label", function (assert) {
+		// Arrange
+		this.oDialog.setLandmarkInfo(new DialogAccessibleLandmarkInfo({
+			headerLabel: "",
+			footerLabel: ""
+		}));
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		var oHeader = this.getRegion(".sapMDialogHeader"),
+			oContent = this.oDialog.getDomRef("cont"),
+			oFooter = this.getRegion(".sapMDialogFooter");
+
+		assert.strictEqual(oHeader.getAttribute("role"), "region", "Header is still a region landmark");
+		assert.strictEqual(oHeader.getAttribute("aria-label"), this.oRb.getText("DIALOG_REGION_HEADER"), "Empty header label falls back to the predefined label");
+		assert.strictEqual(oContent.getAttribute("role"), "region", "Content is still a region landmark");
+		assert.strictEqual(oContent.getAttribute("aria-label"), this.oRb.getText("DIALOG_REGION_CONTENT"), "Unset content label uses the predefined label");
+		assert.strictEqual(oFooter.getAttribute("role"), "region", "Footer is still a region landmark");
+		assert.strictEqual(oFooter.getAttribute("aria-label"), this.oRb.getText("DIALOG_REGION_FOOTER"), "Empty footer label falls back to the predefined label");
+	});
+
+	QUnit.test("Suppressing one region keeps the other regions with their default landmarks", function (assert) {
+		// Arrange
+		this.oDialog.setLandmarkInfo(new DialogAccessibleLandmarkInfo({
+			showContentLandmark: false
+		}));
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert
+		var oHeader = this.getRegion(".sapMDialogHeader"),
+			oContent = this.oDialog.getDomRef("cont"),
+			oFooter = this.getRegion(".sapMDialogFooter");
+
+		assert.strictEqual(oHeader.getAttribute("role"), "region", "Header region is still exposed");
+		assert.strictEqual(oHeader.getAttribute("aria-label"), this.oRb.getText("DIALOG_REGION_HEADER"), "Header keeps its predefined label");
+		assert.notOk(oContent.hasAttribute("role"), "Content region is suppressed");
+		assert.strictEqual(oFooter.getAttribute("role"), "region", "Footer region is still exposed");
+		assert.strictEqual(oFooter.getAttribute("aria-label"), this.oRb.getText("DIALOG_REGION_FOOTER"), "Footer keeps its predefined label");
+	});
+
+	QUnit.test("Headerless Dialog with embedded Page and suppressed Content landmark", function (assert) {
+		// Arrange
+		var AccessibleLandmarkRole = coreLibrary.AccessibleLandmarkRole;
+		var oTitle = new Title({ text: "Order details" });
+		var oPage = new Page({
+			customHeader: new Bar({ contentLeft: [oTitle] }),
+			landmarkInfo: new PageAccessibleLandmarkInfo({
+				rootRole: AccessibleLandmarkRole.None,
+				headerRole: AccessibleLandmarkRole.None,
+				contentRole: AccessibleLandmarkRole.Region,
+				contentLabel: "Documents"
+			})
+		});
+
+		this.oDialog.destroy();
+		this.oDialog = new Dialog({
+			showHeader: false,
+			ariaLabelledBy: [oTitle],
+			landmarkInfo: new DialogAccessibleLandmarkInfo({
+				showContentLandmark: false
+			}),
+			content: oPage,
+			beginButton: new Button({ text: "Close" })
+		});
+
+		// Act
+		this.oDialog.open();
+		this.clock.tick(500);
+
+		// Assert — Dialog
+		var oDialogDom = this.oDialog.getDomRef();
+		assert.strictEqual(oDialogDom.getAttribute("role"), "dialog", "Dialog has role dialog");
+		assert.ok(oDialogDom.getAttribute("aria-labelledby"), "Dialog is labelled by the Page title");
+
+		var oContent = this.oDialog.getDomRef("cont");
+		assert.notOk(oContent.hasAttribute("role"), "Dialog Content region is suppressed");
+		assert.notOk(oContent.hasAttribute("aria-label"), "Dialog Content region has no label");
+
+		var oFooter = this.oDialog.$().find(".sapMDialogFooter")[0];
+		assert.strictEqual(oFooter.getAttribute("role"), "region", "Dialog Footer region is still exposed");
+		assert.strictEqual(oFooter.getAttribute("aria-label"), this.oRb.getText("DIALOG_REGION_FOOTER"), "Footer keeps its predefined label");
+
+		// Assert — embedded Page
+		var oPageContent = oPage.getDomRef("cont");
+		assert.strictEqual(oPageContent.getAttribute("role"), "region", "Page content is a region landmark");
+		assert.strictEqual(oPageContent.getAttribute("aria-label"), "Documents", "Page content region has the custom label");
 	});
 
 	QUnit.module("Accessibility");

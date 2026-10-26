@@ -3546,8 +3546,8 @@
 		},
 		{
 		  "id": "sap.m.sample.DialogLandmarkInfo",
-		  "name": "Dialog - Landmark Roles",
-		  "description": "Configuring the Dialog's Header, Content and Footer region landmarks with DialogAccessibleLandmarkInfo - suppressing the Content region when the content is a Page with its own landmarks, and suppressing all regions for a small dialog."
+		  "name": "Dialog - Accessible Landmarks",
+		  "description": "Embedding a Page inside a headerless Dialog with DialogAccessibleLandmarkInfo – the Dialog's Content region is suppressed so the Page's own landmarks are not nested, and the Page title labels the Dialog."
 		},
 		{
 		  "id": "sap.m.sample.DialogFullScreen",

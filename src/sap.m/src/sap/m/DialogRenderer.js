@@ -53,6 +53,7 @@ sap.ui.define([
 			oValueStateText = oDialog.getAggregation("_valueState"),
 			oFooter = oDialog.getFooter(),
 			sContentWidth = oDialog.getContentWidth(),
+			oLandmarkInfo = oDialog.getLandmarkInfo(),
 			oRb = Library.getResourceBundleFor("sap.m");
 
 		// write the HTML into the render manager
@@ -213,7 +214,7 @@ sap.ui.define([
 		if (oHeader || oSubHeader) {
 			oRM.openStart("div")
 				.class("sapMDialogHeader");
-			oRM.accessibilityState(oDialog._formatLandmarkInfo("Header", oRb));
+			oRM.accessibilityState(oDialog._formatLandmarkInfo(oLandmarkInfo, "Header", oRb));
 			oRM.openEnd();
 
 			if (oHeader) {
@@ -248,7 +249,7 @@ sap.ui.define([
 
 		oRM.openStart("div", sId + "-cont")
 			.class("sapMDialogSection");
-		oRM.accessibilityState(oDialog._formatLandmarkInfo("Content", oRb));
+		oRM.accessibilityState(oDialog._formatLandmarkInfo(oLandmarkInfo, "Content", oRb));
 		oRM.openEnd();
 
 		oRM.openStart("div", sId + "-scroll")
@@ -273,7 +274,7 @@ sap.ui.define([
 		if (hasFooter) {
 			oRM.openStart("div")
 				.class("sapMDialogFooter");
-			oRM.accessibilityState(oDialog._formatLandmarkInfo("Footer", oRb));
+			oRM.accessibilityState(oDialog._formatLandmarkInfo(oLandmarkInfo, "Footer", oRb));
 			oRM.openEnd();
 
 			if (oFooter) {
