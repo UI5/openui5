@@ -14,10 +14,22 @@ sap.ui.define([
 	"use strict";
 
 	/**
-	 * SAPUI5 library with <code>sap.ui.geomap</code>
+	 * SAPUI5 library providing map-visualization controls based on the Geomap web component.
 	 *
-	 * <b>Note:</b> The controls in this library integrate the Geomap Web Component providing support as standard UI5 controls.
+	 * <h3>Overview</h3>
 	 *
+	 * The <code>sap.ui.geomap</code> library offers a set of UI5 controls for rendering
+	 * interactive 2D maps declaratively from XML views. The main container control is
+	 * {@link sap.ui.geomap.Geomap}; the library additionally provides:
+	 * <ul>
+	 *   <li>Per-feature primitives such as {@link sap.ui.geomap.GeomapSpot}, {@link sap.ui.geomap.GeomapCircle}, {@link sap.ui.geomap.GeomapPolygon}, and {@link sap.ui.geomap.GeomapLine}.</li>
+	 *   <li>Data-driven layers such as {@link sap.ui.geomap.GeomapCircleLayer}, {@link sap.ui.geomap.GeomapFillLayer}, {@link sap.ui.geomap.GeomapLineLayer}, {@link sap.ui.geomap.GeomapSymbolLayer}, and {@link sap.ui.geomap.GeomapHeatmapLayer}, fed by a {@link sap.ui.geomap.GeomapSource}.</li>
+	 *   <li>Map UI controls such as {@link sap.ui.geomap.GeomapNavigationControl}, {@link sap.ui.geomap.GeomapScaleControl}, {@link sap.ui.geomap.GeomapFullscreenControl}, {@link sap.ui.geomap.GeomapLegendControl}, {@link sap.ui.geomap.GeomapSelectionControl}, and {@link sap.ui.geomap.GeomapCopyrightControl}.</li>
+	 * </ul>
+	 *
+	 * <b>Note:</b> The controls in this library integrate the Geomap web component, surfacing it
+	 * as standard UI5 controls. For usage guidance and performance considerations when displaying
+	 * many features, see {@link sap.ui.geomap.Geomap}.
 	 *
 	 * @namespace
 	 * @alias sap.ui.geomap
