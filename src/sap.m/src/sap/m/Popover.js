@@ -531,7 +531,7 @@ sap.ui.define([
 			this._fnAdjustPositionAndArrow = jQuery.proxy(this._adjustPositionAndArrow, this);
 
 			// The orientationchange event listener
-			this._fnOrientationChange = jQuery.proxy(this._onOrientationChange, this);
+			this._fnResize = jQuery.proxy(this._onResize, this);
 
 			// The handler to close popover when the size or position of the open by control changes
 			this._fnFollowOf = jQuery.proxy(function (mInfo) {
@@ -857,7 +857,7 @@ sap.ui.define([
 			this._removeDocumentEventListeners();
 			this._deregisterContentResizeHandler();
 
-			Device.resize.detachHandler(this._fnOrientationChange);
+			Device.resize.detachHandler(this._fnResize);
 
 			InstanceManager.removePopoverInstance(this);
 
@@ -961,7 +961,7 @@ sap.ui.define([
 			//binding should be registered here (very early) because when keyboard in android closes at the same time, resize event needs to be reacted in order to
 			//reposition the popover after the keyboard fully closes.
 			if (Device.support.touch) {
-				Device.resize.attachHandler(this._fnOrientationChange);
+				Device.resize.attachHandler(this._fnResize);
 			}
 
 			if (!this._oOpenBy || oControl !== this._oOpenBy) {
@@ -1191,7 +1191,7 @@ sap.ui.define([
 				|| oRect.left >= window.innerWidth;
 		};
 
-		Popover.prototype._onOrientationChange = function () {
+		Popover.prototype._onResize = function () {
 			var ePopupState = (this.oPopup && this.oPopup.getOpenState()) || {};
 			if (ePopupState !== OpenState.OPEN && ePopupState !== OpenState.OPENING) {
 				return;
@@ -1247,7 +1247,7 @@ sap.ui.define([
 
 			if (!Device.support.touch) {
 				setTimeout(() => {
-					!this.bIsDestroyed && Device.resize.attachHandler(this._fnOrientationChange);
+					!this.bIsDestroyed && Device.resize.attachHandler(this._fnResize);
 				}, 0);
 			}
 
@@ -1277,7 +1277,7 @@ sap.ui.define([
 
 			this.oPopup.detachClosed(this._handleClosed, this);
 
-			Device.resize.detachHandler(this._fnOrientationChange);
+			Device.resize.detachHandler(this._fnResize);
 
 			InstanceManager.removePopoverInstance(this);
 
@@ -2228,7 +2228,7 @@ sap.ui.define([
 
 		Popover.prototype._registerContentResizeHandler = function(oScrollDomRef) {
 			if (!this._sResizeListenerId) {
-				this._sResizeListenerId = ResizeHandler.register(oScrollDomRef || this.getDomRef("scroll"), this._fnOrientationChange);
+				this._sResizeListenerId = ResizeHandler.register(oScrollDomRef || this.getDomRef("scroll"), this._fnResize);
 			}
 		};
 
