@@ -644,6 +644,71 @@ sap.ui.define([
 		assert.notOk(document.getElementById(oItem.getId() + "-fileNameEditLabel"), "Label DOM node should not exist after leaving edit mode.");
 	});
 
+	QUnit.test("sapMUCEditMode class is applied to text container when item enters edit mode", async function (assert) {
+		// Arrange
+		var oItem = this.oUploadSet.getItems()[0];
+		var oListItemDom = oItem._getListItem().getDomRef();
+		assert.ok(oListItemDom, "List item should be rendered in the DOM.");
+
+		var oTextContainer = oListItemDom.querySelector(".sapMUCTextContainer");
+		assert.notOk(oTextContainer.classList.contains("sapMUCEditMode"),
+			"sapMUCEditMode class should not be present before edit mode.");
+
+		// Act
+		oItem._setInEditMode(true);
+		await nextUIUpdate();
+
+		// Re-query after rerender
+		oListItemDom = oItem._getListItem().getDomRef();
+		oTextContainer = oListItemDom.querySelector(".sapMUCTextContainer");
+
+		// Assert
+		assert.ok(oTextContainer.classList.contains("sapMUCEditMode"),
+			"sapMUCEditMode class should be present on the text container when item is in edit mode.");
+	});
+
+	QUnit.test("sapMUCEditMode class is removed from text container when item leaves edit mode", async function (assert) {
+		// Arrange
+		var oItem = this.oUploadSet.getItems()[0];
+
+		oItem._setInEditMode(true);
+		await nextUIUpdate();
+
+		var oListItemDom = oItem._getListItem().getDomRef();
+		var oTextContainer = oListItemDom.querySelector(".sapMUCTextContainer");
+		assert.ok(oTextContainer.classList.contains("sapMUCEditMode"),
+			"sapMUCEditMode class should be present while item is in edit mode.");
+
+		// Act
+		oItem._setInEditMode(false);
+		await nextUIUpdate();
+
+		// Re-query after rerender
+		oListItemDom = oItem._getListItem().getDomRef();
+		oTextContainer = oListItemDom.querySelector(".sapMUCTextContainer");
+
+		// Assert
+		assert.notOk(oTextContainer.classList.contains("sapMUCEditMode"),
+			"sapMUCEditMode class should be removed after leaving edit mode.");
+	});
+
+	QUnit.test("File name edit input description contains the file extension", async function (assert) {
+		// Arrange
+		var oItem = new UploadSetItem({ fileName: "report.docx" });
+		this.oUploadSet.insertItem(oItem);
+		await nextUIUpdate();
+
+		// Act
+		oItem._setInEditMode(true);
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oItem._getFileNameEdit().getDescription(), ".docx",
+			"Input description should contain the file extension '.docx'.");
+		assert.strictEqual(oItem._getFileNameEdit().getValue(), "report",
+			"Input value should contain only the file name without extension.");
+	});
+
 	QUnit.module("UploadSetItems now accespts markersAsStatus aggregation", {
 		beforeEach: async function() {
 			this.oUploadSet = new UploadSet("upload-set",{
