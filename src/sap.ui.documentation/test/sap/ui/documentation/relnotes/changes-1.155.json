@@ -1,0 +1,12 @@
+{
+  "1.155.0": {
+    "date": "October 2026",
+    "notes": [
+      {
+        "id": "9bca23a10b24cc51a57aaa3f77c6f8ae23b2dbff",
+        "type": "FIX",
+        "text": " Demo Kit: wrap long API titles instead of cutting them off"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "1.155.0": {
+    "date": "October 2026",
+    "notes": [
+      {
+        "id": "8c821ce4de5cfda42b4c16996f7ebb7f1a2d9503",
+        "type": "FIX",
+        "text": " sap/ui/model/odata/v2/ODataModel#_importData: Handle function results"
+      },
+      {
+        "id": "52f872db54174639195ee4ac8621aeeb376be70e",
+        "type": "FIX",
+        "text": " sap/ui/model/odata/v2/ODataModel: Clear pending Decimal changes"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "1.155.0": {
+    "date": "October 2026",
+    "notes": [
+      {
+        "id": "61d39ba24799e029a0683b9faab7f0d3e3723604",
+        "type": "FIX",
+        "text": " sap.f, sap.ui.geomap: fix package module generation"
+      },
+      {
+        "id": "a9c9800b217dd13587ec0ce5281a893f8fcd5d9d",
+        "type": "FEATURE",
+        "text": " sap.ui.geomap - introduce library as part of OpenUI5"
+      }
+    ]
+  }
+}

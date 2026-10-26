@@ -1,0 +1,12 @@
+{
+  "1.155.0": {
+    "date": "October 2026",
+    "notes": [
+      {
+        "id": "be24ccd87da5b5b114fe3b81deb089fbd1924744",
+        "type": "FIX",
+        "text": " Field: no error message if wrong input in unit field"
+      }
+    ]
+  }
+}

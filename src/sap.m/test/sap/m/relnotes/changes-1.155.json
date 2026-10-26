@@ -3,6 +3,41 @@
     "date": "October 2026",
     "notes": [
       {
+        "id": "c250efe0f85904802f73da3035a412adc8415295",
+        "type": "FIX",
+        "text": " VariantManagement: duplicate ID error after lazy loading"
+      },
+      {
+        "id": "4cc0ad4dbbb60d22a6413eccee62ed8b108f8602",
+        "type": "FEATURE",
+        "text": " sap.m.Dialog: added landmarkInfo aggregation"
+      },
+      {
+        "id": "756c7460a12b2c3397bcf1f388757bcd1bfc55cb",
+        "type": "FEATURE",
+        "text": " Table: keyboard shortcut for navigation"
+      },
+      {
+        "id": "151f41300e4ae387f9beddadbc6ba23fa9031086",
+        "type": "FEATURE",
+        "text": " sap.m.Panel: Enhanced Tooltip enablement"
+      },
+      {
+        "id": "1edaeb37d1fc86cab4fea3fd84384113c052603f",
+        "type": "FIX",
+        "text": " sap.m.Slider: tooltip value no longer clipped"
+      },
+      {
+        "id": "53b63b4e97b19956c69445c0ff4147679d2b4056",
+        "type": "FIX",
+        "text": " sap.m.Popover: restore documentElement scrolling on exit"
+      },
+      {
+        "id": "d83091c3f06d485910bc53ae90f59d5fb5361149",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange: correct calculation of calendarWeekNumbering for Calendar control"
+      },
+      {
         "id": "ddc67fff529b9a40ad05471c5a057969648689de",
         "type": "FIX",
         "text": " sap.m.Menu: fixed End key error when there are invisible items"
@@ -18,9 +53,19 @@
         "text": " SelectionPanel: update selected and visible count after filtering"
       },
       {
+        "id": "27af8dbec1b99730bc3092614fdce8e9088d28c8",
+        "type": "FIX",
+        "text": " sap.m.Tokenizer: Add aria-label to n-more popover"
+      },
+      {
         "id": "26ee3a1ebfe4eccdf04fad7322ffa12d8ae2ba86",
         "type": "FIX",
         "text": " We've now fixed the HTTP/1.1 connection pool exhaustion in PDFViewer by canceling the fetch response body after URL validation"
+      },
+      {
+        "id": "4a18879afa69bb2c60609427499a975c571c21b0",
+        "type": "FIX",
+        "text": " sap.m.Toolbar: fix arrow key navigation escaping   composite controls"
       }
     ]
   }

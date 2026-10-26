@@ -1,0 +1,12 @@
+{
+  "1.155.0": {
+    "date": "October 2026",
+    "notes": [
+      {
+        "id": "756c7460a12b2c3397bcf1f388757bcd1bfc55cb",
+        "type": "FEATURE",
+        "text": " Table: keyboard shortcut for navigation"
+      }
+    ]
+  }
+}
