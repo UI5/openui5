@@ -303,6 +303,7 @@ sap.ui.define([
 		assert.ok($Overlay.hasClass("sapMTableOverlay"), "Table overlay is rendered as showOverlay=true");
 		assert.equal($Overlay.attr("role"), "region", "Table overlay role is correct");
 		assert.equal($Overlay.attr("aria-labelledby"), sAriaLabelledBy, "aria-labelledby valid for overlay");
+		assert.strictEqual($Overlay.text(), "\u00a0", "Overlay contains a non-breaking space so JAWS doesn't skip it in VPC Mode");
 
 		sut.invalidate();
 		await nextUIUpdate();
@@ -313,6 +314,7 @@ sap.ui.define([
 		assert.ok($Overlay.hasClass("sapMTableOverlay"), "Table overlay is rerendered as showOverlay=true");
 		assert.equal($Overlay.attr("role"), "region", "Table overlay role is correct after rerendering");
 		assert.equal($Overlay.attr("aria-labelledby"), sAriaLabelledBy, "aria-labelledby valid for overlay after rerendering");
+		assert.strictEqual($Overlay.text(), "\u00a0", "Overlay is rerendered with a non-breaking space so JAWS doesn't skip it in VPC Mode");
 
 		sut.setShowOverlay(false);
 		await nextUIUpdate();
@@ -1851,14 +1853,8 @@ sap.ui.define([
 
 		assert.ok(sut.getDomRef("overlay"), "Overlay is rendered for the visible table");
 
-		sut.getItems()[0].focus();
-		if (Device.browser.firefox) {
-			// it looks like FF does not trigger the focus event because of the overlay
-			sut.onfocusin(jQuery.Event("focusin", {
-				target: sut.getItems()[0].getDomRef()
-			}));
-		}
-		assert.equal(document.activeElement, sut.getDomRef("overlay"));
+		// The table content is inert while the overlay is shown, so the focus cannot be set behind the overlay
+		assert.ok(sut.getItems()[0].getDomRef().closest("[inert]"), "The table content is inert while the overlay is shown");
 
 		const fnFocusSpy = sinon.spy(jQuery.fn, "trigger");
 		qutils.triggerKeydown(sut.$("overlay"), KeyCodes.TAB, true, false, false);
@@ -1867,6 +1863,40 @@ sap.ui.define([
 		assert.notOk(sut.$().attr("tabindex"), "tab index is reverted");
 
 		fnFocusSpy.restore();
+		sut.destroy();
+	});
+
+	QUnit.test("setShowOverlay sets the inert attribute", async function(assert) {
+		const sut = createSUT(true, false, "MultiSelect");
+		sut.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const sOverlayId = sut.getId() + "-overlay";
+
+		const getContentChildren = () => Array.from(sut.getDomRef().children).filter((oChild) => oChild.id !== sOverlayId);
+		const getInertChildren = () => getContentChildren().filter((oChild) => oChild.hasAttribute("inert"));
+
+		// No inert before the overlay is shown
+		assert.ok(getContentChildren().length > 0, "Table has children in the DOM");
+		assert.strictEqual(getInertChildren().length, 0, "No child is inert before the overlay is shown");
+
+		// Overlay shown: every child except the overlay itself becomes inert
+		sut.setShowOverlay(true);
+		assert.ok(sut.getDomRef("overlay"), "Overlay element is present");
+		assert.notOk(sut.getDomRef("overlay").hasAttribute("inert"), "Overlay itself is not inert");
+		assert.strictEqual(getInertChildren().length, getContentChildren().length, "All non-overlay children are inert while the overlay is shown");
+
+		// Re-rendering while the overlay is shown must re-apply inert to the fresh DOM (onAfterRendering path)
+		sut.invalidate();
+		await nextUIUpdate();
+		assert.ok(sut.getDomRef("overlay"), "Overlay element is present after re-rendering");
+		assert.strictEqual(getInertChildren().length, getContentChildren().length, "All non-overlay children are inert after re-rendering with the overlay shown");
+
+		// Overlay removed: inert is cleared from all children
+		sut.setShowOverlay(false);
+		assert.notOk(sut.getDomRef("overlay"), "Overlay element is removed");
+		assert.strictEqual(getInertChildren().length, 0, "No child is inert after the overlay is removed");
+
 		sut.destroy();
 	});
 
