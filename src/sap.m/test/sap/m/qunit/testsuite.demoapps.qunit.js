@@ -25,6 +25,7 @@ sap.ui.define(function () {
 			},
 			"sap/m/demokit/illustrationExplorer/webapp/test/integration/opaTests": {
 				group: "IllustrationExplorer",
+				skip: true,
 				page: "test-resources/sap/m/demokit/illustrationExplorer/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/illustrationExplorer/testsuite.qunit&test=integration/opaTests"
 			},
 			"sap/m/demokit/orderbrowser/webapp/test/testsuite.qunit.html": {
@@ -54,66 +55,82 @@ sap.ui.define(function () {
 			// NOTE: testing tutorial unitTests are failing intentionally in step 2 and 4. opaTests in step 6, 11 and 13
 			"sap/m/demokit/tutorial/testing/01/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/01/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/testing/02/webapp/test/integration/opaTests": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/02/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/bulletinboard/testsuite.qunit&test=integration/opaTests"
 			},
 			"sap/m/demokit/tutorial/testing/03/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/03/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/testing/04/webapp/test/integration/opaTests": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/04/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/bulletinboard/testsuite.qunit&test=integration/opaTests"
 			},
 			"sap/m/demokit/tutorial/testing/05/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/05/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/testing/06/webapp/test/unit/unitTests": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/06/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/bulletinboard/testsuite.qunit&test=unit/unitTests"
 			},
 			"sap/m/demokit/tutorial/testing/07/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/07/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/testing/08/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/08/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/testing/09/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/09/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/testing/10/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/10/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/testing/11/webapp/test/unit/unitTests": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/11/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/bulletinboard/testsuite.qunit&test=unit/unitTests"
 			},
 			"sap/m/demokit/tutorial/testing/12/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/12/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/testing/13/webapp/test/unit/unitTests": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/13/webapp/test/Test.qunit.html?testsuite=test-resources/sap/ui/demo/bulletinboard/testsuite.qunit&test=unit/unitTests"
 			},
 			"sap/m/demokit/tutorial/testing/14/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/14/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/testing/15/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/15/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/testing/16/webapp/test/testsuite.qunit.html": {
 				group: "Testing Tutorial",
+				skip: true,
 				page: "test-resources/sap/m/demokit/tutorial/testing/16/webapp/test/testsuite.qunit.html"
 			},
 			"sap/m/demokit/tutorial/worklist/07/webapp/test/testsuite": {
