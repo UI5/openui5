@@ -87,6 +87,10 @@ sap.ui.define(function () {
 			"OPA.Create" : {
 				module : ["sap/ui/core/sample/odata/v4/Create/Opa.qunit"]
 			},
+			"OPA.CreateInline" : {
+				module : ["sap/ui/core/sample/odata/v4/CreateInline/Opa.qunit"],
+				realOData : false // requires stable test data
+			},
 			"OPA.DataAggregation" : {
 				module : ["sap/ui/core/sample/odata/v4/DataAggregation/Opa.qunit"],
 				realOData : false // requires stable test data
