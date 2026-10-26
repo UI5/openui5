@@ -281,11 +281,12 @@ sap.ui.define([
 
 				if (this._isRouteBypassedEvent(oEvent)) {
 					this._cacheRouteEventDetails(oEvent);
+					setTimeout(this.appendPageTitle.bind(this, sNotFoundTitle));
+					return;
 				}
 
 				this.getRouter().myNavToWithoutHash("sap.ui.documentation.sdk.view.NotFound", "XML", false);
 				setTimeout(this.appendPageTitle.bind(this, sNotFoundTitle));
-				return;
 			},
 
 			onEditCookiePreferencesRequest: function () {
