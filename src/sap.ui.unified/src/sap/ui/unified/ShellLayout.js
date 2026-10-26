@@ -472,7 +472,7 @@ sap.ui.define([
 			return;
 		}
 
-		var duration = parseInt(Parameters.get("_sap_ui_unified_ShellLayout_AnimDuration"));
+		var duration = parseInt(Parameters.get({name: "_sap_ui_unified_ShellLayout_AnimDuration"}) || "500ms");
 		if (!this._animation) {
 			duration = 0;
 		}
