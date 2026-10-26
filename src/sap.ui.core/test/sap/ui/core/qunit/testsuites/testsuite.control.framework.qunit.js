@@ -25,6 +25,11 @@ sap.ui.define(function() {
 				title: "sap.ui.core.BlockLayerUtils",
 				ui5: {
 					libs: "sap.m"
+				},
+				loader: {
+					paths: {
+						"testdata/blocklayerutils": "test-resources/sap/ui/core/qunit/testdata/blocklayerutils"
+					}
 				}
 			},
 			"popover/Positioning": {
