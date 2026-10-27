@@ -112,11 +112,7 @@ describe('sap.m.MultiComboBox', function() {
 			var oMultiComboBoxArrow = element(by.id("MultiComboBoxWithGrouping-arrow"));
 			oMultiComboBoxArrow.click();
 			browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
-			expect(takeScreenshot()).toLookAs("mcb_dropdown_arrowdown_focus_group");
-			browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
-			expect(takeScreenshot()).toLookAs("mcb_dropdown_arrowdown_focus_item");
-			browser.actions().sendKeys(protractor.Key.ARROW_UP).perform();
-			expect(takeScreenshot()).toLookAs("mcb_dropdown_arrowup_focus_group");
+			expect(takeScreenshot()).toLookAs("mcb_dropdown_focus_first_item");
 			browser.actions().sendKeys(protractor.Key.ARROW_UP).perform();
 			expect(takeScreenshot()).toLookAs("mcb_dropdown_arrowup_focus_input");
 			oMultiComboBoxArrow.click();
@@ -209,20 +205,13 @@ describe('sap.m.MultiComboBox', function() {
 	});
 
 	// MultiComboBox - ENTER on group header
-	it("should not close MultiComboBox dropdown on performing ENTER key on group header", function() {
+	it("should skip group header on performing Arrow Down key when grouping is presented", function() {
 		browser.executeScript('document.getElementById("MultiComboBoxWithGrouping").scrollIntoView()').then(function() {
 			var oMultiComboBoxArrow = element(by.id("MultiComboBoxWithGrouping-arrow"));
 			oMultiComboBoxArrow.click();
 			browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
-			browser.actions().sendKeys(protractor.Key.ENTER).perform();
-			expect(takeScreenshot()).toLookAs("mcb_dropdown_open_group");
-			browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
-			browser.actions().sendKeys(protractor.Key.ENTER).perform();
-			expect(takeScreenshot()).toLookAs("mcb_dropdown_closed_non_group");
-
-			// clear token
-			browser.actions().sendKeys(protractor.Key.BACK_SPACE).perform();
-			browser.actions().sendKeys(protractor.Key.BACK_SPACE).perform();
+			expect(takeScreenshot()).toLookAs("mcb_dropdown_first_item_focused");
+			browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
 		});
 	});
 
@@ -243,11 +232,11 @@ describe('sap.m.MultiComboBox', function() {
 	// MultiComboBox - showSelectAll and grouping
 	it("should visualize a MultiComboBox dropdown with showSelectAll and grouping", function() {
 		browser.executeScript('document.getElementById("MultiComboBoxGroupingAndSelectAll").scrollIntoView()').then(function() {
-			var oMultiComboBoxArrow = element(by.id("MultiComboBoxGroupingAndSelectAll"));
+			var oMultiComboBox = element(by.id("MultiComboBoxGroupingAndSelectAll"));
 
-			oMultiComboBoxArrow.click();
+			oMultiComboBox.click();
 			browser.actions().sendKeys(protractor.Key.F4).perform();
-			expect(takeScreenshot()).toLookAs("first_group_header_visible");
+			expect(takeScreenshot()).toLookAs("first_suggestion_focused");
 
 			// clean up
 			browser.actions().sendKeys(protractor.Key.ESCAPE).perform();
