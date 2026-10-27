@@ -94,6 +94,16 @@ sap.ui.define([
 		renderer: ShellOverlayRenderer
 	});
 
+	/**
+	 * Fallback values for animation duration theme parameters.
+	 * Used when CSS custom properties are not yet applied (e.g., before theme CSS is loaded).
+	 * @private
+	 */
+	var mAnimDurationFallbacks = {
+		"_sap_ui_unified_ShellOverlay_BlockLayerAnimDuration": 210,
+		"_sap_ui_unified_ShellOverlay_OpenAnimOverAll": 483,
+		"_sap_ui_unified_ShellOverlay_CloseAnimOverAll": 525
+	};
 
 	/**** API ****/
 
@@ -290,7 +300,10 @@ sap.ui.define([
 	/**** Private Helpers ****/
 
 	ShellOverlay.prototype._getAnimDurationThemeParam = function(sParam, bClearIfNotActive){
-		var val = parseInt(Parameters.get(sParam));
+		var val = parseInt(Parameters.get({name: sParam}));
+		if (!val && val !== 0) {
+			val = mAnimDurationFallbacks[sParam] || 0;
+		}
 		if (!this._getAnimActive() && bClearIfNotActive) {
 			val = 0;
 		}
