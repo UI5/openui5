@@ -953,37 +953,23 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns if the overlay's elementInstance is visible in DOM (or is invisible, but consumes screen space,
-	 * like opacity 0 or visibility hidden)
-	 * @private
-	 * @return {boolean} if the overlay's elementInstance is editable
-	 */
-	ElementOverlay.prototype._getElementInstanceVisible = function() {
-		const oElement = this.getElement();
-		if (oElement) {
-			const oGeometry = this.getGeometry();
-			return oGeometry && oGeometry.visible;
-		}
-		return false;
-	};
-
-	/**
-	 * Checks if the associated Element is visible or not. For controls it returns the result of .getVisible,
-	 * otherwise it gets the domRef from DesigntimeMetadata and checks visibility in the DOM.
+	 * Checks if the associated Element is visible or not. If the DesigntimeMetadata defines a custom
+	 * <code>isVisible</code> function, its result is returned. Otherwise, for controls it returns the
+	 * result of .getVisible.
 	 *
-	 * @returns {boolean|undefined} Returns the visibility of the associated Element or undefined, if it is not a control and has no domRef
+	 * @returns {boolean|undefined} Returns the visibility of the associated Element or undefined, if it is not a control and has no custom <code>isVisible</code> function
 	 */
 	ElementOverlay.prototype.getElementVisibility = function() {
 		const oElement = this.getElement();
+		const oDesignTimeMetadata = this.getDesignTimeMetadata();
+		const fnisVisible = oDesignTimeMetadata?.getData().isVisible;
+		if (typeof fnisVisible === "function") {
+			return fnisVisible(oElement);
+		}
 		if (oElement instanceof Control) {
 			return oElement.getVisible();
 		}
-		const oDesignTimeMetadata = this.getDesignTimeMetadata();
-		const fnisVisible = oDesignTimeMetadata && oDesignTimeMetadata.getData().isVisible;
-		if (!fnisVisible) {
-			return undefined;
-		}
-		return fnisVisible(this.getElement());
+		return undefined;
 	};
 
 	ElementOverlay.prototype.isElementVisible = function() {
