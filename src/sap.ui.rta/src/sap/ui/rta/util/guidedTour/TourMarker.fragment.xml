@@ -1,6 +1,7 @@
 <core:FragmentDefinition
 	xmlns="sap.m"
-	xmlns:core="sap.ui.core">
+	xmlns:core="sap.ui.core"
+>
 	<Popover
 		id="guidedTourMarkerPopover"
 		title="{/title}"
@@ -9,13 +10,15 @@
 		modal="true"
 		horizontalScrolling="false"
 		contentWidth="32rem"
-		initialFocus="continueButton">
+		initialFocus="continueButton"
+	>
 		<endButton>
 			<Button
 				id="closeButton"
 				icon="sap-icon://decline"
 				press=".onClosePress"
-				tooltip="{i18n>TOOLTIP_GUIDED_TOUR_END}" />
+				tooltip="{i18n>TOOLTIP_GUIDED_TOUR_END}"
+			/>
 		</endButton>
 		<content>
 			<VBox>
@@ -23,14 +26,16 @@
 				<List
 					visible="{= ${/listContent}.length > 0}"
 					items="{/listContent}"
-					id="navigationList">
+					id="navigationList"
+				>
 					<FeedListItem senderActive="false" sender="{title}" text="{description}" icon="{icon}" />
 				</List>
 				<ProgressIndicator
 					id="progressIndicator"
 					percentValue="{/progress}"
 					state="None"
-					displayOnly="true"/>
+					displayOnly="true"
+				/>
 			</VBox>
 		</content>
 		<footer>
@@ -40,11 +45,13 @@
 					id="previousButton"
 					text="{i18n>BTN_GUIDED_TOUR_PREV}"
 					visible="{= !${/isFirstStep}}"
-					press=".onPreviousPress" />
+					press=".onPreviousPress"
+				/>
 				<Button
 					id="continueButton"
 					text="{= ${/isLastStep} ? ${i18n>BTN_GUIDED_TOUR_END} : ${i18n>BTN_GUIDED_TOUR_NEXT} }"
-					press=".onNextPress" />
+					press=".onNextPress"
+				/>
 			</OverflowToolbar>
 		</footer>
 	</Popover>

@@ -1,6 +1,8 @@
-<mvc:View xmlns:mvc="sap.ui.core.mvc"
+<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
-	xmlns:l="sap.ui.layout">
+	xmlns:l="sap.ui.layout"
+>
 	<Page title="Title" id="Page" showFooter="true">
 		<content>
 			<l:VerticalLayout id="VerticalLayout0">

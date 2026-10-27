@@ -1,18 +1,20 @@
 <core:FragmentDefinition
-		xmlns="sap.m"
-		xmlns:core="sap.ui.core"
-		xmlns:u="sap.ui.unified">
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:u="sap.ui.unified"
+>
 	<Dialog
 		title="{i18n>TIT_UPLOAD_CHANGED_TEXTS}"
-		type="Message">
+		type="Message"
+	>
 		<Label
 			labelFor="fileUploader"
 			wrappingType="Hyphenated"
 			wrapping="true"
 			width="auto"
 			text="{i18n>MSG_UPLOAD_CHANGED_TEXTS}"
-			class="sapUiTinyMarginBottom">
-		</Label>
+			class="sapUiTinyMarginBottom"
+		/>
 		<u:FileUploader
 			id="fileUploader"
 			sameFilenameAllowed="true"
@@ -20,7 +22,8 @@
 			width="100%"
 			value="{translation>/filePath}"
 			icon="sap-icon://upload"
-			change=".saveFiles">
+			change=".saveFiles"
+		>
 			<u:xhrSettings>
 				<u:FileUploaderXHRSettings withCredentials = "true"/>
 			</u:xhrSettings>
@@ -31,13 +34,15 @@
 				text="{i18n>BTN_UPLOAD_CHANGED_TEXTS}"
 				enabled="{= !!${translation>/filePath}}"
 				type="Emphasized"
-				press=".handleUploadPress" />
+				press=".handleUploadPress"
+			/>
 		</beginButton>
 		<endButton>
 			<Button
 				id="cancelTranslationUpload"
 				text="{i18n>BUT_UPLOAD_CHANGED_TEXTS_CANCEL}"
-				press=".onCancelUploadDialog" />
+				press=".onCancelUploadDialog"
+			/>
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

@@ -1,6 +1,7 @@
 <core:FragmentDefinition
 	xmlns="sap.m"
-	xmlns:core="sap.ui.core">
+	xmlns:core="sap.ui.core"
+>
 	<SelectDialog
 		id="selectContexts"
 		noDataText="{i18n>NO_DATA}"
@@ -12,11 +13,13 @@
 		title="{i18n>SELECT_ROLE_DIALOG_TITLE}"
 		search=".onSearch"
 		confirm=".onSelectContexts"
-		items="{contexts>/values}">
+		items="{contexts>/values}"
+	>
 		<StandardListItem
 			title="{contexts>id}"
 			description="{path: 'contexts>description', formatter: '.formatTooltip'}"
 			wrapping="true"
-			selected="{ parts: ['contexts>', 'selectedContexts>/selected'], formatter: '.isSelected' }"/>
+			selected="{ parts: ['contexts>', 'selectedContexts>/selected'], formatter: '.isSelected' }"
+		/>
 	</SelectDialog>
 </core:FragmentDefinition>

@@ -1,14 +1,16 @@
-<core:FragmentDefinition xmlns:core="sap.ui.core"
-		   xmlns="sap.m"
-		   xmlns:smartField="sap.ui.comp.smartfield"
-		   xmlns:smartForm="sap.ui.comp.smartform"
-		   xmlns:form="sap.ui.layout.form"
-		   xmlns:sap.ui.layout="sap.ui.layout"
-		   xmlns:sap.ui.rta="sap.ui.rta"
-		   xmlns:sap.ui.dt="sap.ui.dt"
-		   xmlns:sap.ui.fl="sap.ui.fl"
-		   xmlns:vm="sap.ui.fl.variants"
-		   xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+<core:FragmentDefinition
+	xmlns:core="sap.ui.core"
+	xmlns="sap.m"
+	xmlns:smartField="sap.ui.comp.smartfield"
+	xmlns:smartForm="sap.ui.comp.smartform"
+	xmlns:form="sap.ui.layout.form"
+	xmlns:sap.ui.layout="sap.ui.layout"
+	xmlns:sap.ui.rta="sap.ui.rta"
+	xmlns:sap.ui.dt="sap.ui.dt"
+	xmlns:sap.ui.fl="sap.ui.fl"
+	xmlns:vm="sap.ui.fl.variants"
+	xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+>
 	<Text text="START OF TEST FRAGMENT!" />
 	<vm:VariantManagement id="variantManagementBar" for="bar" updateVariantInURL="true" />
 	<Bar id="bar">
@@ -42,8 +44,8 @@
 				<Input value="My label can only be renamed to capital letters" id="InputSpecificFlexibility" />
 			</smartForm:GroupElement>
 			<smartForm:GroupElement label="Two-Bound-Fields" id="Dates.BoundButton35">
-				<Button text="{PostingDate}"></Button>
-				<TextArea value="{CreationDate}"></TextArea>
+				<Button text="{PostingDate}" />
+				<TextArea value="{CreationDate}" />
 			</smartForm:GroupElement>
 		</smartForm:Group>
 		<smartForm:Group title="Group without stable Id">
@@ -53,24 +55,25 @@
 		</smartForm:Group>
 	</smartForm:SmartForm>
 	<sap.ui.layout:VerticalLayout width="100%">
-		<smartForm:SmartForm id="MainForm1" title="Personal Data" editable="true" entityType="Header">
-		</smartForm:SmartForm>
+		<smartForm:SmartForm id="MainForm1" title="Personal Data" editable="true" entityType="Header" />
 	</sap.ui.layout:VerticalLayout>
-	<form:SimpleForm title="SimpleForm with titles"
-					id="SimpleForm"
-					maxContainerCols="3"
-					editable="true"
-					layout="ResponsiveGridLayout"
-					labelSpanXL="4"
-					labelSpanL="4"
-					labelSpanM="4"
-					emptySpanXL="0"
-					emptySpanL="0"
-					emptySpanM="0"
-					columnsXL="3"
-					columnsL="2"
-					columnsM="2"
-					class="editableForm">
+	<form:SimpleForm
+		title="SimpleForm with titles"
+		id="SimpleForm"
+		maxContainerCols="3"
+		editable="true"
+		layout="ResponsiveGridLayout"
+		labelSpanXL="4"
+		labelSpanL="4"
+		labelSpanM="4"
+		emptySpanXL="0"
+		emptySpanL="0"
+		emptySpanM="0"
+		columnsXL="3"
+		columnsL="2"
+		columnsM="2"
+		class="editableForm"
+	>
 		<form:content>
 			<core:Title id="Title0" text="Office" />
 			<Label id="Label0" text="Name" />

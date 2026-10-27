@@ -4,7 +4,8 @@
 	xmlns:form="sap.ui.layout.form"
 	xmlns:uxap="sap.uxap"
 	xmlns:sap.ui.layout="sap.ui.layout"
-	controllerName="sap.ui.rta.test.rtaOpenUI5Only.Root" >
+	controllerName="sap.ui.rta.test.rtaOpenUI5Only.Root"
+>
 
 	<Page title="{i18n>appTitle}" id="page">
 		<headerContent>
@@ -48,14 +49,14 @@
 									<Input value="{Property04}" />
 								</form:FormElement>
 								<form:FormElement label="Ignored Property05 bound" id="EntityType01.BoundButton" >
-									<Button text="{Property05}"></Button>
+									<Button text="{Property05}" />
 								</form:FormElement>
 								<form:FormElement label="No-Bound-Field" id="EntityType01.BoundButton34" >
-									<Button text="{i18n>buttonText}"></Button>
-									<TextArea value="Some Text"></TextArea>
+									<Button text="{i18n>buttonText}" />
+									<TextArea value="Some Text" />
 								</form:FormElement>
 								<form:FormElement id="EntityType01.UnboundButton" >
-									<Button text="No Binding"></Button>
+									<Button text="No Binding" />
 								</form:FormElement>
 								<form:FormElement id="EntityType01.CommonProperty" visible="false" label="CommonProp">
 									<Input value="{CommonPropertyName}" />
@@ -82,17 +83,17 @@
 									<Input value="{EntityType02_Complex/ComplexProperty02}"/>
 								</form:FormElement>
 								<form:FormElement label="Property02 bound button" id="EntityType02.Prop2Button" >
-									<Button text="{EntityType02_Property02}"></Button>
+									<Button text="{EntityType02_Property02}" />
 								</form:FormElement>
 								<form:FormElement label="{i18n>customLabel}" id="ComplexBindingCase">
 									<TextArea id="mytextarea" value="{EntityType02_Property03} {EntityType02_Complex/ComplexProperty02}"/>
 								</form:FormElement>
 								<form:FormElement label="No-Bound-Field" id="EntityType02.BoundButton34" >
-									<Button text="{i18n>buttonText}"></Button>
-									<TextArea value="Some Text"></TextArea>
+									<Button text="{i18n>buttonText}" />
+									<TextArea value="Some Text" />
 								</form:FormElement>
 								<form:FormElement id="EntityType02.UnboundButton" label="unbound">
-									<Button text="No Binding"></Button>
+									<Button text="No Binding" />
 								</form:FormElement>
 								<form:FormElement label="Partially visible combined field, real use case from SD CustomerReturn_OP_F1708Type" id="EntityType02.PartiallyVisible" >
 									<Input value="{EntityType02_Property05}"/>
