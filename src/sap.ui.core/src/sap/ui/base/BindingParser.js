@@ -29,8 +29,8 @@ sap.ui.define(['jquery.sap.global', './ExpressionParser', 'sap/ui/model/BindingM
 		return vValue === eval || vValue === setTimeout || vValue === setInterval
 			|| vValue === document.write || vValue === document.writeln
 			|| vValue === window.location.assign || vValue === window.location.replace
-			|| vValue === jQuery.globalEval
-			|| vValue === jQuery.sap.globalEval;
+			|| vValue === jQuery.globalEval || vValue === jQuery.getScript || vValue === jQuery._evalUrl
+			|| vValue === jQuery.sap.globalEval || vValue === jQuery.sap.includeScript;
 	}
 
 	/**
