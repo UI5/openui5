@@ -3,6 +3,11 @@
     "date": "October 2026",
     "notes": [
       {
+        "id": "f16da7dad7bb3a5a33012b0f3840372b56d2f1b8",
+        "type": "FIX",
+        "text": " Field: no error message if wrong input in unit field"
+      },
+      {
         "id": "60e7718b6c6b0aaccedd5c9a4d0e8d9e29699606",
         "type": "FEATURE",
         "text": " MDC Geomap: experimental flag is now removed"

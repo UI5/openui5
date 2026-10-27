@@ -3,6 +3,11 @@
     "date": "October 2026",
     "notes": [
       {
+        "id": "461d76d680e7093c9f0969502344ec4d07bfca81",
+        "type": "FIX",
+        "text": " VariantManagement: duplicate ID error after lazy loading"
+      },
+      {
         "id": "9434a4dc1a417f44547d166a5b19519179dd9125",
         "type": "FIX",
         "text": " sap.m.SplitButton: delegate tabindex fixup to inner button rendering"
