@@ -1182,7 +1182,7 @@
           ]
         },
         "chartProperties": {
-          "description": "[Experimental] Chart configuration",
+          "description": "Chart configuration",
           "oneOf": [
             {
               "type": "object"
@@ -1284,6 +1284,7 @@
           }
         },
         "actionableArea": {
+          "description": "Defines which part of the content triggers the configured actions",
           "oneOf": [
             {
               "enum": [
