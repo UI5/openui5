@@ -756,8 +756,8 @@ sap.ui.define([
 				this._removeFactoryControl();
 			},
 			updateFinished: () => {
-				// Update visible items count after table rendering completes
-				this._updateVisibleItemsCount();
+				// Update both selected and visible counts after table rendering completes
+				this._updateCount();
 				if (this._getShowFactory() && !this._bInactive) {
 					this._addFactoryControl();
 				}
