@@ -141,7 +141,6 @@ sap.ui.define([
 		},
 		{
 			"type": "Column",
-			"allowColumnLabels": true,
 			"leftTopLabel": "0M",
 			"rightTopLabel": "80M",
 			"leftBottomLabel": "June 1",
@@ -328,11 +327,16 @@ sap.ui.define([
 		onInit: function () {
 			const oSamplesPanel = this.byId("samples");
 
-			const aFullSamples = aChartSamples.concat(aChartSamples.map((oSample) => {
-				oSample = deepClone(oSample);
-				oSample.size = "S";
-				return oSample;
-			}));
+			// Size S is only valid in the card header and not supported by the stacked bar.
+			const aFullSamples = aChartSamples.concat(
+				aChartSamples
+					.filter((oSample) => oSample.type !== "StackedBar")
+					.map((oSample) => {
+						oSample = deepClone(oSample);
+						oSample.size = "S";
+						return oSample;
+					})
+			);
 
 			aFullSamples.forEach((oSample, iInd) => {
 				const oSampleManifest = deepClone(oManifest);

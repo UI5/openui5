@@ -15,7 +15,6 @@
 		"chart": {
 			"total": 100,
 			"totalScale": "K",
-			"percentage": 65,
 			"fraction": 65,
 			"fractionScale": "K"
 		},
