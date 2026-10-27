@@ -29108,10 +29108,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-825
 	//
 	// All levels present as groups (JIRA: CPOUI5ODATAV4-2755)
-	// Editing works via navigation on leaf level (JIRA: CPOUI5ODATAV4-3438)
+	// Editing works via navigation on single entity leaf level (JIRA: CPOUI5ODATAV4-3438)
 	// Overlapping paths for "additionally" on different group levels (JIRA: CPOUI5ODATAV4-3438)
 	// Late property requests via API & UI (JIRA: CPOUI5ODATAV4-3438)
 	// Delete w/ visual grouping works on leaf level w/ $count & outdated (JIRA: CPOUI5ODATAV4-3398)
+	// Delete a kept-alive outside the collection works w/ $count (JIRA: CPOUI5ODATAV4-3724)
 	//
 	// If there are no subtotals, the @$ui5.context.isOutdated at group nodes is not set when
 	// editing or deleting a single entity.
@@ -29120,10 +29121,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	const sTitle = "Data Aggregation: additionally via navigation; edit before delete = " + bEdit;
 
 	QUnit.test(sTitle, function (assert) {
-		var oArtist1,
+		var oArtist0,
+			oArtist1,
 			oIsActiveEntityTrue,
+			oListBinding,
 			oModel = this.createSpecialCasesModel({autoExpandSelect : true}),
 			oNameB,
+			fnOnBeforeDestroy0 = sinon.spy(),
 			oTable,
 			sView = '\
 <Text id="count" text="{$count}"/>\
@@ -29176,6 +29180,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		//                  A
 		//                         n/a
 		//                  B
+		//                         0 (hero content, deleted early)
 		//                         1
 		//                         2
 
@@ -29186,7 +29191,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					+ "))/orderby(BestPublication/DraftAdministrativeData/InProcessByUser desc)"
 					+ "/concat(aggregate($count as UI5__count),top(6)))", {
 				value : [{
-					UI5__leaves : "4"
+					UI5__leaves : "5"
 				}, {
 					UI5__count : "2"
 				}, {
@@ -29224,9 +29229,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		return this.createView(assert, sView, oModel).then(function () {
 			oTable = that.oView.byId("table");
 			oIsActiveEntityTrue = oTable.getRows()[1].getBindingContext();
-			const oHeaderContext = oIsActiveEntityTrue.getBinding().getHeaderContext();
+			oListBinding = oIsActiveEntityTrue.getBinding();
+			const oHeaderContext = oListBinding.getHeaderContext();
+			assert.strictEqual(oListBinding.getCount(), 5);
 
-			that.expectChange("count", "4")
+			that.expectChange("count", "5")
 				.expectChange("isOutdatedHeader", undefined);
 
 			that.oView.byId("count").setBindingContext(oHeaderContext);
@@ -29260,6 +29267,47 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oIsActiveEntityTrue.requestProperty("Address/RegionName").then((sRegionName) => {
 				assert.strictEqual(sRegionName, undefined, "not available here");
 			});
+
+			that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)"
+					+ "?$select=ArtistID,IsActiveEntity,Messages", {
+					groupId : "$auto.0" // Note: just to test-drive API
+				}, {
+					ArtistID : "0",
+					IsActiveEntity : true,
+					Messages : [] // Note: just to kick the tires on this API
+				});
+
+			oArtist0 = oListBinding.getKeepAliveContext(
+				"/Artists(ArtistID='0',IsActiveEntity=true)", /*bRequestMessages*/true, "$auto.0");
+			oArtist0.setKeepAlive(true, fnOnBeforeDestroy0, /*bRequestMessages*/true);
+
+			return that.waitForChanges(assert, "ODLB#getKeepAliveContext");
+		}).then(function () {
+			that.expectRequest("#0 DELETE Artists(ArtistID='0',IsActiveEntity=true)", oNO_CONTENT)
+				.expectRequest("#0 Artists/$count"
+					+ "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe", 4)
+				.expectChange("isOutdatedHeader", true) // CPOUI5ODATAV4-3260
+				.expectChange("count", "4");
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3724)
+				oArtist0.delete(),
+				that.waitForChanges(assert, "delete kept-alive outside the collection")
+			]);
+		}).then(function () {
+			// Note: subtle timing issues w/ ODLB#destroyPreviousContextsLater
+			sinon.assert.notCalled(fnOnBeforeDestroy0);
+			assert.strictEqual(oArtist0.getBinding(), oListBinding, "context not yet destroyed");
+
+			that.expectChange("isOutdatedHeader", false);
+
+			// BEWARE: not a public API - don't try this at home, kids!
+			oListBinding.getHeaderContext().setOutdated(false);
+
+			return that.waitForChanges(assert, "reset outdated");
+		}).then(function () {
+			sinon.assert.calledOnceWithExactly(fnOnBeforeDestroy0);
+			assert.strictEqual(oArtist0.getBinding(), undefined, "context destroyed");
 
 			that.expectRequest("Artists?$apply=filter(IsActiveEntity eq true"
 					+ " and (Name ne 'TAFKAP' and sendsAutographs ge false))/search(covfefe)"

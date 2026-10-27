@@ -2537,16 +2537,22 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.lib._Cache#requestCount
 	 */
 	_AggregationCache.prototype.requestCount = function (oGroupLock) {
-		if (this.oAggregation.hierarchyQualifier || this.oAggregation.groupLevels.length) {
-			// for recursive hierarchy and data aggregation with groupLevels: use #readCount
-			throw new Error("Unsupported with recursive hierarchy or groupLevels");
+		if (this.oAggregation.hierarchyQualifier) { // for recursive hierarchy: use #readCount
+			throw new Error("Unsupported with recursive hierarchy");
+		}
+
+		if (this.oCountPromise) {
+			this.createCountPromise();
+			this.readCount(oGroupLock);
+
+			return this.oCountPromise;
 		}
 
 		const mQueryOptions = {...this.oFirstLevel.mQueryOptions};
 		mQueryOptions.$count = true; // may have been removed in #readGap
 		// drop not needed system query options; $filter and $search must not be used with grand
-		// totals; all filters are contained in $$filterBeforeAggregate; $expand/$select are ignored
-		// by #requestCount below anyway
+		// totals or group levels; all filters are contained in $$filterBeforeAggregate;
+		// $expand/$select are ignored by #requestCount below anyway
 		delete mQueryOptions.$apply;
 		if (mQueryOptions.$$filterBeforeAggregate) {
 			mQueryOptions.$filter = mQueryOptions.$$filterBeforeAggregate;
