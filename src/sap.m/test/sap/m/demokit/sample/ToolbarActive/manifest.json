@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.ToolbarActive",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "OverflowToolbar - Active",
+		"description": "Demonstrates the active property of OverflowToolbar: a non-interactive toolbar fires a press event when clicked. A CheckBox toggles the active state at runtime.",
+		"tags": { "keywords": ["sap.m.OverflowToolbar", "active", "press-event", "design-info"] },
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

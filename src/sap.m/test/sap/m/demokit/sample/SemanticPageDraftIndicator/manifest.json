@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.SemanticPageDraftIndicator",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Semantic Page - Draft Indicator",
+		"description": "FullscreenPage that places a sap.m.DraftIndicator in its draftIndicator aggregation slot. An Input liveChange handler cycles the indicator through Saving, Saved, and clear states to show real-time draft-save feedback.",
+		"tags": { "keywords": ["sap.m.semantic.FullscreenPage", "sap.m.DraftIndicator", "draft-indicator", "live-change", "draft-save"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

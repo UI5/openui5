@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageTitleOnLeft",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: subsection title on left",
+		"description": "An ObjectPageLayout with subSectionLayout=\"TitleOnLeft\" so each subsection's title appears in the left column next to its content, instead of above it, giving a two-column label-value layout.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "sub-section-layout", "title-on-left", "two-column-layout"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

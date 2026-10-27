@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.ToolbarEnabled",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "OverflowToolbar - Enabled",
+		"description": "Demonstrates the enabled property of OverflowToolbar: toggling it via a CheckBox disables all child controls (Button, CheckBox, Input, RadioButton) simultaneously, without individual control changes.",
+		"tags": { "keywords": ["sap.m.OverflowToolbar", "enabled", "disabled", "toggle"] },
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

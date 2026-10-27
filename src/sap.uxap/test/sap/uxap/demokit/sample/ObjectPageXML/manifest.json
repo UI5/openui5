@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageXML",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: classic ObjectPageHeader with XML blocks",
+		"description": "An ObjectPageLayout using the classic sap.uxap.ObjectPageHeader (non-dynamic) with an objectImageURI, alongside ModelMapping blocks and multi-view-type blocks (MultiViewBlock, SimpleEdit, MixedBlock); section and subsection titles are data-bound to an ObjectPageState model.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "sap.uxap.ObjectPageHeader", "model-mapping", "multi-view-block", "data-binding"]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

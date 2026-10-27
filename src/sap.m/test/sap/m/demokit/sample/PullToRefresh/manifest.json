@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.PullToRefresh",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Pull To Refresh",
+		"description": "Minimal PullToRefresh pattern: the refresh event handler simulates a 1-second async load then calls hide() to collapse the pull indicator. A List shows incrementally loaded product items.",
+		"tags": { "keywords": ["sap.m.PullToRefresh", "refresh-event", "hide", "data-loading", "list"] },
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

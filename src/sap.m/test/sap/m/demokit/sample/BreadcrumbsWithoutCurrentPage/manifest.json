@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.BreadcrumbsWithoutCurrentPage",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Breadcrumbs sample without current page",
+		"description": "Shows sap.m.Breadcrumbs with no currentLocationText set: the control renders only the links aggregation without a trailing non-interactive label. Also allows switching separatorStyle at runtime.",
+		"tags": {
+			"keywords": ["sap.m.Breadcrumbs", "separator-style", "no-current-location", "links"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

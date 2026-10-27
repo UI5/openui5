@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.OverflowToolbarFooter",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Overflow Toolbar - in a table and in the footer of a page",
+		"description": "Two OverflowToolbars: one as a Table headerToolbar with SearchField (NeverOverflow), sort/group/export OverflowToolbarMenuButton and filter/reset actions; one as a Page footer with Accept/Reject buttons (NeverOverflow) and icon-only OverflowToolbarButton/OverflowToolbarToggleButton for overflow. Table data is filtered/sorted/grouped through the controller.",
+		"tags": { "keywords": ["sap.m.OverflowToolbar", "table-header-toolbar", "footer-toolbar", "overflow-toolbar-menu-button", "filter", "sort"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

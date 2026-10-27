@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageSubSectionBackground",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageSubSection: transparent background",
+		"description": "An ObjectPageSubSection with the sapUxAPObjectPageSubSectionTransparentBackground CSS class applied, removing the default card-style background so subsection content merges visually with the page background.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageSubSection", "transparent-background", "css-class", "custom-styling"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

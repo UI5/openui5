@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.BlockBaseEventing",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Eventing blocks",
+		"description": "A custom BlockBase that fires a named custom control event (dummy) from inside the block; the parent page's controller handles it via an event handler bound in the view, showing MessageToast with the source control ID.",
+		"tags": {
+			"keywords": ["sap.uxap.BlockBase", "block-events", "custom-event", "event-handling", "message-toast"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

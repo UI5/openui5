@@ -3,7 +3,20 @@
 		"id": "sap.f.sample.ProductSwitchNavigation",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Product Switch with Navigation",
+		"description": "A standalone ProductSwitch opened from a Button as a ResponsivePopover; the change event reads the selected ProductSwitchItem's targetSrc property and uses sap.m.URLHelper.redirect to navigate to the target URL.",
+		"tags": {
+			"keywords": [
+				"sap.f.ProductSwitch",
+				"sap.f.ProductSwitchItem",
+				"navigation",
+				"url-helper",
+				"target-src",
+				"responsive-popover"
+			]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

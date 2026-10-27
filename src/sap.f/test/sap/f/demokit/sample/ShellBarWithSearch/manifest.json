@@ -3,7 +3,20 @@
 		"id": "sap.f.sample.ShellBarWithSearch",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Shell Bar with search",
+		"description": "A ShellBar using the searchManager aggregation with a SearchManager configured for live suggestions: enableSuggestions=true, a suggest handler, and SuggestionItems data-bound to a product collection with name and price description.",
+		"tags": {
+			"keywords": [
+				"sap.f.ShellBar",
+				"search-manager",
+				"suggestions",
+				"enable-suggestions",
+				"live-search",
+				"data-binding"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

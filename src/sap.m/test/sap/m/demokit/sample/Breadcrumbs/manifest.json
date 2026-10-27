@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.Breadcrumbs",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Breadcrumbs sample",
+		"description": "Shows sap.m.Breadcrumbs with currentLocationText and multiple Link items, with a Select control that lets the user switch separatorStyle at runtime (Slash/BackSlash/DoubleSlash) via two-way binding.",
+		"tags": {
+			"keywords": ["sap.m.Breadcrumbs", "current-location-text", "separator-style", "links", "data-binding"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

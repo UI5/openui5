@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.AnchorBar",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: anchor bar",
+		"description": "An ObjectPageLayout showing the automatically generated anchor bar built from sections and subsections; clicking an anchor scrolls the page to the corresponding section, demonstrating the default ObjectPage navigation mechanism.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "anchor-bar", "section-navigation", "scroll-navigation"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.SingleView",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Single View sample",
+		"description": "A minimal ObjectPage with a single section and one subsection hosting a simple custom BlockBase (BlockBlue), demonstrating the basic block-based layout pattern of sap.uxap.ObjectPageLayout.",
+		"tags": {
+			"keywords": ["sap.uxap.BlockBase", "sap.uxap.ObjectPageLayout", "block-layout", "single-view"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

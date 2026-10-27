@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ProfileObjectPageHeader",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageHeader: profile page",
+		"description": "An ObjectPageHeader configured as a profile page with showPlaceholder=true (circular image placeholder), isObjectTitleAlwaysVisible=false, isObjectSubtitleAlwaysVisible=false, isActionAreaAlwaysVisible=true, and a navigationBar using sap.m.Bar with a back button and title.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageHeader", "profile-page", "show-placeholder", "navigation-bar", "action-area"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

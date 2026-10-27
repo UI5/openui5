@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.ToolbarShrinkable",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Toolbar - Shrinkable Items",
+		"description": "Demonstrates ToolbarLayoutData shrinkable property with minWidth/maxWidth constraints. Three toolbars show different shrink configurations so long labels or inputs shrink gracefully when the toolbar is resized rather than overflowing.",
+		"tags": { "keywords": ["sap.m.Toolbar", "toolbar-layout-data", "shrinkable", "min-width", "max-width", "resize"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

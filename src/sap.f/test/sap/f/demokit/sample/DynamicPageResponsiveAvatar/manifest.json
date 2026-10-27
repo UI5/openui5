@@ -6,7 +6,19 @@
 		"applicationVersion": {
 			"version": "1.0.0"
 		},
-		"title": "DynamicPage with Responsive Avatar"
+		"title": "DynamicPage with Responsive Avatar",
+		"description": "A DynamicPage that listens to the breakpointChange event to adapt an Avatar's displaySize across Phone (M), Tablet (L), and Desktop/DesktopExtraLarge (XL) breakpoints; a snapped Avatar version appears in snappedContent when the header collapses.",
+		"tags": {
+			"keywords": [
+				"sap.f.DynamicPage",
+				"responsive",
+				"breakpoint-change",
+				"sap.m.Avatar",
+				"display-size",
+				"snapped-content"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

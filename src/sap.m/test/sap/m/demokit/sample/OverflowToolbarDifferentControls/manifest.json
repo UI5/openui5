@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.OverflowToolbarDifferentControls",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Overflow Toolbar - Different Controls",
+		"description": "An OverflowToolbar hosting a wide variety of control types (Label, Button, ToggleButton, CheckBox, SegmentedButton, ComboBox, DatePicker, Breadcrumbs, MenuButton, Input, SearchField, TimePicker, DateTimePicker, Select, OverflowToolbarButton, GenericTag) to demonstrate how each behaves when the toolbar overflows. A Slider dynamically resizes the toolbar.",
+		"tags": { "keywords": ["sap.m.OverflowToolbar", "overflow-behavior", "layout-data", "mixed-controls", "resize"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

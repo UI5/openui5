@@ -3,7 +3,20 @@
 		"id": "sap.f.sample.FlexibleColumnLayoutWithTwoColumnStart",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Flexible Column Layout with Routing and Two Initial Columns",
+		"description": "A routing-based app using FlexibleColumnLayout that opens with two initial columns via FlexibleColumnLayoutSemanticHelper (initialColumnsCount 2), with navigation-arrow URL sync and an end-column fullscreen route.",
+		"tags": {
+			"keywords": [
+				"sap.f.FlexibleColumnLayout",
+				"routing",
+				"semantic-helper",
+				"two-column",
+				"layout-type",
+				"fullscreen"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"config": {

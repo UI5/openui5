@@ -3,7 +3,18 @@
 		"id": "sap.m.sample.SelectWithIcons",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Select - with icons",
+		"description": "A data-bound Select whose dropdown items each display a data-driven icon via the ListItem icon property bound to the model.",
+		"tags": {
+			"keywords": [
+				"sap.m.Select",
+				"icons",
+				"data-binding",
+				"list-item"
+			]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

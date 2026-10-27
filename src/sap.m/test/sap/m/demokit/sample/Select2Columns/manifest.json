@@ -3,7 +3,20 @@
 		"id": "sap.m.sample.Select2Columns",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Select - Two columns layout",
+		"description": "A Select dropdown with a two-column layout using ListItem additionalText and showSecondaryValues, plus interactive controls to adjust column ratio, separator style, text wrapping and editability.",
+		"tags": {
+			"keywords": [
+				"sap.m.Select",
+				"two-column",
+				"secondary-values",
+				"column-ratio",
+				"list-item",
+				"additional-text"
+			]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

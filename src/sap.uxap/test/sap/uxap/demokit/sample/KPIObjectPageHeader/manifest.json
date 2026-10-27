@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.KPIObjectPageHeader",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageHeader: KPI header",
+		"description": "An ObjectPageHeader for a product/material page where the headerContent area contains KPI ObjectNumber values and ObjectAttribute pairs, demonstrating the standard SAP Fiori object page with numeric key performance indicators in the header.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageHeader", "kpi", "object-number", "object-attribute", "header-content"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

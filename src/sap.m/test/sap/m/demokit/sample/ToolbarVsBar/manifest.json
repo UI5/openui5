@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.ToolbarVsBar",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Toolbar vs Bar vs OverflowToolbar",
+		"description": "Side-by-side comparison of sap.m.Toolbar, sap.m.Bar, and sap.m.OverflowToolbar in equivalent configurations. Useful for choosing the right container: Toolbar for general content rows, Bar for page headers/footers, OverflowToolbar when items must overflow to a popover.",
+		"tags": { "keywords": ["sap.m.Toolbar", "sap.m.Bar", "sap.m.OverflowToolbar", "comparison", "header", "footer"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

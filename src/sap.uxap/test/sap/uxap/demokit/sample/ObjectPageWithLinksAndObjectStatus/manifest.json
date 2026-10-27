@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageWithLinksAndObjectStatus",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: links and ObjectStatus in header",
+		"description": "An ObjectPageLayout with showTitleInHeaderContent=true where the headerContent contains Link-titled facets, multiple ObjectStatus values (Delivery, shipping, Error states), a RatingIndicator, and a QuickView fragment; sections use anchorBarButtonColor to style anchor bar buttons.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "sap.m.ObjectStatus", "anchor-bar-button-color", "quick-view", "links", "rating-indicator"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

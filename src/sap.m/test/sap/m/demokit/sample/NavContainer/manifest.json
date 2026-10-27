@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.NavContainer",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Nav Container",
+		"description": "Four-page sap.m.NavContainer with forward/back navigation using CustomData key/value pairs for page identification. Shows the navigationFinished event and a Select for switching transition animations (slide, baseSlide, fade, flip, show) at runtime.",
+		"tags": {
+			"keywords": ["sap.m.NavContainer", "navigation", "custom-data", "navigation-finished", "transition-animation", "multi-page"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

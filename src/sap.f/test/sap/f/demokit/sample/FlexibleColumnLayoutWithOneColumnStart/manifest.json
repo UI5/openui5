@@ -3,7 +3,21 @@
 		"id": "sap.f.sample.FlexibleColumnLayoutWithOneColumnStart",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Flexible Column Layout with Routing and One Initial Column",
+		"description": "A routing-based app using FlexibleColumnLayout that starts in OneColumn layout, with FlexibleColumnLayoutSemanticHelper driving layout transitions, custom column-distribution layout data for desktop and tablet, navigation-arrow URL sync, and fullscreen toggling of the detail columns.",
+		"tags": {
+			"keywords": [
+				"sap.f.FlexibleColumnLayout",
+				"routing",
+				"semantic-helper",
+				"one-column",
+				"layout-type",
+				"fullscreen",
+				"column-distribution"
+			]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"config": {

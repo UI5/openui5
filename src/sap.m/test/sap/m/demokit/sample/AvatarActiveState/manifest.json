@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.AvatarActiveState",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Avatar with toggling of Active state",
+		"description": "Shows sap.m.Avatar with the active property toggled programmatically: clicking the avatar sets active=true, opens a Popover menu (loaded via Fragment.load); closing the popover or selecting a menu item resets active=false. Demonstrates the typical user-menu pattern with Avatar as the trigger.",
+		"tags": {
+			"keywords": ["sap.m.Avatar", "active-state", "popover", "press", "fragment-load", "user-menu"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

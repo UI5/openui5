@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageHeaderContentPriorities",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageHeaderContent: priorities",
+		"description": "An ObjectPageLayout using ObjectPageDynamicHeaderTitle with distinct expanded and snapped heading content; the headerContent uses ObjectPageHeaderLayoutData breakpoint priorities so different items appear or collapse at S/M/L/XL viewport widths.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageHeaderContent", "sap.uxap.ObjectPageDynamicHeaderTitle", "sap.uxap.ObjectPageHeaderLayoutData", "expanded-heading", "snapped-heading", "responsive-priority"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

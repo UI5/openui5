@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageFormLayout",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: form-based layout",
+		"description": "An ObjectPageLayout with enableLazyLoading=true and breadcrumbs in the DynamicHeaderTitle, where subsections contain form-based BlockBase blocks (PersonalFormBlock, BlockJobInfo) built with SimpleForm, showing the standard edit-form pattern in an object page.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "form-layout", "simple-form", "lazy-loading", "breadcrumbs", "dynamic-header-title"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

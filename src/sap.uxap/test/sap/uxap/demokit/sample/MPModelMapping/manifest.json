@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.MPModelMapping",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Model Mapping",
+		"description": "A BlockBase block using ModelMapping with a static externalPath (/Employee), mapping the page-level JSONModel into the block's internalModelName (Contact) so the block accesses data under its own model alias.",
+		"tags": {
+			"keywords": ["sap.uxap.ModelMapping", "sap.uxap.BlockBase", "internal-model", "external-model", "model-scope"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

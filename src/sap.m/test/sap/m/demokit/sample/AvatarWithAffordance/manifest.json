@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.AvatarWithAffordance",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Avatar with Visual Affordance",
+		"description": "Shows sap.m.Avatar badgeIcon and badgeTooltip for visual affordance (camera, edit, add actions), imageFitType=Cover, and the detailBox aggregation with a LightBox for full-screen image preview. All variants: custom badge icon with custom tooltip, custom badge icon with default tooltip, and default badge affordance.",
+		"tags": {
+			"keywords": ["sap.m.Avatar", "badge-icon", "badge-tooltip", "visual-affordance", "light-box", "image-fit-type", "detail-box"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

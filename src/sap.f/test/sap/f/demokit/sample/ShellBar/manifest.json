@@ -3,7 +3,21 @@
 		"id": "sap.f.sample.ShellBar",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Shell Bar with title mega menu",
+		"description": "A ShellBar displaying title, secondTitle, homeIcon, CoPilot, search, and notifications slots, with a sap.m.Menu in the menu aggregation to demonstrate the mega menu (title as clickable menu trigger); includes an Avatar in the profile slot.",
+		"tags": {
+			"keywords": [
+				"sap.f.ShellBar",
+				"mega-menu",
+				"menu",
+				"notifications",
+				"copilot",
+				"profile",
+				"avatar"
+			]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

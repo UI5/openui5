@@ -3,7 +3,18 @@
 		"id": "sap.m.sample.SelectWithWrappedItemText",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Select - Wrapping text",
+		"description": "Data-bound Selects with a fixed width and wrapItemsText enabled so that long item texts wrap onto multiple lines in the dropdown.",
+		"tags": {
+			"keywords": [
+				"sap.m.Select",
+				"text-wrapping",
+				"wrap-items-text",
+				"data-binding"
+			]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

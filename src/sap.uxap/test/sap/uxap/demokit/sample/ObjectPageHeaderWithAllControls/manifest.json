@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageHeaderWithAllControls",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageHeader with all controls",
+		"description": "A showcase of all ObjectPageHeader properties: wrapping objectTitle and objectSubtitle, showTitleSelector, markFavorite/markLocked/markFlagged, circular objectImage, 6 action buttons (including binding-driven icon and text), breadcrumbs, and responsive headerContent items using ObjectPageHeaderLayoutData breakpoint visibility (visibleS/M/L/XL).",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageHeader", "title-selector", "markers", "object-image", "header-layout-data", "breadcrumbs", "responsive-visibility", "action-buttons"]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,11 @@
 		"id": "sap.ui.layout.sample.GridProperties",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Grid - Own Properties",
+		"description": "Explores sap.ui.layout.Grid container-level properties: defaultSpan for uniform column widths and containerQuery to base breakpoints on the grid's own width rather than the window. Shows how different defaultSpan values produce 1-, 2-, and 4-column layouts.",
+		"tags": { "keywords": ["sap.ui.layout.Grid", "default-span", "container-query", "breakpoint", "column-layout"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

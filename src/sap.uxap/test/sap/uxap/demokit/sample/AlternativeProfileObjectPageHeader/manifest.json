@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.AlternativeProfileObjectPageHeader",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageHeader: alternative profile page",
+		"description": "A full HR employee page showing an ObjectPageHeader with markChanges=true (and markChangesPress handler that opens a popover), showTitleSelector, showPlaceholder, plus '2014 Goals Plan' and 'Personal' BlockBase sections demonstrating the complete SAP Fiori Object Page pattern.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageHeader", "mark-changes", "title-selector", "personal-blocks", "unsaved-changes"]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

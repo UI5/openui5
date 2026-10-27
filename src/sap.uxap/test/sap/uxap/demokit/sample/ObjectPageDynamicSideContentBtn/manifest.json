@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageDynamicSideContentBtn",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageHeader: DynamicSideContent button",
+		"description": "An ObjectPageLayout wrapped inside a DynamicSideContent layout; the ObjectPageHeader has a sideContentButton that toggles the side panel, and the DynamicSideContent breakpointChanged event handler updates the side content visibility class at each viewport breakpoint.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageHeader", "sap.ui.layout.DynamicSideContent", "side-content-button", "breakpoint-changed", "toggle-side-panel"]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

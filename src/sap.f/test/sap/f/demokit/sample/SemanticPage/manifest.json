@@ -3,7 +3,19 @@
 		"id": "sap.f.sample.SemanticPage",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Semantic Page using Draft Indicator",
+		"description": "A sap.f.semantic.SemanticPage with a DraftIndicator (state Saved) in the draftIndicator slot, MessagesIndicator in the messagesIndicator slot, and ShareMenu actions (DiscussInJam, SaveAsTile, SendEmail, SendMessage); demonstrates draft-workflow integration on a SemanticPage.",
+		"tags": {
+			"keywords": [
+				"sap.f.semantic.SemanticPage",
+				"draft-indicator",
+				"messages-indicator",
+				"share-menu",
+				"semantic-actions"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

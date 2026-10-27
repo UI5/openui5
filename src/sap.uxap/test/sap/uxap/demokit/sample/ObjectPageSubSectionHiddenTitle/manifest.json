@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageSubSectionHiddenTitle",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageSubSection: hidden title",
+		"description": "An ObjectPageSection with showTitle=false that hides the section title row so its single subsection (containing a products Table) is promoted and rendered without a section heading; a preceding section shows two subsections with SimpleForms.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageSection", "sap.uxap.ObjectPageSubSection", "show-title", "hidden-title"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

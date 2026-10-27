@@ -3,7 +3,20 @@
 		"id": "sap.m.sample.Select",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Select",
+		"description": "Three data-bound Selects placed in a page header, content and footer, demonstrating default, enabled/editable-toggled, and IconOnly display options with two-way selectedKey binding.",
+		"tags": {
+			"keywords": [
+				"sap.m.Select",
+				"data-binding",
+				"selected-key",
+				"icon-only",
+				"editable",
+				"toolbar"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

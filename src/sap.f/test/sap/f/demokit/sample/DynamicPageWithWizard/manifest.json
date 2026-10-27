@@ -3,7 +3,20 @@
 		"id": "sap.f.sample.DynamicPageWithWizard",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Dynamic Page with Wizard",
+		"description": "A DynamicPage with stickySubheaderProvider wired to a branching Wizard (enableBranching=true) with 8 steps; payment type selection branches into Credit Card, Bank Transfer, or Cash on Delivery paths; a second NavContainer page renders a read-only review summary.",
+		"tags": {
+			"keywords": [
+				"sap.f.DynamicPage",
+				"wizard",
+				"sticky-subheader-provider",
+				"branching",
+				"nav-container",
+				"multi-step"
+			]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

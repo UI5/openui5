@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.ProgressIndicatorWithAnnouncement",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Progress Indicator With Announcement",
+		"description": "Shows how to use InvisibleMessage.announce() to deliver accessible live-region announcements when ProgressIndicator value changes. Buttons trigger 0%/50%/100% transitions with and without CSS animation (displayAnimation property).",
+		"tags": { "keywords": ["sap.m.ProgressIndicator", "accessibility", "invisible-message", "live-region", "display-animation", "announcement"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageTabNavigationMode",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: tab navigation mode",
+		"description": "An ObjectPageLayout with useIconTabBar=true and enableLazyLoading=true, showing sections as icon tabs instead of scrolling anchors; section content is loaded on demand when a tab is first selected.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "use-icon-tab-bar", "enable-lazy-loading", "tab-navigation", "section-tabs"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

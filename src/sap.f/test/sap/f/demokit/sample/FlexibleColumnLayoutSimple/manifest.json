@@ -3,7 +3,19 @@
 		"id": "sap.f.sample.FlexibleColumnLayoutSimple",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Flexible Column Layout (with Event Bus)",
+		"description": "The minimal FlexibleColumnLayout pattern: clicking a link in one column uses the EventBus to lazy-load the next view and setLayout to reveal the next column (two- then three-column layouts).",
+		"tags": {
+			"keywords": [
+				"sap.f.FlexibleColumnLayout",
+				"event-bus",
+				"set-layout",
+				"lazy-loading",
+				"column-navigation"
+			]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

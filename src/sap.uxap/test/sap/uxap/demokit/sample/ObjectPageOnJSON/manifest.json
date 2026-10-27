@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageOnJSON",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: full HR page",
+		"description": "A full SAP Fiori HR employee page using ObjectPageDynamicHeaderTitle with showTitleInHeaderContent, headerContentPinned=true, showEditHeaderButton, and a complete set of personal/employment/goals BlockBase sections bound to a JSON model.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "sap.uxap.ObjectPageDynamicHeaderTitle", "show-title-in-header-content", "header-content-pinned", "edit-header-button", "json-model"]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

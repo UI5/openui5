@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.BoundModelMapping",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Bound Model Mapping",
+		"description": "A BlockBase block using ModelMapping where externalPath is bound to a JSONModel property (not hardcoded), demonstrating dynamic model path binding so the same block can display different data based on binding context.",
+		"tags": {
+			"keywords": ["sap.uxap.ModelMapping", "sap.uxap.BlockBase", "data-binding", "dynamic-path", "external-path"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

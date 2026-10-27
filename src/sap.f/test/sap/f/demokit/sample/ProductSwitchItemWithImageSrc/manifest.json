@@ -3,7 +3,19 @@
 		"id": "sap.f.sample.ProductSwitchItemWithImageSrc",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Product Switch with imageSrc",
+		"description": "A ProductSwitch whose items use the imageSrc property to display raster (JPG, PNG) and vector (SVG) images alongside icons; demonstrates the imageSrc and src properties of ProductSwitchItem, with URLHelper.redirect on change.",
+		"tags": {
+			"keywords": [
+				"sap.f.ProductSwitch",
+				"sap.f.ProductSwitchItem",
+				"image-src",
+				"product-switch-item",
+				"url-helper"
+			]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

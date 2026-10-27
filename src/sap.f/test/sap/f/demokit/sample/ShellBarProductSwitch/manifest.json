@@ -3,7 +3,20 @@
 		"id": "sap.f.sample.ShellBarProductSwitch",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Shell Bar with Product Switch",
+		"description": "A ShellBar with showProductSwitcher=true whose productSwitcherPressed event opens a lazy-loaded ResponsivePopover fragment containing a data-bound ProductSwitch grid.",
+		"tags": {
+			"keywords": [
+				"sap.f.ShellBar",
+				"sap.f.ProductSwitch",
+				"product-switcher",
+				"show-product-switcher",
+				"popover",
+				"data-binding"
+			]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

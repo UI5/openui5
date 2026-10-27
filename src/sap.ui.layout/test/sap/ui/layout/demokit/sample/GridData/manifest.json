@@ -3,7 +3,11 @@
 		"id": "sap.ui.layout.sample.GridData",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Grid - Using GridData",
+		"description": "Applies sap.ui.layout.GridData to individual grid cells to control per-cell span, indent, linebreak, and responsive visibility (visibleL/M/S). Lets cells override the grid's defaultSpan for precise layout control.",
+		"tags": { "keywords": ["sap.ui.layout.Grid", "sap.ui.layout.GridData", "span", "indent", "linebreak", "responsive-visibility"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

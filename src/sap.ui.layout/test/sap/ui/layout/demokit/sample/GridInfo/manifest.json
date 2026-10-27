@@ -3,7 +3,11 @@
 		"id": "sap.ui.layout.sample.GridInfo",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Grid - Info Layout",
+		"description": "Data-bound Grid rendering a PersonCollection: each person card uses hSpacing for horizontal gutters and linebreakL/M/S on specific cells to create responsive wraps at different viewport sizes.",
+		"tags": { "keywords": ["sap.ui.layout.Grid", "data-binding", "h-spacing", "linebreak", "responsive", "person-collection"] },
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

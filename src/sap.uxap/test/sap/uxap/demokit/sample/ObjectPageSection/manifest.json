@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageSection",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageSection",
+		"description": "Demonstrates ObjectPageSection rendering: a section with a single subsection inherits its title (title merging), while sections with multiple subsections render each subsection title independently; shows how section title visibility is driven by subsection count.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageSection", "title-merging", "single-subsection", "multi-subsection"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {
