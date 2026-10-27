@@ -30,14 +30,14 @@ sap.ui.define([
 	 * @property {"standard"|"accounting"|"sap-standard"|"sap-accounting"} [currencyContext]
 	 *   Can be set to either 'standard'
 	 *   (the default value) or to 'accounting' for an accounting-specific currency display
-	 * @property {Object<string,object>} [customCurrencies]
-	 *   Defines a set of custom currencies exclusive to this NumberFormat instance.
-	 *   Custom currencies must not consist only of digits.
-	 *   If custom currencies are defined on the instance, no other currencies can be formatted and
-	 *   parsed by this instance.
-	 *   Globally available custom currencies can be added via the global configuration.
-	 *   See {@link module:sap/base/i18n/Formatting.setCustomCurrencies Formatting.setCustomCurrencies} and
-	 *   {@link module:sap/base/i18n/Formatting.addCustomCurrencies Formatting.addCustomCurrencies}.
+	 * @property {Object<string,sap.ui.core.format.NumberFormat.CustomCurrency>} [customCurrencies]
+	 *   A map of custom currencies exclusive to this <code>NumberFormat</code> instance with a currency code as key
+	 *   and a custom currency definition as its value. Each key must contain at least one non-digit character to
+	 *   distinguish the currency from the amount. If custom currencies are defined on the instance, no other currencies
+	 *   can be formatted and parsed by this instance. Each entry in this format option uses <code>decimals</code> for
+	 *   its number of decimal digits. Note that you can also specify custom currencies globally via
+	 *   {@link module:sap/base/i18n/Formatting.setCustomCurrencies Formatting.setCustomCurrencies}.
+	 *   The <code>Formatting</code> API uses <code>digits</code> instead of <code>decimals</code>.
 	 * @property {int} [decimals]
 	 *   The number of decimal digits.
 	 * @property {int} [decimalPadding]

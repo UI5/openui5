@@ -643,8 +643,7 @@ sap.ui.define([
 	QUnit.test("Format with currency symbol with isoCode lookup", function (assert) {
 		Formatting.addCustomCurrencies({
 			"BTC": {
-				"symbol": "Ƀ",
-				"digits": 5
+				"symbol": "Ƀ"
 			}
 		});
 

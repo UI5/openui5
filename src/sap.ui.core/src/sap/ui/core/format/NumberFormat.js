@@ -263,6 +263,23 @@ sap.ui.define([
 	 */
 
 	/**
+	 * @typedef {object} sap.ui.core.format.NumberFormat.CustomCurrency
+	 *
+	 * A custom currency for the <code>customCurrencies</code> format option.
+	 *
+	 * @property {int} [decimals]
+	 *   The number of decimal digits to be used for the currency.
+	 * @property {string} [isoCode]
+	 *   The currency code used to look up a symbol in the global custom currencies or CLDR data if
+	 *   <code>symbol</code> is not given or is empty; this does not change the currency code used for formatting
+	 *   and parsing.
+	 * @property {string} [symbol]
+	 *   The symbol to be used for the currency; a non-empty symbol takes precedence over <code>isoCode</code>.
+	 *
+	 * @public
+	 */
+
+	/**
 	 * @typedef {sap.ui.core.format.NumberFormat.FormatOptions} sap.ui.core.format.NumberFormat.CurrencyFormatOptions
 	 *
 	 * The format options for currencies.
@@ -274,15 +291,14 @@ sap.ui.define([
 	 * @property {"standard"|"accounting"|"sap-standard"|"sap-accounting"} [currencyContext]
 	 *   Can be set either to 'standard' (the default value) or to 'accounting' for an accounting-specific currency
 	 *   display.
-	 * @property {Object<string,object>} [customCurrencies]
-	 *   Defines a set of custom currencies exclusive to this NumberFormat instance.
-	 *   Custom currencies must not only consist of digits.
-	 *   If custom currencies are defined on the instance, no other currencies can be formatted and
-	 *   parsed by this instance.
-	 *   Globally available custom currencies can be added via the global configuration.
-	 *   See the above examples.
-	 *   See also {@link module:sap/base/i18n/Formatting.setCustomCurrencies Formatting.setCustomCurrencies} and
-	 *   {@link module:sap/base/i18n/Formatting.addCustomCurrencies Formatting.addCustomCurrencies}.
+	 * @property {Object<string,sap.ui.core.format.NumberFormat.CustomCurrency>} [customCurrencies]
+	 *   A map of custom currencies exclusive to this <code>NumberFormat</code> instance with a currency code as key
+	 *   and a custom currency definition as its value. Each key must contain at least one non-digit character to
+	 *   distinguish the currency from the amount. If custom currencies are defined on the instance, no other currencies
+	 *   can be formatted and parsed by this instance. Each entry in this format option uses <code>decimals</code> for
+	 *   its number of decimal digits. Note that you can also specify custom currencies globally via
+	 *   {@link module:sap/base/i18n/Formatting.setCustomCurrencies Formatting.setCustomCurrencies}.
+	 *   The <code>Formatting</code> API uses <code>digits</code> instead of <code>decimals</code>.
 	 * @property {int} [decimals]
 	 *   The number of decimal digits.
 	 * @property {int} [decimalPadding]
