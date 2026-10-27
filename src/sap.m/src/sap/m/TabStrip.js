@@ -73,10 +73,10 @@ function(
 		"use strict";
 
 		// shortcut for sap.m.SelectType
-		var SelectType = library.SelectType;
+		const SelectType = library.SelectType;
 
 		// shortcut for sap.m.ButtonType
-		var ButtonType = library.ButtonType;
+		const ButtonType = library.ButtonType;
 
 		/**
 		 * Constructor for a new <code>TabStrip</code>.
@@ -196,7 +196,7 @@ function(
 				}
 			},
 			constructor : function (vId, mSettings) {
-				var bHasSelect = false;
+				let bHasSelect = false;
 				// normalize the expected arguments
 				if (!mSettings && typeof vId === 'object') {
 					mSettings = vId;
@@ -223,7 +223,7 @@ function(
 		 *
 		 * @type {module:sap/base/i18n/ResourceBundle}
 		 */
-		var oRb = Library.getResourceBundleFor("sap.m");
+		const oRb = Library.getResourceBundleFor("sap.m");
 
 		/**
 		 * Icon buttons used in <code>TabStrip</code>.
@@ -264,7 +264,7 @@ function(
 		 * @type {number}
 		 */
 		TabStrip.SCROLL_ANIMATION_DURATION = (function(){
-			var sAnimationMode = ControlBehavior.getAnimationMode();
+			const sAnimationMode = ControlBehavior.getAnimationMode();
 
 			return (sAnimationMode !== Configuration.AnimationMode.none && sAnimationMode !== Configuration.AnimationMode.minimal ? 500 : 0);
 		})();
@@ -288,7 +288,7 @@ function(
 			this._bHighZoom = this._isHighZoom();
 
 			if (!Device.system.phone) {
-				this._oScroller = new ScrollEnablement(this, this.getId() + "-tabs", {
+				this._oScroller = new ScrollEnablement(this, `${this.getId()}-tabs`, {
 					horizontal: true,
 					vertical: false,
 					nonTouchScrolling: true
@@ -365,7 +365,7 @@ function(
 				this.$().toggleClass("sapUiSelectable", this.getItems().length > 1);
 				this._startZoomWatch();
 				if (this._bHighZoom) {
-					var oPanelDom = document.getElementById(this.getId() + "-phoneOverflowPanel");
+					const oPanelDom = document.getElementById(`${this.getId()}-phoneOverflowPanel`);
 					if (oPanelDom && !oPanelDom._sapMTSListenersAttached) {
 						oPanelDom.addEventListener("click", this._handleOverflowItemTap.bind(this));
 						oPanelDom.addEventListener("keydown", this._handleOverflowPanelKeydown.bind(this));
@@ -382,7 +382,7 @@ function(
 		 * @private
 		 */
 		TabStrip.prototype._handleInititalScrollToItem = function() {
-			var oItem = Element.getElementById(this.getSelectedItem());
+			const oItem = Element.getElementById(this.getSelectedItem());
 			if (oItem && oItem.$().length > 0) { // check if the item is already in the DOM
 				this._scrollIntoView(oItem, 500);
 			}
@@ -396,7 +396,7 @@ function(
 		 * @override
 		 */
 		TabStrip.prototype.getFocusDomRef = function () {
-			var oTab = Element.getElementById(this.getSelectedItem());
+			const oTab = Element.getElementById(this.getSelectedItem());
 
 			if (!oTab) {
 				return null;
@@ -424,12 +424,12 @@ function(
 		 * @private
 		 */
 		TabStrip.prototype._addItemNavigation = function () {
-			var oHeadDomRef = this.getDomRef("tabsContainer"),
-				aItems = this.getItems(),
-				aTabDomRefs = [];
+			const oHeadDomRef = this.getDomRef("tabsContainer");
+			const aItems = this.getItems();
+			const aTabDomRefs = [];
 
-			aItems.forEach(function(oItem) {
-				var oItemDomRef = oItem.getDomRef();
+			aItems.forEach((oItem) => {
+				const oItemDomRef = oItem.getDomRef();
 				jQuery(oItemDomRef).attr("tabindex", "-1");
 				aTabDomRefs.push(oItemDomRef);
 			});
@@ -462,8 +462,8 @@ function(
 		 * @private
 		 */
 		TabStrip.prototype._checkScrolling = function() {
-			var oTabsDomRef = this.getDomRef("tabs"),
-				bScrollNeeded = oTabsDomRef && (oTabsDomRef.scrollWidth > this.getDomRef("tabsContainer").offsetWidth);
+			const oTabsDomRef = this.getDomRef("tabs");
+			const bScrollNeeded = oTabsDomRef && (oTabsDomRef.scrollWidth > this.getDomRef("tabsContainer").offsetWidth);
 
 			this.$().toggleClass("sapMTSScrollable", bScrollNeeded);
 
@@ -472,27 +472,27 @@ function(
 
 		TabStrip.prototype.onkeyup = function (oEvent){
 			if (oEvent && oEvent.keyCode === KeyCodes.ARROW_LEFT || oEvent.keyCode === KeyCodes.ARROW_RIGHT) {
-				var oTarget = Element.closestTo(oEvent.target);
+				const oTarget = Element.closestTo(oEvent.target);
 				this._scrollIntoView(oTarget, 500);
 			}
 		};
 
 		TabStrip.prototype._handleOverflowButtons = function() {
-			var oTabsDomRef = this.getDomRef("tabs"),
-				oTabsContainerDomRef = this.getDomRef("tabsContainer"),
-				iScrollLeft,
-				realWidth,
-				availableWidth,
-				bScrollBack = false,
-				bScrollForward = false,
-				bScrollNeeded = this._checkScrolling();
+			const oTabsDomRef = this.getDomRef("tabs");
+			const oTabsContainerDomRef = this.getDomRef("tabsContainer");
+			let iScrollLeft;
+			let realWidth;
+			let availableWidth;
+			let bScrollBack = false;
+			let bScrollForward = false;
+			const bScrollNeeded = this._checkScrolling();
 
 			// in case there is something to be scrolled and the left and right "scrolling" buttons are not initialized
 			// we should initialize and render them
 			if (bScrollNeeded && !this.getAggregation("_rightArrowButton") && !this.getAggregation("_leftArrowButton")) {
 				this._getLeftArrowButton();
 				this._getRightArrowButton();
-				var oRm = new RenderManager().getInterface();
+				const oRm = new RenderManager().getInterface();
 				this.getRenderer().renderRightOverflowButtons(oRm, this, true);
 				this.getRenderer().renderLeftOverflowButtons(oRm, this, true);
 				oRm.destroy();
@@ -574,8 +574,7 @@ function(
 		 * @returns {sap.m.AccButton} The newly created control
 		 */
 		TabStrip.prototype._getArrowButton = function (sButton, sTooltip, sIcon, iDelta) {
-			var oControl = this.getAggregation(sButton),
-				that = this;
+			let oControl = this.getAggregation(sButton);
 
 			if (!oControl) {
 				oControl = new AccButton({
@@ -584,8 +583,8 @@ function(
 					tooltip: sTooltip,
 					tabIndex: "-1",
 					ariaHidden: "true",
-					press: function (oEvent) {
-						that._scroll(iDelta, TabStrip.SCROLL_ANIMATION_DURATION);
+					press: (oEvent) => {
+						this._scroll(iDelta, TabStrip.SCROLL_ANIMATION_DURATION);
 					}
 				});
 
@@ -615,8 +614,8 @@ function(
 		 * @private
 		 */
 		TabStrip.prototype._scroll = function(iDelta, iDuration) {
-			var iScrollLeft = this.getDomRef("tabsContainer").scrollLeft,
-				iScrollTarget;
+			const iScrollLeft = this.getDomRef("tabsContainer").scrollLeft;
+			let iScrollTarget;
 
 			if (this._bRtl) {
 				iScrollTarget = iScrollLeft - iDelta;
@@ -653,17 +652,17 @@ function(
 		 * @private
 		 */
 		TabStrip.prototype._scrollIntoView = function (oItem, iDuration) {
-			var $tabs = this.$("tabs"),
-				$item = oItem.$(),
-				iLeftButtonWidth = this.$("leftOverflowButtons") ? this.$("leftOverflowButtons").width() : 0,
-				iRigtButtonWidth = this.$("rightOverflowButtons") ? this.$("rightOverflowButtons").width() : 0,
-				iTabsPaddingWidth = $tabs.innerWidth() - $tabs.width(),
-				iItemWidth = $item.outerWidth(true),
-				iItemPosLeft = $item.position().left - iTabsPaddingWidth / 2,
-				oTabsContainerDomRef = this.getDomRef("tabsContainer"),
-				iScrollLeft = oTabsContainerDomRef.scrollLeft,
-				iContainerWidth = this.$("tabsContainer").width(),
-				iNewScrollLeft = iScrollLeft;
+			const $tabs = this.$("tabs");
+			const $item = oItem.$();
+			const iLeftButtonWidth = this.$("leftOverflowButtons") ? this.$("leftOverflowButtons").width() : 0;
+			const iRigtButtonWidth = this.$("rightOverflowButtons") ? this.$("rightOverflowButtons").width() : 0;
+			const iTabsPaddingWidth = $tabs.innerWidth() - $tabs.width();
+			const iItemWidth = $item.outerWidth(true);
+			const iItemPosLeft = $item.position().left - iTabsPaddingWidth / 2;
+			const oTabsContainerDomRef = this.getDomRef("tabsContainer");
+			const iScrollLeft = oTabsContainerDomRef.scrollLeft;
+			const iContainerWidth = this.$("tabsContainer").width();
+			let iNewScrollLeft = iScrollLeft;
 
 			// check if item is outside of viewport
 			if (iItemPosLeft < iLeftButtonWidth || iItemPosLeft + iRigtButtonWidth > iContainerWidth - iItemWidth) {
@@ -696,25 +695,22 @@ function(
 		 * @private
 		 */
 		TabStrip.prototype._createSelect = function (aTabStripItems) {
-			var oSelect,
-				oSelectedSelectItem,
-				oSelectedTabStripItem,
-				oConstructorSettings = {
-					type: SelectType.IconOnly,
-					autoAdjustWidth : true,
-					maxWidth: "2.5rem",
-					icon: IconPool.getIconURI(TabStrip.ICON_BUTTONS.DownArrowButton),
-					tooltip: oRb.getText("TABSTRIP_OPENED_TABS"),
-					change: function (oEvent) {
-						oSelectedSelectItem = oEvent.getParameters()['selectedItem'];
-						oSelectedTabStripItem = this._findTabStripItemFromSelectItem(oSelectedSelectItem);
-						if (oSelectedTabStripItem instanceof TabStripItem) {
-							this._activateItem(oSelectedTabStripItem, oEvent);
-						}
-					}.bind(this)
-				};
+			const oConstructorSettings = {
+				type: SelectType.IconOnly,
+				autoAdjustWidth : true,
+				maxWidth: "2.5rem",
+				icon: IconPool.getIconURI(TabStrip.ICON_BUTTONS.DownArrowButton),
+				tooltip: oRb.getText("TABSTRIP_OPENED_TABS"),
+				change: (oEvent) => {
+					const oSelectedSelectItem = oEvent.getParameters()['selectedItem'];
+					const oSelectedTabStripItem = this._findTabStripItemFromSelectItem(oSelectedSelectItem);
+					if (oSelectedTabStripItem instanceof TabStripItem) {
+						this._activateItem(oSelectedTabStripItem, oEvent);
+					}
+				}
+			};
 
-			oSelect = new CustomSelect(oConstructorSettings).addStyleClass("sapMTSOverflowSelect");
+			const oSelect = new CustomSelect(oConstructorSettings).addStyleClass("sapMTSOverflowSelect");
 
 			this._addItemsToSelect(oSelect, aTabStripItems);
 
@@ -742,19 +738,19 @@ function(
 		 * @param {jQuery.Event} oEvent The event object
 		 */
 		TabStrip.prototype.onsapdelete = function(oEvent) {
-			var oItem = Element.closestTo(oEvent.target);
+			let oItem = Element.closestTo(oEvent.target);
 
 			//When delete is triggered from the keyboard on item in popover then the event.target is not instance of TabStripItem so get the correct target
 			if (!(oItem instanceof TabStripItem)) {
 				oItem = Element.getElementById(this.getSelectedItem());
 			}
 
-			var bShouldChangeSelection = oItem.getId() === this.getSelectedItem(),
-				fnSelectionCallback = function() {
-					this._moveToNextItem(bShouldChangeSelection);
-				};
+			const bShouldChangeSelection = oItem.getId() === this.getSelectedItem();
+			const fnSelectionCallback = () => {
+				this._moveToNextItem(bShouldChangeSelection);
+			};
 
-				this._removeItem(oItem, fnSelectionCallback);
+			this._removeItem(oItem, fnSelectionCallback);
 		};
 
 		/**
@@ -768,26 +764,26 @@ function(
 				return;
 			}
 
-			var iItemsCount = this.getItems().length,
-				iCurrentFocusedIndex = this._oItemNavigation.getFocusedIndex(),
-				iNextIndex = iItemsCount === iCurrentFocusedIndex ? --iCurrentFocusedIndex : iCurrentFocusedIndex,
-				oNextItem = this.getItems()[iNextIndex],
-				fnFocusCallback = function () {
-					if (this._oItemNavigation) {
-						this._oItemNavigation.focusItem(iNextIndex);
-					}
-				};
-
-
-				//ToDo: Might be reconsidered when TabStrip is released for standalone usage
-				// Selection (causes invalidation)
-				if (bSetAsSelected) {
-					this.setSelectedItem(oNextItem);
-					//Notify the subscriber
-					this.fireItemPress({item: oNextItem});
+			const iItemsCount = this.getItems().length;
+			const iCurrentFocusedIndex = this._oItemNavigation.getFocusedIndex();
+			const iNextIndex = iItemsCount === iCurrentFocusedIndex ? iCurrentFocusedIndex - 1 : iCurrentFocusedIndex;
+			const oNextItem = this.getItems()[iNextIndex];
+			const fnFocusCallback = () => {
+				if (this._oItemNavigation) {
+					this._oItemNavigation.focusItem(iNextIndex);
 				}
-				// Focus (force to wait until invalidated)
-				setTimeout(fnFocusCallback.bind(this), 0);
+			};
+
+
+			//ToDo: Might be reconsidered when TabStrip is released for standalone usage
+			// Selection (causes invalidation)
+			if (bSetAsSelected) {
+				this.setSelectedItem(oNextItem);
+				//Notify the subscriber
+				this.fireItemPress({item: oNextItem});
+			}
+			// Focus (force to wait until invalidated)
+			setTimeout(fnFocusCallback, 0);
 		};
 
 		/**
@@ -899,7 +895,7 @@ function(
 		 * @override
 		 */
 		TabStrip.prototype.setSelectedItem = function(oSelectedItem) {
-			var bNotMobile = !Device.system.phone;
+			const bNotMobile = !Device.system.phone;
 
 			if (!oSelectedItem) {
 				return this;
@@ -916,7 +912,7 @@ function(
 
 			// propagate the selection change to the select aggregation
 			if (this.getHasSelect()) {
-				var oSelectItem = this._findSelectItemFromTabStripItem(oSelectedItem);
+				const oSelectItem = this._findSelectItemFromTabStripItem(oSelectedItem);
 				this.getAggregation('_select').setAssociation("selectedItem", oSelectItem, true);
 			}
 
@@ -933,8 +929,7 @@ function(
 		 * @override
 		 */
 		TabStrip.prototype.setProperty = function(sPropertyName, vValue, bSuppressInvalidate) {
-			var vRes;
-			vRes = Control.prototype.setProperty.call(this, sPropertyName, vValue, bSuppressInvalidate);
+			let vRes = Control.prototype.setProperty.call(this, sPropertyName, vValue, bSuppressInvalidate);
 
 			// handle the _select aggregation instance
 			if (sPropertyName === 'hasSelect') {
@@ -958,20 +953,20 @@ function(
 		 */
 		TabStrip.prototype._attachItemEventListeners = function (oObject) {
 			if (oObject instanceof TabStripItem) {
-				var aEvents = [
-						'itemClosePressed',
-						'itemPropertyChanged'
-					];
-				aEvents.forEach(function (sEventName) {
-					sEventName = sEventName.charAt(0).toUpperCase() + sEventName.slice(1); // Capitalize
+				const aEvents = [
+					'itemClosePressed',
+					'itemPropertyChanged'
+				];
+				aEvents.forEach((sEventName) => {
+					const sCapitalized = sEventName.charAt(0).toUpperCase() + sEventName.slice(1);
 
 					// detach any listeners - make sure we always have one listener at a time only
-					oObject['detach' + sEventName](this['_handle' + sEventName]);
+					oObject[`detach${sCapitalized}`](this[`_handle${sCapitalized}`]);
 					//e.g. oObject['detachItemClosePressed'](this.['_handleItemClosePressed'])
 
 					// attach the listeners
-					oObject['attach' + sEventName](this['_handle' + sEventName].bind(this));
-				}, this);
+					oObject[`attach${sCapitalized}`](this[`_handle${sCapitalized}`].bind(this));
+				});
 			}
 		};
 
@@ -986,14 +981,14 @@ function(
 			if (!oObject || typeof oObject !== 'object' || !(oObject instanceof TabStripItem)) {
 				// in case of no concrete item object, remove the listeners from all items
 				// ToDo: confirm that the listeners removal is needed ..?
-				var aItems = this.getItems();
-				aItems.forEach(function (oItem) {
+				const aItems = this.getItems();
+				aItems.forEach((oItem) => {
 					if (typeof oItem !== 'object' || !(oItem instanceof TabStripItem)) {
 						// because of recursion, make sure it never goes into endless loop
 						return;
 					}
 					return this._detachItemEventListeners(oItem);
-				}.bind(this));
+				});
 			}
 		};
 
@@ -1004,10 +999,10 @@ function(
 		 * @private
 		 */
 		TabStrip.prototype._handleItemPropertyChanged = function (oEvent) {
-			var oSelectItem = this._findSelectItemFromTabStripItem(oEvent.getSource());
-			var sPropertyKey = oEvent['mParameters'].propertyKey;
+			const oSelectItem = this._findSelectItemFromTabStripItem(oEvent.getSource());
+			const sPropertyKey = oEvent['mParameters'].propertyKey;
 			// call it directly with the setter name so overwritten functions can be called and not setProperty method directly
-			var sMethodName = "set" + sPropertyKey.substr(0,1).toUpperCase() + sPropertyKey.substr(1);
+			const sMethodName = `set${sPropertyKey.charAt(0).toUpperCase()}${sPropertyKey.slice(1)}`;
 			oSelectItem[sMethodName](oEvent['mParameters'].propertyValue);
 		};
 
@@ -1029,7 +1024,7 @@ function(
 		 * @private
 		 */
 		TabStrip.prototype._removeItem = function(oItem, fnCallback) {
-			var oTabStripItem;
+			let oTabStripItem;
 			/* this method is handling the close pressed event on all item instances (TabStrip and the
 			 * CustomSelect copy), so when it's handling the press on the CustomSelect item, it needs to determine the TabStrip item out of the event and vice-versa */
 			if (!(oItem instanceof TabStripItem)) {
@@ -1060,13 +1055,13 @@ function(
 		 * @returns {this} <code>this</code> instance for chaining
 		 */
 		TabStrip.prototype._handleItemsAggregation = function (aArgs, bIsAdding) {
-			var sAggregationName = 'items', // name of the aggregation in CustomSelect
-				sFunctionName = aArgs[0],
-				oObject = aArgs[1],
-				aNewArgs = [sAggregationName];
+			const sAggregationName = 'items'; // name of the aggregation in CustomSelect
+			const sFunctionName = aArgs[0];
+			const oObject = aArgs[1];
+			const aNewArgs = [sAggregationName];
 
 			/* remove the function name from the args array */
-			aArgs.forEach(function (iItem, iIndex) {
+			aArgs.forEach((iItem, iIndex) => {
 				if (iIndex > 0) {
 					aNewArgs.push(iItem);
 				}
@@ -1100,9 +1095,9 @@ function(
 		 * @returns {*}
 		 */
 		TabStrip.prototype._handleSelectItemsAggregation = function (aArgs, bIsAdding, sFunctionName, oObject) {
-			var oSelect = this.getAggregation('_select'),
-				// a new instance, holding a copy of the TabStripItem which is given to the CustomSelect instance
-				oDerivedObject;
+			const oSelect = this.getAggregation('_select');
+			// a new instance, holding a copy of the TabStripItem which is given to the CustomSelect instance
+			let oDerivedObject;
 
 			if (sFunctionName === 'destroyAggregation' && !oSelect) {
 				/* ToDo : For some reason aggregation _select may be already deleted (e.g. TabStrip.destroy will destroy all children including _select */
@@ -1121,7 +1116,7 @@ function(
 			}
 
 			// substitute the TabStrip item instance with the TabStripSelectItem instance
-			aArgs.forEach(function (iItem, iIndex) {
+			aArgs.forEach((iItem, iIndex) => {
 				if (typeof iItem === 'object') {
 					aArgs[iIndex] = oDerivedObject;
 				}
@@ -1137,15 +1132,15 @@ function(
 		 * @param {array} aItems The items to be added
 		 */
 		TabStrip.prototype._addItemsToSelect = function (oSelect, aItems) {
-			aItems.forEach(function (oItem) {
-				var oSelectItem = this._createSelectItemFromTabStripItem(oItem);
+			aItems.forEach((oItem) => {
+				const oSelectItem = this._createSelectItemFromTabStripItem(oItem);
 				oSelect.addAggregation('items', oSelectItem);
 
 				// make sure to set the correct select item
 				if (oItem.getId() === this.getSelectedItem()) {
 					oSelect.setSelectedItem(oSelectItem);
 				}
-			}, this);
+			});
 		};
 
 		/**
@@ -1155,31 +1150,29 @@ function(
 		 * @returns {sap.ui.core.Element} The TabStripSelect item created
 		 */
 		TabStrip.prototype._createSelectItemFromTabStripItem = function (oTabStripItem) {
-			var oSelectItem;
-
 			if (!oTabStripItem && !(BaseObject.isObjectA(oTabStripItem, "sap.m.TabContainerItem"))) {
 				Log.error('Expecting instance of "sap.m.TabContainerItem": instead of ' + oTabStripItem + ' given.');
 				return;
 			}
 
-			oSelectItem = new TabStripItem({
-				id: oTabStripItem.getId() + TabStrip.SELECT_ITEMS_ID_SUFFIX,
+			const oSelectItem = new TabStripItem({
+				id: `${oTabStripItem.getId()}${TabStrip.SELECT_ITEMS_ID_SUFFIX}`,
 				text: oTabStripItem.getText(),
 				additionalText: oTabStripItem.getAdditionalText(),
 				icon: oTabStripItem.getIcon(),
 				iconTooltip: oTabStripItem.getIconTooltip(),
 				modified: oTabStripItem.getModified(),
-				itemClosePressed: function (oEvent) {
+				itemClosePressed: (oEvent) => {
 					this._handleItemClosePressed(oEvent);
-				}.bind(this)
+				}
 			});
 
 			oSelectItem.addEventDelegate({
 				ontap: function (oEvent) {
-					var oTarget = oEvent.srcControl;
+					let oTarget = oEvent.srcControl;
 					// if we clicked on the image/icon change the target to be the parent,
 					// so the change event in the select can be handled properly
-					if (oEvent.target.id === oTarget.getParent().getId() + "-img") {
+					if (oEvent.target.id === `${oTarget.getParent().getId()}-img`) {
 						oEvent.srcControl = oTarget = oTarget.getParent();
 					}
 					if ((oTarget instanceof AccButton || oTarget instanceof Icon)) {
@@ -1198,11 +1191,10 @@ function(
 		 * @returns {sap.m.TabStripItem} The <code>TabStripItem</code> in context of <code>TabStripSelect</code> found (if any)
 		 */
 		TabStrip.prototype._findTabStripItemFromSelectItem = function (oTabStripSelectItem) {
-			var iIndex,
-				sTabStripItemId = oTabStripSelectItem.getId().replace(TabStrip.SELECT_ITEMS_ID_SUFFIX , ''),
-				aTabStripItems = this.getItems();
+			const sTabStripItemId = oTabStripSelectItem.getId().replace(TabStrip.SELECT_ITEMS_ID_SUFFIX , '');
+			const aTabStripItems = this.getItems();
 
-			for (iIndex = 0; iIndex < aTabStripItems.length; iIndex++) {
+			for (let iIndex = 0; iIndex < aTabStripItems.length; iIndex++) {
 				if (aTabStripItems[iIndex].getId() === sTabStripItemId) {
 					return aTabStripItems[iIndex];
 				}
@@ -1216,14 +1208,12 @@ function(
 		 * @returns {sap.m.TabStripItem} The <code>TabStripItem</code> in context of <code>TabStripSelect</code> found (if any)
 		 */
 		TabStrip.prototype._findSelectItemFromTabStripItem = function (oTabStripItem) {
-			var iIndex,
-				aSelectItems,
-				sSelectItemId = oTabStripItem.getId() + TabStrip.SELECT_ITEMS_ID_SUFFIX;
+			const sSelectItemId = `${oTabStripItem.getId()}${TabStrip.SELECT_ITEMS_ID_SUFFIX}`;
 
 			if (this.getHasSelect()) {
-				aSelectItems = this.getAggregation('_select').getItems();
+				const aSelectItems = this.getAggregation('_select').getItems();
 
-				for (iIndex = 0; iIndex < aSelectItems.length; iIndex++) {
+				for (let iIndex = 0; iIndex < aSelectItems.length; iIndex++) {
 					if (aSelectItems[iIndex].getId() === sSelectItemId) {
 						return aSelectItems[iIndex];
 					}
@@ -1245,9 +1235,8 @@ function(
 		 * @private
 		 */
 		TabStrip.prototype._updateAriaSelectedAttributes = function(aItems, oSelectedItem) {
-			var sAriaSelected;
-			aItems.forEach(function (oItem) {
-				sAriaSelected = "false";
+			aItems.forEach((oItem) => {
+				let sAriaSelected = "false";
 				if (oItem.$()) {
 					if (oSelectedItem && oSelectedItem.getId() === oItem.getId()) {
 						sAriaSelected = "true";
@@ -1279,14 +1268,12 @@ function(
 		 * @param {boolean} bShowState If the state must be shown
 		 */
 		TabStrip.prototype.changeItemState = function(vItemId, bShowState) {
-			var $oItemState;
-
 			// optimisation to not invalidate and rerender the whole parent DOM, but only manipulate the CSS class
 			// for invisibility on the concrete DOM element that needs to change
-			var aItems = this.getItems();
-			aItems.forEach(function (oItem) {
+			const aItems = this.getItems();
+			aItems.forEach((oItem) => {
 				if (vItemId === oItem.getId()) {
-					$oItemState = jQuery(oItem.$());
+					const $oItemState = jQuery(oItem.$());
 					if (bShowState === true && !$oItemState.hasClass(TabStripItem.CSS_CLASS_MODIFIED)) {
 						$oItemState.addClass(TabStripItem.CSS_CLASS_MODIFIED);
 					} else {
@@ -1301,7 +1288,7 @@ function(
 		 * @param {jQuery.Event} oEvent  Event object
 		 */
 		TabStrip.prototype.ontouchstart = function (oEvent) {
-			var oTargetItem = Element.closestTo(oEvent.target);
+			const oTargetItem = Element.closestTo(oEvent.target);
 			if (oTargetItem instanceof TabStripItem ||
 				oTargetItem instanceof AccButton ||
 				oTargetItem instanceof Icon ||
@@ -1318,20 +1305,17 @@ function(
 		 * @param {jQuery.Event} oEvent  Event object
 		 */
 		TabStrip.prototype.ontouchend = function (oEvent) {
-			var oTarget,
-				iDeltaX;
-
 			if (!this._oTouchStartX) {
 				return;
 			}
 
-			oTarget = Element.closestTo(oEvent.target);
+			let oTarget = Element.closestTo(oEvent.target);
 			// check if we click on the item Icon and if so, give the parent as a target
-			if (oEvent.target.id === oTarget.getParent().getId() + "-img") {
+			if (oEvent.target.id === `${oTarget.getParent().getId()}-img`) {
 				oTarget = oTarget.getParent();
 			}
 			// Support only single touch
-			iDeltaX = Math.abs(oEvent.changedTouches[0].pageX - this._oTouchStartX);
+			const iDeltaX = Math.abs(oEvent.changedTouches[0].pageX - this._oTouchStartX);
 
 			if (iDeltaX < TabStrip.MIN_DRAG_OFFSET) {
 				if (oTarget instanceof TabStripItem) {
@@ -1369,7 +1353,7 @@ function(
 		/****************************************** PHONE HIGH ZOOM (≤320px) **********************************************/
 
 		TabStrip.prototype._isHighZoom = function() {
-			var iWidth = (window.visualViewport && window.visualViewport.width) || window.innerWidth;
+			const iWidth = (window.visualViewport && window.visualViewport.width) || window.innerWidth;
 			return iWidth <= 320;
 		};
 
@@ -1377,16 +1361,16 @@ function(
 			if (this._fnZoomResizeHandler) {
 				return;
 			}
-			this._fnZoomResizeHandler = function() {
+			this._fnZoomResizeHandler = () => {
 				if (!this.getDomRef()) {
 					return;
 				}
-				var bHighZoom = this._isHighZoom();
+				const bHighZoom = this._isHighZoom();
 				if (bHighZoom !== this._bHighZoom) {
 					this._bHighZoom = bHighZoom;
 					this.invalidate();
 				}
-			}.bind(this);
+			};
 			if (window.visualViewport) {
 				window.visualViewport.addEventListener("resize", this._fnZoomResizeHandler);
 			}
@@ -1404,7 +1388,7 @@ function(
 		};
 
 		TabStrip.prototype._getOverflowButton = function() {
-			var oButton = this.getAggregation("_overflowButton");
+			let oButton = this.getAggregation("_overflowButton");
 			if (!oButton) {
 				oButton = new AccButton({
 					type: ButtonType.Transparent,
@@ -1418,9 +1402,10 @@ function(
 		};
 
 		TabStrip.prototype._toggleOverflowPanel = function() {
+			const oButton = this.getAggregation("_overflowButton");
+
 			if (this._bPhoneOverflowOpen) {
 				this._closeOverflowPanel();
-				var oButton = this.getAggregation("_overflowButton");
 				if (oButton) {
 					oButton.focus();
 				}
@@ -1428,15 +1413,14 @@ function(
 			}
 
 			this._bPhoneOverflowOpen = true;
-			var oButton = this.getAggregation("_overflowButton");
 			oButton.setIcon(IconPool.getIconURI("navigation-up-arrow"));
-			var oPanelDom = document.getElementById(this.getId() + "-phoneOverflowPanel");
+			const oPanelDom = document.getElementById(`${this.getId()}-phoneOverflowPanel`);
 			if (oPanelDom) {
-				var oRect = this.getDomRef().getBoundingClientRect();
+				const oRect = this.getDomRef().getBoundingClientRect();
 				oPanelDom.style.top = oRect.bottom + "px";
 				oPanelDom.classList.add("sapMTSPhoneOverflowPanelOpen");
-				var sSelectedId = this.getSelectedItem();
-				var oFocusTarget = (sSelectedId && oPanelDom.querySelector("[data-item-id='" + sSelectedId + "']"))
+				const sSelectedId = this.getSelectedItem();
+				const oFocusTarget = (sSelectedId && oPanelDom.querySelector("[data-item-id='" + sSelectedId + "']"))
 					|| oPanelDom.querySelector(".sapMTSPhoneOverflowPanelItem");
 				if (oFocusTarget) {
 					oFocusTarget.focus();
@@ -1446,11 +1430,11 @@ function(
 
 		TabStrip.prototype._closeOverflowPanel = function() {
 			this._bPhoneOverflowOpen = false;
-			var oButton = this.getAggregation("_overflowButton");
+			const oButton = this.getAggregation("_overflowButton");
 			if (oButton) {
 				oButton.setIcon(IconPool.getIconURI("navigation-down-arrow"));
 			}
-			var oPanelDom = document.getElementById(this.getId() + "-phoneOverflowPanel");
+			const oPanelDom = document.getElementById(`${this.getId()}-phoneOverflowPanel`);
 			if (oPanelDom) {
 				oPanelDom.classList.remove("sapMTSPhoneOverflowPanelOpen");
 			}
@@ -1458,16 +1442,16 @@ function(
 
 		TabStrip.prototype._handleOverflowItemTap = function(oEvent) {
 			// Close-button tap — remove the item instead of activating it
-			var oCloseBtnEl = oEvent.target.closest(".sapMTSPhoneOverflowPanelCloseBtn");
+			const oCloseBtnEl = oEvent.target.closest(".sapMTSPhoneOverflowPanelCloseBtn");
 			if (oCloseBtnEl) {
-				var sCloseItemId = oCloseBtnEl.getAttribute("data-close-item-id");
+				const sCloseItemId = oCloseBtnEl.getAttribute("data-close-item-id");
 				if (sCloseItemId) {
-					var oItemToClose = Element.getElementById(sCloseItemId);
+					const oItemToClose = Element.getElementById(sCloseItemId);
 					if (oItemToClose) {
 						this._removeItem(oItemToClose);
 					}
 					this._closeOverflowPanel();
-					var oToggleBtn = this.getAggregation("_overflowButton");
+					const oToggleBtn = this.getAggregation("_overflowButton");
 					if (oToggleBtn) {
 						oToggleBtn.focus();
 					}
@@ -1475,39 +1459,39 @@ function(
 				return;
 			}
 
-			var oLi = oEvent.target.closest(".sapMTSPhoneOverflowPanelItem");
+			const oLi = oEvent.target.closest(".sapMTSPhoneOverflowPanelItem");
 			if (!oLi) {
 				return;
 			}
 
-			var sId = oLi.getAttribute("data-item-id");
+			const sId = oLi.getAttribute("data-item-id");
 			if (!sId) {
 				return;
 			}
 
-			var oItem = Element.getElementById(sId);
+			const oItem = Element.getElementById(sId);
 			if (oItem) {
 				this._activateItem(oItem, oEvent);
 			}
 
 			this._closeOverflowPanel();
-			var oButton = this.getAggregation("_overflowButton");
+			const oButton = this.getAggregation("_overflowButton");
 			if (oButton) {
 				oButton.focus();
 			}
 		};
 
 		TabStrip.prototype._handleOverflowPanelKeydown = function(oEvent) {
-			var oPanelDom = document.getElementById(this.getId() + "-phoneOverflowPanel");
+			const oPanelDom = document.getElementById(`${this.getId()}-phoneOverflowPanel`);
 			if (!oPanelDom) {
 				return;
 			}
-			var aItems = Array.prototype.slice.call(oPanelDom.querySelectorAll(".sapMTSPhoneOverflowPanelItem"));
+			const aItems = Array.prototype.slice.call(oPanelDom.querySelectorAll(".sapMTSPhoneOverflowPanelItem"));
 			if (!aItems.length) {
 				return;
 			}
-			var oFocused = document.activeElement;
-			var iIndex = aItems.indexOf(oFocused);
+			const oFocused = document.activeElement;
+			const iIndex = aItems.indexOf(oFocused);
 
 			switch (oEvent.key) {
 				case "ArrowDown":
@@ -1537,18 +1521,18 @@ function(
 		};
 
 		TabStrip.prototype._getOverflowAddButton = function() {
-			var oButton = this.getAggregation("_overflowAddButton");
+			let oButton = this.getAggregation("_overflowAddButton");
 			if (!oButton) {
 				oButton = new Button({
 					text: oRb.getText("TABCONTAINER_ADD_NEW_TAB"),
 					icon: IconPool.getIconURI("add"),
-					press: function() {
-						var oAddButton = this.getAddButton();
+					press: () => {
+						const oAddButton = this.getAddButton();
 						if (oAddButton) {
 							oAddButton.firePress();
 						}
 						this._closeOverflowPanel();
-					}.bind(this)
+					}
 				});
 				this.setAggregation("_overflowAddButton", oButton);
 			}
@@ -1557,94 +1541,73 @@ function(
 
 		/****************************************** CUSTOM SELECT CONTROL **********************************************/
 
-		var CustomSelectRenderer = Renderer.extend(SelectRenderer);
+		const CustomSelectRenderer = Renderer.extend(SelectRenderer);
 
 		CustomSelectRenderer.apiVersion = 2;
 
-		var CustomSelect = Select.extend("sap.m.internal.TabStripSelect", {
+		const CustomSelect = Select.extend("sap.m.internal.TabStripSelect", {
 			metadata: {
 				library: "sap.m"
 			},
-			renderer: CustomSelectRenderer
+			renderer: CustomSelectRenderer,
+
+			onAfterRendering: function() {
+				Select.prototype.onAfterRendering.apply(this, arguments);
+				this.$().attr("tabindex", "-1");
+			},
+
+			onAfterRenderingPicker: function() {
+				const oPicker = this.getPicker();
+
+				Select.prototype.onAfterRenderingPicker.call(this);
+
+				// on phone the picker is a dialog and does not have an offset
+				if (Device.system.phone) {
+					return;
+				}
+
+				oPicker.setOffsetX(Math.round(
+					Localization.getRTL() ?
+						this.getPicker().$().width() - this.$().width() :
+						this.$().width() - this.getPicker().$().width()
+				)); // LTR or RTL mode considered
+				oPicker.setOffsetY(this.$().parents().hasClass('sapUiSizeCompact') ? 2 : 3);
+				oPicker._calcPlacement(); // needed to apply the new offset after the popup is open
+
+			},
+
+			createList: function() {
+				// list to use inside the picker
+				this._oList = new CustomSelectList({
+					width: "100%"
+				}).attachSelectionChange(this.onSelectionChange, this)
+					.addEventDelegate({
+						ontap: function(oEvent) {
+							this.close();
+						}
+					}, this);
+
+				return this._oList;
+			},
+
+			setValue: function(sValue) {
+				Select.prototype.setValue.apply(this, arguments);
+
+				this.$("label").toggleClass("sapMTSOverflowSelectLabelModified",
+					this.getSelectedItem() && this.getSelectedItem().getProperty("modified"));
+
+				return this;
+			},
+
+			_getValueIcon: function() {
+				// our select will not show neither image nor icon on the left of the text
+				return null;
+			}
 		});
-
-		CustomSelect.prototype.onAfterRendering = function (){
-			Select.prototype.onAfterRendering.apply(this, arguments);
-			this.$().attr("tabindex", "-1");
-		};
-
-		CustomSelect.prototype.onAfterRenderingPicker = function() {
-			var oPicker = this.getPicker();
-
-			Select.prototype.onAfterRenderingPicker.call(this);
-
-			// on phone the picker is a dialog and does not have an offset
-			if (Device.system.phone) {
-				return;
-			}
-
-
-			oPicker.setOffsetX(Math.round(
-				Localization.getRTL() ?
-					this.getPicker().$().width() - this.$().width() :
-					this.$().width() - this.getPicker().$().width()
-			)); // LTR or RTL mode considered
-			oPicker.setOffsetY(this.$().parents().hasClass('sapUiSizeCompact') ? 2 : 3);
-			oPicker._calcPlacement(); // needed to apply the new offset after the popup is open
-
-		};
-
-		CustomSelect.prototype.createList = function() {
-			// list to use inside the picker
-			this._oList = new CustomSelectList({
-				width: "100%"
-			}).attachSelectionChange(this.onSelectionChange, this)
-				.addEventDelegate({
-					ontap: function(oEvent) {
-						this.close();
-					}
-				}, this);
-
-			return this._oList;
-		};
-
-		CustomSelect.prototype.onAfterRenderingPicker = function() {
-			var oPicker = this.getPicker();
-
-			Select.prototype.onAfterRenderingPicker.call(this);
-
-			// on phone the picker is a dialog — no offset needed
-			if (Device.system.phone) {
-				return;
-			}
-
-			oPicker.setOffsetX(Math.round(
-				Localization.getRTL() ?
-					this.getPicker().$().width() - this.$().width() :
-					this.$().width() - this.getPicker().$().width()
-			)); // LTR or RTL mode considered
-			oPicker.setOffsetY(this.$().parents().hasClass('sapUiSizeCompact') ? 2 : 3);
-			oPicker._calcPlacement(); // needed to apply the new offset after the popup is open
-
-		};
-
-		CustomSelect.prototype.setValue = function(sValue) {
-			Select.prototype.setValue.apply(this, arguments);
-
-			this.$("label").toggleClass("sapMTSOverflowSelectLabelModified",
-				this.getSelectedItem() && this.getSelectedItem().getProperty("modified"));
-
-			return this;
-		};
-
-		CustomSelect.prototype._getValueIcon = function() {
-			// our select will not show neither image nor icon on the left of the text
-			return null;
-		};
 
 		/****************************************** CUSTOM SELECT LIST CONTROL *****************************************/
 
-		var CustomSelectListRenderer = Renderer.extend(SelectListRenderer);
+		const CustomSelectListRenderer = Renderer.extend(SelectListRenderer);
 
 		CustomSelectListRenderer.apiVersion = 2;
 
@@ -1665,7 +1628,7 @@ function(
 			oRm.attr("tabindex", 0);
 
 			// aria-describedby references
-			var sDescribedBy = InvisibleText.getStaticId("sap.m", "TABSTRIP_ITEM_CLOSABLE") + " ";
+			let sDescribedBy = InvisibleText.getStaticId("sap.m", "TABSTRIP_ITEM_CLOSABLE") + " ";
 			sDescribedBy += InvisibleText.getStaticId("sap.m", oItem.getModified() ? "TABSTRIP_ITEM_MODIFIED" : "TABSTRIP_ITEM_NOT_MODIFIED");
 			if (sDescribedBy !== "") {
 				oRm.attr("aria-describedby", sDescribedBy);
@@ -1712,12 +1675,14 @@ function(
 			oRm.close("div");
 		};
 
-		var CustomSelectList = SelectList.extend("sap.m.internal.TabStripSelectList", {
+		const CustomSelectList = SelectList.extend("sap.m.internal.TabStripSelectList", {
 			metadata: {
 				library: "sap.m"
 			},
 			renderer: CustomSelectListRenderer
 		});
+
+		/************************************************************************************************************/
 
 		return TabStrip;
 	});

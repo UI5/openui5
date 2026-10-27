@@ -21,10 +21,10 @@ sap.ui.define([
 		"use strict";
 
 		// shortcut for sap.m.ButtonType
-		var ButtonType = library.ButtonType;
+		const ButtonType = library.ButtonType;
 
 		// shortcut for PageBackgroundDesign in sap.m library
-		var PageBackgroundDesign = library.PageBackgroundDesign;
+		const PageBackgroundDesign = library.PageBackgroundDesign;
 
 		/**
 		 * Constructor for a new <code>TabContainer</code>.
@@ -153,7 +153,7 @@ sap.ui.define([
 				dnd: { draggable: false, droppable: true }
 			},
 			constructor : function (vId, mSettings) {
-				var aStashedItems = [];
+				let aStashedItems = [];
 
 				// normalize the expected arguments
 				if (!mSettings && typeof vId === 'object') {
@@ -169,15 +169,15 @@ sap.ui.define([
 				}
 
 				Control.prototype.constructor.apply(this, arguments);
-				var oControl = new TabStrip(this.getId() + "--tabstrip", {
+				const oControl = new TabStrip(`${this.getId()}--tabstrip`, {
 					hasSelect: true,
-					itemSelect: function(oEvent) {
-						var oItem = oEvent.getParameter("item"),
+					itemSelect: (oEvent) => {
+						const oItem = oEvent.getParameter("item"),
 							oSelectedItem = this._fromTabStripItem(oItem);
 						this.setSelectedItem(oSelectedItem, oEvent);
-					}.bind(this),
-					itemClose: function(oEvent) {
-						var oItem = oEvent.getParameter("item"),
+					},
+					itemClose: (oEvent) => {
+						const oItem = oEvent.getParameter("item"),
 							oRemovedItem = this._fromTabStripItem(oItem);
 
 						// prevent the tabstrip from closing the item by default
@@ -188,7 +188,7 @@ sap.ui.define([
 							}
 						}
 
-					}.bind(this)
+					}
 				});
 
 				this.setAggregation("_tabStrip", oControl, true);
@@ -198,9 +198,9 @@ sap.ui.define([
 				}
 
 				// re-introduce any existing items from the constructor settings
-				aStashedItems.forEach(function (oItem) {
+				aStashedItems.forEach((oItem) => {
 					this.addItem(oItem);
-				}, this);
+				});
 
 				this.data("sap-ui-fastnavgroup", "true", true);
 			},
@@ -210,7 +210,7 @@ sap.ui.define([
 
 		/* Contains mapping between TabContainerItem properties and TabStripItem properties,
 		that may be set via setter method */
-		var mTCItemToTSItemProperties = {
+		const mTCItemToTSItemProperties = {
 			"name": "text",
 			"additionalText": "additionalText",
 			"icon": "icon",
@@ -246,16 +246,16 @@ sap.ui.define([
 		 * @private
 		 */
 		TabContainer.prototype._getAddNewTabButton = function() {
-			var oControl = this.getAggregation("_addNewButton");
-			var oRb = Library.getResourceBundleFor("sap.m");
+			let oControl = this.getAggregation("_addNewButton");
+			const oRb = Library.getResourceBundleFor("sap.m");
 
 			if (!oControl) {
 				oControl = new Button({
 					type: ButtonType.Transparent,
 					tooltip: oRb.getText("TABCONTAINER_ADD_NEW_TAB"),
 					icon: IconPool.getIconURI("add"),
-					press: function() {
-						this.getParent().getParent().fireAddNewButtonPress();
+					press: () => {
+						this.fireAddNewButtonPress();
 					}
 				});
 				oControl.addStyleClass("sapMTSAddNewTabBtn");
@@ -281,11 +281,10 @@ sap.ui.define([
 		 * @private
 		 */
 		TabContainer.prototype._fromTabStripItem = function(oItem) {
-			var aItems = this.getItems() || [],
-				iItemsCount = aItems.length,
-				iIndex = 0;
+			const aItems = this.getItems() || [];
+			const iItemsCount = aItems.length;
 
-			for (; iIndex < iItemsCount; iIndex++) {
+			for (let iIndex = 0; iIndex < iItemsCount; iIndex++) {
 				if (aItems[iIndex].getId() === oItem.getKey()) {
 					return aItems[iIndex];
 				}
@@ -302,25 +301,22 @@ sap.ui.define([
 		 * @private
 		 */
 		TabContainer.prototype._toTabStripItem = function(vItem) {
-			var iIndex = 0,
-				sKey = vItem,
-				oTabStripItems,
-				oTabStripItemsCount,
-				oTabStrip = this._getTabStrip();
+			let sKey = vItem;
+			const oTabStrip = this._getTabStrip();
 
 			if (!oTabStrip) {
 				// resolves error /getItems() of null/ in case only the _tabStrip aggregation was for some reason removed/destroyed from the container
 				return null;
 			}
 
-			oTabStripItems = oTabStrip.getItems();
-			oTabStripItemsCount = oTabStripItems.length;
+			const oTabStripItems = oTabStrip.getItems();
+			const oTabStripItemsCount = oTabStripItems.length;
 
 			if (typeof vItem === "object") {
 				sKey = vItem.getId();
 			}
 
-			for (; iIndex < oTabStripItemsCount; iIndex++) {
+			for (let iIndex = 0; iIndex < oTabStripItemsCount; iIndex++) {
 				if (oTabStripItems[iIndex].getKey() === sKey) {
 					return oTabStripItems[iIndex];
 				}
@@ -335,10 +331,10 @@ sap.ui.define([
 		 * @private
 		 */
 		TabContainer.prototype._getSelectedItemContent = function() {
-			var oTabStrip = this._getTabStrip(),
-				sSelectedItem = this.getSelectedItem(),
-				oSelectedItem = Element.getElementById(sSelectedItem),
-				oTabStripItem = this._toTabStripItem(oSelectedItem);
+			const oTabStrip = this._getTabStrip();
+			const sSelectedItem = this.getSelectedItem();
+			const oSelectedItem = Element.getElementById(sSelectedItem);
+			const oTabStripItem = this._toTabStripItem(oSelectedItem);
 
 			if (oTabStrip) {
 				// resolves error /getItems() of null/ in case only the _tabStrip aggregation was for some reason removed/destroyed from the container
@@ -359,16 +355,16 @@ sap.ui.define([
 				return;
 			}
 
-			var iItemsCount = this.getItems().length,
-					iCurrentFocusedIndex = this._getTabStrip()._oItemNavigation.getFocusedIndex(),
-					iNextIndex = iItemsCount === iCurrentFocusedIndex ? --iCurrentFocusedIndex : iCurrentFocusedIndex,
-					oNextItem = this.getItems()[iNextIndex],
-					fnFocusCallback = function () {
-						if (this._getTabStrip()._oItemNavigation) {
-							this._getTabStrip()._oItemNavigation.focusItem(iNextIndex);
-						}
-					},
-					aActiveElementClasses = document.activeElement.classList;
+			const iItemsCount = this.getItems().length;
+			const iCurrentFocusedIndex = this._getTabStrip()._oItemNavigation.getFocusedIndex();
+			const iNextIndex = iItemsCount === iCurrentFocusedIndex ? iCurrentFocusedIndex - 1 : iCurrentFocusedIndex;
+			const oNextItem = this.getItems()[iNextIndex];
+			const fnFocusCallback = () => {
+				if (this._getTabStrip()._oItemNavigation) {
+					this._getTabStrip()._oItemNavigation.focusItem(iNextIndex);
+				}
+			};
+			const aActiveElementClasses = document.activeElement.classList;
 
 			// Selection (causes invalidation)
 			if (bSetAsSelected) {
@@ -379,22 +375,22 @@ sap.ui.define([
 			// Focus (force to wait until invalidated)
 			if (aActiveElementClasses.contains('sapMTabStripSelectListItemCloseBtn')
 				|| aActiveElementClasses.contains('sapMTabStripItem')) {
-				setTimeout(fnFocusCallback.bind(this), 0);
+				setTimeout(fnFocusCallback, 0);
 			}
 		};
 
 		TabContainer.prototype._attachItemPropertyChanged = function (oTabContainerItem) {
-			oTabContainerItem.attachItemPropertyChanged(function (oEvent) {
-				var sPropertyKey = oEvent['mParameters'].propertyKey;
+			oTabContainerItem.attachItemPropertyChanged((oEvent) => {
+				let sPropertyKey = oEvent['mParameters'].propertyKey;
 
 				if (mTCItemToTSItemProperties[sPropertyKey]) {//forward only if such property exists in TabStripItem
 					sPropertyKey = mTCItemToTSItemProperties[sPropertyKey];
-					var oTabStripItem = this._toTabStripItem(oEvent.getSource());
+					const oTabStripItem = this._toTabStripItem(oEvent.getSource());
 					// call it directly with the setter name so overwritten functions can be called and not setProperty method directly
-					var sMethodName = "set" + sPropertyKey.substr(0,1).toUpperCase() + sPropertyKey.substr(1);
+					const sMethodName = `set${sPropertyKey.charAt(0).toUpperCase()}${sPropertyKey.slice(1)}`;
 					oTabStripItem && oTabStripItem[sMethodName](oEvent['mParameters'].propertyValue);
 				}
-			}.bind(this));
+			});
 		};
 
 		/**
@@ -405,8 +401,7 @@ sap.ui.define([
 		 * @public
 		 */
 		TabContainer.prototype.removeItem = function(vItem) {
-			var oTabStrip = this._getTabStrip(),
-				bIsSelected, oTab;
+			const oTabStrip = this._getTabStrip();
 
 			if (typeof vItem === "undefined" || vItem === null) {
 				return null;
@@ -416,9 +411,9 @@ sap.ui.define([
 			vItem = this.removeAggregation("items", vItem);
 
 			// The selection flag of the removed item
-			bIsSelected = vItem.getId() === this.getSelectedItem();
+			const bIsSelected = vItem.getId() === this.getSelectedItem();
 
-			oTab = this._toTabStripItem(vItem);
+			const oTab = this._toTabStripItem(vItem);
 			if (oTab.getId() === oTabStrip.getSelectedItem()) {
 				oTabStrip.removeAllAssociation("selectedItem", true);
 			}
@@ -557,7 +552,7 @@ sap.ui.define([
 
 			bShowButton ? this.addStyleClass("sapUiShowAddNewButton") : this.removeStyleClass("sapUiShowAddNewButton");
 
-			var oTabStrip = this._getTabStrip();
+			const oTabStrip = this._getTabStrip();
 			if (oTabStrip) {
 				oTabStrip.setAddButton(bShowButton ? this._getAddNewTabButton() : null);
 			}
@@ -577,7 +572,7 @@ sap.ui.define([
 			/* As the 'setSelectedItem' might be part of a bubbling selection change event, allow the final event handler
 			 * to prevent it. */
 			if (this.fireItemSelect({item: oSelectedItem})) {
-				var oTabStrip = this._getTabStrip();
+				const oTabStrip = this._getTabStrip();
 				if (oSelectedItem && oTabStrip) {
 					oTabStrip.setSelectedItem(this._toTabStripItem(oSelectedItem));
 					this._rerenderContent(oSelectedItem.getContent());
@@ -599,7 +594,7 @@ sap.ui.define([
 		 * @returns {sap.m.TabStripItem} The corresponding tab strip item instance.
 		 */
 		TabContainer.prototype._setupTabStripItem = function(oItem) {
-			var oTabStripItem = oItem._getTabStripItem();
+			const oTabStripItem = oItem._getTabStripItem();
 
 			if (oTabStripItem) {
 				oTabStripItem.setKey(oItem.getId());
@@ -620,16 +615,15 @@ sap.ui.define([
 		 * @param {Object} oContent The content, which should be rendered.
 		 */
 		TabContainer.prototype._rerenderContent = function(oContent) {
-			var $content = this.$("content"),
-				oRM;
+			const $content = this.$("content");
 
 			if (!oContent || ($content.length <= 0)) {
 				return;
 			}
 
-			oRM = new RenderManager().getInterface();
-			for (var i = 0; i < oContent.length; i++) {
-				oRM.renderControl(oContent[i]);
+			const oRM = new RenderManager().getInterface();
+			for (const oItem of oContent) {
+				oRM.renderControl(oItem);
 			}
 			oRM.flush($content[0]);
 			oRM.destroy();
@@ -642,8 +636,7 @@ sap.ui.define([
 		 * @private
 		 */
 		TabContainer.prototype._setDefaultTab = function() {
-
-			var oFirstItem = this.getItems()[0] || null;
+			const oFirstItem = this.getItems()[0] || null;
 
 			this.setSelectedItem(oFirstItem);
 
@@ -652,12 +645,12 @@ sap.ui.define([
 
 		// Override customData getters/setters to forward the customData added to TabContainer to the internal TabStrip
 		["addCustomData", "getCustomData", "destroyCustomData", "indexOfCustomData",
-		 "insertCustomData", "removeAllCustomData", "removeCustomData", "data"].forEach(function(sName){
+		 "insertCustomData", "removeAllCustomData", "removeCustomData", "data"].forEach((sName) => {
 			TabContainer.prototype[sName] = function() {
-				var oTabStrip = this._getTabStrip();
+				const oTabStrip = this._getTabStrip();
 				if (oTabStrip && oTabStrip[sName]) {
-					var res = oTabStrip[sName].apply(oTabStrip, arguments);
-					return res === oTabStrip ? this : res;
+					const oRes = oTabStrip[sName].apply(oTabStrip, arguments);
+					return oRes === oTabStrip ? this : oRes;
 				}
 			};
 		});
