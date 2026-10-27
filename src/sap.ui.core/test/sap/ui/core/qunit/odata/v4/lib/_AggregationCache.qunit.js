@@ -960,11 +960,6 @@ sap.ui.define([
 			oHelperMock = this.mock(_Helper),
 			mTypeForMetaPath = {"/meta/path" : {}};
 
-		if (bParent) {
-			// must not influence bLeaf/bTotal, new entities are always created in oFirstLevel
-			oElement["@$ui5.context.isTransient"] = false;
-		}
-
 		oHelperMock.expects("inheritPathValue").exactly(bParent ? 1 : 0)
 			.withExactArgs(["a", "b"], sinon.match.same(oGroupNode), sinon.match.same(oElement));
 		oHelperMock.expects("inheritPathValue").exactly(bParent ? 1 : 0)
@@ -1004,8 +999,7 @@ sap.ui.define([
 			p2 : "v2",
 			p3 : "v3",
 			"p3@$ui5.noData" : true,
-			p4 : "v4",
-			"@$ui5.context.isTransient" : false
+			p4 : "v4"
 		} : {
 			p2 : "v2",
 			p4 : "v4"

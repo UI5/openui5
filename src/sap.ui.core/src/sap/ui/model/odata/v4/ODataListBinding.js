@@ -1011,7 +1011,7 @@ sap.ui.define([
 			throw new Error("Unsupported on aggregated data: " + this);
 		}
 		if (_Helper.isDataAggregation(this.mParameters)) {
-			if (oAggregation.groupLevels.length && this.bFirstCreateAtEnd === undefined && bAtEnd) {
+			if (bAtEnd && oAggregation.groupLevels.length && this.bFirstCreateAtEnd === undefined) {
 				throw new Error("Must not create at end when using groupLevels: " + this);
 			}
 			if (!_AggregationHelper.hasGrandTotal(oAggregation.aggregate)) {
