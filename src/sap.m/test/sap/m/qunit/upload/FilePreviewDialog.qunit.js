@@ -5,8 +5,9 @@ sap.ui.define("sap.m.qunit.upload.FilePreviewDialog", [
 	"sap/m/upload/UploadItem",
 	"sap/m/IllustratedMessage",
 	"sap/m/library",
-	"sap/m/Carousel"
-], function (FilePreviewDialog, UploadItem, IllustratedMessage, MobileLibrary, Carousel) {
+	"sap/m/Carousel",
+	"sap/ui/core/InvisibleMessage"
+], function (FilePreviewDialog, UploadItem, IllustratedMessage, MobileLibrary, Carousel, InvisibleMessage) {
 	"use strict";
 
 	// Minimal RTE stub — mimics the API _createRichTextEditor expects
@@ -113,6 +114,84 @@ sap.ui.define("sap.m.qunit.upload.FilePreviewDialog", [
 
 		oDialog.destroy();
 	});
+
+	QUnit.module("FilePreviewDialog - File name announcement", {
+		beforeEach: function () {
+			this.oFPD = new FilePreviewDialog();
+			this.oItem1 = new UploadItem({ fileName: "Report.pdf", url: "/" });
+			this.oItem2 = new UploadItem({ fileName: "Data.xlsx", url: "/" });
+		},
+		afterEach: function () {
+			if (this.oFPD._oDialog) {
+				this.oFPD._oDialog.destroy();
+			}
+			this.oFPD.destroy();
+			this.oItem1.destroy();
+			this.oItem2.destroy();
+		}
+	});
+
+	// Aria-label on each carousel page for reliable focus announcement.
+	QUnit.test("Each carousel page has aria-label set to the file name after rendering", async function (assert) {
+		const fnDone = assert.async();
+		this.oFPD._items = [this.oItem1, this.oItem2];
+		this.oFPD._previewItem = this.oItem1;
+
+		const oCarousel = await this.oFPD._createCarousel();
+		const aPages = oCarousel.getPages();
+		let iRendered = 0;
+
+		// Delegates added after _createCarousel() fire after the fix's delegate, so aria-label is already set.
+		aPages.forEach(function (oPage) {
+			oPage.addEventDelegate({
+				onAfterRendering: function () {
+					iRendered++;
+					if (iRendered === aPages.length) {
+						assert.strictEqual(
+							aPages[0].getDomRef()?.getAttribute("aria-label"),
+							"Report.pdf",
+							"First page aria-label must equal the file name so JAWS announces it on focus"
+						);
+						assert.strictEqual(
+							aPages[1].getDomRef()?.getAttribute("aria-label"),
+							"Data.xlsx",
+							"Second page aria-label must equal the file name so JAWS announces it on focus"
+						);
+						oCarousel.destroy();
+						fnDone();
+					}
+				}
+			});
+		});
+
+		oCarousel.placeAt("qunit-fixture");
+	});
+
+	//InvisibleMessage covers the initial page — pageChanged never fires on open.
+	QUnit.test("_open announces the initial file name via InvisibleMessage", async function (assert) {
+		this.oFPD._items = [this.oItem1, this.oItem2];
+		this.oFPD._previewItem = this.oItem1;
+
+		const aAnnouncements = [];
+		const oIM = InvisibleMessage.getInstance();
+		const fnOrig = oIM.announce.bind(oIM);
+
+		try {
+			oIM.announce = function (sText, sMode) {
+				aAnnouncements.push({ text: sText, mode: sMode });
+				return fnOrig(sText, sMode);
+			};
+			await this.oFPD._open();
+		} finally {
+			oIM.announce = fnOrig;
+		}
+
+		assert.ok(
+			aAnnouncements.some((a) => a.text === "Report.pdf"),
+			"InvisibleMessage.announce must be called with the initial file name on open — pageChanged does not fire for the initial page"
+		);
+	});
+
 });
 
 // /*global QUnit*/
