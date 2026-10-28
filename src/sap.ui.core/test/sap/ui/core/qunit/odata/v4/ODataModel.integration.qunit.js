@@ -29808,10 +29808,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			// code under test
 			oCreatedContext1.setProperty("Id", 4),
 			oCreatedContext1.created(),
-			this.waitForChanges(assert, "persist inactive entry")
+			this.waitForChanges(assert, "activate inactive entry")
 		]);
 
-		checkTable("after persist inactive entry", assert, oTable, [
+		checkTable("after activate inactive entry", assert, oTable, [
 			oCreatedContext0,
 			oCreatedContext1,
 			"/BusinessPartners(Country='A')",
