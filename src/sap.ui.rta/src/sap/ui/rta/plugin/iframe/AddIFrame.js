@@ -153,7 +153,8 @@ sap.ui.define([
 			additionalInfoKey: "IFRAME_RTA_CONTEXT_MENU_INFO",
 			rank: iBaseRank,
 			action: oSiblingAction,
-			description: "embed an iframe as a sibling of the element; the URL may include UI5 expression bindings computed from the parent element's data",
+			description: "embed an iframe/page as a sibling of the element;"
+				+ " the URL may include UI5 expression bindings computed from the parent element's data",
 			aggregationRelevant: true
 		});
 
@@ -166,7 +167,8 @@ sap.ui.define([
 				additionalInfoKey: "IFRAME_RTA_CONTEXT_MENU_INFO",
 				rank: ++iBaseRank,
 				action: oAction,
-				description: "embed an iframe as a child of the element; the URL may include UI5 expression bindings computed from the parent element's data",
+				description: "embed an iframe/page as a child of the element;"
+					+ " the URL may include UI5 expression bindings computed from the parent element's data",
 				aggregationRelevant: true
 			}));
 		}
@@ -191,7 +193,8 @@ sap.ui.define([
 				name: "isSibling",
 				type: "boolean",
 				required: true,
-				description: "Whether the iframe should be added as a sibling of the given overlay or as a child of the given overlay, depending on user instructions"
+				description: "Whether the iframe should be added as a sibling of the given overlay"
+					+ " or as a child of the given overlay, depending on user instructions"
 			},
 			{
 				name: "aggregation",
@@ -302,7 +305,8 @@ sap.ui.define([
 					}
 				},
 				required: false,
-				description: "Advanced sandbox settings for the iframe, use as few as required. allowScripts, allowForms, allowSameOrigin is a reasonable default"
+				description: "Advanced sandbox settings for the iframe, use as few as required."
+					+ " allowScripts, allowForms, allowSameOrigin is a reasonable default"
 			}
 		];
 	};
