@@ -3,10 +3,12 @@
 /* Horizon High Contrast Black theme     */
 /* ===================================== */
 
-@_sap_ui_commons_Panel_BorderRadius: 3px;
+.sapUI5Scope {
+	--_sap_ui_commons_Panel_BorderRadius: 3px;
+}
 
 .sapUiPanel {
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 }
 
 .sapUiPanelHdr {
@@ -27,7 +29,7 @@
 }
 
 .sapUiPanelTitle.sapUiTvH4,
-.sapUiPanelTitle.sapUiTvH5{
+.sapUiPanelTitle.sapUiTvH5 {
 	font-size: 11px; /* to be compatible */
 }
 

@@ -319,7 +319,7 @@ sap.ui.define([
 
 		// make sure it is actually filled
 		var sColor = jQuery(oContDomRef).css("backgroundColor");
-		assert.equal(sColor, "rgba(255, 255, 255, 0.8)", "Panel must by default be filled with a white color");
+		assert.equal(sColor, "color(srgb 1.03725 1.03725 1.03725 / 0.8)", "Panel must by default be filled with a white color");
 
 		// now switch to "Plain" and do the same tests
 		oCtrl.setAreaDesign(AreaDesign.Plain);
