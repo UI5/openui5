@@ -16,7 +16,7 @@
 
 .sapUiProgIndBar {
 	position: relative;
-	background-color: lighten(desaturate(@sapUiHighlight, 49), 44);
+	background-color: ~'hsl(from var(--sapHighlightColor) h calc(s - 49) calc(l + 44))';
 	color: contrast(lighten(desaturate(@sapUiHighlight, 49), 44), @sapTextColor, @sapUiTextInverted);
 	border-radius: 3px;
 	box-sizing: border-box;

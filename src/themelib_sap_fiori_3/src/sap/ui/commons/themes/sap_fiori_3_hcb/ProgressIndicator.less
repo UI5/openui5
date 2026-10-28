@@ -5,12 +5,12 @@
 
 .sapUiProgInd {
 	display: inline-block;
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 }
 
 .sapUiProgIndBorder {
 	display: inline-block;
-	background-color: lighten(@sapUiGroupContentBackground, 70);
+	background-color: ~'hsl(from var(--sapGroup_ContentBackground) h s calc(l + 70))';
 	border: 1px solid var(--sapContent_ForegroundBorderColor);
 	border-radius: 3px;
 	box-sizing: border-box;
