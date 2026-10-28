@@ -168,7 +168,7 @@ sap.ui.define(
             },
             /**
              * Defines the component scope options.
-             * @type sap/f/gen/ui5/webcomponents_fiori/dist/SearchField
+             * @type module:sap/f/gen/ui5/webcomponents_fiori.dist.SearchField.ISearchScope
              */
             scopes: {
               type: "sap.f.gen.ui5.webcomponents_fiori.dist.SearchField.ISearchScope",

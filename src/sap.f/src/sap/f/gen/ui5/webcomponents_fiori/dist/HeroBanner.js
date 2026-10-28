@@ -79,7 +79,7 @@ sap.ui.define(
              *
              * - **TopEnd** (default) - Actions are displayed to the right of the header text, at the top of the header row.
              * - **BottomStart** - Actions are displayed below the header text, left-aligned, regardless of `columnsRatio` or slot usage.
-             * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerActionsPlacement
+             * @type module:sap/f/gen/ui5/webcomponents_fiori.dist.types.HeroBannerActionsPlacement
              */
             actionsPlacement: {
               type: "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerActionsPlacement",
@@ -95,7 +95,7 @@ sap.ui.define(
              *   On smaller screens, both slots stack vertically.
              * - **FirstWider** - Two unequal columns. The start content takes two-thirds of the width, the end content one-third.
              *   On smaller screens, both slots stack vertically.
-             * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerColumnsRatio
+             * @type module:sap/f/gen/ui5/webcomponents_fiori.dist.types.HeroBannerColumnsRatio
              */
             columnsRatio: {
               type: "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerColumnsRatio",
@@ -109,7 +109,7 @@ sap.ui.define(
              * - **Bottom** - Header block is pushed to the bottom of column 1. Only takes effect when `columnsRatio`
              *   is `Equal` or `FirstWider` and only `endContent` is provided (no default slot content).
              *   When `actionsPlacement` is also `BottomStart`, the `endContent` slot spans the full height.
-             * @type module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerHeaderBlockPlacement
+             * @type module:sap/f/gen/ui5/webcomponents_fiori.dist.types.HeroBannerHeaderBlockPlacement
              */
             headerBlockPlacement: {
               type: "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerHeaderBlockPlacement",

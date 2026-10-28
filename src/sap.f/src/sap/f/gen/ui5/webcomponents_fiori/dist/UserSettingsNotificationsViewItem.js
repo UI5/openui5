@@ -120,7 +120,7 @@ sap.ui.define(
              * **Note:** If not set, the role is automatically inherited from the parent `ui5-list` based on its `accessible-role` property
              * (e.g. `Menu` -> `MenuItem`, `Tree` -> `TreeItem`, `ListBox` -> `Option`).
              * An explicitly set `accessible-role` on the list item takes precedence over the inherited role.
-             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemAccessibleRole
+             * @type module:sap/f/gen/ui5/webcomponents.dist.types.ListItemAccessibleRole
              */
             accessibleRole: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.ListItemAccessibleRole",
@@ -129,7 +129,7 @@ sap.ui.define(
             /**
              * Defines the highlight state of the list items.
              * Available options are: `"None"` (by default), `"Positive"`, `"Critical"`, `"Information"` and `"Negative"`.
-             * @type module:sap/f/gen/ui5/webcomponents/dist/types/Highlight
+             * @type module:sap/f/gen/ui5/webcomponents.dist.types.Highlight
              */
             highlight: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.Highlight",
@@ -172,7 +172,7 @@ sap.ui.define(
              * `item-click` event is not fired), but the item can still be selected. Clicking the item body,
              * pressing Space/Enter, or interacting with the selection component (checkbox in Multi mode, radio
              * button in Single modes) toggles the selection when the list has a selection mode.
-             * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemType
+             * @type module:sap/f/gen/ui5/webcomponents.dist.types.ListItemType
              */
             type: {
               type: "sap.f.gen.ui5.webcomponents.dist.types.ListItemType",
@@ -203,7 +203,7 @@ sap.ui.define(
              * **Note:** While the slot allows custom buttons, to match
              * design guidelines, please use the `ui5-button` component.
              * **Note:** When the slot is not present, a built-in delete button will be displayed.
-             * @type sap/f/gen/ui5/webcomponents/dist/Button
+             * @type module:sap/f/gen/ui5/webcomponents.dist.Button.IButton
              */
             deleteButton: {
               type: "sap.f.gen.ui5.webcomponents.dist.Button.IButton",

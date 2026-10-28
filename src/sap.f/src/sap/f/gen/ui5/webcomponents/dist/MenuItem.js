@@ -28,7 +28,7 @@ sap.ui.define(
      *
      * `import "@ui5/webcomponents/dist/MenuItem.js";`
      *
-     * @implements module:sap/f/gen/ui5/webcomponents/dist/Menu.IMenuItem
+     * @implements module:sap/f/gen/ui5/webcomponents.dist.Menu.IMenuItem
      * @extends module:sap/f/gen/ui5/webcomponents/dist/ListItem
      * @constructor
      * @private
@@ -74,7 +74,7 @@ sap.ui.define(
            * **Note:** If not set, the role is automatically inherited from the parent `ui5-list` based on its `accessible-role` property
            * (e.g. `Menu` -> `MenuItem`, `Tree` -> `TreeItem`, `ListBox` -> `Option`).
            * An explicitly set `accessible-role` on the list item takes precedence over the inherited role.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemAccessibleRole
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.ListItemAccessibleRole
            */
           accessibleRole: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.ListItemAccessibleRole",
@@ -120,7 +120,7 @@ sap.ui.define(
           /**
            * Defines the highlight state of the list items.
            * Available options are: `"None"` (by default), `"Positive"`, `"Critical"`, `"Information"` and `"Negative"`.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/Highlight
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.Highlight
            */
           highlight: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.Highlight",
@@ -186,7 +186,7 @@ sap.ui.define(
            * `item-click` event is not fired), but the item can still be selected. Clicking the item body,
            * pressing Space/Enter, or interacting with the selection component (checkbox in Multi mode, radio
            * button in Single modes) toggles the selection when the list has a selection mode.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/ListItemType
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.ListItemType
            */
           type: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.ListItemType",
@@ -215,7 +215,7 @@ sap.ui.define(
            *
            * The priority of what will be displayed at the end of the menu item is as follows:
            * sub-menu arrow (if there are items added in `items` slot) -> components added in `endContent` -> text set to `additionalText`.
-           * @type sap/f/gen/ui5/webcomponents/dist/Menu
+           * @type module:sap/f/gen/ui5/webcomponents.dist.Menu.IMenuItem
            */
           items: {
             type: "sap.f.gen.ui5.webcomponents.dist.Menu.IMenuItem",
@@ -226,7 +226,7 @@ sap.ui.define(
            * **Note:** While the slot allows custom buttons, to match
            * design guidelines, please use the `ui5-button` component.
            * **Note:** When the slot is not present, a built-in delete button will be displayed.
-           * @type sap/f/gen/ui5/webcomponents/dist/Button
+           * @type module:sap/f/gen/ui5/webcomponents.dist.Button.IButton
            */
           deleteButton: {
             type: "sap.f.gen.ui5.webcomponents.dist.Button.IButton",

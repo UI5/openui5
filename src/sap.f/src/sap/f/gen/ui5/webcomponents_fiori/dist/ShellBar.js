@@ -176,7 +176,7 @@ sap.ui.define(
           aggregations: {
             /**
              * Defines the assistant slot.
-             * @type sap/f/gen/ui5/webcomponents/dist/Button
+             * @type module:sap/f/gen/ui5/webcomponents.dist.Button.IButton
              */
             assistant: {
               type: "sap.f.gen.ui5.webcomponents.dist.Button.IButton",
@@ -259,7 +259,7 @@ sap.ui.define(
              * Defines a `ui5-button` in the bar that will be placed in the beginning.
              * We encourage this slot to be used for a menu button.
              * It gets overstyled to match ShellBar's styling.
-             * @type sap/f/gen/ui5/webcomponents/dist/Button
+             * @type module:sap/f/gen/ui5/webcomponents.dist.Button.IButton
              */
             startButton: {
               type: "sap.f.gen.ui5.webcomponents.dist.Button.IButton",

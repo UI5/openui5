@@ -18,6 +18,7 @@ sap.ui.define(
     // export the UI5 metadata along with the package
     pkg["_ui5metadata"] = {
       name: "sap/f/gen/ui5/webcomponents_fiori",
+      npmPackage: "@ui5/webcomponents-fiori",
       version: "2.27.2",
       dependencies: ["sap.ui.core"],
       types: [
@@ -125,16 +126,17 @@ sap.ui.define(
     };
 
     // Enums
+    pkg.dist = Object.assign({}, pkg.dist);
+    pkg.dist.types = Object.assign({}, pkg.dist.types);
     /**
      * Different types of FCLLayout.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/FCLLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.FCLLayout
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.FCLLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["FCLLayout"] = {
+    pkg.dist.types.FCLLayout = {
       /**
        * Desktop: Fixed -- -- 100 percent widths of columns, only the End column is displayed
        * Tablet:  Fixed -- -- 100 percent widths of columns, only the End column is displayed
@@ -258,7 +260,7 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.FCLLayout",
-      pkg["FCLLayout"]
+      pkg.dist.types.FCLLayout
     );
     /**
      * Available HeroBanner actions placement options.
@@ -266,12 +268,11 @@ sap.ui.define(
      * Defines where the actions slot is rendered within the hero banner header area.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerActionsPlacement
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerActionsPlacement
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.HeroBannerActionsPlacement
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["HeroBannerActionsPlacement"] = {
+    pkg.dist.types.HeroBannerActionsPlacement = {
       /**
        * Places the actions below the header text, aligned to the start.
        *
@@ -289,7 +290,7 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerActionsPlacement",
-      pkg["HeroBannerActionsPlacement"]
+      pkg.dist.types.HeroBannerActionsPlacement
     );
     /**
      * Available HeroBanner columns ratio options.
@@ -298,12 +299,11 @@ sap.ui.define(
      * When no value is set, the content renders in a single column.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerColumnsRatio
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerColumnsRatio
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.HeroBannerColumnsRatio
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["HeroBannerColumnsRatio"] = {
+    pkg.dist.types.HeroBannerColumnsRatio = {
       /**
        * Two equal columns. Both content blocks share the available width equally.
        *
@@ -321,7 +321,7 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerColumnsRatio",
-      pkg["HeroBannerColumnsRatio"]
+      pkg.dist.types.HeroBannerColumnsRatio
     );
     /**
      * Available HeroBanner header text block placement options.
@@ -329,12 +329,11 @@ sap.ui.define(
      * Defines the vertical placement of the header text block within the banner header area.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/HeroBannerHeaderBlockPlacement
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.HeroBannerHeaderBlockPlacement
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.HeroBannerHeaderBlockPlacement
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["HeroBannerHeaderBlockPlacement"] = {
+    pkg.dist.types.HeroBannerHeaderBlockPlacement = {
       /**
        * Places the header text block at the bottom of the header area.
        *
@@ -352,18 +351,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.HeroBannerHeaderBlockPlacement",
-      pkg["HeroBannerHeaderBlockPlacement"]
+      pkg.dist.types.HeroBannerHeaderBlockPlacement
     );
     /**
      * Different types of IllustrationMessageDesign.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.IllustrationMessageDesign
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.IllustrationMessageDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["IllustrationMessageDesign"] = {
+    pkg.dist.types.IllustrationMessageDesign = {
       /**
        * Automatically decides the &lt;code&gt;Illustration&lt;/code&gt; size (&lt;code&gt;Base&lt;/code&gt;, &lt;code&gt;Dot&lt;/code&gt;, &lt;code&gt;Spot&lt;/code&gt;,
        * &lt;code&gt;Dialog&lt;/code&gt;, or &lt;code&gt;Scene&lt;/code&gt;) depending on the &lt;code&gt;IllustratedMessage&lt;/code&gt; container width.
@@ -444,18 +442,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.IllustrationMessageDesign",
-      pkg["IllustrationMessageDesign"]
+      pkg.dist.types.IllustrationMessageDesign
     );
     /**
      * Different illustration types of Illustrated Message.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/IllustrationMessageType
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.IllustrationMessageType
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.IllustrationMessageType
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["IllustrationMessageType"] = {
+    pkg.dist.types.IllustrationMessageType = {
       /**
        * &quot;Achievement&quot; illustration type.
        *
@@ -1285,18 +1282,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.IllustrationMessageType",
-      pkg["IllustrationMessageType"]
+      pkg.dist.types.IllustrationMessageType
     );
     /**
      * Defines the layout of the content displayed in the `ui5-media-gallery-item`.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryItemLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryItemLayout
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.MediaGalleryItemLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["MediaGalleryItemLayout"] = {
+    pkg.dist.types.MediaGalleryItemLayout = {
       /**
        * Recommended to use when the item contains an image.
        *
@@ -1319,18 +1315,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryItemLayout",
-      pkg["MediaGalleryItemLayout"]
+      pkg.dist.types.MediaGalleryItemLayout
     );
     /**
      * Defines the layout type of the thumbnails list of the `ui5-media-gallery` component.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryLayout
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.MediaGalleryLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["MediaGalleryLayout"] = {
+    pkg.dist.types.MediaGalleryLayout = {
       /**
        * The layout is determined automatically.
        *
@@ -1355,18 +1350,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryLayout",
-      pkg["MediaGalleryLayout"]
+      pkg.dist.types.MediaGalleryLayout
     );
     /**
      * Defines the horizontal alignment of the thumbnails menu of the `ui5-media-gallery` component.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryMenuHorizontalAlign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryMenuHorizontalAlign
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.MediaGalleryMenuHorizontalAlign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["MediaGalleryMenuHorizontalAlign"] = {
+    pkg.dist.types.MediaGalleryMenuHorizontalAlign = {
       /**
        * Displays the menu on the left side of the target.
        *
@@ -1384,18 +1378,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryMenuHorizontalAlign",
-      pkg["MediaGalleryMenuHorizontalAlign"]
+      pkg.dist.types.MediaGalleryMenuHorizontalAlign
     );
     /**
      * Types for the vertical alignment of the thumbnails menu of the `ui5-media-gallery` component.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/MediaGalleryMenuVerticalAlign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.MediaGalleryMenuVerticalAlign
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.MediaGalleryMenuVerticalAlign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["MediaGalleryMenuVerticalAlign"] = {
+    pkg.dist.types.MediaGalleryMenuVerticalAlign = {
       /**
        * Displays the menu at the bottom of the reference control.
        *
@@ -1413,18 +1406,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.MediaGalleryMenuVerticalAlign",
-      pkg["MediaGalleryMenuVerticalAlign"]
+      pkg.dist.types.MediaGalleryMenuVerticalAlign
     );
     /**
      * Specifies the navigation layout mode.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/NavigationLayoutMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.NavigationLayoutMode
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.NavigationLayoutMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["NavigationLayoutMode"] = {
+    pkg.dist.types.NavigationLayoutMode = {
       /**
        * Automatically calculates the navigation layout mode based on the screen width.
        * &#x60;Collapsed&#x60; on small screens (screen width of 599px or less) and &#x60;Expanded&#x60; on larger screens (screen width of 600px or more).
@@ -1450,18 +1442,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.NavigationLayoutMode",
-      pkg["NavigationLayoutMode"]
+      pkg.dist.types.NavigationLayoutMode
     );
     /**
      * Different types of NotificationListItemImportance.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/NotificationListItemImportance
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.NotificationListItemImportance
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.NotificationListItemImportance
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["NotificationListItemImportance"] = {
+    pkg.dist.types.NotificationListItemImportance = {
       /**
        * Important
        *
@@ -1479,18 +1470,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.NotificationListItemImportance",
-      pkg["NotificationListItemImportance"]
+      pkg.dist.types.NotificationListItemImportance
     );
     /**
      * Available Page Background Design.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/PageBackgroundDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.PageBackgroundDesign
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.PageBackgroundDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["PageBackgroundDesign"] = {
+    pkg.dist.types.PageBackgroundDesign = {
       /**
        * Page background color when a List is set as the Page content.
        *
@@ -1515,18 +1505,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.PageBackgroundDesign",
-      pkg["PageBackgroundDesign"]
+      pkg.dist.types.PageBackgroundDesign
     );
     /**
      * Search mode options.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SearchMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SearchMode
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.SearchMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["SearchMode"] = {
+    pkg.dist.types.SearchMode = {
       /**
        * Search field with default appearance.
        *
@@ -1544,18 +1533,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.SearchMode",
-      pkg["SearchMode"]
+      pkg.dist.types.SearchMode
     );
     /**
      * SideContent FallDown options.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentFallDown
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentFallDown
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.SideContentFallDown
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["SideContentFallDown"] = {
+    pkg.dist.types.SideContentFallDown = {
       /**
        * Side content falls down on breakpoints below L
        *
@@ -1587,18 +1575,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideContentFallDown",
-      pkg["SideContentFallDown"]
+      pkg.dist.types.SideContentFallDown
     );
     /**
      * Side Content position options.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentPosition
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentPosition
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.SideContentPosition
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["SideContentPosition"] = {
+    pkg.dist.types.SideContentPosition = {
       /**
        * The side content is on the right side of the main container
        * in left-to-right mode and on the left side in right-to-left mode.
@@ -1618,18 +1605,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideContentPosition",
-      pkg["SideContentPosition"]
+      pkg.dist.types.SideContentPosition
     );
     /**
      * Side Content visibility options.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideContentVisibility
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideContentVisibility
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.SideContentVisibility
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["SideContentVisibility"] = {
+    pkg.dist.types.SideContentVisibility = {
       /**
        * Show the side content on any breakpoint
        *
@@ -1668,18 +1654,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideContentVisibility",
-      pkg["SideContentVisibility"]
+      pkg.dist.types.SideContentVisibility
     );
     /**
      * SideNavigationItem designs.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/SideNavigationItemDesign
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.SideNavigationItemDesign
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.SideNavigationItemDesign
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["SideNavigationItemDesign"] = {
+    pkg.dist.types.SideNavigationItemDesign = {
       /**
        * Design for items that trigger an action, such as opening a dialog.
        *
@@ -1701,18 +1686,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.SideNavigationItemDesign",
-      pkg["SideNavigationItemDesign"]
+      pkg.dist.types.SideNavigationItemDesign
     );
     /**
      * Timeline growing modes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/TimelineGrowingMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.TimelineGrowingMode
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.TimelineGrowingMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["TimelineGrowingMode"] = {
+    pkg.dist.types.TimelineGrowingMode = {
       /**
        * Event &#x60;load-more&#x60; is fired
        * upon pressing a &quot;More&quot; button at the end.
@@ -1738,18 +1722,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.TimelineGrowingMode",
-      pkg["TimelineGrowingMode"]
+      pkg.dist.types.TimelineGrowingMode
     );
     /**
      * Available Timeline layout orientation
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/TimelineLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.TimelineLayout
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.TimelineLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["TimelineLayout"] = {
+    pkg.dist.types.TimelineLayout = {
       /**
        * Horizontal layout
        *
@@ -1768,18 +1751,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.TimelineLayout",
-      pkg["TimelineLayout"]
+      pkg.dist.types.TimelineLayout
     );
     /**
      * Different UploadCollection selection modes.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/UploadCollectionSelectionMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.UploadCollectionSelectionMode
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.UploadCollectionSelectionMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["UploadCollectionSelectionMode"] = {
+    pkg.dist.types.UploadCollectionSelectionMode = {
       /**
        * Multi selection mode (more than one list item can be selected).
        *
@@ -1827,18 +1809,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.UploadCollectionSelectionMode",
-      pkg["UploadCollectionSelectionMode"]
+      pkg.dist.types.UploadCollectionSelectionMode
     );
     /**
      * Different types of UploadState.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/UploadState
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.UploadState
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.UploadState
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["UploadState"] = {
+    pkg.dist.types.UploadState = {
       /**
        * The file has been uploaded successfully.
        *
@@ -1870,18 +1851,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.UploadState",
-      pkg["UploadState"]
+      pkg.dist.types.UploadState
     );
     /**
      * Different types of ViewSettings.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/ViewSettingsDialogMode
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.ViewSettingsDialogMode
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.ViewSettingsDialogMode
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["ViewSettingsDialogMode"] = {
+    pkg.dist.types.ViewSettingsDialogMode = {
       /**
        * Filter type
        *
@@ -1906,18 +1886,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.ViewSettingsDialogMode",
-      pkg["ViewSettingsDialogMode"]
+      pkg.dist.types.ViewSettingsDialogMode
     );
     /**
      * Enumeration for different content layouts of the `ui5-wizard`.
      *
      * @enum {string}
-     * @alias module:sap/f/gen/ui5/webcomponents_fiori/dist/types/WizardContentLayout
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori dist.types.WizardContentLayout
+     * @alias module:sap/f/gen/ui5/webcomponents_fiori.dist.types.WizardContentLayout
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
-    pkg["WizardContentLayout"] = {
+    pkg.dist.types.WizardContentLayout = {
       /**
        * Display the content of the &#x60;ui5-wizard&#x60; as multiple steps in a scroll section.
        *
@@ -1935,7 +1914,7 @@ sap.ui.define(
     };
     registerEnum(
       "sap.f.gen.ui5.webcomponents_fiori.dist.types.WizardContentLayout",
-      pkg["WizardContentLayout"]
+      pkg.dist.types.WizardContentLayout
     );
 
     // Interfaces
@@ -1943,8 +1922,7 @@ sap.ui.define(
      * Interface for components that can be slotted inside `ui5-media-gallery` as items.
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/MediaGallery.IMediaGalleryItem
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IMediaGalleryItem
+     * @name module:sap/f/gen/ui5/webcomponents_fiori.dist.MediaGallery.IMediaGalleryItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1952,8 +1930,7 @@ sap.ui.define(
      * Interface for components that may be slotted inside `ui5-product-switch` as items
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/ProductSwitch.IProductSwitchItem
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori IProductSwitchItem
+     * @name module:sap/f/gen/ui5/webcomponents_fiori.dist.ProductSwitch.IProductSwitchItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1961,8 +1938,7 @@ sap.ui.define(
      * Interface for components that may be slotted inside a `ui5-search`
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchField.ISearchScope
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ISearchScope
+     * @name module:sap/f/gen/ui5/webcomponents_fiori.dist.SearchField.ISearchScope
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
@@ -1970,8 +1946,7 @@ sap.ui.define(
      * Interface for components that may be slotted inside `ui5-timeline` as items
      *
      * @interface
-     * @name module:sap/f/gen/ui5/webcomponents_fiori/dist/Timeline.ITimelineItem
-     * @ui5-module-override sap/f/gen/ui5/webcomponents_fiori ITimelineItem
+     * @name module:sap/f/gen/ui5/webcomponents_fiori.dist.Timeline.ITimelineItem
      * @private
      * @ui5-restricted sap.ushell,sap.esh.search.ui
      */
