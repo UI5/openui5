@@ -3345,8 +3345,24 @@ sap.ui.define([
 		assert.notOk(hasHorizontalOverflow(this.oPopover.getDomRef("cont")), "Popover has no horizontal overflow");
 	});
 
-	QUnit.test("Calling _includeScrollWidth with no dom ref", function(assert) {
-		this.oPopover._includeScrollWidth();
+	QUnit.test("No scrollbar gutter when vertical scrolling is disabled", async function(assert) {
+		this.oPopover.setContentWidth("320px");
+		this.oPopover.setVerticalScrolling(false);
+		this.oPopover.openBy(this.oButton);
+
+		await nextAfterOpenEvent(this.oPopover);
+		await nextUIUpdate();
+
+		const oContentDomRef = this.oPopover.getDomRef("cont");
+
+		assert.ok(hasVerticalOverflow(oContentDomRef), "Content overflows vertically");
+		assert.strictEqual(window.getComputedStyle(oContentDomRef).overflowY, "hidden", "Vertical overflow is hidden");
+		assert.notOk(this.oPopover._hasVerticalScrollbar(), "Hidden overflow is not a vertical scrollbar");
+		assert.notOk(this.oPopover.$().hasClass("sapMPopoverVerticalScrollIncluded"), "No gutter class is added");
+	});
+
+	QUnit.test("Calling _updateScrollbarGutterClass with no dom ref", function(assert) {
+		this.oPopover._updateScrollbarGutterClass();
 		// assert
 		assert.ok(true, "Should not throw an error when there is no dom ref");
 	});
