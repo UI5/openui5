@@ -436,10 +436,19 @@ sap.ui.define([
 		assert.notOk(oLinkDomRef.getAttribute("aria-haspopup"),
 			"There is no aria-haspopup attribute after the link property is being set to None.");
 
-		// check ih href disappears if there is no text
+		// check href when there is no text
 		oLink.setText("");
 		await nextUIUpdate();
-		assert.ok(oLinkDomRef.getAttribute("href"), "Empty links don't have href");
+		assert.ok(oLinkDomRef.getAttribute("href"), "Empty link without LabelledBy and with EmptyIndicatorMode Off has href");
+
+		oLink.setEmptyIndicatorMode("On");
+		await nextUIUpdate();
+		assert.ok(!oLinkDomRef.getAttribute("href"), "Empty link with EmptyIndicatorMode On doesn't have href");
+
+		oLink.addAriaLabelledBy("id1");
+		await nextUIUpdate();
+		assert.ok(!oLinkDomRef.getAttribute("href"), "Empty link with LabelledBy and with EmptyIndicatorMode On doesn't have href");
+
 
 		oLink.destroy();
 	});
