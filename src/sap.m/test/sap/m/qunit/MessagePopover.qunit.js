@@ -57,13 +57,15 @@ sap.ui.define([
 			return;
 		}
 
-		if (bRunToLast) {
-			oClock.runToLast();
-		} else {
-			oClock.runAll();
+		try {
+			if (bRunToLast) {
+				oClock.runToLast();
+			} else {
+				oClock.runAll();
+			}
+		} finally {
+			oClock.restore();
 		}
-
-		oClock.restore();
 	}
 
 	QUnit.module("Public API", {
