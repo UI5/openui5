@@ -736,6 +736,62 @@ sap.ui.define([
 		oMaskInput.destroy();
 	});
 
+	QUnit.module("Cut event", {
+		beforeEach: async function () {
+			this.oMaskInput = new MaskInput({
+				mask: "999",
+				value: "123"
+			});
+			this.oMaskInput.placeAt("content");
+			await nextUIUpdate(this.clock);
+		},
+		afterEach: async function () {
+			if (!bSkipDestroy) {
+				this.oMaskInput.destroy();
+				await nextUIUpdate(this.clock);
+			}
+		}
+	});
+
+	QUnit.test("Cut is ignored when editable=false", async function (assert) {
+		const oControl = this.oMaskInput;
+		oControl.setEditable(false);
+		await nextUIUpdate(this.clock);
+
+		oControl.focus();
+		this.clock.tick(100);
+		oControl.selectText(0, 3);
+
+		qutils.triggerEvent("cut", oControl.getFocusDomRef());
+		this.clock.tick(100);
+
+		assert.strictEqual(oControl._oTempValue.toString(), "123", "Temp value is unchanged after cut on non-editable mask");
+	});
+
+	QUnit.test("Cut is ignored when enabled=false", async function (assert) {
+		const oControl = this.oMaskInput;
+		oControl.setEnabled(false);
+		await nextUIUpdate(this.clock);
+
+		qutils.triggerEvent("cut", oControl.getFocusDomRef());
+		this.clock.tick(100);
+
+		assert.strictEqual(oControl._oTempValue.toString(), "123", "Temp value is unchanged after cut on disabled mask");
+	});
+
+	QUnit.test("Cut works normally when editable=true and enabled=true", function (assert) {
+		const oControl = this.oMaskInput;
+
+		oControl.focus();
+		this.clock.tick(100);
+		oControl.selectText(0, 3);
+
+		qutils.triggerEvent("cut", oControl.getFocusDomRef());
+		this.clock.tick(100);
+
+		assert.notStrictEqual(oControl._oTempValue.toString(), "123", "Temp value is modified after cut on editable mask");
+	});
+
 
 	QUnit.module("RTL support", {
 		beforeEach: async function () {
