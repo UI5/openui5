@@ -5427,7 +5427,13 @@ sap.ui.define([
 	{lengthFinal : true, apiGroup : true, newMaxLength : 41},
 	{lengthFinal : true, apiGroup : true, newMaxLength : 41, dataAggregation : true},
 	{lengthFinal : true, apiGroup : true, newMaxLength : 42, dataAggregation : true},
-	{countChanged : true, lengthFinal : true, noGroup : true} // NO: newMaxLength
+	{lengthFinal : true, apiGroup : true, newMaxLength : 42, dataAggregation : true,
+		/*MUST not matter:*/noCount : true},
+	{lengthFinal : true, apiGroup : true, newMaxLength : 42, dataAggregation : true,
+		/*MUST not matter:*/groupLevels : true},
+	{countChanged : true, lengthFinal : true, noGroup : true}, // NO: newMaxLength
+	// NO: newMaxLength
+	{dataAggregation : true, groupLevels : true, lengthFinal : true, noCount : true, noGroup : true}
 ].forEach(function (oFixture) {
 	var sTitle = "delete: kept-alive context not in the collection: " + JSON.stringify(oFixture);
 
@@ -5448,6 +5454,7 @@ sap.ui.define([
 					+ (oFixture.dataAggregation ? 0 : /*iActiveContexts*/1)),
 			oDeleteFromCacheExpectation,
 			bFireChange = oFixture.newMaxLength === 41,
+			bGroupLevelsNoCount = oFixture.groupLevels && oFixture.noCount,
 			oGroupLock = oFixture.noGroup
 				? null
 				: {
@@ -5479,6 +5486,20 @@ sap.ui.define([
 		oBinding.mPreviousContextsByPath = {
 			"~contextPath~" : oKeptAliveContext
 		};
+		if (oFixture.groupLevels) {
+			// internal data structure, not valid for #setAggregation!
+			oBinding.mParameters.$$aggregation = {
+				groupLevels : ["LifecycleStatus"]
+			};
+		} else if (oFixture.dataAggregation) {
+			// internal data structure, not valid for #setAggregation!
+			oBinding.mParameters.$$aggregation = {
+				groupLevels : [] // filled before by _AggregationHelper.buildApply
+			};
+		}
+		if (!oFixture.noCount) {
+			oBinding.mQueryOptions.$count = true;
+		}
 
 		this.mock(oKeptAliveContext).expects("isDeleted").withExactArgs().returns(false);
 		this.mock(oKeptAliveContext).expects("isExpanded").withExactArgs().returns(false);
@@ -5486,6 +5507,7 @@ sap.ui.define([
 		oBindingMock.expects("destroyPreviousContexts").never();
 		oHelperMock.expects("getRelativePath")
 			.withExactArgs("~contextPath~", "/EMPLOYEES").returns("~predicate~");
+		oBindingMock.expects("setOutdated").withExactArgs("delete");
 		oDeleteFromCacheExpectation = this.mock(oKeptAliveContext).expects("doDelete")
 			.withExactArgs(sinon.match.same(oGroupLock), "EMPLOYEES('1')", "~predicate~",
 				"oETagEntity", sinon.match.same(oBinding), sinon.match.func)
@@ -5506,7 +5528,9 @@ sap.ui.define([
 
 		// code under test
 		oPromise = oBinding.delete(oGroupLock, "EMPLOYEES('1')", oKeptAliveContext, "oETagEntity",
-			(oFixture.error || !oFixture.newMaxLength) && !oFixture.countChanged, fnUndelete);
+			(oFixture.error || !oFixture.newMaxLength) && !oFixture.countChanged
+				&& !bGroupLevelsNoCount,
+			fnUndelete);
 
 		if (oGroupLock) {
 			this.mock(oGroupLock).expects("getGroupId").exactly(oFixture.newMaxLength ? 1 : 0)
@@ -5525,14 +5549,16 @@ sap.ui.define([
 			.returns(oCountPromise);
 		this.mock(this.oModel).expects("getReporter").exactly(oFixture.newMaxLength ? 1 : 0)
 			.withExactArgs().returns(fnReporter);
-		oHelperMock.expects("isDataAggregation").exactly(oFixture.newMaxLength ? 1 : 0)
+		oHelperMock.expects("isDataAggregation")
+			.exactly(oFixture.newMaxLength || oFixture.groupLevels ? 1 : 0)
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(oFixture.dataAggregation);
 		oBindingMock.expects("getCount")
 			.exactly(oFixture.newMaxLength && oFixture.dataAggregation ? 1 : 0)
 			.withExactArgs().returns(42); // old count
 		const oSetOutdatedExpectation = this.mock(oBinding.oHeaderContext).expects("setOutdated")
-			.exactly(bFireChange && oFixture.dataAggregation || oFixture.countChanged ? 1 : 0)
+			.exactly(bFireChange && oFixture.dataAggregation || oFixture.countChanged
+				|| bGroupLevelsNoCount ? 1 : 0)
 			.withExactArgs(true);
 		const oFireChangeExpectation = oBindingMock.expects("_fireChange")
 			.exactly(bFireChange ? 1 : 0)
