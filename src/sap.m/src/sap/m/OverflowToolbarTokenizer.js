@@ -42,7 +42,7 @@ sap.ui.define([
 	 * <b>Note:</b> This control is intended to be used exclusively in the context of <code>sap.m.Toolbar</code> and <code>sap.m.OverflowToolbar</code>.
 	 * Using more than one tokenizer in the same toolbar is not recomended, as it may lead to unexpected behavior.
 	 * Do not use tokenizers within a toolbar if its active property is set to <code>true</code>.
-	 * @extends sap.m.Button
+	 * @extends sap.m.Tokenizer
 	 *
 	 * @implements sap.m.IOverflowToolbarContent
 	 * @implements sap.m.IToolbarInteractiveControl
@@ -53,7 +53,7 @@ sap.ui.define([
 	 *
 	 * @constructor
 	 * @public
-	 * @ui5-experimental-since 1.139
+	 * @since 1.155
 	 * @alias sap.m.OverflowToolbarTokenizer
 	 */
 	const OverflowToolbarTokenizer = Tokenizer.extend("sap.m.OverflowToolbarTokenizer", /** @lends sap.m.OverflowToolbarTokenizer.prototype */ {
