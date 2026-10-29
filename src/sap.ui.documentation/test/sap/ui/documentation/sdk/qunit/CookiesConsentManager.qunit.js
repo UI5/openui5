@@ -127,6 +127,23 @@ function (CookiesConsentManager) {
 		aTrackerHostnames.forEach(function (sHostname) {
 			assert.strictEqual(CookiesConsentManager._checkHostnameIsTracked(sHostname), true, "hostname is tracked: " + sHostname);
 		});
+
+		var aUntrackedSapTldHostnames = ["abc.sapui5.foo.sap", "abcsapui5.foo.sap", "abc.foo.sap"];
+		aUntrackedSapTldHostnames.forEach(function (sHostname) {
+			assert.strictEqual(CookiesConsentManager._checkHostnameIsTracked(sHostname), false, ".sap TLD hostname is not in the tracked list: " + sHostname);
+		});
+	});
+
+	QUnit.test("_checkHostnameIsOwnDomain", function (assert) {
+		var aSapSubdomains = ["abc.sapui5.foo.sap", "xyz.sapui5.bar.sap", "demo.sapui5.foo.baz.sap", "abc.def.sapui5.foo.sap", "abcsapui5.foo.sap"];
+		aSapSubdomains.forEach(function (sHostname) {
+			assert.strictEqual(CookiesConsentManager._checkHostnameIsOwnDomain(sHostname), true, "hostname is a sap subdomain: " + sHostname);
+		});
+
+		var aNonSapSubdomains = ["sapui5.sap", "abc.openui5.foo.sap", "abc.foo.sap", "ui5.sap.com"];
+		aNonSapSubdomains.forEach(function (sHostname) {
+			assert.strictEqual(CookiesConsentManager._checkHostnameIsOwnDomain(sHostname), false, "hostname is not a sap subdomain: " + sHostname);
+		});
 	});
 
 	QUnit.module("_isTrustArcScriptIncluded", {
