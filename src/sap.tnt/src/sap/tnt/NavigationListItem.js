@@ -639,6 +639,8 @@ sap.ui.define([
 			this._renderExternalLinkIcon(oRM);
 		}
 
+		this._renderCloseLink(oRM);
+
 		if (bListExpanded) {
 			const oIcon = this._getExpandIconControl();
 			oIcon.setVisible(bExpanderVisible)
@@ -652,8 +654,6 @@ sap.ui.define([
 			const oIcon = this._getExpandIconControl().setSrc(EXPAND_ICON_SRC);
 			oRM.renderControl(oIcon);
 		}
-
-		this._renderCloseLink(oRM);
 
 		oRM.close("div");
 	};
@@ -950,6 +950,15 @@ sap.ui.define([
 	 * @private
 	 */
 	NavigationListItem.prototype.onmousedown = function (oEvent) {
+		// The expander icon is rendered outside the <a> and is not focusable, so pressing it would
+		// move focus to an ancestor element. Keep focus on the item's anchor, as it was when the
+		// expander was still rendered inside the anchor.
+		if (oEvent.target.closest(".sapTntNLIExpandIcon")) {
+			oEvent.preventDefault();
+			this.getDomRef("a")?.focus();
+			return;
+		}
+
 		// prevent focusin event to be fired on <a> element
 		// ItemNavigation will take care of focusing it
 		if (this.getHref()) {
@@ -999,7 +1008,7 @@ sap.ui.define([
 	 */
 	NavigationListItem.prototype._renderTag = function (oRM) {
 		const oTag = this.getTag();
-		if (!oTag) {
+		if (!oTag || !oTag.getVisible()) {
 			return;
 		}
 		const sTagText = oTag.getText();

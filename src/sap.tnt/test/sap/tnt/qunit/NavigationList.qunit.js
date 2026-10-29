@@ -1014,6 +1014,21 @@ sap.ui.define([
 		assert.strictEqual(oItemChildrenContainer.classList.contains("sapTntNLIItemsContainerHidden"), true, "sapTntNLIItemsContainerHidden class is set");
 	});
 
+	QUnit.test("Pressing the expander keeps focus on the item's anchor", async function (assert) {
+		// Arrange - a first-level item with href and children renders the expander outside the anchor
+		this.clock.restore(); // use real timeouts for render/focus
+		const oItem = Element.getElementById("groupItem3");
+		const oExpander = oItem.getDomRef().querySelector(".sapTntNLIExpandIcon");
+
+		// Act - press and tap the expander (toggles expand -> re-render)
+		QUnitUtils.triggerEvent("mousedown", oExpander);
+		QUnitUtils.triggerEvent("tap", oExpander);
+		await Promise.all([nextUIUpdate(), nextJQuerySlideUp()]);
+
+		// Assert
+		assert.strictEqual(document.activeElement, oItem.getDomRef("a"), "Focus is on the item's anchor after toggling via the expander, not on an ancestor element");
+	});
+
 	QUnit.test("Expand/collapse with keyboard", async function (assert) {
 		// Arrange
 		var oItem = Element.getElementById("groupItem3"),
@@ -1414,11 +1429,23 @@ sap.ui.define([
 		assert.strictEqual(window.location.href, sCurrHref, "Default action when clicking on anchor tag is prevented.");
 	});
 
+	QUnit.test("Expander icon is rendered outside the anchor for item with 'href' and children", function (assert) {
+		// Arrange
+		var oItem = Element.getElementById("groupItem3"),
+			oAnchor = oItem.getDomRef().querySelector("a"),
+			oExpandIcon = oItem.getDomRef().querySelector(".sapTntNLIExpandIcon");
+
+		// Assert
+		assert.ok(oExpandIcon, "Expander icon is rendered");
+		assert.notOk(oAnchor.contains(oExpandIcon), "Expander icon is not a descendant of the anchor, so native link actions (middle-click, right-click) do not target it");
+		assert.strictEqual(oExpandIcon.parentElement, oItem.getDomRef().querySelector(".sapTntNLIFirstLevel"), "Expander icon is a direct child of the first-level item container, as a sibling of the anchor");
+	});
+
 	QUnit.test("External link icon", function (assert) {
 		// on first level item
 		// Arrange
-		var sExternalLinkWithTarget = Element.getElementById("groupItem1").getDomRef().querySelector("a").children[2].classList.contains("sapTntNLIExternalLinkIcon"),
-			sExternalLinkWithoutTarget = Element.getElementById("groupItem3").getDomRef().querySelector("a").children[2].classList.contains("sapTntNLIExternalLinkIcon");
+		var sExternalLinkWithTarget = !!Element.getElementById("groupItem1").getDomRef().querySelector("a .sapTntNLIExternalLinkIcon"),
+			sExternalLinkWithoutTarget = !!Element.getElementById("groupItem3").getDomRef().querySelector("a .sapTntNLIExternalLinkIcon");
 
 		// Assert
 		assert.ok(sExternalLinkWithTarget, "External link icon is rendered when href is set and 'target=_blank'");
@@ -2273,6 +2300,40 @@ sap.ui.define([
 
 		assert.notOk(oTag, "No tag aggregated");
 		assert.notOk(oItem.getDomRef().querySelector(".sapTntNLITagContainer"), "Tag container not rendered");
+	});
+
+	QUnit.test("Item with an invisible tag doesn't render tag container", async function(assert) {
+		const oNavigationList = new NavigationList({
+			items: [
+				new NavigationListItem({
+					text: "Item with invisible tag",
+					icon: "sap-icon://employee",
+					tag: new ObjectStatus({
+						text: "Beta",
+						state: "Indication15",
+						inverted: true,
+						visible: false
+					})
+				})
+			]
+		});
+		oNavigationList.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		const oItem = oNavigationList.getItems()[0];
+
+		assert.ok(oItem.getTag(), "Tag is set");
+		assert.notOk(oItem.getTag().getVisible(), "Tag is invisible");
+		assert.notOk(oItem.getDomRef().querySelector(".sapTntNLITagContainer"), "Tag container not rendered while the tag is invisible");
+
+		// making the tag visible re-renders the item, so the container appears
+		oItem.getTag().setVisible(true);
+		await nextUIUpdate();
+
+		assert.ok(oItem.getDomRef().querySelector(".sapTntNLITagContainer"), "Tag container rendered once the tag becomes visible");
+		assert.ok(oItem.getDomRef().querySelector(".sapMObjStatus"), "Visible tag rendered");
+
+		oNavigationList.destroy();
 	});
 
 	QUnit.test("Tag aggregation methods work correctly", async function(assert) {
