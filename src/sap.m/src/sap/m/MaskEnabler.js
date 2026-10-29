@@ -1006,6 +1006,10 @@ sap.ui.define([
 		 * @private
 		 */
 		this.oncut = function(oEvent) {
+			if (!this.getEditable() || !this.getEnabled()) {
+				return;
+			}
+
 			var oSelection = this._getTextSelection(),
 				iMinBrowserDelay = this._getMinBrowserDelay(),
 				iBegin = oSelection.iFrom,
