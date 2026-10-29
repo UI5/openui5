@@ -375,6 +375,22 @@ sap.ui.define([
 				dynamicVariantsLoadedCallback: {
 					type: "function",
 					bindable: false
+				},
+
+				/**
+				 * Callback function that can be used to load the content of a variant before a variant switch finalizes.
+				 * The function receives the key of the variant being switched to and must return a <code>Promise</code>.
+				 * The <code>fireSelect</code> event is delayed until the returned <code>Promise</code> is resolved or rejected.
+				 * If no callback is provided, the variant switch proceeds immediately.
+				 *
+				 * @since 1.155
+				 *
+				 * @private
+				 * @ui5-restricted sap.ui.fl, sap.m
+				 */
+				variantContentLoadedCallback: {
+					type: "function",
+					bindable: false
 				}
 			},
 			defaultAggregation: "items",
@@ -1424,14 +1440,22 @@ sap.ui.define([
 	 *
 	 * @since 1.121
 	 */
-	VariantManagement.prototype.setCurrentVariantKey = function(sKey) {
-		var oItem = this.getItemByKey(sKey);
+	VariantManagement.prototype.setCurrentVariantKey = async function(sKey) {
+		const oItem = this.getItemByKey(sKey);
 		if (oItem) {
-			var bTriggerForSameItem = this.getProperty("_selectStategyForSameItem");
+			const bTriggerForSameItem = this.getProperty("_selectStategyForSameItem");
 
 			if (bTriggerForSameItem || (!bTriggerForSameItem && (this.getSelectedKey() !== sKey))) {
 				this.setSelectedKey(sKey);
 
+				const fnContentCallback = this.getVariantContentLoadedCallback();
+				try {
+					if (typeof fnContentCallback === "function") {
+						await fnContentCallback(sKey);
+					}
+				} catch (oError) {
+					Log.error("variantContentLoadedCallback failed for key '" + sKey + "'", oError);
+				}
 				this.fireSelect({
 					key: sKey
 				});

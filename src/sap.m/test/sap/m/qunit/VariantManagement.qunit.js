@@ -3900,4 +3900,81 @@ sap.ui.define([
 		this.oVM._openManagementDialog();
 	});
 
+	QUnit.module("VariantManagement variantContentLoadedCallback", {
+		beforeEach: async function() {
+			this.oVM = new VariantManagement("VM1");
+			this.oVM.addItem(new VariantItem("VMI1", {key: "key1", title: "One"}));
+			this.oVM.addItem(new VariantItem("VMI2", {key: "key2", title: "Two"}));
+			this.oVM.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oVM.destroy();
+		}
+	});
+
+	QUnit.test("fireSelect is called synchronously when no callback is set", function(assert) {
+		let bSelectFired = false;
+		this.oVM.attachSelect(function() { bSelectFired = true; });
+
+		this.oVM.setCurrentVariantKey("key2");
+
+		assert.ok(bSelectFired, "select fired synchronously");
+	});
+
+	QUnit.test("fireSelect is delayed until the callback promise resolves", function(assert) {
+		const done = assert.async();
+		let bSelectFired = false;
+		let fnResolve;
+
+		this.oVM.setVariantContentLoadedCallback(function() {
+			return new Promise(function(resolve) { fnResolve = resolve; });
+		});
+		this.oVM.attachSelect(function() { bSelectFired = true; });
+
+		this.oVM.setCurrentVariantKey("key2");
+
+		assert.notOk(bSelectFired, "select has not fired yet while promise is pending");
+
+		fnResolve();
+		Promise.resolve().then(function() {
+			assert.ok(bSelectFired, "select fires after promise resolves");
+			done();
+		});
+	});
+
+	QUnit.test("the callback receives the key of the variant being switched to", function(assert) {
+		const done = assert.async();
+		let sReceivedKey;
+
+		this.oVM.setVariantContentLoadedCallback(function(sKey) {
+			sReceivedKey = sKey;
+			return Promise.resolve();
+		});
+		this.oVM.attachSelect(function() {
+			assert.strictEqual(sReceivedKey, "key2", "callback received the correct variant key");
+			done();
+		});
+
+		this.oVM.setCurrentVariantKey("key2");
+	});
+
+	QUnit.test("fireSelect still fires even when the callback promise rejects", function(assert) {
+		const done = assert.async();
+		const oLogStub = sinon.stub(Log, "error");
+
+		this.oVM.setVariantContentLoadedCallback(function() {
+			return Promise.reject(new Error("load failed"));
+		});
+		this.oVM.attachSelect(function() {
+			assert.ok(oLogStub.calledOnce, "error was logged");
+			assert.ok(oLogStub.args[0][0].includes("key2"), "error message includes the variant key");
+			oLogStub.restore();
+			done();
+		});
+
+		this.oVM.setCurrentVariantKey("key2");
+	});
+
 });
+
