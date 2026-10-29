@@ -11044,7 +11044,7 @@ sap.ui.define([
 //*********************************************************************************************
 [false, true].forEach((bDataAggregation) => {
 	[false, true].forEach((bWithAggregationCache) => {
-		["", "createActive", "deleteViaPath", "delete", "refreshEntity"].forEach((sUseCase) => {
+		["createActive", "deleteViaPath", "delete", "refreshEntity"].forEach((sUseCase) => {
 			[{
 				title : "$search parameter",
 				setup : function (oBinding) {
@@ -11066,13 +11066,6 @@ sap.ui.define([
 				},
 				grandTotal : true,
 				headerContext : true
-			}, { // sap-valid-* has to be handled as $search; other sap-* parameters are forbidden
-				title : "sap-valid-... parameter",
-				setup : function (oBinding) {
-					oBinding.mParameters["sap-valid-at"] = "now";
-				},
-				grandTotal : true,
-				headerContext : true
 			}, {
 				title : "filter matches",
 				isFilteredByResult : true,
@@ -11086,9 +11079,6 @@ sap.ui.define([
 				headerContext : true
 			}, {
 				title : "no filter/search/custom query option/sorter matches, but GT relevant",
-				setup : function (oBinding) {
-					oBinding.mParameters.$apply = "~apply~";
-				},
 				isFilteredByResult : false,
 				isSortedByResult : false,
 				isUsedForGrandTotal : true,
@@ -11097,8 +11087,8 @@ sap.ui.define([
 			}, {
 				title : "no filter/search/custom query option/sorter matches, GT not relevant",
 				setup : function (oBinding) {
-					// system query options are ignored
-					oBinding.mParameters.$apply = "~apply~";
+					// system query options do not influence the outdated states
+					oBinding.mParameters.$foo = "~foo~";
 				},
 				isFilteredByResult : false,
 				isSortedByResult : false,
@@ -11106,18 +11096,10 @@ sap.ui.define([
 				grandTotal : false,
 				headerContext : false
 			}].forEach((oFixture) => {
-				[false, true].forEach((bWithPath) => {
-					[undefined, false, true].forEach((bNoRequest) => {
-						[[], ["X"]].forEach((aGroupLevels) => {
+				[[], ["X"]].forEach((aGroupLevels) => {
 	const sTitle = "setOutdated: bDataAggregation=" + bDataAggregation
 		+ ", bWithAggregationCache=" + bWithAggregationCache + ", sUseCase=" + sUseCase
-		+ ", bWithPath=" + bWithPath + ", bNoRequest=" + bNoRequest
 		+ ", aGroupLevels=" + JSON.stringify(aGroupLevels) + ", " + oFixture.title;
-
-	if (bNoRequest && !bWithPath || sUseCase === "delete" && (bWithPath || bNoRequest)
-			|| sUseCase && bWithPath) {
-		return; // bNoRequest requires aPaths to be provided
-	}
 
 	QUnit.test(sTitle, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
@@ -11133,54 +11115,188 @@ sap.ui.define([
 		this.mock(oBinding).expects("isFilteredBy")
 			.exactly(bDataAggregation && !bForce && "isFilteredByResult" in oFixture
 				&& sUseCase !== "delete" ? 1 : 0)
-			.withExactArgs(...(sUseCase ? [] : [bWithPath ? "~aPaths~" : undefined]))
+			.withExactArgs()
 			.returns(oFixture.isFilteredByResult);
 		const bForceHeader = sUseCase === "createActive" || bForce || aGroupLevels.length;
 		this.mock(oBinding).expects("isSortedBy")
 			.exactly(bDataAggregation && !bForceHeader && sUseCase !== "delete"
 				&& "isSortedByResult" in oFixture ? 1 : 0)
-			.withExactArgs(...(sUseCase ? [] : [bWithPath ? "~aPaths~" : undefined]))
+			.withExactArgs()
+			.returns(oFixture.isSortedByResult);
+		this.mock(_AggregationHelper).expects("isUsedForGrandTotal").never();
+
+		if (bWithAggregationCache) {
+			oBinding.oCache.setGrandTotalOutdated = mustBeMocked;
+			this.mock(oBinding.oCache).expects("setGrandTotalOutdated")
+				.exactly(bDataAggregation && (bForce || oFixture.grandTotal)
+					&& sUseCase !== "delete" ? 1 : 0)
+				.withExactArgs(true);
+			oBinding.oCache.setSubtotalsOutdated = mustBeMocked;
+			this.mock(oBinding.oCache).expects("setSubtotalsOutdated")
+				.exactly(bDataAggregation
+					&& (bForceHeader || sUseCase !== "delete" && oFixture.headerContext)
+					? 1 : 0)
+				.withExactArgs();
+		}
+		this.mock(oBinding.oHeaderContext).expects("setOutdated")
+			.exactly(bDataAggregation
+				&& (bForceHeader || sUseCase !== "delete" && oFixture.headerContext) ? 1 : 0)
+			.withExactArgs(true);
+
+		// code under test
+		assert.strictEqual(oBinding.setOutdated(sUseCase), undefined);
+	});
+				});
+			});
+		});
+	});
+});
+
+//*********************************************************************************************
+[false, true].forEach((bDataAggregation) => {
+	[false, true].forEach((bWithAggregationCache) => {
+		[{
+			title : "$search parameter",
+			setup : function (oBinding) {
+				oBinding.mParameters.$search = "~searchterm~";
+			},
+			grandTotal : true,
+			subTotals : true,
+			headerContext : true
+		}, {
+			title : "$$aggregation.search",
+			setup : function (oBinding) {
+				oBinding.mParameters.$$aggregation.search = "~term~";
+			},
+			grandTotal : true,
+			subTotals : true,
+			headerContext : true
+		}, {
+			title : "custom query option",
+			setup : function (oBinding) {
+				oBinding.mParameters.foo = "bar";
+			},
+			grandTotal : true,
+			subTotals : true,
+			headerContext : true
+		}, {
+			title : "filter matches",
+			isFilteredByResult : true,
+			grandTotal : true,
+			subTotals : true,
+			headerContext : true
+		}, {
+			title : "is used for subtotals",
+			isFilteredByResult : false,
+			isUsedForSubtotals : true,
+			grandTotal : false,
+			subTotals : true,
+			headerContext : true
+		}, {
+			title : "is used for groupLevels",
+			isFilteredByResult : false,
+			isUsedForGroupLevels : true,
+			isUsedForSubtotals : false,
+			grandTotal : false,
+			subTotals : true,
+			headerContext : true
+		}, {
+			title : "only sorting affected",
+			isFilteredByResult : false,
+			isSortedByResult : true,
+			isUsedForGroupLevels : false,
+			isUsedForSubtotals : false,
+			grandTotal : false,
+			subTotals : false,
+			headerContext : true
+		}, {
+			title : "property only used for grand total",
+			isFilteredByResult : false,
+			isSortedByResult : false,
+			isUsedForGrandTotal : true,
+			isUsedForGroupLevels : false,
+			isUsedForSubtotals : false,
+			grandTotal : false,
+			subTotals : false,
+			headerContext : false
+		}, {
+			title : "not affected at all",
+			setup : function (oBinding) {
+				// system query options do not influence the outdated states
+				oBinding.mParameters.$foo = "~foo~";
+			},
+			isFilteredByResult : false,
+			isSortedByResult : false,
+			isUsedForGrandTotal : false,
+			isUsedForGroupLevels : false,
+			isUsedForSubtotals : false,
+			grandTotal : false,
+			subTotals : false,
+			headerContext : false
+		}].forEach((oFixture) => {
+			[undefined, false, true].forEach((bNoRequest) => {
+	const sTitle = "setOutdated: sUseCase='', bDataAggregation=" + bDataAggregation
+		+ ", bWithAggregationCache=" + bWithAggregationCache
+		+ ", bNoRequest=" + bNoRequest + ", " + oFixture.title;
+
+	QUnit.test(sTitle, function (assert) {
+		const oBinding = this.bindList("/EMPLOYEES");
+		oBinding.mParameters.$$aggregation = {
+			aggregate : "~aggregate~",
+			groupLevels : "~notRelevant~"
+		};
+		oFixture.setup?.(oBinding);
+		this.mock(_Helper).expects("isDataAggregation")
+			.withExactArgs(sinon.match.same(oBinding.mParameters))
+			.returns(bDataAggregation);
+		this.mock(oBinding).expects("isFilteredBy")
+			.exactly(bDataAggregation && "isFilteredByResult" in oFixture ? 1 : 0)
+			.withExactArgs("~aPaths~")
+			.returns(oFixture.isFilteredByResult);
+		this.mock(_AggregationHelper).expects("isUsedForSubtotals")
+			.exactly(bDataAggregation && "isUsedForSubtotals" in oFixture ? 1 : 0)
+			.withExactArgs("~aPaths~", sinon.match.same(oBinding.mParameters.$$aggregation))
+			.returns(oFixture.isUsedForSubtotals);
+		this.mock(_AggregationHelper).expects("isUsedForGroupLevels")
+			.exactly(bDataAggregation && "isUsedForGroupLevels" in oFixture ? 1 : 0)
+			.withExactArgs("~aPaths~", sinon.match.same(oBinding.mParameters.$$aggregation))
+			.returns(oFixture.isUsedForGroupLevels);
+		this.mock(oBinding).expects("isSortedBy")
+			.exactly(bDataAggregation && "isSortedByResult" in oFixture ? 1 : 0)
+			.withExactArgs("~aPaths~")
 			.returns(oFixture.isSortedByResult);
 		this.mock(_AggregationHelper).expects("isUsedForGrandTotal")
-			.exactly(bDataAggregation && bNoRequest && !bForceHeader && !oFixture.headerContext
+			.exactly(bDataAggregation && bNoRequest && !oFixture.headerContext
 				? 1 : 0)
-			.withExactArgs(bWithPath ? "~aPaths~" : undefined, "~aggregate~")
+			.withExactArgs("~aPaths~", "~aggregate~")
 			.returns(oFixture.isUsedForGrandTotal);
 
 		if (bDataAggregation && bNoRequest
-				&& (bForceHeader || oFixture.headerContext || oFixture.isUsedForGrandTotal)) {
+				&& (oFixture.headerContext || oFixture.isUsedForGrandTotal)) {
 			assert.throws(() => {
 				// code under test
-				oBinding.setOutdated(sUseCase, bWithPath ? "~aPaths~" : undefined, true);
+				oBinding.setOutdated("", "~aPaths~", true);
 			}, new Error("Missing PATCH request when @$ui5.context.isOutdated would be set"));
 		} else {
 			if (bWithAggregationCache) {
 				oBinding.oCache.setGrandTotalOutdated = mustBeMocked;
 				this.mock(oBinding.oCache).expects("setGrandTotalOutdated")
-					.exactly(bDataAggregation && (bForce || oFixture.grandTotal) && !bNoRequest
-						&& sUseCase !== "delete" ? 1 : 0)
+					.exactly(bDataAggregation && oFixture.grandTotal && !bNoRequest ? 1 : 0)
 					.withExactArgs(true);
 				oBinding.oCache.setSubtotalsOutdated = mustBeMocked;
 				this.mock(oBinding.oCache).expects("setSubtotalsOutdated")
-					.exactly(bDataAggregation && !bNoRequest
-						&& (bForceHeader || sUseCase !== "delete" && oFixture.headerContext)
-						? 1 : 0)
+					.exactly(bDataAggregation && !bNoRequest && oFixture.subTotals ? 1 : 0)
 					.withExactArgs();
 			}
 			this.mock(oBinding.oHeaderContext).expects("setOutdated")
-				.exactly(bDataAggregation && !bNoRequest
-					&& (bForceHeader || sUseCase !== "delete" && oFixture.headerContext) ? 1 : 0)
+				.exactly(bDataAggregation && !bNoRequest && oFixture.headerContext ? 1 : 0)
 				.withExactArgs(true);
 
 			// code under test
 			assert.strictEqual(
-				oBinding.setOutdated(sUseCase, bWithPath ? "~aPaths~" : undefined, bNoRequest),
-				undefined);
+				oBinding.setOutdated("", "~aPaths~", bNoRequest), undefined);
 		}
 	});
-						});
-					});
-				});
 			});
 		});
 	});
