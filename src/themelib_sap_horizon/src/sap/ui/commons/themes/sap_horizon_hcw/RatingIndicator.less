@@ -9,11 +9,9 @@
 @_sap_ui_commons_RatingIndicator_SymbolHovered: url('img/rating/star_hover.png');
 
 .sapUiRating {
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 }
 
 .sapUiRating:focus {
-	outline-width: 3px;
-	outline-style: solid;
-	outline-color: var(--sapContent_FocusColor);
+	outline: var(--sapContent_FocusColor) solid 3px;
 }
