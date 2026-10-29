@@ -58,11 +58,11 @@ sap.ui.define([
 		rm.openStart("div", oTable);
 		this._decorateRootElement(rm, oTable);
 		rm.openEnd();
-		this.renderTabElement(rm, {className: "sapUiTableOuterBefore"});
+		this.renderTabElement(rm, oTable, {className: "sapUiTableOuterBefore"});
 		this._renderTopSection(rm, oTable);
 		this._renderMainSection(rm, oTable);
 		this._renderBottomSection(rm, oTable);
-		this.renderTabElement(rm, {className: "sapUiTableOuterAfter"});
+		this.renderTabElement(rm, oTable, {className: "sapUiTableOuterAfter"});
 		rm.close("div");
 	};
 
@@ -241,7 +241,7 @@ sap.ui.define([
 			this.renderVSb(rm, oTable);
 		}
 
-		this.renderTabElement(rm, {className: "sapUiTableCtrlBefore", tabIndex: bHasFocusableContent ? "0" : "-1"});
+		this.renderTabElement(rm, oTable, {className: "sapUiTableCtrlBefore", tabIndex: bHasFocusableContent ? "0" : "-1"});
 
 		rm.openStart("div", oTable.getId() + "-sapUiTableGridCnt");
 		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "Content");
@@ -251,8 +251,8 @@ sap.ui.define([
 		this.renderTable(rm, oTable);
 		rm.close("div");
 
-		this.renderTabElement(rm, {className: "sapUiTableCtrlAfter", tabIndex: bHasFocusableContent ? "0" : "-1"});
-		this.renderTabElement(rm, {tabIndex: "-1", id: oTable.getId() + "-focusDummy"});
+		this.renderTabElement(rm, oTable, {className: "sapUiTableCtrlAfter", tabIndex: bHasFocusableContent ? "0" : "-1"});
+		this.renderTabElement(rm, oTable, {tabIndex: "-1", id: oTable.getId() + "-focusDummy"});
 
 		const oCreationRow = oTable.getCreationRow();
 		if (oCreationRow && oCreationRow.getVisible()) {
@@ -2224,19 +2224,22 @@ sap.ui.define([
 	 * Renders an empty area with tabindex=0 and the given class and id.
 	 *
 	 * @param {sap.ui.core.RenderManager} rm RenderManager instance
+	 * @param {sap.ui.table.Table} oTable Table instance
 	 * @param {object} mConfig Configuration object
 	 * @param {string} [mConfig.className] Optional CSS class name
 	 * @param {string|int} [mConfig.tabIndex="0"] Tab index to apply
 	 * @param {string} [mConfig.id] Optional ID to apply
 	 * @private
 	 */
-	TableRenderer.renderTabElement = function(rm, mConfig) {
+	TableRenderer.renderTabElement = function(rm, oTable, mConfig) {
 		rm.openStart("div", mConfig.id);
 		if (mConfig.className) {
 			rm.class(mConfig.className);
 		}
 		rm.attr("role", "none");
 		rm.attr("tabindex", mConfig.tabIndex == null ? "0" : String(mConfig.tabIndex));
+		const oAccRenderExtension = oTable._getAccRenderExtension();
+		oAccRenderExtension.writeAriaAttributesFor(rm, oTable, "TabElement");
 		rm.openEnd().close("div");
 	};
 
