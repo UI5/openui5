@@ -1,0 +1,18 @@
+# Build outputs
+dist/
+target/
+
+# Dependencies
+node_modules/
+
+# Generated theme artifacts (compiled from source LESS, not hand-authored)
+src/**/themes/**/library.css
+src/**/themes/**/*.css.map
+
+# Legacy themes
+src/**/themes/sap_bluecrystal/
+src/**/themes/sap_belize*/
+src/**/themes/sap_hcb/
+
+# Third-party vendored CSS/LESS
+src/**/thirdparty/

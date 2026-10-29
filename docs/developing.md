@@ -180,11 +180,29 @@ npx eslint ./src/sap.ui.core --quiet
 ### Stylelint (LESS files)
 
 Run before committing any `.less` changes. The config lives in [.stylelintrc.mjs](.stylelintrc.mjs).
+See [docs/stylelint.md](stylelint.md) for the full rule reference and the "No LESS Features" migration
+rules. CSS-compatible nesting with `&` is allowed.
+
+Selector-complexity checks (`max-nesting-depth` and `selector-max-compound-selectors`) are
+**disabled by default** for local and central npm/Maven runs. Use the dedicated local
+`lint:styles:complexity` command to enable them; all other checks remain enabled in either
+mode. No environment variables or automatic CI detection are involved.
+Legacy themes (`sap_bluecrystal`, all `sap_belize*` variants, and `sap_hcb`) are excluded.
 
 **Check all LESS files:**
 ```sh
 npm run lint:styles
 ```
+
+**Include selector-complexity advice in a local run (macOS/Windows/Linux):**
+```sh
+npm run lint:styles:complexity
+```
+
+This command selects the local complexity configuration. Additional Stylelint options can
+be passed with `--`, for example `npm run lint:styles:complexity -- --fix`. With pnpm, use
+`pnpm run lint:styles:complexity`, or `pnpm run lint:styles:complexity --fix`.
+The default `lint:styles` command and Maven Stylelint do not include complexity advice.
 
 **Check a specific library:**
 ```sh
@@ -200,6 +218,34 @@ npx stylelint src/sap.m/src/sap/m/themes/base/Button.less
 ```sh
 npx stylelint "src/sap.m/**/*.less" --fix
 ```
+
+**Per-library, changed-files-only run (voter / Gerrit):**
+
+The authoritative changed-files gate is the Maven `stylelintnode.build` profile (mirrors
+`eslintnode.build`). Like ESLint, it compares `HEAD~1` with `HEAD` in Gerrit voter mode,
+and with the working tree locally. No target branch configuration is needed. Voter mode
+uses `GERRIT_NEWREV` (falling back to `GERRIT_PATCHSET_REVISION`) and skips a revision
+that does not match `HEAD`. Results can be posted as Gerrit inline comments in CI.
+The profile selects `com.sap.openui5:reactor` from the collected Maven model as the npm owner,
+including when the module is selected with `-pl` or OpenUI5 is included in a SAPUI5 reactor.
+It runs `npm ci --include=dev` at that project's npm root once per Maven invocation, recreating
+`node_modules` even if dependencies were installed earlier.
+Runner retrieval uses npm's registry/authentication settings without installing the runner.
+
+```sh
+# Changed-files mode for sap.m (voter-style)
+mvn -P stylelintnode.build -pl :sap.m verify \
+  -Dsap.ui5.stylelint.skip.validation=false \
+  -Dsap.ui5.stylelint.onlyChangedFiles=true
+
+# Full-library mode for sap.m
+mvn -P stylelintnode.build -pl :sap.m verify \
+  -Dsap.ui5.stylelint.skip.validation=false \
+  -Dsap.ui5.stylelint.onlyChangedFiles=false
+```
+
+See [docs/stylelint.md](stylelint.md#per-library--changed-files-linting-maven) for opt-in
+instructions and the full property reference.
 
 ### Running Tests
 

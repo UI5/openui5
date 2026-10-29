@@ -16,6 +16,7 @@
     "test": "npm run lint",
     "lint": "eslint ./src --quiet --cache",
     "lint:styles": "stylelint \"src/**/*.less\"",
+    "lint:styles:complexity": "stylelint \"src/**/*.less\" --config scripts/stylelint/complexity.config.mjs",
     "clean": "npm x --ws -c 'rimraf --verbose ./dist'",
     "link-all": "wsrun --serial link",
     "unlink-all": "wsrun --serial unlink",

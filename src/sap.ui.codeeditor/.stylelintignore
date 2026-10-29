@@ -1,0 +1,21 @@
+# Keep shared exclusions in sync with ../../.stylelintignore.
+# Paths are relative to this library project.
+
+# Build outputs
+dist/
+target/
+
+# Dependencies
+node_modules/
+
+# Generated theme artifacts (compiled from source LESS, not hand-authored)
+**/themes/**/library.css
+**/themes/**/*.css.map
+
+# Legacy themes
+**/themes/sap_bluecrystal/
+**/themes/sap_belize*/
+**/themes/sap_hcb/
+
+# Third-party vendored CSS/LESS
+**/thirdparty/
