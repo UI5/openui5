@@ -145,14 +145,14 @@ sap.ui.define([
 									if (sFunctionName.indexOf(".") > 0) {
 										// if function has no leading dot (which would mean it is a Controller method), but has a dot later on, accept the first component as global object
 										var sGlobal = sFunctionName.split(".")[0];
-										mEventHandlerVariables[sGlobal] = window[sGlobal];
+										mEventHandlerVariables[sGlobal] = globalThis[sGlobal];
 									} else if (sFunctionName.indexOf(".") === -1) {
 										if (oController && oController[sFunctionName]) {
 											// if function has no dot at all, and oController has a member with the same name, this member should be used as function
 											// (this tells the expression parser to use the same logic as applied above)
 											sExpression = "$controller." + sExpression;
-										} else if (window[sFunctionName]) {
-											mEventHandlerVariables[sFunctionName] = window[sFunctionName];
+										} else if (globalThis[sFunctionName]) {
+											mEventHandlerVariables[sFunctionName] = globalThis[sFunctionName];
 										}
 									}
 

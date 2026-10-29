@@ -823,7 +823,7 @@
 		}
 	}
 
-	// configuration via window['sap-ui-config'] always overrides an auto detected base URL
+	// configuration via globalThis['sap-ui-config'] always overrides an auto detected base URL
 	var mResourceRoots = BaseConfig.get({
 		name: "sapUiResourceRoots",
 		type: BaseConfig.Type.MergedObject
@@ -907,23 +907,23 @@
 
 		// if bootstrap URL explicitly refers to a debug source, generally use debug sources
 		if ( /-dbg\.js([?#]|$)/.test(sBootstrapUrl) ) {
-			window['sap-ui-loaddbg'] = true;
+			globalThis['sap-ui-loaddbg'] = true;
 			vDebugInfo = vDebugInfo || true;
 		}
 
 		// export resulting debug mode under legacy property
-		window["sap-ui-debug"] = vDebugInfo;
+		globalThis["sap-ui-debug"] = vDebugInfo;
 
 		// check for optimized sources by testing variable names in a local function
 		// (check for native API ".getAttribute" to make sure that the function's source can be retrieved)
-		window["sap-ui-optimized"] = window["sap-ui-optimized"] ||
+		globalThis["sap-ui-optimized"] = globalThis["sap-ui-optimized"] ||
 			(/\.getAttribute/.test(findBaseUrl) && !/oScript/.test(findBaseUrl));
 
-		if ( window["sap-ui-optimized"] && vDebugInfo ) {
+		if ( globalThis["sap-ui-optimized"] && vDebugInfo ) {
 			// if current sources are optimized and any debug sources should be used, enable the "-dbg" suffix
-			window['sap-ui-loaddbg'] = true;
+			globalThis['sap-ui-loaddbg'] = true;
 			// if debug sources should be used in general, restart with debug URL (if not disabled, e.g. by test runner)
-			if ( vDebugInfo === true && !window["sap-ui-debug-no-reboot"] ) {
+			if ( vDebugInfo === true && !globalThis["sap-ui-debug-no-reboot"] ) {
 				var sDebugUrl;
 				if ( sBootstrapUrl != null ) {
 					sDebugUrl = sBootstrapUrl.replace(/\/(?:sap-ui-cachebuster\/)?([^\/]+)\.js/, "/$1-dbg.js");
@@ -936,7 +936,7 @@
 				ui5loader.config({
 					amd:false
 				});
-				window["sap-ui-optimized"] = false;
+				globalThis["sap-ui-optimized"] = false;
 
 				if (ui5loader.config().async) {
 					var script = document.createElement("script");
@@ -988,7 +988,7 @@
 		}
 
 		ui5loader.config({
-			debugSources: !!window['sap-ui-loaddbg'],
+			debugSources: !!globalThis['sap-ui-loaddbg'],
 			ignoreBundledResources: fnIgnorePreload
 		});
 

@@ -26,15 +26,19 @@
 /*global OpenAjax */
 
 sap.ui.define([
-	'sap/ui/VersionInfo',
-	'sap/base/Log',
 	'sap/base/assert',
-	'sap/base/util/ObjectPath'
+	'sap/base/Log',
+	'sap/base/util/ObjectPath',
+	'sap/ui/VersionInfo'
 ],
-	function(VersionInfo, Log, assert, ObjectPath) {
+	function(assert, Log, ObjectPath, VersionInfo) {
 	"use strict";
 
-	// Register to the OpenAjax Hub if it exists
+	/**
+	 * Register to the OpenAjax Hub if it exists.
+	 *
+	 * @deprecated As of version 1.120, because OpenAJAX concluded its work in 2012 already.
+	 */
 	if (globalThis.OpenAjax && globalThis.OpenAjax.hub) {
 		OpenAjax.hub.registerLibrary("sap", "http://www.sap.com/", "0.1", {});
 	}
@@ -54,7 +58,7 @@ sap.ui.define([
 
 	let Global = {
 		/**
-		 * The version of the SAP UI Library
+		 * The version of the sap.ui.core library
 		 * @type string
 		 */
 		version: "${version}",
