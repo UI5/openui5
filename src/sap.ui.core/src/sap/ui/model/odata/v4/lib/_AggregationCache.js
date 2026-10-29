@@ -1226,6 +1226,10 @@ sap.ui.define([
 
 				return SyncPromise.resolve();
 			}
+			if (!this.mQueryOptions.$count) { // for compatibility, still provide right answer
+				Log.warning("Missing system query option $count", this.toString(),
+					"sap.ui.model.odata.v4.lib._AggregationCache");
+			}
 
 			return this.oFirstLevel.fetchValue(oGroupLock, sPath, fnDataRequested, oListener);
 		}
