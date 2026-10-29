@@ -396,7 +396,7 @@ sap.ui.define([
 		 * functionality (e.g. formatting, data types, translated texts, ...).
 		 *
 		 * When the language can't be interpreted as a BCP47 language (using the relaxed syntax
-		 * described in {@link #getLanguage}, an error will be thrown.
+		 * described in {@link module:sap/base/i18n/Localization.getLanguage Localization.getLanguage}, an error will be thrown.
 		 *
 		 * When the language has changed, the Localization will fire its
 		 * {@link module:sap/base/i18n/Localization.change change} event.
