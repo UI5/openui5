@@ -2564,9 +2564,9 @@ sap.ui.define([
 
 		if (this.oCountPromise) {
 			this.createCountPromise();
-			this.readCount(oGroupLock);
 
-			return this.oCountPromise;
+			return this.readCount(oGroupLock)?.then(() => this.oCountPromise)
+				?? this.oCountPromise;
 		}
 
 		const mQueryOptions = {...this.oFirstLevel.mQueryOptions};

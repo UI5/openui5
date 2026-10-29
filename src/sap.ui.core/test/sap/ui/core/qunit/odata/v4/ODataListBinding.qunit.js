@@ -5422,6 +5422,7 @@ sap.ui.define([
 	{lengthFinal : true, error : true},
 	{lengthFinal : true, noGroup : true},
 	{lengthFinal : true, noGroup : true, newMaxLength : 42},
+	{lengthFinal : true, noGroup : true, newMaxLength : 42, countError : true},
 	{lengthFinal : true, apiGroup : false, newMaxLength : 42},
 	{lengthFinal : true, apiGroup : true, newMaxLength : 41},
 	{lengthFinal : true, apiGroup : true, newMaxLength : 41, dataAggregation : true},
@@ -5430,6 +5431,10 @@ sap.ui.define([
 ].forEach(function (oFixture) {
 	var sTitle = "delete: kept-alive context not in the collection: " + JSON.stringify(oFixture);
 
+	if (oFixture.countError && oFixture.error) {
+		throw new Error("Unsupported");
+	}
+
 	// we assume 42 entities matching the filter plus 2 created entities
 	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("/EMPLOYEES"),
@@ -5437,8 +5442,10 @@ sap.ui.define([
 			oBindingResetCall,
 			oCacheResetCall,
 			aContexts = [{iIndex : -2}, {iIndex : -1}, {iIndex : 0}, {iIndex : 1}],
-			oCountPromise = Promise.resolve(oFixture.newMaxLength
-				+ (oFixture.dataAggregation ? 0 : /*iActiveContexts*/1)),
+			oCountPromise = oFixture.countError
+				? Promise.reject("~oCountError~")
+				: Promise.resolve(oFixture.newMaxLength
+					+ (oFixture.dataAggregation ? 0 : /*iActiveContexts*/1)),
 			oDeleteFromCacheExpectation,
 			bFireChange = oFixture.newMaxLength === 41,
 			oGroupLock = oFixture.noGroup
@@ -5459,6 +5466,7 @@ sap.ui.define([
 			},
 			iOldMaxLength = oFixture.lengthFinal ? 42 : Infinity,
 			oPromise,
+			fnReporter = sinon.spy(),
 			fnUndelete = sinon.spy(),
 			that = this;
 
@@ -5481,7 +5489,7 @@ sap.ui.define([
 		oDeleteFromCacheExpectation = this.mock(oKeptAliveContext).expects("doDelete")
 			.withExactArgs(sinon.match.same(oGroupLock), "EMPLOYEES('1')", "~predicate~",
 				"oETagEntity", sinon.match.same(oBinding), sinon.match.func)
-			.returns(oCountPromise.then(function () {
+			.returns(Promise.resolve().then(function () {
 				if (oFixture.error) {
 					that.mock(oBinding).expects("getKeepAlivePredicates").withExactArgs()
 						.returns("~predicates~");
@@ -5515,6 +5523,8 @@ sap.ui.define([
 		this.mock(oBinding.oCache).expects("requestCount").exactly(oFixture.newMaxLength ? 1 : 0)
 			.withExactArgs("~groupLock~")
 			.returns(oCountPromise);
+		this.mock(this.oModel).expects("getReporter").exactly(oFixture.newMaxLength ? 1 : 0)
+			.withExactArgs().returns(fnReporter);
 		oHelperMock.expects("isDataAggregation").exactly(oFixture.newMaxLength ? 1 : 0)
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(oFixture.dataAggregation);
@@ -5549,6 +5559,10 @@ sap.ui.define([
 			if (oFixture.dataAggregation && bFireChange) {
 				sinon.assert.callOrder(oSetOutdatedExpectation, oFireChangeExpectation);
 			}
+
+			return oCountPromise.catch(function () {
+				sinon.assert.calledOnceWithExactly(fnReporter, "~oCountError~");
+			});
 		}, function (oError) {
 			assert.strictEqual(oError, "~oError~");
 

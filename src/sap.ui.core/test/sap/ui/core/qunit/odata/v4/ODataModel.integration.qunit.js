@@ -29127,6 +29127,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Late property requests via API & UI (JIRA: CPOUI5ODATAV4-3438)
 	// Delete w/ visual grouping works on leaf level w/ $count & outdated (JIRA: CPOUI5ODATAV4-3398)
 	// Delete a kept-alive outside the collection works w/ $count (JIRA: CPOUI5ODATAV4-3724)
+	// Such deletes even work in parallel (JIRA: CPOUI5ODATAV4-3730)
 	// (Grand) parent can be collapsed before deleting a leaf (JIRA: CPOUI5ODATAV4-3729)
 	//
 	// If there are no subtotals, the @$ui5.context.isOutdated at group nodes is not set when
@@ -29150,6 +29151,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	QUnit.test(sTitle, function (assert) {
 		var oArtist0,
 			oArtist1,
+			oArtistOutside,
 			sFilters = bWithSearchFilterSort
 				? "filters : [{path : 'Name', operator : 'NE', value1 : 'TAFKAP'},"
 					+ "{path : 'sendsAutographs', operator : 'GE', value1 : false}],"
@@ -29214,6 +29216,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		//                  A
 		//                         n/a
 		//                  B
+		//                         out (outside collection, deleted early & in parallel)
 		//                         0 (hero content, deleted early)
 		//                         1
 		//                         2
@@ -29316,15 +29319,24 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					ArtistID : "0",
 					IsActiveEntity : true,
 					Messages : [] // Note: just to kick the tires on this API
+				})
+				//TODO: avoid this useless GET for key properties only!
+				.expectRequest("Artists(ArtistID='out',IsActiveEntity=true)"
+					+ "?$select=ArtistID,IsActiveEntity", {
+					ArtistID : "out",
+					IsActiveEntity : true
 				});
 
 			oArtist0 = oListBinding.getKeepAliveContext(
 				"/Artists(ArtistID='0',IsActiveEntity=true)", /*bRequestMessages*/true, "$auto.0");
 			oArtist0.setKeepAlive(true, fnOnBeforeDestroy0, /*bRequestMessages*/true);
+			oArtistOutside = oListBinding.getKeepAliveContext(
+				"/Artists(ArtistID='out',IsActiveEntity=true)");
 
 			return that.waitForChanges(assert, "ODLB#getKeepAliveContext");
 		}).then(function () {
 			that.expectRequest("#0 DELETE Artists(ArtistID='0',IsActiveEntity=true)", oNO_CONTENT)
+				.expectRequest("#0 DELETE Artists(ArtistID='out',IsActiveEntity=true)", oNO_CONTENT)
 				.expectRequest("#0 Artists/$count"
 					+ (bWithSearchFilterSort
 					? "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe"
@@ -29335,6 +29347,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			return Promise.all([
 				// code under test (JIRA: CPOUI5ODATAV4-3724)
 				oArtist0.delete(),
+				oArtistOutside.delete(),
 				that.waitForChanges(assert, "delete kept-alive outside the collection")
 			]);
 		}).then(function () {

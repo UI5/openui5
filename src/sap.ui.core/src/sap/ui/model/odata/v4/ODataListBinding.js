@@ -1426,7 +1426,7 @@ sap.ui.define([
 						if (bChanged) {
 							that._fireChange({reason : ChangeReason.Remove});
 						}
-					});
+					}).catch(that.oModel.getReporter());
 				}
 			}
 		).then(function () {
