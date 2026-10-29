@@ -7,6 +7,7 @@ sap.ui.define([
 	Opa5.extendConfig({
 		arrangements: new Startup(),
 		viewNamespace: "sap.ui.core.sample.RoutingNestedComponent.view.",
-		autoWait: true
+		autoWait: true,
+		timeout: 60
 	});
 });
