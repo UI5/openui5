@@ -189,7 +189,7 @@ sap.ui.define([
 				oRm.openStart("div");
 				oRm.class("sapMUCTextContainer");
 				oControl._item = oItem;
-				if (this._bInEditMode) {
+				if (oItem._bInEditMode) {
 					oRm.class("sapMUCEditMode");
 				}
 				oRm.attr("id", oControl.getId());

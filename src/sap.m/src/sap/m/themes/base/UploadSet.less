@@ -81,6 +81,32 @@
 	.sapMUSButtonContainer {
 		padding-top: 0.75rem;
 	}
+
+	/* In edit mode at small screens, stack label and input vertically */
+	.sapMUCTextContainer.sapMUCEditMode .sapMUSTextInnerContainer {
+		flex-wrap: wrap;
+	}
+
+	.sapMUCTextContainer.sapMUCEditMode .sapMUCEditLabel {
+		flex: 1 0 100%;
+		margin-right: 0;
+		margin-bottom: 0.25rem;
+	}
+
+	.sapMUCTextContainer.sapMUCEditMode .sapMInputBase.sapMUCEditBox {
+		flex: 1 1 auto;
+		min-width: 0;
+		width: 100%;
+	}
+
+	/* Widen description area so file extension is fully visible */
+	.sapMUCTextContainer.sapMUCEditMode .sapMInputBase.sapMUCEditBox .sapMInputBaseContentWrapper {
+		width: 60% !important;
+	}
+
+	.sapMUCTextContainer.sapMUCEditMode .sapMInputBase.sapMUCEditBox .sapMInputDescriptionWrapper {
+		width: 40% !important;
+	}
 }
 
 .sapMUSButtonContainer > .sapMBtn {
