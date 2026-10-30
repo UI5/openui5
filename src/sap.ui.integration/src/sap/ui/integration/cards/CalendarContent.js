@@ -591,7 +591,7 @@ sap.ui.define([
 				if (oSelectedDate.getDate() === oNow.getDate()
 					&& oSelectedDate.getMonth() === oNow.getMonth()
 					&& oSelectedDate.getFullYear() === oNow.getFullYear()) {
-					return this._iAllItems - iIndex < this._iVisibleItems
+					return this._iAllItems - iIndex <= this._iVisibleItems
 						|| oEndDate.getTime() > oNow.getTime();
 				}
 
