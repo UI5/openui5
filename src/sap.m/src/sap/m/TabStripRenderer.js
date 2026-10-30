@@ -15,7 +15,7 @@ sap.ui.define([
 	 * <code>TabStrip</code> renderer.
 	 * @namespace
 	 */
-	var TabStripRenderer = {
+	const TabStripRenderer = {
 		apiVersion: 2
 	};
 
@@ -35,7 +35,7 @@ sap.ui.define([
 		this.beginTabStrip(oRm, oControl);
 
 		if (!Device.system.phone) {
-			oRm.openStart("div", oControl.getId() + "-leftOverflowButtons");
+			oRm.openStart("div", `${oControl.getId()}-leftOverflowButtons`);
 			oRm.class(this.LEFT_OVERRFLOW_BTN_CLASS_NAME);
 			oRm.openEnd();
 			if (oControl.getAggregation("_leftArrowButton")) {
@@ -49,7 +49,7 @@ sap.ui.define([
 		this.endTabsContainer(oRm);
 
 		if (!Device.system.phone) {
-			oRm.openStart("div", oControl.getId() + "-rightOverflowButtons");
+			oRm.openStart("div", `${oControl.getId()}-rightOverflowButtons`);
 			oRm.class(this.RIGHT_OVERRFLOW_BTN_CLASS_NAME);
 			oRm.openEnd();
 			if (oControl.getAggregation("_rightArrowButton")) {
@@ -73,20 +73,18 @@ sap.ui.define([
 	 * @param {sap.m.TabStrip} oControl An object representation of the <code>TabStrip</code> control that should be rendered
 	 */
 	TabStripRenderer.renderItems = function (oRm, oControl) {
-		var aItems = oControl.getItems(),
-			sSelectedItemId = oControl.getSelectedItem(),
-			bIsSelected,
-			oSelectedItem;
+		const aItems = oControl.getItems();
+		const sSelectedItemId = oControl.getSelectedItem();
 
 		// On mobile device we render only the selected tab if there is one
 		if (Device.system.phone) {
-			oSelectedItem = Element.getElementById(sSelectedItemId);
+			const oSelectedItem = Element.getElementById(sSelectedItemId);
 			oSelectedItem && this.renderItem(oRm, oControl, oSelectedItem, true);
 		} else {
-			aItems.forEach(function (oItem) {
-				bIsSelected = sSelectedItemId && sSelectedItemId === oItem.getId();
+			aItems.forEach((oItem) => {
+				const bIsSelected = sSelectedItemId && sSelectedItemId === oItem.getId();
 				this.renderItem(oRm, oControl, oItem, bIsSelected);
-			}, this);
+			});
 		}
 	};
 
@@ -99,9 +97,9 @@ sap.ui.define([
 	 * @param {boolean} bSelected Flag indicating if this is the currently selected item
 	 */
 	TabStripRenderer.renderItem = function (oRm, oControl, oItem, bSelected) {
-		var sTooltip = oItem.getTooltip(),
-			sTabTexDomId = getTabTextDomId(oItem),
-			bModified = oItem.getModified();
+		const sTooltip = oItem.getTooltip();
+		const sTabTexDomId = getTabTextDomId(oItem);
+		const bModified = oItem.getModified();
 
 		oRm.openStart("div", oItem);
 		oRm.class(TabStripItem.CSS_CLASS);
@@ -130,19 +128,19 @@ sap.ui.define([
 		oRm.openStart("div"); // Start texts container
 		oRm.class("sapMTSTexts");
 		oRm.openEnd();
-		oRm.openStart("div", sTabTexDomId + "-addText");
+		oRm.openStart("div", `${sTabTexDomId}-addText`);
 		oRm.class(TabStripItem.CSS_CLASS_TEXT);
 		oRm.openEnd();
 		this.renderItemText(oRm, oItem.getAdditionalText());
 		oRm.close("div");
 
 
-		oRm.openStart("div", sTabTexDomId + "-text");
+		oRm.openStart("div", `${sTabTexDomId}-text`);
 		oRm.class(TabStripItem.CSS_CLASS_LABEL);
 		oRm.openEnd();
 		this.renderItemText(oRm, oItem.getText());
 		if (bModified) {
-			oRm.openStart("span", sTabTexDomId + "-symbol");
+			oRm.openStart("span", `${sTabTexDomId}-symbol`);
 			// oRm.class(this.LEFT_OVERRFLOW_BTN_CLASS_NAME);
 			oRm.class(TabStripItem.CSS_CLASS_MODIFIED_SYMBOL);
 			oRm.attr("role", "presentation");
@@ -226,7 +224,7 @@ sap.ui.define([
 	 * @param {sap.m.TabStrip} oControl An object representation of the <code>TabStrip</code> control that should be rendered
 	 */
 	TabStripRenderer.beginTabsContainer = function (oRm, oControl) {
-		oRm.openStart("div", oControl.getId() + "-tabsContainer");
+		oRm.openStart("div", `${oControl.getId()}-tabsContainer`);
 		oRm.class("sapMTSTabsContainer");
 		if (Device.system.phone && oControl._bHighZoom) {
 			// At ≤320px the select button is replaced by the overflow toggle (2.75rem); CSS rules
@@ -235,7 +233,7 @@ sap.ui.define([
 			oRm.style("right", "2.75rem");
 		}
 		oRm.openEnd();
-		oRm.openStart("div", oControl.getId() + "-tabs");
+		oRm.openStart("div", `${oControl.getId()}-tabs`);
 		oRm.class("sapMTSTabs");
 		oRm.accessibilityState(oControl, {
 			role: "tablist"
@@ -290,7 +288,7 @@ sap.ui.define([
 	 * @param {sap.m.TabStrip} oControl An object representation of the <code>TabStrip</code> control that should be rendered
 	 */
 	TabStripRenderer.renderTouchArea = function (oRm, oControl) {
-		oRm.openStart("div", oControl.getId() + "-touchArea");
+		oRm.openStart("div", `${oControl.getId()}-touchArea`);
 		oRm.class("sapMTSTouchArea");
 		oRm.openEnd();
 
@@ -313,9 +311,9 @@ sap.ui.define([
 	 * @param {sap.m.TabStrip} oControl The TabStrip control
 	 */
 	TabStripRenderer.renderPhoneOverflowPanel = function(oRm, oControl) {
-		var sSelectedId = oControl.getSelectedItem();
+		const sSelectedId = oControl.getSelectedItem();
 
-		oRm.openStart("div", oControl.getId() + "-phoneOverflowPanel");
+		oRm.openStart("div", `${oControl.getId()}-phoneOverflowPanel`);
 		oRm.class("sapMTSPhoneOverflowPanel");
 		if (oControl._bPhoneOverflowOpen) {
 			oRm.class("sapMTSPhoneOverflowPanelOpen");
@@ -328,8 +326,8 @@ sap.ui.define([
 		oRm.openEnd();
 
 		// item list
-		oControl.getItems().forEach(function(oItem) {
-			var bSelected = sSelectedId && sSelectedId === oItem.getId();
+		oControl.getItems().forEach((oItem) => {
+			const bSelected = sSelectedId && sSelectedId === oItem.getId();
 			oRm.openStart("div");
 			oRm.class("sapMTSPhoneOverflowPanelItem");
 			if (bSelected) {
@@ -406,7 +404,7 @@ sap.ui.define([
 	 * @private
 	 */
 	function getTabTextDomId (oItem) {
-		return oItem.getId() + "-label";
+		return `${oItem.getId()}-label`;
 	}
 
 	/**
@@ -420,11 +418,11 @@ sap.ui.define([
 	 */
 	function getTabStripItemAccAttributes(oItem, oTabStrip, oSelectedItem) {
 
-		var aItems = oTabStrip.getItems(),
-			iIndex = aItems.indexOf(oItem),
-			oTabStripParent = oTabStrip.getParent(),
-			mAccAttributes = { role: "tab"},
-			sDescribedBy = InvisibleText.getStaticId("sap.m", "TABSTRIP_ITEM_CLOSABLE") + " ";
+		const aItems = oTabStrip.getItems();
+		const iIndex = aItems.indexOf(oItem);
+		const oTabStripParent = oTabStrip.getParent();
+		const mAccAttributes = { role: "tab"};
+		let sDescribedBy = InvisibleText.getStaticId("sap.m", "TABSTRIP_ITEM_CLOSABLE") + " ";
 
 		sDescribedBy += InvisibleText.getStaticId("sap.m", oItem.getModified() ? "TABSTRIP_ITEM_MODIFIED" : "TABSTRIP_ITEM_NOT_MODIFIED");
 		mAccAttributes["describedby"] = sDescribedBy;

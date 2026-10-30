@@ -206,7 +206,7 @@ sap.ui.define([
 		 * If the name starts with a dot ('.'), lookup happens within the given context only;
 		 * otherwise it will first happen within the given context (only if
 		 * <code>bPreferContext</code> is set) and then use <code>mLocals</code> to resolve
-		 * the function and finally fall back to the global context (window).
+		 * the function and finally fall back to the global context (globalThis).
 		 *
 		 * @param {object} o Object from which the property should be read and resolved
 		 * @param {string} sProp name of the property to resolve
@@ -263,7 +263,7 @@ sap.ui.define([
 		 * Resolves a data type name and configuration either to a type constructor or to a type instance.
 		 *
 		 * The name is resolved locally (against oEnv.oContext) if it starts with a '.', otherwise against
-		 * the oEnv.mLocals and if it's still not resolved, against the global context (window).
+		 * the oEnv.mLocals and if it's still not resolved, against the global context (globalThis).
 		 *
 		 * The resolution is done in place. If the name resolves to a function, it is assumed to be the
 		 * constructor of a data type. A new instance will be created, using the values of the

@@ -134,7 +134,7 @@ sap.ui.define(
 					// schedule reposition after the list layout has been adjusted
 					setTimeout(function () {
 						if (oPopup._getOpenByDomRef()) {
-							oPopup._fnOrientationChange();
+							oPopup._fnResize();
 						}
 					}, 0);
 				}
@@ -155,7 +155,7 @@ sap.ui.define(
 				if (oPopup.isA("sap.m.Popover")) {
 					setTimeout(function () {
 						if (oPopup._getOpenByDomRef()) {
-							oPopup._fnOrientationChange();
+							oPopup._fnResize();
 							oPopup._storeScrollPosition();
 							oPopup.oPopup._applyPosition();
 						}

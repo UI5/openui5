@@ -1,7 +1,12 @@
-<sap.ui.core.mvc:View controllerName="dt.view.Test"
-	height="100%" xmlns="sap.m" xmlns:sap.ui.layout="sap.ui.layout"
-	xmlns:f="sap.ui.layout.form" xmlns:core="sap.ui.core"
-	xmlns:sap.ui.core.mvc="sap.ui.core.mvc">
+<sap.ui.core.mvc:View
+	controllerName="dt.view.Test"
+	height="100%"
+	xmlns="sap.m"
+	xmlns:sap.ui.layout="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"
+	xmlns:sap.ui.core.mvc="sap.ui.core.mvc"
+>
 	<Page title="Title">
 		<content>
 			<f:SimpleForm id="SimpleForm0" layout="ColumnLayout">
@@ -36,8 +41,10 @@
 				</f:content>
 			</f:SimpleForm>
 
-			<f:SimpleForm id="SimpleForm1"
-				layout="ResponsiveGridLayout">
+			<f:SimpleForm
+				id="SimpleForm1"
+				layout="ResponsiveGridLayout"
+			>
 				<f:content>
 					<core:Title text="Title of Group 0_1" id="Group0_1" />
 
@@ -69,8 +76,10 @@
 				</f:content>
 			</f:SimpleForm>
 
-			<f:SimpleForm id="SimpleForm2"
-				layout="ResponsiveGridLayout">
+			<f:SimpleForm
+				id="SimpleForm2"
+				layout="ResponsiveGridLayout"
+			>
 				<f:content>
 					<core:Title text="Title of Group 0_2" id="Group0_2" />
 

@@ -122,31 +122,41 @@ sap.ui.define([
 	// @override sap.ui.model.odata.v4.lib._Cache#_delete
 	_AggregationCache.prototype._delete = function (oGroupLock, sEditUrl, sIndexOrPredicate,
 			oETagEntity, fnCallback) {
+		var oElement, oParentCache, sPredicate;
+
 		let iIndex = parseInt(sIndexOrPredicate);
 		if (isNaN(iIndex)) { // it must be a predicate because the element is not in the collection
 			if (this.oAggregation.hierarchyQualifier) {
 				throw new Error(
 					`Unsupported kept-alive entity: ${this.sResourcePath}${sIndexOrPredicate}`);
+			} // BEWARE: the code below (e.g. bCountChanged) relies on this check!
+
+			sPredicate = sIndexOrPredicate;
+			oElement = this.aElements.$byPredicate[sPredicate];
+			oParentCache = _Helper.getPrivateAnnotation(oElement, "parent");
+			if (!oParentCache) {
+				return SyncPromise.all([
+					_Cache.prototype._delete.apply(this, arguments),
+					this.readGrandTotal(oGroupLock)
+				]);
 			}
-			return SyncPromise.all([
-				_Cache.prototype._delete.apply(this, arguments),
-				this.readGrandTotal(oGroupLock)
-			]);
+		} else {
+			oElement = this.aElements[iIndex];
+			sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate");
+			if (oElement["@$ui5.node.isExpanded"]) {
+				throw new Error(`Unsupported expanded node: ${this.sResourcePath}${sPredicate}`);
+			}
+
+			oParentCache = _Helper.getPrivateAnnotation(oElement, "parent");
+			if (oElement["@$ui5.context.isTransient"]) {
+				// cancel the create (no callback function necessary)
+				return oParentCache._delete(oGroupLock, sEditUrl,
+					_Helper.getPrivateAnnotation(oElement, "transientPredicate"));
+			}
 		}
 
-		const oElement = this.aElements[iIndex];
-		const sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate");
-		if (oElement["@$ui5.node.isExpanded"]) {
-			throw new Error(`Unsupported expanded node: ${this.sResourcePath}${sPredicate}`);
-		}
-
-		const oParentCache = _Helper.getPrivateAnnotation(oElement, "parent");
-		if (oElement["@$ui5.context.isTransient"]) {
-			// cancel the create (no callback function necessary)
-			return oParentCache._delete(oGroupLock, sEditUrl,
-				_Helper.getPrivateAnnotation(oElement, "transientPredicate"));
-		}
-
+		// Note: if pending, bCountChanged becomes true below
+		const iOldCount = this.oCountPromise?.getResult();
 		if (this.oCountPromise) {
 			this.createCountPromise();
 		}
@@ -186,12 +196,19 @@ sap.ui.define([
 				// make parent a leaf (the direct predecessor)
 				this.makeLeaf(this.aElements[iIndex - 1]);
 			}
-			this.shiftRank(iIndex, -iOffset);
+			let bCountChanged;
+			if (iIndex >= 0) {
+				this.shiftRank(iIndex, -iOffset);
+			} else {
+				iIndex = undefined;
+				bCountChanged = iOldCount !== this.oCountPromise?.getResult();
+				_AggregationHelper.removeFromSpliced(oElement, this.aElements);
+			}
 			// remove in this cache
 			delete oElement["@$ui5.context.isDeleted"]; // @see #removeElement
-			this.removeElement(iIndex, sPredicate);
+			this.removeElement(iIndex, sPredicate); // Note: iIndex < 0 would also be OK here
 			// notify caller
-			fnCallback(iIndex, -1);
+			fnCallback(iIndex, -1, bCountChanged);
 		});
 	};
 
@@ -292,6 +309,22 @@ sap.ui.define([
 			vReadElements.forEach(addElement);
 		} else {
 			addElement(vReadElements, 0);
+		}
+	};
+
+	/**
+	 * Adjusts the count of leaves by the given delta on the client side and notifies the listeners.
+	 * Nothing to do if <code>this.mQueryOptions.$count</code> is not set.
+	 *
+	 * @param {number} iDelta - The delta
+	 *
+	 * @private
+	 */
+	_AggregationCache.prototype.addToCount = function (iDelta) {
+		if (this.oCountPromise) {
+			const iCount = this.oCountPromise.getResult() + iDelta;
+			this.oCountPromise = SyncPromise.resolve(iCount);
+			_Helper.fireChange(this.mChangeListeners, "./$count", iCount);
 		}
 	};
 
@@ -574,10 +607,17 @@ sap.ui.define([
 		_Helper.addByPath(this.mPostRequests, sTransientPredicate, oEntityData);
 		let iIndex = aElements.indexOf(oParentNode) + 1; // 0 w/o oParentNode :-)
 		if (this.oCountPromise) {
-			// create a new count promise early, that a synchronous call to
-			// oHeaderContext.requestProperty("$count") waits until the creation was successful or
-			// has been cancelled; cancellation of the creation will restore the old count promise
-			this.createCountPromise(true);
+			if (this.oAggregation.hierarchyQualifier) {
+				// Recursive hierarchy reads "$count" from the server.
+				// Create a new count promise early so that a synchronous call to
+				// oHeaderContext.requestProperty("$count") waits until the creation was successful
+				// or has been cancelled; cancellation restores the old count promise.
+				this.createCountPromise(true);
+			} else if (!oGroupLock.getGroupId().startsWith("$inactive.")) {
+				// Data aggregation maintains "$count" on the client side, no additional GET.
+				// The "$count" increases synchronously, #readCount has no effect anymore.
+				this.addToCount(1);
+			}
 		}
 		const fnOldSubmitCallback = fnSubmitCallback;
 		fnSubmitCallback = () => {
@@ -589,7 +629,11 @@ sap.ui.define([
 		const oPromise = oCache.create(oGroupLock, oPostPathPromise, sPath, sTransientPredicate,
 			oEntityData, bAtEndOfCreated, fnErrorCallback, fnSubmitCallback, /*onCancel*/() => {
 				_Helper.removeByPath(this.mPostRequests, sTransientPredicate, oEntityData);
-				this.oCountPromise?.$restore();
+				if (this.oAggregation.hierarchyQualifier) {
+					this.oCountPromise?.$restore();
+				} else if (!oEntityData["@$ui5.context.isInactive"]) {
+					this.addToCount(-1);
+				}
 				if (this.oAggregation.createInPlace) {
 					return;
 				}
@@ -1198,6 +1242,10 @@ sap.ui.define([
 					this.toString(), "sap.ui.model.odata.v4.lib._Cache");
 
 				return SyncPromise.resolve();
+			}
+			if (!this.mQueryOptions.$count) { // for compatibility, still provide right answer
+				Log.warning("Missing system query option $count", this.toString(),
+					"sap.ui.model.odata.v4.lib._AggregationCache");
 			}
 
 			return this.oFirstLevel.fetchValue(oGroupLock, sPath, fnDataRequested, oListener);
@@ -2171,12 +2219,8 @@ sap.ui.define([
 				+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, false,
 					bSortSystemQueryOptions);
 
-			const sGroupId = oGroupLock.getGroupId();
-			const oGroupLock4Request = sGroupId.startsWith("$inactive.")
-				? this.oRequestor.lockGroup(sGroupId.slice(10), oGroupLock.getOwner())
-				: oGroupLock.getUnlockedCopy();
-
-			return this.oRequestor.request("GET", sResourcePathWithQuery, oGroupLock4Request)
+			return this.oRequestor.request("GET", sResourcePathWithQuery,
+					oGroupLock.getUnlockedCopy())
 				.then((iCount) => { // Note: iCount is already of type number here
 					fnResolve(iCount);
 					_Helper.fireChange(this.mChangeListeners, "./$count", iCount);
@@ -2514,16 +2558,22 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.lib._Cache#requestCount
 	 */
 	_AggregationCache.prototype.requestCount = function (oGroupLock) {
-		if (this.oAggregation.hierarchyQualifier || this.oAggregation.groupLevels.length) {
-			// for recursive hierarchy and data aggregation with groupLevels: use #readCount
-			throw new Error("Unsupported with recursive hierarchy or groupLevels");
+		if (this.oAggregation.hierarchyQualifier) { // for recursive hierarchy: use #readCount
+			throw new Error("Unsupported with recursive hierarchy");
+		}
+
+		if (this.oCountPromise) {
+			this.createCountPromise();
+			this.readCount(oGroupLock);
+
+			return this.oCountPromise;
 		}
 
 		const mQueryOptions = {...this.oFirstLevel.mQueryOptions};
 		mQueryOptions.$count = true; // may have been removed in #readGap
 		// drop not needed system query options; $filter and $search must not be used with grand
-		// totals; all filters are contained in $$filterBeforeAggregate; $expand/$select are ignored
-		// by #requestCount below anyway
+		// totals or group levels; all filters are contained in $$filterBeforeAggregate;
+		// $expand/$select are ignored by #requestCount below anyway
 		delete mQueryOptions.$apply;
 		if (mQueryOptions.$$filterBeforeAggregate) {
 			mQueryOptions.$filter = mQueryOptions.$$filterBeforeAggregate;
@@ -2974,6 +3024,9 @@ sap.ui.define([
 	 */
 	_AggregationCache.prototype.setInactive = function (sPath, bInactive) {
 		this.oFirstLevel.setInactive(sPath, bInactive, this.mChangeListeners);
+		if (!bInactive) {
+			this.addToCount(1);
+		}
 	};
 
 	/**

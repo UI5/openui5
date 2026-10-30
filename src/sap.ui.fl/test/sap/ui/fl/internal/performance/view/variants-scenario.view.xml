@@ -2,7 +2,8 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:l="sap.ui.layout"
-	xmlns:vm="sap.ui.fl.variants">
+	xmlns:vm="sap.ui.fl.variants"
+>
 	<l:HorizontalLayout id="HorizontalLayout">
 		<l:VerticalLayout id="ContainerLayout">
 			<vm:VariantManagement id="variantManagementOrdersTable" for="HorizontalLayout" updateVariantInURL="true" />

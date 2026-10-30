@@ -179,6 +179,11 @@ sap.ui.define([
 				this.privateUse);
 			Object.freeze(this);
 		}
+		/**
+		 * Returns the normalized BCP47 tag for the LanguageTag instance.
+		 * @public
+		 * @returns {string} the normalized BCP47 tag
+		 */
 		toString() {
 			return this.#tagAsString;
 		}

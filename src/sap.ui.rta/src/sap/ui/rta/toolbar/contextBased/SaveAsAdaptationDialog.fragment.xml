@@ -1,24 +1,31 @@
 <core:FragmentDefinition
 	xmlns:form="sap.ui.layout.form"
 	xmlns="sap.m"
-	xmlns:core="sap.ui.core">
-	<Dialog id="selectContextsDialog"
+	xmlns:core="sap.ui.core"
+>
+	<Dialog
+		id="selectContextsDialog"
 		resizable="true"
 		draggable="true"
-		title="{dialogModel>/title}">
+		title="{dialogModel>/title}"
+	>
 		<Panel id="saveAdaptation-information-panel">
 			<headerToolbar>
 				<Toolbar id="toolbar">
-					<Label id="label"
+					<Label
+						id="label"
 						text="Information"
-						design="Bold">
-					</Label>
+						design="Bold"
+					/>
 				</Toolbar>
 			</headerToolbar>
-			<form:Form id="saveAdaptation-form"
-				editable="true">
+			<form:Form
+				id="saveAdaptation-form"
+				editable="true"
+			>
 				<form:layout>
-					<form:ResponsiveGridLayout labelSpanXL="3"
+					<form:ResponsiveGridLayout
+						labelSpanXL="3"
 						labelSpanL="3"
 						labelSpanM="3"
 						labelSpanS="12"
@@ -30,54 +37,63 @@
 						columnsXL="1"
 						columnsL="1"
 						columnsM="1"
-						singleContainerFullSize="false"/>
+						singleContainerFullSize="false"
+					/>
 				</form:layout>
 				<form:FormContainer>
 					<form:formElements>
 						<form:FormElement >
 							<form:label>
-								<Label id="saveAdaptation-title-label"
+								<Label
+									id="saveAdaptation-title-label"
 									text="{i18n>APP_DIALOG_TITLE_TEXT}"
-									required="true">
-								</Label>
+									required="true"
+								/>
 							</form:label>
-							<Input id="saveAdaptation-title-input"
+							<Input
+								id="saveAdaptation-title-input"
 								value="{/title}"
 								valueLiveUpdate="true"
 								liveChange=".onAdaptationTitleChange"
-								placeholder="{i18n>SAVE_AS_DIALOG_PLACEHOLDER_TITLE_TEXT}">
-							</Input>
+								placeholder="{i18n>SAVE_AS_DIALOG_PLACEHOLDER_TITLE_TEXT}"
+							/>
 						</form:FormElement>
 						<form:FormElement >
 							<form:label>
-								<Label id="saveAdaptation-rank-label"
+								<Label
+									id="saveAdaptation-rank-label"
 									text="{i18n>CLM_HEADER_PRIORITY}"
-									required="true">
-								</Label>
+									required="true"
+								/>
 							</form:label>
-								<Select
-									id="saveAdaptation-rank-select"
-									forceSelection="true"
-									selectedKey="{dialogModel>/selected}"
-									items="{dialogModel>/priority}"
-									change=".onPriorityChange">
-									<core:Item key="{dialogModel>key}" text="{dialogModel>title}" />
-								</Select>
+							<Select
+								id="saveAdaptation-rank-select"
+								forceSelection="true"
+								selectedKey="{dialogModel>/selected}"
+								items="{dialogModel>/priority}"
+								change=".onPriorityChange"
+							>
+								<core:Item key="{dialogModel>key}" text="{dialogModel>title}" />
+							</Select>
 						</form:FormElement>
 					</form:formElements>
 				</form:FormContainer>
 			</form:Form>
 		</Panel>
 		<beginButton>
-			<Button id="saveAdaptation-saveButton"
+			<Button
+				id="saveAdaptation-saveButton"
 				type="Emphasized"
 				text="{i18n>APP_CTX_DIALOG_SAVE}"
-				press=".onSaveAsAdaptation"/>
+				press=".onSaveAsAdaptation"
+			/>
 		</beginButton>
 		<endButton>
-			<Button id="saveAdaptation-cancelButton"
+			<Button
+				id="saveAdaptation-cancelButton"
 				text="{i18n>APP_CTX_DIALOG_CANCEL}"
-				press=".onCancelAdaptationDialog"/>
+				press=".onCancelAdaptationDialog"
+			/>
 		</endButton>
 	</Dialog>
 </core:FragmentDefinition>

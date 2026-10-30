@@ -2769,4 +2769,86 @@ sap.ui.define([
 			"Group view: factory NOT called for all " + N_TOTAL + " fields (got " + iCallsGroupView + ")"
 		);
 	});
+
+	// ===========================================================================================
+	// Module: Add filter section focus (regression for GitHub issue #4482)
+	//
+	// The add filter section is an sap.m.HBox, so its children live in the "items" aggregation.
+	// When the last filter is removed, _updateFocus moves focus to the ComboBox in that section.
+	// A former implementation used getContent() (which HBox does not provide), throwing
+	// "this._getAddFilterSection(...).getContent is not a function".
+	// ===========================================================================================
+	QUnit.module("Add filter section focus (issue #4482)", {
+		beforeEach: async function() {
+			this.oAFPanel = new AdaptFiltersPanel({
+				defaultView: "list"
+			});
+
+			this.aFactoryInstances = [];
+			this.oAFPanel.setItemFactory(() => {
+				const oFilterField = new FilterField();
+				oFilterField.getConditions = function() { return []; };
+				const oFGL = new FilterGroupLayout();
+				oFGL.setFilterField(oFilterField);
+				this.aFactoryInstances.push(oFilterField, oFGL);
+				return oFGL;
+			});
+
+			this.oAFPanel.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oAFPanel.destroy();
+			this.aFactoryInstances.forEach(function(oCtrl) {
+				if (!oCtrl.bIsDestroyed) {
+					oCtrl.destroy();
+				}
+			});
+			this.aFactoryInstances = [];
+		}
+	});
+
+	QUnit.test("_getAddFilterSection exposes the ComboBox via the items aggregation", async function(assert) {
+		const oP13nData = createLargeP13nData(3, 1, 0);
+		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oAddFilterSection = oViewContent._getAddFilterSection();
+
+		assert.ok(oAddFilterSection.isA("sap.m.HBox"), "Add filter section is an sap.m.HBox");
+		assert.notOk(oAddFilterSection.getContent, "HBox does not provide a getContent aggregation accessor");
+
+		const aItems = oAddFilterSection.getItems();
+		assert.equal(aItems.length, 2, "Add filter section has a label and a ComboBox");
+		assert.ok(aItems[1].isA("sap.m.ComboBox"), "Second item is the add filter ComboBox");
+		assert.strictEqual(aItems[1], oViewContent._oKeySelect, "Second item is the panel's ComboBox instance");
+	});
+
+	QUnit.test("focus recovery after removing the last filter does not throw", async function(assert) {
+		const oP13nData = createLargeP13nData(3, 1, 0);
+		this.oAFPanel.setP13nModel(new JSONModel(oP13nData));
+		await nextUIUpdate();
+
+		const oViewContent = this.oAFPanel.getCurrentViewContent();
+		const oComboBox = oViewContent._getAddFilterSection().getItems()[1];
+		const oFocusSpy = sinon.spy(oComboBox, "focus");
+
+		// Simulate the state after the last filter was removed: the list has no visible rows.
+		// _updateFocus must then fall back to focusing the add filter ComboBox. The previous
+		// implementation used getContent() on the HBox section here and threw a TypeError.
+		const aRemovedRows = oViewContent._oListControl.getItems();
+		const oListStub = sinon.stub(oViewContent._oListControl, "getItems").returns([]);
+
+		try {
+			oViewContent._updateFocus(aRemovedRows[0] || null);
+			oViewContent._oListControl.fireUpdateFinished({ reason: "Change" });
+		} finally {
+			oListStub.restore();
+		}
+
+		assert.ok(oFocusSpy.called, "Focus moved to the add filter ComboBox without throwing");
+
+		oFocusSpy.restore();
+	});
 });

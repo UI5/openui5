@@ -182,7 +182,7 @@ sap.ui.define(
                         sTitle;
                     if (sRoute === SPECIAL_ROUTES.DOCUMENTATION_TOPIC) {
                         var docuId = oArguments.id;
-                        DocuInfo.getDocumentTitle(docuId, this._oConfig).then(fnCallback).catch(fnCallback);
+                        DocuInfo.getDocumentTitle(docuId, this._oConfig).then(fnCallback).catch(function() { fnCallback(undefined); });
                     } else if (sRoute === SPECIAL_ROUTES.API_REFERENCE) {
                         sTitle = this._oRouter._decodeSpecialRouteArguments(oArguments).id;
                         fnCallback(sTitle);

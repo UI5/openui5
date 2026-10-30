@@ -3,6 +3,6 @@
 	xmlns="sap.m"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:core="sap.ui.core"
-	>
+>
 	<core:Fragment fragmentName="sap.ui.rta.test.fragment.Popup" type="XML" />
 </mvc:View>

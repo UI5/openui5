@@ -516,6 +516,47 @@ sap.ui.define([
 		assert.equal(sTextFirstColumn, "Fields " + oRB.getText("p13n.HEADER_COUNT", [3, 3]), "3 are selected, 3 are visible (filter still active)");
 	});
 
+	QUnit.test("Check count header reflects visible selected items after search filter (updateFinished)", async function(assert) {
+		// Arrange: 3 selected (key1-3), 3 unselected (key4-6)
+		this.oSelectionPanel.setEnableCount(true);
+		this.oSelectionPanel.setP13nData(this.getTestData());
+		var aColumns = ["Fields", "Test"];
+		this.oSelectionPanel._setPanelColumns(aColumns);
+		await nextUIUpdate();
+
+		var oRB = Library.getResourceBundleFor("sap.m");
+		var fnGetHeaderText = function() {
+			var oFirstColumn = this.oSelectionPanel._oListControl.getColumns()[0];
+			return oFirstColumn.getHeader().getText();
+		}.bind(this);
+
+		// Assert initial count
+		assert.equal(fnGetHeaderText(), "Fields " + oRB.getText("p13n.HEADER_COUNT", [3, 6]), "Initial count: 3 selected, 6 visible");
+
+		// Act: search for an unselected item — only "Field 4" (unselected) will be visible
+		this.oSelectionPanel._filterList(false, "Field 4");
+
+		// The binding filter is async; wait for the table to re-render via updateFinished
+		await nextUIUpdate();
+
+		// Assert: after re-render, count must reflect the filtered state — 0 selected among 1 visible
+		assert.equal(fnGetHeaderText(), "Fields " + oRB.getText("p13n.HEADER_COUNT", [0, 1]), "After search filter: 0 selected, 1 visible (count updated via updateFinished)");
+
+		// Act: search for a selected item — only "Field 1" (selected) will be visible
+		this.oSelectionPanel._filterList(false, "Field 1");
+		await nextUIUpdate();
+
+		// Assert: 1 selected among 1 visible
+		assert.equal(fnGetHeaderText(), "Fields " + oRB.getText("p13n.HEADER_COUNT", [1, 1]), "After search filter on selected item: 1 selected, 1 visible");
+
+		// Act: clear filter
+		this.oSelectionPanel._filterList(false, undefined);
+		await nextUIUpdate();
+
+		// Assert: back to full count
+		assert.equal(fnGetHeaderText(), "Fields " + oRB.getText("p13n.HEADER_COUNT", [3, 6]), "After clearing filter: 3 selected, 6 visible");
+	});
+
 	QUnit.test("Check reset of hover logic on data update", function(assert){
 
 		this.oSelectionPanel.setP13nData(this.getTestData());

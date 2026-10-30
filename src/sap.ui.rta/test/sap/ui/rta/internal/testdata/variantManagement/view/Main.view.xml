@@ -10,12 +10,13 @@
 	xmlns:smartField="sap.ui.comp.smartfield"
 	xmlns:smartLink="sap.ui.comp.navpopover"
 	xmlns:html="http://www.w3.org/1999/xhtml"
-	controllerName="sap.ui.rta.test.variantManagement.controller.Main">
+	controllerName="sap.ui.rta.test.variantManagement.controller.Main"
+>
 	<!--The view is is bound to EntityType01 in the controller -->
 	<App id="app">
 		<Page title="{i18n>appTitleMain}" id="page" enableScrolling="false">
 			<headerContent>
-					<Button visible="{app>/showAdaptButton}" text="{= ${app>/showAdaptButton} ? ${i18n>btnAdapt} : ${i18n>btnNonAdapt} }" press=".switchToAdaptionMode" />
+				<Button visible="{app>/showAdaptButton}" text="{= ${app>/showAdaptButton} ? ${i18n>btnAdapt} : ${i18n>btnNonAdapt} }" press=".switchToAdaptionMode" />
 			</headerContent>
 			<content>
 				<uxap:ObjectPageLayout id="ObjectPageLayout">
@@ -37,22 +38,25 @@
 					<uxap:sections>
 						<uxap:ObjectPageSection id="ObjectPageSectionWithForm">
 							<uxap:ObjectPageSubSection id="ObjectPageSubSectionWithForm" title="{SubSectionTitle1}">
-								<form:SimpleForm class="sapUiSmallMargin"
-												title="Simple Form bound to EntityType02" id="MainForm"
-												maxContainerCols="3"
-												editable="true"
-												adjustLabelSpan="false"
-												layout="ResponsiveGridLayout"
-												labelSpanXL="4"
-												labelSpanL="4"
-												labelSpanM="4"
-												emptySpanXL="0"
-												emptySpanL="0"
-												emptySpanM="0"
-												columnsXL="3"
-												columnsL="2"
-												columnsM="2"
-												singleContainerFullSize="false">
+								<form:SimpleForm
+									class="sapUiSmallMargin"
+									title="Simple Form bound to EntityType02"
+									id="MainForm"
+									maxContainerCols="3"
+									editable="true"
+									adjustLabelSpan="false"
+									layout="ResponsiveGridLayout"
+									labelSpanXL="4"
+									labelSpanL="4"
+									labelSpanM="4"
+									emptySpanXL="0"
+									emptySpanL="0"
+									emptySpanM="0"
+									columnsXL="3"
+									columnsL="2"
+									columnsM="2"
+									singleContainerFullSize="false"
+								>
 									<form:content>
 										<core:Title id="EntityType02.Title1" text="EntityType02 Title 1" />
 										<Label id="EntityType02.Label1" text="{/#EntityType02/EntityType02_Property01/@sap:label}" />
@@ -72,21 +76,24 @@
 
 						<uxap:ObjectPageSection id="ObjectPageSectionForNavigation" title="{SectionTitle2}">
 							<uxap:ObjectPageSubSection id="ObjectPageSectionForNavigationSubSection1" title="SubSection 1">
-								<form:SimpleForm title="Simple Form bound to EntityTypeNav using navigation" id="NavPropertyForm"
-												maxContainerCols="3"
-												editable="true"
-												adjustLabelSpan="false"
-												layout="ResponsiveGridLayout"
-												labelSpanXL="4"
-												labelSpanL="4"
-												labelSpanM="4"
-												emptySpanXL="0"
-												emptySpanL="0"
-												emptySpanM="0"
-												columnsXL="3"
-												columnsL="2"
-												columnsM="2"
-												singleContainerFullSize="false">
+								<form:SimpleForm
+									title="Simple Form bound to EntityTypeNav using navigation"
+									id="NavPropertyForm"
+									maxContainerCols="3"
+									editable="true"
+									adjustLabelSpan="false"
+									layout="ResponsiveGridLayout"
+									labelSpanXL="4"
+									labelSpanL="4"
+									labelSpanM="4"
+									emptySpanXL="0"
+									emptySpanL="0"
+									emptySpanM="0"
+									columnsXL="3"
+									columnsL="2"
+									columnsM="2"
+									singleContainerFullSize="false"
+								>
 									<form:content>
 										<core:Title id="NavTitle1" text="Navigation Title 1" />
 										<Label id="NavProperty.Label1" text="{/#EntityTypeNav/NavProperty/@sap:label}" />
@@ -121,7 +128,8 @@
 											columnsXL="2"
 											columnsL="2"
 											columnsM="1"
-											singleContainerFullSize="false" />
+											singleContainerFullSize="false"
+										/>
 									</form:layout>
 									<form:formContainers>
 										<form:FormContainer id="FormContainer1" title="Contact data">

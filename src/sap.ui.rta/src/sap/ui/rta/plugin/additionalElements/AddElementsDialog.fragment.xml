@@ -1,51 +1,61 @@
 <core:FragmentDefinition
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core"
-	xmlns:layout="sap.ui.layout">
+	xmlns:layout="sap.ui.layout"
+>
 
 	<Dialog
 		class="sapUIRtaFieldRepositoryDialog sapUiNoContentPadding"
 		title="{/dialogTitle}"
 		contentWidth="auto"
-		horizontalScrolling="false">
+		horizontalScrolling="false"
+	>
 		<buttons>
 			<Button
 				id="rta_addDialogOkButton"
 				text="{i18n>BTN_FREP_OK}"
 				press="._submitDialog"
-				type="Emphasized"/>
+				type="Emphasized"
+			/>
 			<Button
 				text="{i18n>BTN_FREP_CANCEL}"
-				press="._cancelDialog"/>
+				press="._cancelDialog"
+			/>
 		</buttons>
 		<content>
 			<Toolbar>
 				<SearchField
 					width="100%"
 					showSearchButton="false"
-					liveChange="._updateModelFilter"/>
+					liveChange="._updateModelFilter"
+				/>
 				<Button
 					text=""
 					icon="sap-icon://sort"
-					press="._resortList"/>
+					press="._resortList"
+				/>
 				<Button
 					id="rta_customFieldButton"
 					text="{/customFieldButtonText}"
 					tooltip="{/customFieldButtonTooltip}"
 					visible="{/customFieldButtonVisible}"
-					press="._redirectToExtensibilityAction(${/extensibilityOptions/0/actionKey})"/>
+					press="._redirectToExtensibilityAction(${/extensibilityOptions/0/actionKey})"
+				/>
 				<MenuButton
 					id="rta_customFieldMenuButton"
 					text="{/extensibilityMenuButtonText}"
 					tooltip="{/extensibilityMenuButtonTooltip}"
-					visible="{/extensibilityMenuButtonActive}">
+					visible="{/extensibilityMenuButtonActive}"
+				>
 					<Menu
-						items="{/extensibilityOptions}">
+						items="{/extensibilityOptions}"
+					>
 						<items>
 							<MenuItem
 								text="{text}"
 								tooltip="{tooltip}"
-								press="._redirectToExtensibilityAction(${actionKey})"/>
+								press="._redirectToExtensibilityAction(${actionKey})"
+							/>
 						</items>
 					</Menu>
 				</MenuButton>
@@ -54,19 +64,22 @@
 				id="rta_businessContextContainer"
 				class="sapUIRtaBusinessContextContainer"
 				visible="{/businessContextVisible}"
-				content="{/businessContextTexts}">
-					<Text text="{text}"/>
+				content="{/businessContextTexts}"
+			>
+				<Text text="{text}"/>
 			</layout:VerticalLayout>
 			<ScrollContainer
 				class="sapUIRtaCCDialogScrollContainer"
 				vertical="true"
-				horizontal="false">
+				horizontal="false"
+			>
 				<List
 					id="rta_addElementsDialogList"
 					mode="MultiSelect"
 					includeItemInSelection="true"
 					items="{ path: '/elementsFlat', factory: '._createListItem' }"
-					noDataText="{i18n>MSG_NO_FIELDS}"/>
+					noDataText="{i18n>MSG_NO_FIELDS}"
+				/>
 			</ScrollContainer>
 		</content>
 	</Dialog>

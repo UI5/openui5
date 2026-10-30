@@ -875,6 +875,48 @@ sap.ui.define([
 				"then it returns true because removeLastElement is allowed"
 			);
 		});
+
+		QUnit.test("when the selected overlay-element coexists with other elements that have no overlay, removal is allowed", function(assert) {
+			// Simulate a mixed aggregation: button2 and button3 have no overlay (as with forwarded
+			// aggregations in SemanticPage), but they are still real visible members of the aggregation.
+			// Removing button1 (which has an overlay) must not be blocked because there are still
+			// other visible elements remaining in the aggregation.
+			OverlayRegistry.deregister(this.oButton2Overlay);
+			OverlayRegistry.deregister(this.oButton3Overlay);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnRemove([this.oButton1Overlay], this.oDesignTime),
+				true,
+				"then it returns true because the other elements without overlays are still visible"
+			);
+		});
+
+		QUnit.test("when the selected overlay-element coexists with invisible elements that have no overlay, removal is blocked", function(assert) {
+			// The other elements have no overlay AND are set invisible — so the selected element
+			// really is the last visible one and must respect removeLastElement.
+			this.oButton2.setVisible(false);
+			this.oButton3.setVisible(false);
+			OverlayRegistry.deregister(this.oButton2Overlay);
+			OverlayRegistry.deregister(this.oButton3Overlay);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnRemove([this.oButton1Overlay], this.oDesignTime),
+				false,
+				"then it returns false because all other elements are invisible and removal is blocked by default"
+			);
+		});
+
+		QUnit.test("when a DT isVisible override is defined and returns false, elements are not counted as visible", function(assert) {
+			// button2 and button3 have an overlay but DT marks them as not visible
+			sandbox.stub(this.oButton2Overlay, "getElementVisibility").returns(false);
+			sandbox.stub(this.oButton3Overlay, "getElementVisibility").returns(false);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnRemove([this.oButton1Overlay], this.oDesignTime),
+				false,
+				"then it returns false because DT isVisible override makes other elements invisible"
+			);
+		});
 	});
 
 	QUnit.module("Given that canBeRemovedFromAggregationOnMove is called", {
@@ -1026,6 +1068,43 @@ sap.ui.define([
 			);
 
 			oOrphanButton.destroy();
+		});
+
+		QUnit.test("when the selected overlay-element coexists with other elements that have no overlay, move is allowed", function(assert) {
+			// Simulate forwarded aggregation: button2 and button3 have no overlay but are still
+			// visible Controls in the aggregation. Moving button1 must be allowed.
+			OverlayRegistry.deregister(this.oButton2Overlay);
+			OverlayRegistry.deregister(this.oButton3Overlay);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnMove(this.oButton1Overlay, this.oDesignTime),
+				true,
+				"then it returns true because the other elements without overlays are still visible"
+			);
+		});
+
+		QUnit.test("when the selected overlay-element coexists with invisible elements that have no overlay, move is blocked", function(assert) {
+			this.oButton2.setVisible(false);
+			this.oButton3.setVisible(false);
+			OverlayRegistry.deregister(this.oButton2Overlay);
+			OverlayRegistry.deregister(this.oButton3Overlay);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnMove(this.oButton1Overlay, this.oDesignTime),
+				false,
+				"then it returns false because all other elements are invisible and no Remove plugin allows last-element removal"
+			);
+		});
+
+		QUnit.test("when a DT isVisible override returns false, elements are not counted as visible for move", function(assert) {
+			sandbox.stub(this.oButton2Overlay, "getElementVisibility").returns(false);
+			sandbox.stub(this.oButton3Overlay, "getElementVisibility").returns(false);
+
+			assert.strictEqual(
+				OverlayUtil.canBeRemovedFromAggregationOnMove(this.oButton1Overlay, this.oDesignTime),
+				false,
+				"then it returns false because DT isVisible override makes other elements invisible"
+			);
 		});
 	});
 

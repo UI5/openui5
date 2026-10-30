@@ -182,7 +182,7 @@ License Text: https://github.com/UI5/openui5/blob/master/LICENSES/Apache-2.0.txt
 Contained in: src/sap.ui.core/src/sap/ui/thirdparty/caja-html-sanitizer.js
 
 Component: Unicode Common Locale Data Repository, version: 48.0.0
-Copyright: 1991-2024 Unicode, Inc.
+Copyright: 2015-2024 Unicode, Inc.
 License: LicenseRef-Unicode-3.0
 License Text: https://github.com/UI5/openui5/blob/master/LICENSES/LicenseRef-Unicode-3.0.txt
 Contained in: src/sap.ui.core/src/sap/ui/core/cldr/**
@@ -960,7 +960,7 @@ UNICODE LICENSE V3
 
 COPYRIGHT AND PERMISSION NOTICE
 
-Copyright © 1991-2024 Unicode, Inc.
+Copyright © 2015-2024 Unicode, Inc.
 
 NOTICE TO USER: Carefully read the following legal agreement. BY
 DOWNLOADING, INSTALLING, COPYING OR OTHERWISE USING DATA FILES, AND/OR
@@ -996,6 +996,7 @@ not be used in advertising or otherwise to promote the sale, use or other
 dealings in these Data Files or Software without prior written
 authorization of the copyright holder.
 
+SPDX-License-Identifier: Unicode-3.0
 =================================
 END of license: LicenseRef-Unicode-3.0
 =================================

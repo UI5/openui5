@@ -9,7 +9,8 @@
 	xmlns:smartField="sap.ui.comp.smartfield"
 	xmlns:smartLink="sap.ui.comp.navpopover"
 	xmlns:html="http://www.w3.org/1999/xhtml"
-	controllerName="sap.ui.rta.rtaReload.Page">
+	controllerName="sap.ui.rta.rtaReload.Page"
+>
 
 	<App id="app">
 		<Page title="RTA Reload" id="page" enableScrolling="false">
@@ -32,22 +33,25 @@
 					<uxap:sections>
 						<uxap:ObjectPageSection id="ObjectPageSectionWithForm">
 							<uxap:ObjectPageSubSection id="ObjectPageSubSectionWithForm" title="{SubSectionTitle1}">
-								<form:SimpleForm class="sapUiSmallMargin"
-												title="Simple Form bound to EntityType02" id="MainForm"
-												maxContainerCols="3"
-												editable="true"
-												adjustLabelSpan="false"
-												layout="ResponsiveGridLayout"
-												labelSpanXL="4"
-												labelSpanL="4"
-												labelSpanM="4"
-												emptySpanXL="0"
-												emptySpanL="0"
-												emptySpanM="0"
-												columnsXL="3"
-												columnsL="2"
-												columnsM="2"
-												singleContainerFullSize="false">
+								<form:SimpleForm
+									class="sapUiSmallMargin"
+									title="Simple Form bound to EntityType02"
+									id="MainForm"
+									maxContainerCols="3"
+									editable="true"
+									adjustLabelSpan="false"
+									layout="ResponsiveGridLayout"
+									labelSpanXL="4"
+									labelSpanL="4"
+									labelSpanM="4"
+									emptySpanXL="0"
+									emptySpanL="0"
+									emptySpanM="0"
+									columnsXL="3"
+									columnsL="2"
+									columnsM="2"
+									singleContainerFullSize="false"
+								>
 									<form:content>
 										<core:Title id="EntityType02.Title1" text="EntityType02 Title 1" />
 										<Label id="EntityType02.Label1" text="{/#EntityType02/EntityType02_Property01/@sap:label}" />

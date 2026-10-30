@@ -1364,7 +1364,7 @@ sap.ui.define([
 		that.setOutdated("delete");
 
 		return oContext.doDelete(oGroupLock, sEditUrl, sPath, oETagEntity, this,
-			function (iIndex, iOffset) {
+			function (iIndex, iOffset, bCountChanged) {
 				if (iIndex !== undefined) {
 					// An entity can only be deleted when its key predicate is known. So we can be
 					// sure to have key predicates and the contexts are related to entities and not
@@ -1396,6 +1396,8 @@ sap.ui.define([
 				} else if (iOffset > 0) { // trying to reinsert an element w/o index
 					bReset = true;
 					fnUndelete();
+				} else if (bCountChanged) {
+					that.oHeaderContext.setOutdated(true);
 				} else if (that.bLengthFinal && !bDoNotRequestCount) {
 					const bDataAggregation = _Helper.isDataAggregation(that.mParameters);
 					const iOldCount = bDataAggregation && that.getCount();
@@ -5455,27 +5457,28 @@ sap.ui.define([
 	 * to get the list up-to-date, so setting the grand total or subtotals to outdated also causes
 	 * an outdated header context.
 	 *
-	 * Subtotals are set to outdated independent of the use case.
-	 *
 	 * @param {string} sUseCase
 	 *   The use case which caused the (potential) outdating; supported values are:
 	 *   <ul>
 	 *     <li> "createActive": an active created entity is part of the creation area of the list
 	 *       and it may disappear or appear in a different position after a refresh, so a manual
 	 *       refresh is always needed; the grand total is additionally set to outdated if there are
-	 *       any filters;
+	 *       any filters; subtotals are set to outdated;
 	 *     <li> "delete": an entity is deleted via its context; a manual refresh might be necessary
 	 *       only if visual grouping is used; otherwise, the entity is directly removed from the
-	 *       list and no refresh is needed; the grand total is never set to outdated;
+	 *       list and no refresh is needed; the grand total is never set to outdated; subtotals are
+	 *       set to outdated;
 	 *     <li> "deleteViaPath": an entity was deleted via its path and no grand total is requested,
-	 *       so a manual refresh is needed; the grand total is set to outdated;
+	 *       so a manual refresh is needed; the grand total is set to outdated; subtotals are set to
+	 *       outdated;
 	 *     <li> "refreshEntity": a single entity is refreshed; if there are filters, sorters or
 	 *       grouping, a manual refresh might be needed; the grand total is additionally set to
-	 *       outdated if there are any filters;
+	 *       outdated if there are any filters; subtotals are set to outdated;
 	 *     <li> "": properties given in <code>aPaths</code> are updated or requested as a side
 	 *       effect; if these properties are used for filtering, sorting or grouping, a manual
 	 *       refresh is needed; the grand total is additionally set to outdated if a given property
-	 *       is used for filtering;
+	 *       is used for filtering; subtotals are set to outdated if the given properties contribute
+	 *       to subtotals, visual grouping, are used for filtering, or if search is used;
 	 *   </ul>
 	 * @param {string[]} [aPaths]
 	 *   An optional array of "14.4.1.5 Expression edm:NavigationPropertyPath" or
@@ -5504,6 +5507,7 @@ sap.ui.define([
 			const bVisualGrouping = oAggregation.groupLevels.length > 0;
 			let bGrandTotalOutdated;
 			let bHeaderContextOutdated;
+			let bSubtotalsOutdated = true;
 			switch (sUseCase) {
 				case "createActive":
 					bGrandTotalOutdated = bHasSearchOrCustomQueryOptions || this.isFilteredBy();
@@ -5532,23 +5536,31 @@ sap.ui.define([
 				case "":
 					bGrandTotalOutdated = bHasSearchOrCustomQueryOptions
 						|| this.isFilteredBy(aPaths);
-					bHeaderContextOutdated = bGrandTotalOutdated || bVisualGrouping
-						|| this.isSortedBy(aPaths);
+					bSubtotalsOutdated = bGrandTotalOutdated
+						|| _AggregationHelper.isUsedForSubtotals(aPaths, oAggregation)
+						// if a group property is affected the entry may occur in a different group
+						// when scrolling, then the subtotals may be inconsistent
+						|| _AggregationHelper.isUsedForGroupLevels(aPaths, oAggregation);
+					bHeaderContextOutdated = bSubtotalsOutdated || this.isSortedBy(aPaths);
+					if (bNoRequest
+							&& (bHeaderContextOutdated
+							|| _AggregationHelper.isUsedForGrandTotal(aPaths,
+								oAggregation.aggregate))) {
+						throw new Error(
+							"Missing PATCH request when @$ui5.context.isOutdated would be set");
+					}
 					break;
 				default:
 					throw new Error("Unknown use case: " + sUseCase);
-			}
-			if (bNoRequest
-					&& (bHeaderContextOutdated
-					|| _AggregationHelper.isUsedForGrandTotal(aPaths, oAggregation.aggregate))) {
-				throw new Error("Missing PATCH request when @$ui5.context.isOutdated would be set");
 			}
 			if (bGrandTotalOutdated) {
 				this.oCache.setGrandTotalOutdated?.(true);
 			}
 			if (bHeaderContextOutdated) {
 				this.oHeaderContext.setOutdated(true);
-				this.oCache.setSubtotalsOutdated?.();
+				if (bSubtotalsOutdated) {
+					this.oCache.setSubtotalsOutdated?.();
+				}
 			}
 		}
 	};

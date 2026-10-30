@@ -13,7 +13,8 @@
 	xmlns:uxap="sap.uxap"
 	xmlns:layout="sap.ui.layout"
 	xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
-	controllerName="sap.ui.rta.test.additionalElements.ComplexTest">
+	controllerName="sap.ui.rta.test.additionalElements.ComplexTest"
+>
 
 	<!--The view is is bound to EntityType01 in the controller -->
 	<Page title="{i18n>appTitle}">
@@ -24,30 +25,30 @@
 			<uxap:ObjectPageLayout id="ObjectPageLayout">
 				<uxap:headerTitle>
 					<uxap:ObjectPageHeader
-							id="obheader0"
-							objectTitle="Available Elements Test App (view bound to EntityType01): {Property01}"
-							objectSubtitle="{Property02} : {Property03}"
-							objectImageURI="">
-					</uxap:ObjectPageHeader>
+						id="obheader0"
+						objectTitle="Available Elements Test App (view bound to EntityType01): {Property01}"
+						objectSubtitle="{Property02} : {Property03}"
+						objectImageURI=""
+					/>
 				</uxap:headerTitle>
 				<uxap:sections>
 
 					<uxap:ObjectPageSection id="ObjectPageSectionWithRadioButtons" title="Extension Data Mock">
 						<uxap:ObjectPageSubSection>
 							<layout:VerticalLayout class="sapUiContentPadding" width="100%" id="RadioButtonVerticalLayout">
-								<FormattedText 
+								<FormattedText
 									htmlText="&lt;p style=&quot;font-weight:bold&quot;>Restart RTA for the change to take effect:&lt;/p>"
 									visible="{view>/extensibilityEnabled}"
 								/>
-								<FormattedText 
+								<FormattedText
 									htmlText="&lt;p style=&quot;color:red; font-weight:bold&quot;>The Extension Data Mock only works with FLP&lt;/p>"
 									visible="{= !${view>/extensibilityEnabled} }"
 								/>
 								<RadioButtonGroup id="ExtensionDataRadioButtonGroup" enabled="{view>/extensibilityEnabled}">
-										<RadioButton text="Extension Data with multiple Options" selected="true" />
-										<RadioButton text="Extension Data with one Option" />
-										<RadioButton text="Extension Data with no Options (Legacy)"  />
-										<RadioButton text="No Extension Data" />
+									<RadioButton text="Extension Data with multiple Options" selected="true" />
+									<RadioButton text="Extension Data with one Option" />
+									<RadioButton text="Extension Data with no Options (Legacy)"  />
+									<RadioButton text="No Extension Data" />
 								</RadioButtonGroup>
 							</layout:VerticalLayout>
 						</uxap:ObjectPageSubSection>
@@ -78,14 +79,14 @@
 										<smartField:SmartField value="{Property04}" />
 									</smartForm:GroupElement>
 									<smartForm:GroupElement label="Ignored Property05 bound" id="EntityType01.BoundButton" >
-										<Button text="{Property05}"></Button>
+										<Button text="{Property05}" />
 									</smartForm:GroupElement>
 									<smartForm:GroupElement label="No-Bound-Field" id="EntityType01.BoundButton34" >
-										<Button text="{i18n>buttonText}"></Button>
-										<TextArea value="Some Text"></TextArea>
+										<Button text="{i18n>buttonText}" />
+										<TextArea value="Some Text" />
 									</smartForm:GroupElement>
 									<smartForm:GroupElement id="EntityType01.UnboundButton" >
-										<Button text="No Binding"></Button>
+										<Button text="No Binding" />
 									</smartForm:GroupElement>
 									<smartForm:GroupElement id="EntityType01.CommonProperty" visible="false">
 										<smartField:SmartField value="{CommonPropertyName}" />
@@ -113,14 +114,18 @@
 									</smartForm:GroupElement>
 									<smartForm:GroupElement id="FormActivationElement" label="Template using another model + bound field">
 										<Select
-											id="FormSelect" items="{path: '/activation', templateShareable: false}">
+											id="FormSelect"
+											items="{path: '/activation', templateShareable: false}"
+										>
 											<core:Item key="{key}" text="{text}" />
 										</Select>
 										<smartField:SmartField editable="true" contextEditable="true" value="{Property01}"/>
 									</smartForm:GroupElement>
 									<smartForm:GroupElement id="FormActivationElementAlone" label="Template using another model alone">
 										<Select
-											id="FormSelectAlone" items="{path: '/activation', templateShareable: false}">
+											id="FormSelectAlone"
+											items="{path: '/activation', templateShareable: false}"
+										>
 											<core:Item key="{key}" text="{text}" />
 										</Select>
 									</smartForm:GroupElement>
@@ -134,17 +139,17 @@
 										<smartField:SmartField value="{EntityType02_Complex/ComplexProperty02}"/>
 									</smartForm:GroupElement>
 									<smartForm:GroupElement label="Property02 bound button" id="EntityType02.Prop2Button" >
-										<Button text="{EntityType02_Property02}"></Button>
+										<Button text="{EntityType02_Property02}" />
 									</smartForm:GroupElement>
 									<smartForm:GroupElement label="{i18n>customLabel}" id="ComplexBindingCase">
 										<TextArea id="mytextarea" value="{EntityType02_Property03} {EntityType02_Complex/ComplexProperty02}"/>
 									</smartForm:GroupElement>
 									<smartForm:GroupElement label="No-Bound-Field" id="EntityType02.BoundButton34" >
-										<Button text="{i18n>buttonText}"></Button>
-										<TextArea value="Some Text"></TextArea>
+										<Button text="{i18n>buttonText}" />
+										<TextArea value="Some Text" />
 									</smartForm:GroupElement>
 									<smartForm:GroupElement id="EntityType02.UnboundButton" >
-										<Button text="No Binding"></Button>
+										<Button text="No Binding" />
 									</smartForm:GroupElement>
 									<smartForm:GroupElement label="Partially visible combined field, real use case from SD CustomerReturn_OP_F1708Type" id="EntityType02.PartiallyVisible" >
 										<smartField:SmartField value="{EntityType02_Property05}"/>
@@ -207,7 +212,10 @@
 					<uxap:ObjectPageSection id="DelegateObjectPageSectionWithForm" title="Objectpage section with form and delegate">
 						<uxap:ObjectPageSubSection>
 							<!--This Form is bound to EntityType02 in the controller -->
-							<form:Form id="DelegateMainForm" title="Form  with Delegate assigned bound to EntityType02" editable="true"
+							<form:Form
+								id="DelegateMainForm"
+								title="Form  with Delegate assigned bound to EntityType02"
+								editable="true"
 								fl:delegate='{ "name": "sap/ui/rta/test/additionalElements/V2StackDelegate" }'
 							>
 								<form:layout>
@@ -235,14 +243,14 @@
 											<Input value="{Property04}" />
 										</form:FormElement>
 										<form:FormElement label="Ignored Property05 bound" id="DelegateEntityType01.BoundButton" >
-											<Button text="{Property05}"></Button>
+											<Button text="{Property05}" />
 										</form:FormElement>
 										<form:FormElement label="No-Bound-Field" id="DelegateEntityType01.BoundButton34" >
-											<Button text="{i18n>buttonText}"></Button>
-											<TextArea value="Some Text"></TextArea>
+											<Button text="{i18n>buttonText}" />
+											<TextArea value="Some Text" />
 										</form:FormElement>
 										<form:FormElement id="DelegateEntityType01.UnboundButton" >
-											<Button text="No Binding"></Button>
+											<Button text="No Binding" />
 										</form:FormElement>
 										<form:FormElement id="DelegateEntityType01.CommonProperty" visible="false" label="CommonProp">
 											<Input value="{CommonPropertyName}" />
@@ -269,17 +277,17 @@
 											<Input value="{EntityType02_Complex/ComplexProperty02}"/>
 										</form:FormElement>
 										<form:FormElement label="Property02 bound button" id="DelegateEntityType02.Prop2Button" >
-											<Button text="{EntityType02_Property02}"></Button>
+											<Button text="{EntityType02_Property02}" />
 										</form:FormElement>
 										<form:FormElement label="{i18n>customLabel}" id="DelegateComplexBindingCase">
 											<TextArea id="Delegatemytextarea" value="{EntityType02_Property03} {EntityType02_Complex/ComplexProperty02}"/>
 										</form:FormElement>
 										<form:FormElement label="No-Bound-Field" id="DelegateEntityType02.BoundButton34" >
-											<Button text="{i18n>buttonText}"></Button>
-											<TextArea value="Some Text"></TextArea>
+											<Button text="{i18n>buttonText}" />
+											<TextArea value="Some Text" />
 										</form:FormElement>
 										<form:FormElement id="DelegateEntityType02.UnboundButton" label="unbound">
-											<Button text="No Binding"></Button>
+											<Button text="No Binding" />
 										</form:FormElement>
 										<form:FormElement label="Partially visible combined field, real use case from SD CustomerReturn_OP_F1708Type" id="DelegateEntityType02.PartiallyVisible" >
 											<Input value="{EntityType02_Property05}"/>
@@ -346,33 +354,36 @@
 						<uxap:ObjectPageSubSection id="ObjectPageSubSectionForNavigation" blocks="{ path: 'to_EntityType01Nav', length: 1, templateShareable: false }">
 							<!-- This form is bound to EntityTypeNav through navigation in the controller -->
 							<smartForm:SmartForm id="NavPropertyForm" title="Smart Form bound to EntityTypeNav using navigation">
-									<smartForm:Group id="NavPropertyGroup" title="Group for navigation property">
-										<smartForm:GroupElement id="NavPropertyGroupElement" label="Relative navigation property">
-											<smartField:SmartField value="{NavProperty}"/>
-										</smartForm:GroupElement>
-									</smartForm:Group>
-									<smartForm:Group id="OtherGroup" title="Other Group" >
-										<smartForm:GroupElement id="NavForm.EntityType01.Prop1" label="Element bound to EntityType01" binding="{path: &quot;/EntityTypes(Property01='propValue01',Property02='propValue02',Property03='propValue03')&quot;}">
-											<smartField:SmartField editable="true" contextEditable="true" value="{Property01}"/>
-										</smartForm:GroupElement>
-										<smartForm:GroupElement id="OtherGroup.UnboundButton" label="Button without binding">
-											<Button text="No Binding"></Button>
-										</smartForm:GroupElement>
-									</smartForm:Group>
+								<smartForm:Group id="NavPropertyGroup" title="Group for navigation property">
+									<smartForm:GroupElement id="NavPropertyGroupElement" label="Relative navigation property">
+										<smartField:SmartField value="{NavProperty}"/>
+									</smartForm:GroupElement>
+								</smartForm:Group>
+								<smartForm:Group id="OtherGroup" title="Other Group" >
+									<smartForm:GroupElement id="NavForm.EntityType01.Prop1" label="Element bound to EntityType01" binding="{path: &quot;/EntityTypes(Property01='propValue01',Property02='propValue02',Property03='propValue03')&quot;}">
+										<smartField:SmartField editable="true" contextEditable="true" value="{Property01}"/>
+									</smartForm:GroupElement>
+									<smartForm:GroupElement id="OtherGroup.UnboundButton" label="Button without binding">
+										<Button text="No Binding" />
+									</smartForm:GroupElement>
+								</smartForm:Group>
 							</smartForm:SmartForm>
 						</uxap:ObjectPageSubSection>
 					</uxap:ObjectPageSection>
 
-					<uxap:ObjectPageSection id="ObjectPageSectionForNavigationWithoutOtherGroup" title="Object Page Section with only Form bound to navigation properties"
-						visible="false">
+					<uxap:ObjectPageSection
+						id="ObjectPageSectionForNavigationWithoutOtherGroup"
+						title="Object Page Section with only Form bound to navigation properties"
+						visible="false"
+					>
 						<uxap:ObjectPageSubSection id="ObjectPageSubSectionForNavigationWithoutOtherGroup" blocks="{ path: 'to_EntityType01Nav', length: 1, templateShareable: false }">
 							<!-- This form is bound to EntityTypeNav through navigation in the controller -->
 							<smartForm:SmartForm id="OnlyNavPropertyForm" title="Smart Form bound to EntityTypeNav using navigation only">
-									<smartForm:Group id="OnlyNavPropertyGroup" title="Group for navigation property only">
-										<smartForm:GroupElement id="OnlyNavPropertyGroupElement" label="Relative navigation property only">
-											<smartField:SmartField value="{NavProperty}"/>
-										</smartForm:GroupElement>
-									</smartForm:Group>
+								<smartForm:Group id="OnlyNavPropertyGroup" title="Group for navigation property only">
+									<smartForm:GroupElement id="OnlyNavPropertyGroupElement" label="Relative navigation property only">
+										<smartField:SmartField value="{NavProperty}"/>
+									</smartForm:GroupElement>
+								</smartForm:Group>
 							</smartForm:SmartForm>
 						</uxap:ObjectPageSubSection>
 					</uxap:ObjectPageSection>
@@ -381,14 +392,14 @@
 						<uxap:ObjectPageSubSection id="ObjectPageSubSectionForAggrBinding" blocks="{ path: 'to_EntityType01Nav', templateShareable: false }">
 							<!-- This form is bound to EntityTypeNav through navigation in the controller -->
 							<smartForm:SmartForm id="NavPropertyFormForAggrBinding" title="Smart Form bound to EntityTypeNav">
-									<smartForm:Group id="NavPropertyGroupForAggrBinding" title="Group" >
-										<smartForm:GroupElement id="EntityType01_Prop1" label="First bound element">
-											<smartField:SmartField editable="true" contextEditable="true" value="{EntityTypeNav_Property01}"/>
-										</smartForm:GroupElement>
-										<smartForm:GroupElement id="EntityType01_Prop2" label="Second bound element">
-											<smartField:SmartField editable="true" contextEditable="true" value="{EntityTypeNav_Property02}"/>
-										</smartForm:GroupElement>
-									</smartForm:Group>
+								<smartForm:Group id="NavPropertyGroupForAggrBinding" title="Group" >
+									<smartForm:GroupElement id="EntityType01_Prop1" label="First bound element">
+										<smartField:SmartField editable="true" contextEditable="true" value="{EntityTypeNav_Property01}"/>
+									</smartForm:GroupElement>
+									<smartForm:GroupElement id="EntityType01_Prop2" label="Second bound element">
+										<smartField:SmartField editable="true" contextEditable="true" value="{EntityTypeNav_Property02}"/>
+									</smartForm:GroupElement>
+								</smartForm:Group>
 							</smartForm:SmartForm>
 						</uxap:ObjectPageSubSection>
 					</uxap:ObjectPageSection>
@@ -415,7 +426,9 @@
 					</uxap:ObjectPageSection>
 					<uxap:ObjectPageSection id="ObjectPageSectionSimpleForm" title="Visible ObjectPage Section">
 						<uxap:ObjectPageSubSection>
-							<form:SimpleForm title="SimpleForm with titles" id="SimpleForm"
+							<form:SimpleForm
+								title="SimpleForm with titles"
+								id="SimpleForm"
 								maxContainerCols="3"
 								editable="true"
 								layout="ColumnLayout"
@@ -428,7 +441,8 @@
 								columnsXL="3"
 								columnsL="2"
 								columnsM="2"
-								class="editableForm">
+								class="editableForm"
+							>
 								<form:content>
 									<core:Title id="Title1" text="1. Group Bound to EntityType01" />
 									<Label id="Label11" text="Property01" />
@@ -481,7 +495,9 @@
 											<Text id="celltext2" text="{EntityTypeNav_Property02}" />
 											<Text id="celltext3" text="{EntityTypeNav_Property03}" />
 											<Select
-												id="TableSelect" items="{path: '/activation', templateShareable: false}">
+												id="TableSelect"
+												items="{path: '/activation', templateShareable: false}"
+											>
 												<core:Item key="{key}" text="{text}" />
 											</Select>
 										</cells>

@@ -562,13 +562,6 @@ html[data-sap-ui-browser^='sf'] .sapMPopover {
 	}
 }
 
-html[data-sap-ui-browser^='sf'] .sapMPopover.sapMPopoverVerticalScrollIncluded {
-
-	.sapMPopoverScroll {
-		width: calc(~'100% + 20px');
-	}
-
-	.sapMPopoverCont {
-		padding-right: 20px;
-	}
+.sapMPopover.sapMPopoverVerticalScrollIncluded .sapMPopoverCont {
+	scrollbar-gutter: stable;
 }

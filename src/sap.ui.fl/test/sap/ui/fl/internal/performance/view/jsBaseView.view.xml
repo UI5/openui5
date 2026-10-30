@@ -3,7 +3,8 @@
 	xmlns="sap.m"
 	xmlns:l="sap.ui.layout"
 	xmlns:vm="sap.ui.fl.variants"
-	controllerName="fl.performance.view.jsBaseView">
+	controllerName="fl.performance.view.jsBaseView"
+>
 	<l:HorizontalLayout id="HorizontalLayout">
 		<l:VerticalLayout id="ContainerLayout">
 			<vm:VariantManagement id="variantManagementOrdersTable" for="HorizontalLayout" updateVariantInURL="true" />

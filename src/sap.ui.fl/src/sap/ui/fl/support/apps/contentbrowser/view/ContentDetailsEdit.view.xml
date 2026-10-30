@@ -1,15 +1,19 @@
-<mvc:View xmlns:mvc="sap.ui.core.mvc"
-		  xmlns="sap.m" controllerName="sap.ui.fl.support.apps.contentbrowser.controller.ContentDetailsEdit"
-		  xmlns:f="sap.ui.layout.form">
+<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	controllerName="sap.ui.fl.support.apps.contentbrowser.controller.ContentDetailsEdit"
+	xmlns:f="sap.ui.layout.form"
+>
 	<Page title="{path: 'selectedContent>/', formatter: '.oDataUtils.formatItemTitle'}">
 		<f:SimpleForm
-				maxContainerCols="1"
-				editable="false"
-				layout="ResponsiveGridLayout"
-				labelSpanL="12"
-				labelSpanM="12"
-				columnsL="1"
-				columnsM="1">
+			maxContainerCols="1"
+			editable="false"
+			layout="ResponsiveGridLayout"
+			labelSpanL="12"
+			labelSpanM="12"
+			columnsL="1"
+			columnsM="1"
+		>
 			<TextArea id="dataTextArea" class="codeBlock" rows="50" value="{selectedContent>/data}" />
 		</f:SimpleForm>
 		<footer>

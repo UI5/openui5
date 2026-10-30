@@ -143,16 +143,14 @@ describe("sap.m.ComboBox", function() {
 	});
 
 	// ComboBox - ENTER on group header
-	it("should not close ComboBox dropdown on performing ENTER key on group header", function() {
+	it("should skip group header on arrow down", function() {
 		browser.executeScript('document.getElementById("combo-grouping").scrollIntoView()').then(function() {
 			var comboboxGroupingArrow = element(by.id("combo-grouping-arrow"));
 			comboboxGroupingArrow.click();
 			browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
-			browser.actions().sendKeys(protractor.Key.ENTER).perform();
-			expect(takeScreenshot()).toLookAs("combobox_dropdown_open_group");
-			browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
-			browser.actions().sendKeys(protractor.Key.ENTER).perform();
-			expect(takeScreenshot()).toLookAs("combobox_dropdown_closed_non_group");
+			expect(takeScreenshot()).toLookAs("combobox_group_header_skipped");
+			browser.actions().sendKeys(protractor.Key.ARROW_UP).perform();
+			expect(takeScreenshot()).toLookAs("combobox_input_focused");
 		});
 	});
 

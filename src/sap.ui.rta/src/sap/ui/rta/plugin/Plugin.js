@@ -157,6 +157,11 @@ sap.ui.define([
 			}
 		};
 
+		// If the element is meant to be visible but its overlay has no visible geometry yet,
+		// wait for the overlay to be rendered before running the callback — editable checks may
+		// depend on DOM geometry. Otherwise (already rendered, or element not visible at all)
+		// run immediately; an invisible overlay may never fire geometryChanged, so deferring
+		// would drop the callback.
 		const mOverlayGeometry = oElementOverlay.getGeometry();
 		if (
 			oElementOverlay.getElementVisibility()

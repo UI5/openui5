@@ -185,7 +185,12 @@ sap.ui.define([
 	 */
 	Microchart.create = function (oChartSettings, bIsForHeader) {
 		var oChart,
-			sForceHeight = "1rem";
+			sForceHeight = "1rem",
+			bIsStackedBar = oChartSettings.type === "StackedBar";
+
+		if (!bIsStackedBar && !bIsForHeader && oChartSettings.size === Size.S) {
+			Log.error("Size 'S' is not supported for charts in list items. It is only available in the card header.", "sap.ui.integration.controls.Microchart");
+		}
 
 		if (oChartSettings.type === "Bullet") {
 			oChart = Microchart._createBulletChart(oChartSettings);
@@ -207,7 +212,7 @@ sap.ui.define([
 
 		const oMicrochart = new Microchart({
 			valueColor: BindingHelper.reuse(oChartSettings.color),
-			size: prepareSize(oChartSettings.size),
+			size: bIsStackedBar ? Size.Responsive : prepareSize(oChartSettings.size),
 			displayValue: oChartSettings.displayValue,
 			chart: oChart,
 			height: sForceHeight,
@@ -259,6 +264,10 @@ sap.ui.define([
 	 * @returns {sap.suite.ui.microcharts.StackedBarChart } new StackedBarChart.
 	 */
 	Microchart._createStackedBarChart = function (oChartSettings) {
+		if (oChartSettings.size) {
+			Log.error("The 'size' property is not supported for the stacked bar chart and will be ignored.", "sap.ui.integration.controls.Microchart");
+		}
+
 		var aBars = oChartSettings.bars.map(function (oBar) {
 			var vColor = validateBarValueColor(oBar.color);
 			return new StackedBarMicroChartBar({
@@ -269,7 +278,6 @@ sap.ui.define([
 		});
 
 		return new StackedBarMicroChart({
-			size: prepareSize(oChartSettings.size),
 			bars: aBars,
 			maxValue: oChartSettings.maxValue,
 			displayZeroValue: oChartSettings.displayZeroValue
@@ -287,6 +295,7 @@ sap.ui.define([
 				size: prepareSize(oChartSettings.size),
 				total: oChartSettings.total,
 				totalScale: oChartSettings.totalScale,
+				showTotal: oChartSettings.showTotal,
 				alignContent: "Right",
 				items: [
 					new HarveyBallMicroChartItem({
@@ -315,6 +324,7 @@ sap.ui.define([
 			maxYValue: oChartSettings.maxYValue,
 			minYValue: oChartSettings.minYValue,
 			threshold: oChartSettings.threshold,
+			showThresholdLine: oChartSettings.showThresholdLine,
 			leftTopLabel: oChartSettings.leftTopLabel,
 			leftBottomLabel: oChartSettings.leftBottomLabel,
 			rightTopLabel:oChartSettings.rightTopLabel,
@@ -411,7 +421,6 @@ sap.ui.define([
 	Microchart._createColumnChart = function (oChartSettings){
 		var mSettings = {
 			size: prepareSize(oChartSettings.size),
-			allowColumnLabels: oChartSettings.allowColumnLabels,
 			leftTopLabel: new ColumnMicroChartLabel({ label: oChartSettings.leftTopLabel }),
 			leftBottomLabel: new ColumnMicroChartLabel({ label: oChartSettings.leftBottomLabel }),
 			rightTopLabel: new ColumnMicroChartLabel({ label: oChartSettings.rightTopLabel }),

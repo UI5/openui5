@@ -5,7 +5,8 @@
 	xmlns:uxap="sap.uxap"
 	xmlns:vm="sap.ui.fl.variants"
 	xmlns:l="sap.ui.layout"
-	xmlns:form="sap.ui.layout.form">
+	xmlns:form="sap.ui.layout.form"
+>
 	<Page title="Variant Management Testapp" id="page" enableScrolling="false">
 		<content>
 			<Button id="Button" text="Test" />
@@ -23,15 +24,16 @@
 			<uxap:ObjectPageLayout id="ObjectPageLayout">
 				<uxap:headerTitle>
 					<uxap:ObjectPageHeader
-							id="obheader0"
-							objectTitle="VMTitle"
-							objectSubtitle="VMSubtitle"
-							objectImageURI="">
+						id="obheader0"
+						objectTitle="VMTitle"
+						objectSubtitle="VMSubtitle"
+						objectImageURI=""
+					>
 						<uxap:navigationBar>
 							<Bar>
 								<contentRight>
-									<vm:VariantManagement id="VariantManagement1" for="ObjectPageLayout" updateVariantInURL="true"></vm:VariantManagement>
-									<vm:VariantManagement id="VariantManagement3" for="hbox1 hbox2" updateVariantInURL="true"></vm:VariantManagement>
+									<vm:VariantManagement id="VariantManagement1" for="ObjectPageLayout" updateVariantInURL="true" />
+									<vm:VariantManagement id="VariantManagement3" for="hbox1 hbox2" updateVariantInURL="true" />
 								</contentRight>
 							</Bar>
 						</uxap:navigationBar>
@@ -41,12 +43,14 @@
 				<uxap:sections>
 					<uxap:ObjectPageSection id="ObjectPageSection1">
 						<uxap:ObjectPageSubSection  id="ObjectPageSubSection1" title="SubSectionTitle1">
-							<form:SimpleForm class="sapUiSmallMargin"
-											 title="Simple Form"
-											 layout="ColumnLayout"
-											 id="MainForm"
-											 maxContainerCols="3"
-											 editable="true">
+							<form:SimpleForm
+								class="sapUiSmallMargin"
+								title="Simple Form"
+								layout="ColumnLayout"
+								id="MainForm"
+								maxContainerCols="3"
+								editable="true"
+							>
 								<form:content>
 									<core:Title id="Title1" text="Title 1" />
 									<Label id="Label1" text="Label 1" />
@@ -66,11 +70,14 @@
 
 					<uxap:ObjectPageSection id="ObjectPageSection2" title="SectionTitle2">
 						<uxap:ObjectPageSubSection>
-							<form:SimpleForm class="sapUiNoMargin"
-											 title="Simple Form bound to EntityTypeNav using navigation" id="NavPropertyForm"
-											 maxContainerCols="3"
-											 layout="ColumnLayout"
-											 editable="true">
+							<form:SimpleForm
+								class="sapUiNoMargin"
+								title="Simple Form bound to EntityTypeNav using navigation"
+								id="NavPropertyForm"
+								maxContainerCols="3"
+								layout="ColumnLayout"
+								editable="true"
+							>
 								<form:content>
 									<core:Title id="Title3" text="Title 3" />
 									<Label id="Label5" text="Label 5" />
@@ -93,11 +100,11 @@
 							<l:Grid>
 								<Bar>
 									<contentRight>
-										<vm:VariantManagement id="VariantManagement2" for="ObjectPageSection3" updateVariantInURL="true"></vm:VariantManagement>
+										<vm:VariantManagement id="VariantManagement2" for="ObjectPageSection3" updateVariantInURL="true" />
 									</contentRight>
 								</Bar>
-								<Title id="TextTitle1" text="Text Title 1"></Title>
-								<Title id="TextTitle2" text="Text Title 2"></Title>
+								<Title id="TextTitle1" text="Text Title 1" />
+								<Title id="TextTitle2" text="Text Title 2" />
 							</l:Grid>
 						</uxap:ObjectPageSubSection>
 					</uxap:ObjectPageSection>
@@ -108,8 +115,7 @@
 			<uxap:ObjectPageLayout id="ObjectPageLayout2">
 				<uxap:sections>
 					<uxap:ObjectPageSection id="ObjectPageSection21">
-						<uxap:ObjectPageSubSection  id="ObjectPageSubSection21" title="SubSectionTitle21">
-						</uxap:ObjectPageSubSection>
+						<uxap:ObjectPageSubSection  id="ObjectPageSubSection21" title="SubSectionTitle21" />
 					</uxap:ObjectPageSection>
 				</uxap:sections>
 			</uxap:ObjectPageLayout>

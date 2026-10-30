@@ -25096,6 +25096,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					LifecycleStatus : {additionally : [\'LifecycleStatusDesc\']}\
 				}\
 			},\
+			$count : true,\
 			$orderby : \'LifecycleStatusDesc asc\'\
 		}}">\
 	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>\
@@ -25840,6 +25841,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const oBinding = oTable.getBinding("rows");
 		const oHeaderContext = oBinding.getHeaderContext();
 
+		this.oLogMock.expects("warning").thrice()
+			.withExactArgs("Missing system query option $count",
+				sSalesOrderService + "SalesOrderList?sap-client=123&$expand=SO_2_BP"
+				+ "&$filter=LifecycleStatus%20gt%20'P'"
+				+ "&$select=CurrencyCode,GrossAmount,SalesOrderID",
+				"sap.ui.model.odata.v4.lib._AggregationCache");
 		this.expectChange("count", "42")
 			.expectChange("isOutdatedHeader", undefined);
 
@@ -26047,6 +26054,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Test side effect for messages (JIRA: CPOUI5ODATAV4-3390)
 	// Must not change groupLevels when inactive contexts are at bottom (JIRA: CPOUI5ODATAV4-3683)
+	//
+	// The subtotals configuration for the aggregate GrossAmount must not influence the outdated
+	// state of the header context if there are no groupLevels configured.
+	// JIRA: CPOUI5ODATAV4-3702
 	[
 		"context refresh",
 		"requestSideEffects-combine calls and request grand total once",
@@ -26083,7 +26094,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			parameters : {
 				$$aggregation : {
 					aggregate : {
-						GrossAmount : {grandTotal : true, unit : 'CurrencyCode'}
+						GrossAmount : {grandTotal : true, subtotals : true, unit : 'CurrencyCode'}
 					},
 					grandTotalAtBottomOnly : false,
 					group : {
@@ -26245,6 +26256,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						value : [{CurrencyCode : "EUR", GrossAmount : "46"}]
 					})
 					.expectChange("isOutdated", [false,,, false])
+					// no change for isOutdatedHeader (JIRA: CPOUI5ODATAV4-3702)
 					.expectChange("grossAmount", ["46",,, "46"]);
 
 				await Promise.all([
@@ -26278,6 +26290,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						value : [{CurrencyCode : "EUR", GrossAmount : "46"}]
 					})
 					.expectChange("isOutdated", [false,,, false])
+					// no change for isOutdatedHeader (JIRA: CPOUI5ODATAV4-3702)
 					.expectChange("grossAmount", ["46", "42",, "46"]);
 
 				await Promise.all([
@@ -26447,6 +26460,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			} else if (sScenario === "multiple setProperty in multiple $batches") {
 				let fnRespond;
 				this.expectChange("grossAmount", [, "42"])
+					// no change for isOutdatedHeader (JIRA: CPOUI5ODATAV4-3702)
 					.expectRequest("#2 PATCH SalesOrderList('25')?sap-client=123",
 						{payload : {GrossAmount : "42"}},
 						new Promise(function (resolve) {
@@ -29090,64 +29104,88 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-825
 	//
 	// All levels present as groups (JIRA: CPOUI5ODATAV4-2755)
-	// Editing works via navigation on leaf level (JIRA: CPOUI5ODATAV4-3438)
+	// Editing works via navigation on single entity leaf level (JIRA: CPOUI5ODATAV4-3438)
 	// Overlapping paths for "additionally" on different group levels (JIRA: CPOUI5ODATAV4-3438)
 	// Late property requests via API & UI (JIRA: CPOUI5ODATAV4-3438)
 	// Delete w/ visual grouping works on leaf level w/ $count & outdated (JIRA: CPOUI5ODATAV4-3398)
+	// Delete a kept-alive outside the collection works w/ $count (JIRA: CPOUI5ODATAV4-3724)
+	// (Grand) parent can be collapsed before deleting a leaf (JIRA: CPOUI5ODATAV4-3729)
 	//
 	// If there are no subtotals, the @$ui5.context.isOutdated at group nodes is not set when
 	// editing or deleting a single entity.
 	// JIRA: CPOUI5ODATAV4-3502
+	//
+	// If a side effect is requested for a path prefix (e.g. 'Address') of an additional property
+	// (e.g. 'Address/RegionName') of a group used for visual grouping, the header context needs to
+	// be set to outdated as a manual refresh might be needed to reflect the changes. Avoid using
+	// search, filter, or sorter which already cause an outdated header context. A side effect for
+	// all structural properties, but no navigation properties, of an entity may change a group
+	// related property, so the header context needs to be set to outdated, too.
+	// JIRA: CPOUI5ODATAV4-3702
 	[false, true].forEach((bEdit) => {
-		const sTitle = "Data Aggregation: additionally via navigation; edit before delete = " + bEdit;
+		[false, true].forEach((bWithSearchFilterSort) => {
+			[false, true, 1].forEach((bCollapse) => { // 1: grand parent
+			const sTitle = "Data Aggregation: additionally via navigation; edit before delete = "
+				+ bEdit + ", with search/filter/sort = " + bWithSearchFilterSort
+				+ ", collapse before delete = " + bCollapse;
 
 		QUnit.test(sTitle, function (assert) {
-			var oArtist1,
+			var oArtist0,
+				oArtist1,
+				sFilters = bWithSearchFilterSort
+					? "filters : [{path : 'Name', operator : 'NE', value1 : 'TAFKAP'},"
+						+ "{path : 'sendsAutographs', operator : 'GE', value1 : false}],"
+					: "",
 				oIsActiveEntityTrue,
+				oListBinding,
 				oModel = this.createSpecialCasesModel({autoExpandSelect : true}),
 				oNameB,
+				fnOnBeforeDestroy0 = sinon.spy(),
+				sOrderby = bWithSearchFilterSort
+					? ",$orderby : 'BestPublication/DraftAdministrativeData/InProcessByUser desc"
+						+ ",BestFriend/Name,Address/City asc'"
+					: "",
+				sSearch = bWithSearchFilterSort ? "search : 'covfefe'," : "",
 				oTable,
-				sView = '\
-<Text id="count" text="{$count}"/>\
-<Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>\
-<t:Table id="table" rows="{path : \'/Artists\',\
-	filters : [{path : \'Name\', operator : \'NE\', value1 : \'TAFKAP\'},\
-		{path : \'sendsAutographs\', operator : \'GE\', value1 : false}],\
-	parameters : {\
-		$$aggregation : {\
-			aggregate : {\
-				sendsAutographs : {}\
-			},\
-			group : {\
-				ArtistID : {additionally : [\'Address/City\']},\
-				IsActiveEntity : {\
-					additionally : [\'BestPublication/DraftAdministrativeData/InProcessByUser\']\
-				},\
-				Name : {additionally : [\'Address/RegionName\', \'BestFriend/Name\']}\
-			},\
-			groupLevels : [\'IsActiveEntity\', \'Name\', \'ArtistID\'],\
-			search : \'covfefe\',\
-			subtotalsAtBottomOnly : true\
-		},\
-		$count : true,\
-		$orderby :\
-\'BestPublication/DraftAdministrativeData/InProcessByUser desc,BestFriend/Name,Address/City asc\'\
-	}}" threshold="0" visibleRowCount="6">\
-	<t:dependents><t_plugins:ODataV4Aggregation/></t:dependents>\
-	<Text id="groupLevelCount" text="{= %{@$ui5.node.groupLevelCount} }"/>\
-	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>\
-	<Text id="isOutdated" text="{= %{@$ui5.context.isOutdated} }"/>\
-	<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>\
-	<Text id="level" text="{= %{@$ui5.node.level} }"/>\
-	<Text id="isActiveEntity" text="{= %{IsActiveEntity} }"/>\
-	<Text id="inProcessByUser" text="{BestPublication/DraftAdministrativeData/InProcessByUser}"/>\
-	<Text id="name" text="{Name}"/>\
-	<Text id="bestFriendName" text="{BestFriend/Name}"/>\
-	<Text id="artistID" text="{ArtistID}"/>\
-	<Text id="city" text="{Address/City}"/>\
-	<Text id="sendsAutographs" text="{= %{sendsAutographs} }"/>\
-</t:Table>\
-<Text id="regionID" text="{Address/RegionID}"/>',
+				sView = `
+	<Text id="count" text="{$count}"/>
+	<Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>
+	<t:Table id="table" rows="{path : '/Artists',
+		${sFilters}
+		parameters : {
+			$$aggregation : {
+				aggregate : {
+					sendsAutographs : {}
+				},
+				group : {
+					ArtistID : {additionally : ['Address/City']},
+					IsActiveEntity : {
+						additionally : ['BestPublication/DraftAdministrativeData/InProcessByUser']
+					},
+					Name : {additionally : ['Address/RegionName', 'BestFriend/Name']}
+				},
+				groupLevels : ['IsActiveEntity', 'Name', 'ArtistID'],
+				${sSearch}
+				subtotalsAtBottomOnly : true
+			},
+			$count : true
+			${sOrderby}
+		}}" threshold="0" visibleRowCount="7">
+		<t:dependents><t_plugins:ODataV4Aggregation/></t:dependents>
+		<Text id="groupLevelCount" text="{= %{@$ui5.node.groupLevelCount} }"/>
+		<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>
+		<Text id="isOutdated" text="{= %{@$ui5.context.isOutdated} }"/>
+		<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>
+		<Text id="level" text="{= %{@$ui5.node.level} }"/>
+		<Text id="isActiveEntity" text="{= %{IsActiveEntity} }"/>
+		<Text id="inProcessByUser" text="{BestPublication/DraftAdministrativeData/InProcessByUser}"/>
+		<Text id="name" text="{Name}"/>
+		<Text id="bestFriendName" text="{BestFriend/Name}"/>
+		<Text id="artistID" text="{ArtistID}"/>
+		<Text id="city" text="{Address/City}"/>
+		<Text id="sendsAutographs" text="{= %{sendsAutographs} }"/>
+	</t:Table>
+	<Text id="regionID" text="{Address/RegionID}"/>`,
 				that = this;
 
 			// IsActiveEntity > Name > ArtistID
@@ -29158,17 +29196,25 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			//                  A
 			//                         n/a
 			//                  B
+			//                         0 (hero content, deleted early)
 			//                         1
 			//                         2
+			//                  C
+			//                         n/a
 
-			this.expectRequest("Artists"
-					+ "?$apply=filter(Name ne 'TAFKAP' and sendsAutographs ge false)/search(covfefe)"
-					+ "/concat(groupby((ArtistID,IsActiveEntity,Name))/aggregate($count as UI5__leaves)"
+			this.expectRequest("Artists?$apply="
+					+ (bWithSearchFilterSort
+						? "filter(Name ne 'TAFKAP' and sendsAutographs ge false)/search(covfefe)/"
+						: "")
+					+ "concat(groupby((ArtistID,IsActiveEntity,Name))/aggregate($count as UI5__leaves)"
 					+ ",groupby((IsActiveEntity,BestPublication/DraftAdministrativeData/InProcessByUser"
-						+ "))/orderby(BestPublication/DraftAdministrativeData/InProcessByUser desc)"
-						+ "/concat(aggregate($count as UI5__count),top(6)))", {
+						+ "))"
+						+ (bWithSearchFilterSort
+							? "/orderby(BestPublication/DraftAdministrativeData/InProcessByUser desc)"
+							: "")
+						+ "/concat(aggregate($count as UI5__count),top(7)))", {
 					value : [{
-						UI5__leaves : "4"
+						UI5__leaves : "6"
 					}, {
 						UI5__count : "2"
 					}, {
@@ -29206,9 +29252,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			return this.createView(assert, sView, oModel).then(function () {
 				oTable = that.oView.byId("table");
 				oIsActiveEntityTrue = oTable.getRows()[1].getBindingContext();
-				const oHeaderContext = oIsActiveEntityTrue.getBinding().getHeaderContext();
+				oListBinding = oIsActiveEntityTrue.getBinding();
+				const oHeaderContext = oListBinding.getHeaderContext();
+				assert.strictEqual(oListBinding.getCount(), 6);
 
-				that.expectChange("count", "4")
+				that.expectChange("count", "6")
 					.expectChange("isOutdatedHeader", undefined);
 
 				that.oView.byId("count").setBindingContext(oHeaderContext);
@@ -29243,11 +29291,57 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					assert.strictEqual(sRegionName, undefined, "not available here");
 				});
 
+				that.expectRequest("Artists(ArtistID='0',IsActiveEntity=true)"
+						+ "?$select=ArtistID,IsActiveEntity,Messages", {
+						groupId : "$auto.0" // Note: just to test-drive API
+					}, {
+						ArtistID : "0",
+						IsActiveEntity : true,
+						Messages : [] // Note: just to kick the tires on this API
+					});
+
+				oArtist0 = oListBinding.getKeepAliveContext(
+					"/Artists(ArtistID='0',IsActiveEntity=true)", /*bRequestMessages*/true, "$auto.0");
+				oArtist0.setKeepAlive(true, fnOnBeforeDestroy0, /*bRequestMessages*/true);
+
+				return that.waitForChanges(assert, "ODLB#getKeepAliveContext");
+			}).then(function () {
+				that.expectRequest("#0 DELETE Artists(ArtistID='0',IsActiveEntity=true)", oNO_CONTENT)
+					.expectRequest("#0 Artists/$count"
+						+ (bWithSearchFilterSort
+						? "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe"
+						: ""), 5)
+					.expectChange("isOutdatedHeader", true) // CPOUI5ODATAV4-3260
+					.expectChange("count", "5");
+
+				return Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-3724)
+					oArtist0.delete(),
+					that.waitForChanges(assert, "delete kept-alive outside the collection")
+				]);
+			}).then(function () {
+				// Note: subtle timing issues w/ ODLB#destroyPreviousContextsLater
+				sinon.assert.notCalled(fnOnBeforeDestroy0);
+				assert.strictEqual(oArtist0.getBinding(), oListBinding, "context not yet destroyed");
+
+				that.expectChange("isOutdatedHeader", false);
+
+				// BEWARE: not a public API - don't try this at home, kids!
+				oListBinding.getHeaderContext().setOutdated(false);
+
+				return that.waitForChanges(assert, "reset outdated");
+			}).then(function () {
+				sinon.assert.calledOnceWithExactly(fnOnBeforeDestroy0);
+				assert.strictEqual(oArtist0.getBinding(), undefined, "context destroyed");
+
 				that.expectRequest("Artists?$apply=filter(IsActiveEntity eq true"
-						+ " and (Name ne 'TAFKAP' and sendsAutographs ge false))/search(covfefe)"
-						+ "/groupby((Name,Address/RegionName,BestFriend/Name))/orderby(BestFriend/Name)"
-						+ "&$count=true&$skip=0&$top=6", {
-						"@odata.count" : "2",
+						+ (bWithSearchFilterSort
+							? " and (Name ne 'TAFKAP' and sendsAutographs ge false))/search(covfefe)/"
+							: ")/")
+						+ "groupby((Name,Address/RegionName,BestFriend/Name))"
+						+ (bWithSearchFilterSort ? "/orderby(BestFriend/Name)" : "")
+						+ "&$count=true&$skip=0&$top=7", {
+						"@odata.count" : "3",
 						value : [{
 							Address : {RegionName : "England"},
 							BestFriend : {Name : "A's best friend"},
@@ -29256,20 +29350,25 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							Address : {RegionName : "England"},
 							BestFriend : {Name : "B's best friend"},
 							Name : "B"
+						}, {
+							Address : {RegionName : "England"},
+							BestFriend : {Name : "C's best friend"},
+							Name : "C"
 						}]
 					})
-					.expectChange("groupLevelCount", [, 2, undefined, undefined])
-					.expectChange("isExpanded", [, true, false, false])
-					.expectChange("isOutdated", [,, undefined, undefined])
-					.expectChange("isTotal", [,, false, false])
-					.expectChange("level", [,, 2, 2])
-					.expectChange("isActiveEntity", [,, true, true])
-					.expectChange("inProcessByUser", [,, "", ""]) // Note: inherited from parent
-					.expectChange("name", [,, "A", "B"])
-					.expectChange("bestFriendName", [,, "A's best friend", "B's best friend"])
-					.expectChange("artistID", [,, null, null])
-					.expectChange("city", [,, null, null])
-					.expectChange("sendsAutographs", [,, undefined, undefined]);
+					.expectChange("groupLevelCount", [, 3, undefined, undefined, undefined])
+					.expectChange("isExpanded", [, true, false, false, false])
+					.expectChange("isOutdated", [,, undefined, undefined, undefined])
+					.expectChange("isTotal", [,, false, false, false])
+					.expectChange("level", [,, 2, 2, 2])
+					.expectChange("isActiveEntity", [,, true, true, true])
+					.expectChange("inProcessByUser", [,, "", "", ""]) // Note: inherited from parent
+					.expectChange("name", [,, "A", "B", "C"])
+					.expectChange("bestFriendName",
+						[,, "A's best friend", "B's best friend", "C's best friend"])
+					.expectChange("artistID", [,, null, null, null])
+					.expectChange("city", [,, null, null, null])
+					.expectChange("sendsAutographs", [,, undefined, undefined, undefined]);
 
 				return Promise.all([
 					// code under test
@@ -29310,11 +29409,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							+ ",BestPublication($select=PublicationID"
 								+ ";$expand=DraftAdministrativeData($select=DraftID,InProcessByUser))"
 						+ "&$filter=IsActiveEntity eq true and Name eq 'B'"
-							+ " and (Name ne 'TAFKAP' and sendsAutographs ge false)"
-						+ "&$orderby=Address/City asc&$search=covfefe"
+							+ (bWithSearchFilterSort
+								? " and (Name ne 'TAFKAP' and sendsAutographs ge false)"
+									+ "&$orderby=Address/City asc&$search=covfefe"
+								: "")
 						+ "&$select=Address/City,Address/RegionName,ArtistID,IsActiveEntity,Name"
 							+ ",sendsAutographs"
-						+ "&$skip=0&$top=6", {
+						+ "&$skip=0&$top=7", {
 						"@odata.count" : "2",
 						value : [{
 							Address : {City : "Liverpool", RegionName : "England"},
@@ -29355,18 +29456,19 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							sendsAutographs : true
 						}]
 					})
-					.expectChange("groupLevelCount", [,,, 2, undefined, undefined])
-					.expectChange("isExpanded", [,,, true, undefined, undefined])
-					.expectChange("isOutdated", [undefined, undefined], 4)
-					.expectChange("isTotal", [false, false], 4)
-					.expectChange("level", [3, 3], 4)
-					.expectChange("isActiveEntity", [true, true], 4)
-					.expectChange("inProcessByUser", ["", ""], 4)
-					.expectChange("name", ["B", "B"], 4)
-					.expectChange("bestFriendName", ["B's best friend", "B's best friend"], 4)
-					.expectChange("artistID", ["1", "2"], 4)
-					.expectChange("city", ["Liverpool", "London"], 4)
-					.expectChange("sendsAutographs", [false, true], 4);
+					.expectChange("groupLevelCount", [,,, 2,, undefined, undefined])
+					.expectChange("isExpanded", [,,, true, undefined, undefined, false])
+					.expectChange("isOutdated", [undefined, undefined], 5)
+					.expectChange("isTotal", [false, false], 5)
+					.expectChange("level", [3, 3, 2], 4)
+					.expectChange("isActiveEntity", [true, true], 5)
+					.expectChange("inProcessByUser", ["", ""], 5)
+					.expectChange("name", ["B", "B", "C"], 4)
+					.expectChange("bestFriendName",
+						["B's best friend", "B's best friend", "C's best friend"], 4)
+					.expectChange("artistID", ["1", "2", null], 4)
+					.expectChange("city", ["Liverpool", "London", null], 4)
+					.expectChange("sendsAutographs", [false, true, undefined], 4);
 
 				return Promise.all([
 					// code under test
@@ -29425,6 +29527,46 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						"edit via navigation; no subtotals -> isOutdated at group nodes not set")
 				]);
 			}).then(function () {
+				that.expectChangeIf(!bEdit, "isOutdatedHeader", true)
+					.expectRequest("Artists(ArtistID='1',IsActiveEntity=true)"
+						+ "?$select=Address/City,Address/RegionName", {
+							Address : {City : "Liverpool", RegionName : "England"}
+						});
+
+				return Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-3702)
+					oArtist1.requestSideEffects(["Address"]),
+					that.waitForChanges(assert, "request side effects for Address")
+				]).then(function () {
+					that.expectChange("isOutdatedHeader", false);
+
+					// BEWARE: not a public API - don't try this at home, kids!
+					oArtist1.getBinding().getHeaderContext().setOutdated(false);
+				});
+			}).then(function () {
+				that.expectChange("isOutdatedHeader", true)
+					.expectRequest("Artists(ArtistID='1',IsActiveEntity=true)"
+						+ "?$select=Address/City,Address/RegionName,ArtistID,IsActiveEntity,Messages"
+						+ ",Name,sendsAutographs", {
+							Address : {City : "Liverpool", RegionName : "England"},
+							ArtistID : "1",
+							IsActiveEntity : true,
+							Messages : [],
+							Name : "B",
+							sendsAutographs : false
+						});
+
+				return Promise.all([
+					// code under test (JIRA: CPOUI5ODATAV4-3702)
+					oArtist1.requestSideEffects(["*"]),
+					that.waitForChanges(assert, "request side effects for *")
+				]).then(function () {
+					that.expectChange("isOutdatedHeader", false);
+
+					// BEWARE: not a public API - don't try this at home, kids!
+					oArtist1.getBinding().getHeaderContext().setOutdated(false);
+				});
+			}).then(function () {
 				that.expectRequest("Artists(ArtistID='1',IsActiveEntity=true)"
 						+ "?$select=Address/RegionID,Address/ZIP", {
 						Address : {RegionID : 42, ZIP : "L2 6RE"}
@@ -29450,31 +29592,67 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"/Artists(IsActiveEntity=true,Name='A')",
 					oNameB,
 					oArtist1,
-					"/Artists(ArtistID='2',IsActiveEntity=true)"
+					"/Artists(ArtistID='2',IsActiveEntity=true)",
+					"/Artists(IsActiveEntity=true,Name='C')"
 				], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
 					// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
 					["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
-					["2", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+					["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
 					["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
 					["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
 					["", "", "", "false", "3", "true", sInProcessByUser, "B", sBestFriendName, "1",
 						"Liverpool", "false"],
 					["", "", "", "false", "3", "true", "", "B", "B's best friend", "2", "London",
-						"true"]
+						"true"],
+					["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
 				]);
 
-				that.expectChangeIf(!bEdit, "isOutdatedHeader", true)
+				oNameB.setSelected(true); // in case grand parent is collapsed
+				oArtist1.setKeepAlive(true); // in case (grand) parent is collapsed
+
+				if (!bCollapse) {
+					return;
+				}
+
+				if (bCollapse === 1) { // collapse grand parent
+					that.expectChange("isExpanded", [, false]);
+
+					oIsActiveEntityTrue.collapse(); // (JIRA: CPOUI5ODATAV4-3689)
+				} else { // collapse parent
+					that.expectChange("isExpanded", [,,, false, false])
+						.expectChange("level", [2], 4)
+						.expectChangeIf(bEdit, "inProcessByUser", [""], 4)
+						.expectChange("name", ["C"], 4)
+						.expectChange("bestFriendName", ["C's best friend"], 4)
+						.expectChange("artistID", [null], 4)
+						.expectChange("city", [null], 4)
+						.expectChange("sendsAutographs", [undefined], 4);
+
+					oNameB.collapse(); // (JIRA: CPOUI5ODATAV4-3689)
+				}
+
+				return that.waitForChanges(assert, "collapse (grand) parent, keep 1st leaf alive");
+			}).then(function () {
+				that.expectChange("isOutdatedHeader", true)
 					.expectRequest("#0 DELETE Artists(ArtistID='1',IsActiveEntity=true)", oNO_CONTENT)
 					.expectRequest("#0 Artists/$count"
-						+ "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe", 3)
-					.expectChange("count", "3")
+						+ (bWithSearchFilterSort
+							? "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe"
+							: ""), 4)
+					.expectChange("count", "4");
 					//TODO: .expectChange("groupLevelCount", [,,, 1])
-					.expectChangeIf(bEdit, "inProcessByUser", [""], 4)
-					.expectChangeIf(bEdit, "bestFriendName", ["B's best friend"], 4)
-					.expectChange("artistID", ["2"], 4)
-					.expectChange("city", ["London"], 4)
-					.expectChange("sendsAutographs", [true], 4)
-					.expectChange("regionID", null);
+				if (!bCollapse) {
+					that.expectChange("isExpanded", [false], 5)
+						.expectChange("level", [2], 5)
+						.expectChangeIf(bEdit, "inProcessByUser", [""], 4)
+						.expectChange("name", ["C"], 5)
+						.expectChangeIf(bEdit, "bestFriendName", ["B's best friend"], 4)
+						.expectChange("bestFriendName", ["C's best friend"], 5)
+						.expectChange("artistID", ["2", null], 4)
+						.expectChange("city", ["London", null], 4)
+						.expectChange("sendsAutographs", [true, undefined], 4);
+				}
+				that.expectChange("regionID", null);
 
 				return Promise.all([
 					// code under test (JIRA: CPOUI5ODATAV4-3398)
@@ -29482,27 +29660,76 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					that.waitForChanges(assert, "delete 1st leaf")
 				]);
 			}).then(function () {
+				if (!bCollapse) {
+					return;
+				}
+
+				that.expectChange("isExpanded", [,,, true,, false])
+					.expectChange("isTotal", [false], 5)
+					.expectChange("level", [3, 2], 4)
+					.expectChange("isActiveEntity", [true], 5)
+					.expectChange("inProcessByUser", [""], 5)
+					.expectChange("name", ["B", "C"], 4)
+					.expectChange("bestFriendName", ["B's best friend", "C's best friend"], 4)
+					.expectChange("artistID", ["2"], 4)
+					.expectChange("city", ["London"], 4)
+					.expectChange("sendsAutographs", [true], 4);
+
+				if (bCollapse === 1) { // expand grand parent again
+					that.expectChange("isExpanded", [, true, false])
+						.expectChange("isTotal", [,, false, false, false])
+						.expectChange("level", [,, 2, 2])
+						.expectChange("isActiveEntity", [,, true, true, true])
+						.expectChange("inProcessByUser", [,, "", "", ""])
+						.expectChange("name", [,, "A", "B"])
+						.expectChange("bestFriendName", [,, "A's best friend", "B's best friend"])
+						.expectChange("groupLevelCount", [,,, 2]);
+
+					return Promise.all([
+						oIsActiveEntityTrue.expand(),
+						that.waitForChanges(assert, "expand grand parent again")
+					]);
+				}
+
+				that.expectChange("isExpanded", [undefined], 4);
+
+				return Promise.all([
+					oNameB.expand(),
+					that.waitForChanges(assert, "expand parent again")
+				]);
+			}).then(function () {
 				checkTable("after delete 1st leaf", assert, oTable, [
 					"/Artists(IsActiveEntity=false)",
 					oIsActiveEntityTrue,
 					"/Artists(IsActiveEntity=true,Name='A')",
 					oNameB,
-					"/Artists(ArtistID='2',IsActiveEntity=true)"
+					"/Artists(ArtistID='2',IsActiveEntity=true)",
+					"/Artists(IsActiveEntity=true,Name='C')"
 				], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
 					// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
 					["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
-					["2", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+					["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
 					["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
 					["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
 					["", "", "", "false", "3", "true", "", "B", "B's best friend", "2", "London",
-						"true"]
+						"true"],
+					["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
 				]);
 				const oArtist2 = oTable.getRows()[4].getBindingContext();
 
-				that.expectRequest("#0 DELETE Artists(ArtistID='2',IsActiveEntity=true)", oNO_CONTENT)
+				that.expectChange("isExpanded", [false], 4)
+					.expectChange("level", [2], 4)
+					.expectChange("name", ["C"], 4)
+					.expectChange("bestFriendName", ["C's best friend"], 4)
+					.expectChange("artistID", [null], 4)
+					.expectChange("city", [null], 4)
+					.expectChange("sendsAutographs", [undefined], 4)
+					.expectRequest("#0 DELETE Artists(ArtistID='2',IsActiveEntity=true)", oNO_CONTENT)
 					.expectRequest("#0 Artists/$count"
-						+ "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe", 2)
-					.expectChange("count", "2");
+						+ (bWithSearchFilterSort
+							? "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe"
+							: ""), 3)
+					.expectChange("count", "3");
 					//TODO: .expectChange("groupLevelCount", [,,, 0])
 
 				return Promise.all([
@@ -29515,18 +29742,21 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"/Artists(IsActiveEntity=false)",
 					oIsActiveEntityTrue,
 					"/Artists(IsActiveEntity=true,Name='A')",
-					oNameB
+					oNameB,
+					"/Artists(IsActiveEntity=true,Name='C')"
 				], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
 					// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
 					["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
-					["2", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+					["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
 					["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
-					["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""]
-				], 4, true, [ // type|level|expandable|expanded|title
+					["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
+					["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
+				], 5, true, [ // type|level|expandable|expanded|title
 					["GroupHeader", 1, true, false, "No"],
 					["GroupHeader", 1, true, true, "Yes"],
 					["GroupHeader", 2, true, false, "A"],
-					["GroupHeader", 2, true, /*look here*/true, "B"]
+					["GroupHeader", 2, true, /*look here*/true, "B"],
+					["GroupHeader", 2, true, false, "C"]
 				]);
 
 				that.expectChange("isExpanded", [,,, false])
@@ -29543,18 +29773,21 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"/Artists(IsActiveEntity=false)",
 					oIsActiveEntityTrue,
 					"/Artists(IsActiveEntity=true,Name='A')",
-					oNameB
+					oNameB,
+					"/Artists(IsActiveEntity=true,Name='C')"
 				], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
 					// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
 					["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
-					["2", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+					["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
 					["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
-					["2", "false", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""]
-				], 4, true, [ // type|level|expandable|expanded|title
+					["2", "false", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
+					["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
+				], 5, true, [ // type|level|expandable|expanded|title
 					["GroupHeader", 1, true, false, "No"],
 					["GroupHeader", 1, true, true, "Yes"],
 					["GroupHeader", 2, true, false, "A"],
-					["GroupHeader", 2, true, /*look here*/false, "B"]
+					["GroupHeader", 2, true, /*look here*/false, "B"],
+					["GroupHeader", 2, true, false, "C"]
 				]);
 
 				that.expectChange("isExpanded", [,,, true])
@@ -29572,20 +29805,25 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					"/Artists(IsActiveEntity=false)",
 					oIsActiveEntityTrue,
 					"/Artists(IsActiveEntity=true,Name='A')",
-					oNameB
+					oNameB,
+					"/Artists(IsActiveEntity=true,Name='C')"
 				], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
 					// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
 					["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
-					["2", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+					["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
 					["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
-					["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""]
-				], 4, true, [ // type|level|expandable|expanded|title
+					["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
+					["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
+				], 5, true, [ // type|level|expandable|expanded|title
 					["GroupHeader", 1, true, false, "No"],
 					["GroupHeader", 1, true, true, "Yes"],
 					["GroupHeader", 2, true, false, "A"],
-					["GroupHeader", 2, true, /*look here*/true, "B"]
+					["GroupHeader", 2, true, /*look here*/true, "B"],
+					["GroupHeader", 2, true, false, "C"]
 				]);
 			});
+		});
+		});
 		});
 	});
 
@@ -29593,12 +29831,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Scenario: Data aggregation with visual grouping and a grand total shown at the bottom only. A
 	// new entity is created at the start of the list. The created entity is shown as a groupless
 	// leaf at the very top of the table, above the group levels. The grand total is updated after
-	// the create. Creating another (inactive) entity at the end of start also works. The $count is
-	// increased when created entities are persisted. After expanding and collapsing a group, the
-	// indices of all contexts are still correct. When changing the groupLevels via #setAggregation,
-	// an inactive element remains in the creation area on top while the created persisted entries
-	// are moved into their server positions.
+	// the create. Creating another (inactive) entity at the end of start also works. After
+	// expanding and collapsing a group, the indices of all contexts are still correct. When
+	// changing the groupLevels via #setAggregation, an inactive element remains in the creation
+	// area on top while the created persisted entries are moved into their server positions.
 	// JIRA: CPOUI5ODATAV4-3683
+	//
+	// The $count is maintained on the client side: it is increased when a (non-inactive) entity is
+	// created, and decreased again if that creation is canceled. An inactive entity is not counted
+	// until it is activated; removing an inactive entity leaves the count unchanged.
+	// JIRA: CPOUI5ODATAV4-3711
 	QUnit.test("Data Aggregation: create with visual grouping", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -29669,6 +29911,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}, new Error("Must not create at end when using groupLevels: " + oListBinding));
 
 		this.expectChange("isOutdatedHeader", true)
+			.expectChange("count", "3")
 			.expectRequest("#0 POST BusinessPartners", {
 				payload : {Id : 3}
 			}, {
@@ -29676,11 +29919,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				Id : 3, // Edm.Int16
 				SalesNumber : 5
 			})
-			.expectRequest("#0 BusinessPartners/$count", 3)
 			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
 				value : [{SalesNumber : 35}]
-			})
-			.expectChange("count", "3");
+			});
 
 		// code under test
 		const oCreatedContext0 = oListBinding.create({Id : 3}, /*bSkipRefresh*/true);
@@ -29723,27 +29964,26 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[false, true, 0, "", "", "35"]
 		]);
 
-		this.expectRequest("#0 POST BusinessPartners", {
+		this.expectChange("count", "4")
+			.expectRequest("#0 POST BusinessPartners", {
 				payload : {Id : 4}
 			}, {
 				Country : "A",
 				Id : 4, // Edm.Int16
 				SalesNumber : 7
 			})
-			.expectRequest("#0 BusinessPartners/$count", 4)
 			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
 				value : [{SalesNumber : 42}]
-			})
-			.expectChange("count", "4");
+			});
 
 		await Promise.all([
 			// code under test
 			oCreatedContext1.setProperty("Id", 4),
 			oCreatedContext1.created(),
-			this.waitForChanges(assert, "persist inactive entry")
+			this.waitForChanges(assert, "activate inactive entry")
 		]);
 
-		checkTable("after persist inactive entry", assert, oTable, [
+		checkTable("after activate inactive entry", assert, oTable, [
 			oCreatedContext0,
 			oCreatedContext1,
 			"/BusinessPartners(Country='A')",
@@ -29809,6 +30049,28 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[false, true, 0, "", "", "42"]
 		]);
 		assertIndices(assert, oListBinding.getCurrentContexts(), [-2, -1, 0, 1, 2]);
+
+		this.expectChange("count", "5")
+			.expectChange("count", "4");
+
+		const oActiveToDelete = oListBinding.create({}, /*bSkipRefresh*/true);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3711)
+			oListBinding.resetChanges(),
+			checkCanceled(assert, oActiveToDelete.created()),
+			this.waitForChanges(assert, "reset active creation before submit")
+		]);
+
+		const oInactiveToDelete = oListBinding.create({}, /*bSkipRefresh*/true, /*bAtEnd*/true,
+			/*bInactive*/true);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3711)
+			oInactiveToDelete.delete(),
+			checkCanceled(assert, oInactiveToDelete.created()),
+			this.waitForChanges(assert, "delete inactive creation") // ensure $count was not changed
+		]);
 
 		// code under test
 		const oCreatedContext2 = oListBinding.create({Country : "C"}, /*bSkipRefresh*/true,
@@ -30398,8 +30660,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 					assert.strictEqual(oListBinding.isLengthFinal(), true, "length is final");
 					assert.strictEqual(oListBinding.getLength(), 27, "length includes grand total row");
+
 					// Note: header context gives count of leaves (w/o grand total)
 					that.expectChange("count", "26");
+					that.oLogMock.expects("warning").exactly(bCount ? 0 : 1)
+						.withExactArgs("Missing system query option $count",
+							"/aggregation/BusinessPartners?$apply=filter(AmountPerSale%20gt%2099)"
+							+ "/groupby((Country,Region),aggregate(SalesNumber))"
+							+ "/orderby(Region%20desc)",
+							"sap.ui.model.odata.v4.lib._AggregationCache");
 
 					that.oView.byId("count").setBindingContext(oListBinding.getHeaderContext());
 
@@ -30501,8 +30770,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				assert.strictEqual(oListBinding.isLengthFinal(), true, "length is final");
 				assert.strictEqual(oListBinding.getLength(), 27, "length includes grand total row");
-				assert.strictEqual(oListBinding.getCount(), 26, "count of leaves");
 
+				that.oLogMock.expects("warning").exactly(bCount ? 0 : 2)
+					.withExactArgs("Missing system query option $count",
+						"/aggregation/BusinessPartners?$apply=filter(AmountPerSale%20gt%2099)"
+						+ "/groupby((Country,Region),aggregate(SalesNumber))"
+						+ "/orderby(Region%20desc)",
+						"sap.ui.model.odata.v4.lib._AggregationCache");
+				assert.strictEqual(oListBinding.getCount(), 26, "count of leaves");
 				// Note: header context gives count of leaves (w/o grand total)
 				that.expectChange("count", "26");
 
@@ -30830,16 +31105,26 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Paging in a group level cache with identity (JIRA: CPOUI5ODATAV4-3362)
 	// Check that auto-$expand/$select works, incl. manual $select (JIRA: CPOUI5ODATAV4-3438)
 	// Check that subtotals at bottom have "...@$ui5.noData" as needed (JIRA: CPOUI5ODATAV4-3438)
+	//
+	// Set subtotals only to outdated if a property used for filtering, grouping, or subtotals is
+	// modified (or requested as a side effect). If subtotals are set to outdated, the header
+	// context is also set to outdated.
+	// JIRA: CPOUI5ODATAV4-3702
 	QUnit.test("Data Aggregation: keep alive single entity", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
+<Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>
 <t:Table id="table" rows="{path : '/BusinessPartners',
 			parameters : {
 				$$aggregation : {
 					aggregate : {
-						SalesAmount : {subtotals : true, unit : 'Currency'}
+						SalesAmount : {subtotals : true, unit : 'Currency'},
+						SalesNumber : {}
 					},
 					group : {
+						Country : {
+							additionally : ['CountryText']
+						},
 						Id : {
 							additionally : ['Name']
 						}
@@ -30853,10 +31138,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}" threshold="0" visibleRowCount="3">
 	<Text id="isOutdated" text="{= %{@$ui5.context.isOutdated} }"/>
 	<Text id="country" text="{Country}"/>
+	<Text id="countryText" text="{CountryText}"/>
 	<Text id="id" text="{Id}"/>
 	<Text id="name" text="{Name}"/>
 	<Text id="salesAmount" text="{SalesAmount}"/>
 	<Text id="currency" text="{Currency}"/>
+	<Text id="salesNumber" text="{SalesNumber}"/>
 </t:Table>
 <FlexBox id="details">
 	<Text id="detailId" text="{Id}"/>
@@ -30864,31 +31151,41 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 </FlexBox>`;
 
 		this.expectRequest("BusinessPartners"
-				+ "?$apply=groupby((Country),aggregate(SalesAmount,Currency))"
+				+ "?$apply=groupby((Country,CountryText),aggregate(SalesAmount,Currency))"
 				+ "&$count=true&$skip=0&$top=3", {
 				"@odata.count" : "26",
 				value : [
-					{Country : "A", Currency : "EUR", SalesAmount : "1"},
-					{Country : "B", Currency : "EUR", SalesAmount : "2"},
-					{Country : "C", Currency : "EUR", SalesAmount : "3"}
+					{Country : "A", CountryText : "A Text", Currency : "EUR", SalesAmount : "1"},
+					{Country : "B", CountryText : "B Text", Currency : "EUR", SalesAmount : "2"},
+					{Country : "C", CountryText : "C Text", Currency : "EUR", SalesAmount : "3"}
 				]
 			})
 			.expectChange("isOutdated", [undefined, undefined, undefined])
 			.expectChange("country", ["A", "B", "C"])
+			.expectChange("countryText", ["A Text", "B Text", "C Text"])
 			.expectChange("id", [null, null, null])
 			.expectChange("name", [null, null, null])
 			.expectChange("salesAmount", ["1", "2", "3"])
 			.expectChange("currency", ["EUR", "EUR", "EUR"])
+			.expectChange("salesNumber", [null, null, null])
 			.expectChange("detailId")
-			.expectChange("region");
+			.expectChange("region")
+			.expectChange("isOutdatedHeader");
 
 		await this.createView(assert, sView, oModel);
 
 		const oListBinding = this.oView.byId("table").getBinding("rows");
 
+		this.expectChange("isOutdatedHeader", undefined);
+
+		this.oView.byId("isOutdatedHeader").setBindingContext(oListBinding.getHeaderContext());
+
+		await this.waitForChanges(assert, "set header context");
+
 		// code under test (JIRA: CPOUI5ODATAV4-3362)
 		assert.strictEqual(oListBinding.getDownloadUrl(), "/aggregation/BusinessPartners"
-			+ "?$select=Country,Currency,Id,LocalCurrency,Name,SalesAmount");
+			+ "?$select=Country,CountryText,Currency,Id,LocalCurrency,Name,SalesAmount"
+			+ ",SalesNumber");
 
 		const oContextA = oListBinding.getCurrentContexts()[0];
 		assert.throws(() => {
@@ -30901,11 +31198,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"@$ui5.node.isTotal" : true,
 			"@$ui5.node.level" : 1,
 			Country : "A",
+			CountryText : "A Text",
 			Currency : "EUR",
 			"Id@$ui5.noData" : true,
 			"LocalCurrency@$ui5.noData" : true,
 			"Name@$ui5.noData" : true,
-			SalesAmount : "1"
+			SalesAmount : "1",
+			"SalesNumber@$ui5.noData" : true
 		});
 
 		// code under test (no "Failed to drill-down into ...")
@@ -30914,19 +31213,23 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		});
 
 		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A'"
-				+ "&$select=Country,Currency,Id,LocalCurrency,Name,SalesAmount&$skip=0&$top=3", {
+				+ "&$select=Country,CountryText,Currency,Id,LocalCurrency,Name,SalesAmount"
+				+ ",SalesNumber"
+				+ "&$skip=0&$top=3", {
 				"@odata.count" : "2",
 				value : [
-					{Country : "A", Currency : "EUR", Id : 26, LocalCurrency : "DEM", Name : "Foo",
-						SalesAmount : "60"},
-					{Country : "A", Currency : "EUR", Id : 25, LocalCurrency : "DEM", Name : "Bar",
-						SalesAmount : "40"}
+					{Country : "A", CountryText : "A Text", Currency : "EUR", Id : 26,
+						LocalCurrency : "DEM", Name : "Foo", SalesAmount : "60", SalesNumber : 6},
+					{Country : "A", CountryText : "A Text", Currency : "EUR", Id : 25,
+						LocalCurrency : "DEM", Name : "Bar", SalesAmount : "40", SalesNumber : 4}
 				]
 			})
 			.expectChange("country", [, "A", "A"])
+			.expectChange("countryText", [, "A Text", "A Text"])
 			.expectChange("id", [, "26", "25"])
 			.expectChange("name", [, "Foo", "Bar"])
-			.expectChange("salesAmount", [, "60", "40"]);
+			.expectChange("salesAmount", [, "60", "40"])
+			.expectChange("salesNumber", [, "6", "4"]);
 
 		await Promise.all([
 			oContextA.expand(),
@@ -30976,9 +31279,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await this.waitForChanges(assert, "ODLB#getKeepAliveContext");
 
 		this.expectChange("country", [, "B", "C"])
+			.expectChange("countryText", [, "B Text", "C Text"])
 			.expectChange("id", [, null, null])
 			.expectChange("name", [, null, null])
-			.expectChange("salesAmount", [, "2", "3"]);
+			.expectChange("salesAmount", [, "2", "3"])
+			.expectChange("salesNumber", [, null, null]);
 			// currency, detailId, and region remain unchanged
 
 		await Promise.all([
@@ -30993,10 +31298,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oContext26.getProperty("Name"), "Foo", "data still available");
 
 		this.expectChange("region", "Modified")
-			.expectChange("isOutdated", [true, true, true])
+			// "isOutdated" is not set (JIRA: CPOUI5ODATAV4-3702)
 			.expectRequest("PATCH BusinessPartners(26)", {
 				payload : {Region : "Modified"}
-			}, oNO_CONTENT);
+			}, oDONT_CARE);
 
 		// code under test
 		oContext26.setProperty("Region", "Modified");
@@ -31004,45 +31309,53 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await this.waitForChanges(assert, "modify Region of Id 26");
 
 		this.expectRequest("#7 BusinessPartners?"
-				+ "$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount,myMessages"
+				+ "$select=Country,CountryText,Currency,Id,LocalCurrency,Name,Region,SalesAmount"
+					+ ",SalesNumber,myMessages"
 				+ "&$filter=Id eq 24 or Id eq 25 or Id eq 26&$top=3", {
 				value : [{ // simulate that Id 25 was deleted in the meantime
-					Country : "A refreshed",
+					Country : "A",
+					CountryText : "A Text refreshed",
 					Currency : "EUR",
 					Id : 26,
 					LocalCurrency : "DEM",
 					Name : "Foo",
 					Region : "Refreshed",
 					SalesAmount : "61",
+					SalesNumber : 6,
 					myMessages : []
 				}, {
-					Country : "A refreshed",
+					Country : "A",
+					CountryText : "A Text refreshed",
 					Currency : "EUR",
 					Id : 24,
 					LocalCurrency : "DEM",
 					Name : "Bar",
 					Region : "Outside",
 					SalesAmount : "0",
+					SalesNumber : 0,
 					myMessages : []
 				}]
 			})
 			.expectRequest("#7 BusinessPartners"
-				+ "?$apply=groupby((Country),aggregate(SalesAmount,Currency))"
+				+ "?$apply=groupby((Country,CountryText),aggregate(SalesAmount,Currency))"
 				+ "&$count=true&$skip=0&$top=3", {
 				"@odata.count" : "26",
 				value : [
-					{Country : "A refreshed", Currency : "EUR", SalesAmount : "11"},
-					{Country : "B refreshed", Currency : "EUR", SalesAmount : "22"},
-					{Country : "C refreshed", Currency : "EUR", SalesAmount : "33"}
+					{Country : "A", CountryText : "A Text refreshed", Currency : "EUR",
+						SalesAmount : "11"},
+					{Country : "B", CountryText : "B Text refreshed", Currency : "EUR",
+						SalesAmount : "22"},
+					{Country : "C", CountryText : "C Text refreshed", Currency : "EUR",
+						SalesAmount : "33"}
 				]
 			})
 			.expectChange("region", "Refreshed")
-			.expectChange("isOutdated", [undefined, undefined, undefined])
-			.expectChange("country", ["A refreshed", "B refreshed", "C refreshed"])
+			.expectChange("countryText",
+				["A Text refreshed", "B Text refreshed", "C Text refreshed"])
 			.expectChange("salesAmount", ["11", "22", "33"]);
 
 		await Promise.all([
-			// code under test
+			// code under test (JIRA: CPOUI5ODATAV4-2757)
 			oListBinding.requestRefresh(),
 			this.waitForChanges(assert, "refresh list")
 		]);
@@ -31053,27 +31366,33 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oContext26.getBinding(), oListBinding, "context for Id 26 still alive");
 		assert.strictEqual(oContext26.getProperty("SalesAmount"), "61", "data still available");
 
-		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A refreshed'"
-				+ "&$select=Country,Currency,Id,LocalCurrency,Name,SalesAmount&$skip=0&$top=3", {
+		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A'"
+				+ "&$select=Country,CountryText,Currency,Id,LocalCurrency,Name,SalesAmount"
+				+ ",SalesNumber"
+				+ "&$skip=0&$top=3", {
 				"@odata.count" : "1",
 				value : [{
-					Country : "A refreshed",
+					Country : "A",
+					CountryText : "A Text refreshed",
 					Currency : "EUR",
 					Id : 26,
 					LocalCurrency : "DEM",
 					Name : "Foo",
-					SalesAmount : "61"
+					SalesAmount : "61",
+					SalesNumber : 6
 				}]
 			})
-			.expectChange("country", [, "A refreshed", null])
+			.expectChange("country", [, "A", null])
+			.expectChange("countryText", [, "A Text refreshed", null])
 			.expectChange("id", [, "26"])
 			.expectChange("name", [, "Foo"])
-			.expectChange("salesAmount", [, "61", "11"]);
+			.expectChange("salesAmount", [, "61", "11"])
+			.expectChange("salesNumber", [, "6"]);
 
 		await Promise.all([
 			// code under test
 			oListBinding.getCurrentContexts()[0].expand(),
-			this.waitForChanges(assert, "expand Country 'A refreshed'")
+			this.waitForChanges(assert, "expand Country 'A' (refreshed)")
 		]);
 
 		assert.strictEqual(oListBinding.getCurrentContexts()[1], oContext26, "still the same");
@@ -31082,23 +31401,27 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"@$ui5.node.isExpanded" : true,
 			"@$ui5.node.isTotal" : true,
 			"@$ui5.node.level" : 1,
-			Country : "A refreshed",
+			Country : "A",
+			CountryText : "A Text refreshed",
 			Currency : "EUR",
 			"Id@$ui5.noData" : true,
 			"LocalCurrency@$ui5.noData" : true,
 			"Name@$ui5.noData" : true,
-			SalesAmount : "11"
+			SalesAmount : "11",
+			"SalesNumber@$ui5.noData" : true
 		}, "group level");
 		const oSubtotal = oListBinding.getCurrentContexts()[2];
 		assert.deepEqual(oSubtotal.getObject(), {
 			"@$ui5.node.isTotal" : true,
 			"@$ui5.node.level" : 1,
 			"Country@$ui5.noData" : true,
+			"CountryText@$ui5.noData" : true,
 			Currency : "EUR",
 			"Id@$ui5.noData" : true,
 			"LocalCurrency@$ui5.noData" : true,
 			"Name@$ui5.noData" : true,
-			SalesAmount : "11"
+			SalesAmount : "11",
+			"SalesNumber@$ui5.noData" : true
 		}, "subtotals");
 
 		// code under test - LocalCurrency doesn't lead to a "failed to drill-down"
@@ -31107,37 +31430,42 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		});
 
 		this.expectRequest("#9 BusinessPartners?"
-				+ "$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount,myMessages"
+				+ "$select=Country,CountryText,Currency,Id,LocalCurrency,Name,Region,SalesAmount"
+					+ ",SalesNumber,myMessages"
 				+ "&$filter=Id eq 24 or Id eq 26&$top=2", {
 				value : [{ // simulate that Id 24 was deleted in the meantime
 					Country : "A",
+					CountryText : "A Text",
 					Currency : "EUR",
 					Id : 26,
 					LocalCurrency : "DEM",
 					Name : "Foo",
 					Region : "side-effects refresh",
 					SalesAmount : "61",
+					SalesNumber : 6,
 					myMessages : []
 				}]
 			})
 			.expectRequest("#9 BusinessPartners"
-				+ "?$apply=groupby((Country),aggregate(SalesAmount,Currency))"
+				+ "?$apply=groupby((Country,CountryText),aggregate(SalesAmount,Currency))"
 				+ "&$count=true&$skip=0&$top=3", {
 				"@odata.count" : "26",
 				value : [
-					{Country : "A", Currency : "EUR", SalesAmount : "1"},
-					{Country : "B", Currency : "EUR", SalesAmount : "2"},
-					{Country : "C", Currency : "EUR", SalesAmount : "3"}
+					{Country : "A", CountryText : "A Text", Currency : "EUR", SalesAmount : "1"},
+					{Country : "B", CountryText : "B Text", Currency : "EUR", SalesAmount : "2"},
+					{Country : "C", CountryText : "C Text", Currency : "EUR", SalesAmount : "3"}
 				]
 			})
 			// First update kept-alive entity
-			.expectChange("country", [, "A"])
+			.expectChange("countryText", [, "A Text"])
+			.expectChange("countryText", ["A Text", "B Text", "C Text"])
 			.expectChange("region", "side-effects refresh")
 			// then refresh the list - collapses "A"
-			.expectChange("country", ["A", "B", "C"])
+			.expectChange("country", [, "B", "C"])
 			.expectChange("id", [, null])
 			.expectChange("name", [, null])
-			.expectChange("salesAmount", ["1", "2", "3"]);
+			.expectChange("salesAmount", ["1", "2", "3"])
+			.expectChange("salesNumber", [, null]);
 
 		await Promise.all([
 			// code under test
@@ -31149,21 +31477,25 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		assert.strictEqual(oContext24.getBinding(), undefined, "context for Id 24 destroyed");
 
 		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A'"
-				+ "&$select=Country,Currency,Id,LocalCurrency,Name,SalesAmount&$skip=0&$top=3", {
+				+ "&$select=Country,CountryText,Currency,Id,LocalCurrency,Name,SalesAmount"
+				+ ",SalesNumber"
+				+ "&$skip=0&$top=3", {
 				"@odata.count" : "4",
 				value : [
-					{Country : "A", Currency : "EUR", Id : 26, LocalCurrency : "DEM", Name : "Foo",
-						SalesAmount : "61"},
-					{Country : "A", Currency : "EUR", Id : 24, LocalCurrency : "DEM", Name : "Baz",
-						SalesAmount : "20"},
-					{Country : "A", Currency : "EUR", Id : 23, LocalCurrency : "DEM", Name : "Qux",
-						SalesAmount : "30"}
+					{Country : "A", CountryText : "A Text", Currency : "EUR", Id : 26,
+						LocalCurrency : "DEM", Name : "Foo", SalesAmount : "61", SalesNumber : 6},
+					{Country : "A", CountryText : "A Text", Currency : "EUR", Id : 24,
+						LocalCurrency : "DEM", Name : "Baz", SalesAmount : "20", SalesNumber : 2},
+					{Country : "A", CountryText : "A Text", Currency : "EUR", Id : 23,
+						LocalCurrency : "DEM", Name : "Qux", SalesAmount : "30", SalesNumber : 3}
 				]
 			})
 			.expectChange("country", [, "A", "A"])
+			.expectChange("countryText", [, "A Text", "A Text"])
 			.expectChange("id", [, "26", "24"])
 			.expectChange("name", [, "Foo", "Baz"])
-			.expectChange("salesAmount", [, "61", "20"]);
+			.expectChange("salesAmount", [, "61", "20"])
+			.expectChange("salesNumber", [, "6", "2"]);
 
 		await Promise.all([
 			// code under test (JIRA: CPOUI5ODATAV4-3284)
@@ -31172,16 +31504,21 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 
 		this.expectRequest("BusinessPartners?$filter=Country eq 'A'"
-				+ "&$select=Country,Currency,Id,LocalCurrency,Name,SalesAmount&$skip=3&$top=1", {
+				+ "&$select=Country,CountryText,Currency,Id,LocalCurrency,Name,SalesAmount"
+				+ ",SalesNumber"
+				+ "&$skip=3&$top=1", {
 				value : [
-					{Id : 22, Name : "Quux", Currency : "EUR", SalesAmount : "10"}
+					{Country : "A", CountryText : "A Text", Id : 22, Name : "Quux",
+						Currency : "EUR", SalesAmount : "10", SalesNumber : 1}
 				]
 			})
 			.expectChange("country", [,,,, "A"])
+			.expectChange("countryText", [,,,, "A Text"])
 			.expectChange("id", [,, "24", "23", "22"])
 			.expectChange("name", [,, "Baz", "Qux", "Quux"])
 			.expectChange("salesAmount", [,, "20", "30", "10"])
-			.expectChange("currency", [,,,, "EUR"]);
+			.expectChange("currency", [,,,, "EUR"])
+			.expectChange("salesNumber", [,, "2", "3", "1"]);
 
 		// code under test (JIRA: CPOUI5ODATAV4-3362)
 		this.oView.byId("table").setFirstVisibleRow(2);
@@ -31191,7 +31528,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		this.expectChange("id", [null, "26", "24"])
 			.expectChange("name", [null, "Foo", "Baz"])
 			.expectChange("salesAmount", ["1", "61", "20"])
-			.expectChange("currency", []);
+			.expectChange("currency", [])
+			.expectChange("salesNumber", [null, "6", "2"]);
 
 		// code under test
 		this.oView.byId("table").setFirstVisibleRow(0);
@@ -31201,23 +31539,27 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert, "scroll to top")
 		]);
 
-		const oContext26Data = {Country : "A", Currency : "EUR", Id : 26,
+		const oContext26Data = {Country : "A", CountryText : "A Text", Currency : "EUR", Id : 26,
 			LocalCurrency : "DEM", Name : "Foo", Region : "Region", SalesAmount : "60",
-			myMessages : []};
+			SalesNumber : 6, myMessages : []};
 		const refresh = (bFirst) => {
 			this.expectRequest("#0 BusinessPartners?"
-					+ "$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount,myMessages"
+					+ "$select=Country,CountryText,Currency,Id,LocalCurrency,Name,Region"
+						+ ",SalesAmount,SalesNumber,myMessages"
 					+ "&$filter=Id eq 26", {
 					value : [{...oContext26Data}]
 				})
 				.expectRequest("#0 BusinessPartners"
-					+ "?$apply=groupby((Country),aggregate(SalesAmount,Currency))"
+					+ "?$apply=groupby((Country,CountryText),aggregate(SalesAmount,Currency))"
 					+ "&$count=true&$skip=0&$top=3", {
 					"@odata.count" : "26",
 					value : [
-						{Country : "A", Currency : "EUR", SalesAmount : "11"},
-						{Country : "B", Currency : "EUR", SalesAmount : "22"},
-						{Country : "C", Currency : "EUR", SalesAmount : "33"}
+						{Country : "A", CountryText : "A Text", Currency : "EUR",
+							SalesAmount : "11"},
+						{Country : "B", CountryText : "B Text", Currency : "EUR",
+							SalesAmount : "22"},
+						{Country : "C", CountryText : "C Text", Currency : "EUR",
+							SalesAmount : "33"}
 					]
 				});
 			if (bFirst) {
@@ -31225,11 +31567,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				this.expectChange("region", "Region")
 					.expectChange("salesAmount", [, "60"])
 					.expectChange("country", [, "B", "C"])
+					.expectChange("countryText", [, "B Text", "C Text"])
 					.expectChange("id", [, null, null])
 					.expectChange("name", [, null, null])
-					.expectChange("salesAmount", ["11", "22", "33"]);
+					.expectChange("salesAmount", ["11", "22", "33"])
+					.expectChange("salesNumber", [, null, null]);
 			} else {
-				this.expectChange("isOutdated", [undefined, undefined, undefined]);
+				this.expectChange("isOutdated", [undefined, undefined, undefined])
+					.expectChange("isOutdatedHeader", false);
 			}
 
 			return Promise.all([
@@ -31241,46 +31586,218 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		await refresh(true);
 
+		const refreshEntityVia = async (sTest, aArgs) => {
+			this.expectChange("isOutdated", [true, true, true])
+				.expectChange("isOutdatedHeader", true)
+				.expectRequest("BusinessPartners(26)?$select=Country,CountryText,Currency,Id"
+					+ ",LocalCurrency,Name,Region,SalesAmount,SalesNumber,myMessages",
+					{...oContext26Data});
+
+			await Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3697)
+				oContext26[sTest](...(aArgs)),
+				this.waitForChanges(assert, sTest
+					+ (aArgs.length ? "(" + JSON.stringify(aArgs[0]) + ")" : "()")
+					+ " for Id 26 -> subtotals get outdated")
+			]);
+
+			await refresh();
+		};
+
+		await refreshEntityVia("requestRefresh", []);
+		await refreshEntityVia("requestSideEffects", [[""]]);
+		await refreshEntityVia("requestSideEffects", [["*"]]);
+
 		this.expectChange("isOutdated", [true, true, true])
-			.expectRequest("BusinessPartners(26)"
-				+ "?$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount"
-				+ ",myMessages",
-				{...oContext26Data});
+			.expectChange("isOutdatedHeader", true)
+			.expectRequest("BusinessPartners(26)?$select=Currency", {Currency : "DEM"});
 
 		await Promise.all([
 			// code under test (JIRA: CPOUI5ODATAV4-3697)
-			oContext26.requestRefresh(),
-			this.waitForChanges(assert, "requestRefresh for Id 26 -> subtotals get outdated")
+			oContext26.requestSideEffects(["Currency"]),
+			this.waitForChanges(assert, "requestSideEffects (Currency) for Id 26"
+				+ " -> subtotals get outdated as the unit of subtotals may have changed")
 		]);
 
 		await refresh();
 
 		this.expectChange("isOutdated", [true, true, true])
-			.expectRequest("BusinessPartners(26)"
-				+ "?$select=Country,Currency,Id,LocalCurrency,Name,Region,SalesAmount"
-				+ ",myMessages",
-				{...oContext26Data});
+			.expectChange("isOutdatedHeader", true)
+			.expectRequest("PATCH BusinessPartners(26)", {
+				payload : {Currency : "USD"}
+			}, oDONT_CARE);
+
+		// code under test (JIRA: CPOUI5ODATAV4-3702)
+		oContext26.setProperty("Currency", "USD");
+
+		await this.waitForChanges(assert, "setProperty (Currency) for Id 26 -> subtotals get"
+			+ " outdated as the unit of subtotals has changed");
+
+		await refresh();
+
+		this.expectChange("isOutdated", [true, true, true])
+			.expectChange("isOutdatedHeader", true)
+			.expectRequest("BusinessPartners(26)?$select=SalesAmount", {SalesAmount : "123"});
 
 		await Promise.all([
 			// code under test (JIRA: CPOUI5ODATAV4-3697)
-			oContext26.requestSideEffects([""]),
-			this.waitForChanges(assert, "requestSideEffects for Id 26 -> subtotals get outdated")
+			oContext26.requestSideEffects(["SalesAmount"]),
+			this.waitForChanges(assert, "requestSideEffects (SalesAmount) for Id 26"
+				+ " -> subtotals get outdated as the amount of subtotals may have changed")
 		]);
 
 		await refresh();
 
 		this.expectChange("isOutdated", [true, true, true])
-			.expectRequest("BusinessPartners(26)?$select=Region", {
-				Region : "Region by requestSideEffects"
+			.expectChange("isOutdatedHeader", true)
+			.expectRequest("PATCH BusinessPartners(26)", {
+				payload : {Currency : "EUR", SalesAmount : "432"}
+			}, oDONT_CARE);
+
+		// code under test (JIRA: CPOUI5ODATAV4-3702)
+		oContext26.setProperty("SalesAmount", "432");
+
+		await this.waitForChanges(assert, "setProperty (SalesAmount) for Id 26 -> subtotals get"
+			+ " outdated as the amount of subtotals has changed");
+
+		await refresh();
+
+		this.expectChange("isOutdated", [true, true, true])
+			.expectChange("isOutdatedHeader", true)
+			.expectRequest("BusinessPartners(26)?$select=Country", {
+				Country : "Country by requestSideEffects"
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3697)
+			oContext26.requestSideEffects(["Country"]),
+			this.waitForChanges(assert, "requestSideEffects (Country) for Id 26"
+				+ " -> subtotals get outdated as a group level property may have changed")
+		]);
+
+		await refresh();
+
+		this.expectChange("isOutdated", [true, true, true])
+			.expectChange("isOutdatedHeader", true)
+			.expectRequest("PATCH BusinessPartners(26)", {
+				payload : {Country : "A*"}
+			}, oDONT_CARE);
+
+		// code under test (JIRA: CPOUI5ODATAV4-3702)
+		oContext26.setProperty("Country", "A*");
+
+		await this.waitForChanges(assert, "setProperty (Country) for Id 26 -> subtotals get"
+			+ " outdated as a group level value has changed");
+
+		await refresh();
+
+		this.expectChange("isOutdated", [true, true, true])
+			.expectChange("isOutdatedHeader", true)
+			.expectRequest("BusinessPartners(26)?$select=CountryText", {
+				CountryText : "CountryText by requestSideEffects"
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3697)
+			oContext26.requestSideEffects(["CountryText"]),
+			this.waitForChanges(assert, "requestSideEffects (CountryText) for Id 26"
+				+ " -> subtotals get outdated as an additional property of a group level may have"
+				+ " changed")
+		]);
+
+		await refresh();
+
+		this.expectChange("isOutdated", [true, true, true])
+			.expectChange("isOutdatedHeader", true)
+			.expectRequest("PATCH BusinessPartners(26)", {
+				payload : {CountryText : "A*"}
+			}, oDONT_CARE);
+
+		// code under test (JIRA: CPOUI5ODATAV4-3702)
+		oContext26.setProperty("CountryText", "A*");
+
+		await this.waitForChanges(assert, "setProperty (CountryText) for Id 26 -> subtotals get"
+			+ " outdated as an additional property of a group level has changed");
+
+		await refresh();
+
+		this.expectRequest("BusinessPartners(26)?$select=Name,Region,SalesNumber", {
+				Name : "Name by requestSideEffects",
+				Region : "Region by requestSideEffects",
+				SalesNumber : 42
 			})
+			// "isOutdated" is not set (JIRA: CPOUI5ODATAV4-3702)
 			.expectChange("region", "Region by requestSideEffects");
 
 		await Promise.all([
-			// code under test (JIRA: CPOUI5ODATAV4-3697)
-			oContext26.requestSideEffects(["Region"]),
-			this.waitForChanges(assert,
-				"requestSideEffects (Region) for Id 26 -> subtotals get outdated")
+			// code under test (JIRA: CPOUI5ODATAV4-3702)
+			oContext26.requestSideEffects(["Name", "Region", "SalesNumber"]),
+			this.waitForChanges(assert, "requestSideEffects (Name, Region, SalesNumber) for Id 26"
+				+ " -> subtotals are not outdated as neither Name, nor Region, nor SalesNumber"
+				+ " contribute to grouping or subtotals")
 		]);
+
+		this.expectRequest("PATCH BusinessPartners(26)", {
+				payload : {Name : "Foo"}
+			}, oDONT_CARE); // "isOutdated" is not set (JIRA: CPOUI5ODATAV4-3702)
+
+		// code under test (JIRA: CPOUI5ODATAV4-3702)
+		oContext26.setProperty("Name", "Foo");
+
+		await this.waitForChanges(assert, "setProperty (Name) for Id 26 -> subtotals are not"
+			+ " outdated as Name does not contribute to grouping or subtotals");
+
+		this.expectRequest("PATCH BusinessPartners(26)", {
+				payload : {SalesNumber : 13}
+			}, oDONT_CARE); // "isOutdated" is not set (JIRA: CPOUI5ODATAV4-3702)
+
+		// code under test (JIRA: CPOUI5ODATAV4-3702)
+		oContext26.setProperty("SalesNumber", 13);
+
+		await this.waitForChanges(assert, "setProperty (SalesNumber) for Id 26 -> subtotals are not"
+			+ " outdated as SalesNumber does not contribute to grouping or subtotals");
+
+		this.expectRequest("#0 BusinessPartners?$apply=filter(Name ne '')"
+			+ "/groupby((Country,CountryText),aggregate(SalesAmount,Currency))"
+			+ "&$count=true&$skip=0&$top=3", {
+			"@odata.count" : "26",
+			value : [
+				{Country : "A", CountryText : "A Text", Currency : "EUR",
+					SalesAmount : "11"},
+				{Country : "B", CountryText : "B Text", Currency : "EUR",
+					SalesAmount : "22"},
+				{Country : "C", CountryText : "C Text", Currency : "EUR",
+					SalesAmount : "33"}
+			]
+		});
+
+		// code under test
+		oListBinding.filter([new Filter("Name", FilterOperator.NE, "")]);
+
+		await this.waitForChanges(assert, "filter by name");
+
+		this.expectRequest("PATCH BusinessPartners(26)", {
+				payload : {SalesNumber : 13}
+			}, oDONT_CARE); // "isOutdated" is not set (JIRA: CPOUI5ODATAV4-3702)
+
+		// code under test (JIRA: CPOUI5ODATAV4-3702)
+		oContext26.setProperty("SalesNumber", 13);
+
+		await this.waitForChanges(assert, "setProperty (SalesNumber) for Id 26 -> subtotals are not"
+			+ " outdated as SalesNumber is not used in filter and does not contribute to grouping"
+			+ " or subtotals");
+
+		this.expectChange("isOutdated", [true, true, true])
+			.expectChange("isOutdatedHeader", true)
+			.expectRequest("PATCH BusinessPartners(26)", {
+				payload : {Name : "baz"}
+			}, oDONT_CARE);
+
+		// code under test (JIRA: CPOUI5ODATAV4-3702)
+		oContext26.setProperty("Name", "baz");
+
+		await this.waitForChanges(assert,
+			"update a property used by the filter -> header context and subtotals are outdated");
 	});
 
 	//*********************************************************************************************
@@ -31571,6 +32088,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						},
 						search : 'covfefe'
 					},
+					$count : true,
 					$orderby : 'Region asc,SalesAmount desc'
 				}
 			}" threshold="0">

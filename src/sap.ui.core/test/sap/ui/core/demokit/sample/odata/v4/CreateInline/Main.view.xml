@@ -10,13 +10,14 @@
 						<ToolbarSpacer/>
 						<SearchField id="searchField" placeholder="Filter by Buyer ID" search=".onFilter"
 							width="20rem"/>
-						<Button icon="{= %{ui>/bDescending} === undefined
+						<Button id="sortButton" icon="{= %{ui>/bDescending} === undefined
 								? 'sap-icon://sort'
 								: (%{ui>/bDescending}
 										? 'sap-icon://sort-descending'
 										: 'sap-icon://sort-ascending') }"
 							press=".onSort" tooltip="Sort by Sales Order ID"/>
-						<Button icon="sap-icon://refresh" press=".onRefresh" tooltip="Refresh"/>
+						<Button id="refreshButton" icon="sap-icon://refresh" press=".onRefresh"
+							tooltip="Refresh"/>
 					</Toolbar>
 				</headerToolbar>
 				<columns>
@@ -47,7 +48,7 @@
 						highlight="{= (%{@$ui5.context.isInactive} === false
 								|| %{@$ui5.context.isInactive} === 1) ? 'Information' : 'None' }"
 						highlightText="Newly Created">
-					<core:Icon
+					<core:Icon id="stateIcon"
 						src="{= %{@$ui5.context.isInactive}
 								? 'sap-icon://sys-minus'
 								: (%{@$ui5.context.isTransient}
@@ -62,16 +63,16 @@
 										: (%{@$ui5.context.isTransient} === undefined
 												? 'From Server'
 												: 'Persisted')) }"/>
-					<Text text="{SalesOrderID}"/>
-					<Input description="{SO_2_BP/CompanyName}"
+					<Text id="salesOrderIdText" text="{SalesOrderID}"/>
+					<Input id="buyerInput" description="{SO_2_BP/CompanyName}"
 						editable="{= %{@$ui5.context.isTransient} === true }"
 						placeholder="Buyer (required)" value="{BuyerID}"/>
-					<Text text="{CurrencyCode}"/>
-					<Text text="{GrossAmount}"/>
-					<Input placeholder="Note" value="{Note}"/>
-					<Text text="{LifecycleStatusDesc}"/>
-					<Button visible="{= %{@$ui5.context.isInactive} !== true }" press=".onDelete"
-						icon="sap-icon://decline" tooltip="Delete"/>
+					<Text id="currencyText" text="{CurrencyCode}"/>
+					<Text id="grossAmountText" text="{GrossAmount}"/>
+					<Input id="noteInput" placeholder="Note" value="{Note}"/>
+					<Text id="statusText" text="{LifecycleStatusDesc}"/>
+					<Button id="deleteButton" visible="{= %{@$ui5.context.isInactive} !== true }"
+						press=".onDelete" icon="sap-icon://decline" tooltip="Delete"/>
 				</ColumnListItem>
 			</Table>
 		</Page>

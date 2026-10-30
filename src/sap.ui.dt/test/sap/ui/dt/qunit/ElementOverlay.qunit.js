@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/m/VBox",
 	"sap/m/Title",
 	"sap/ui/base/ManagedObject",
+	"sap/ui/core/Element",
 	"sap/ui/core/Popup",
 	"sap/ui/dt/DesignTime",
 	"sap/ui/dt/DOMUtil",
@@ -40,6 +41,7 @@ sap.ui.define([
 	VBox,
 	Title,
 	ManagedObject,
+	UIElement,
 	Popup,
 	DesignTime,
 	DOMUtil,
@@ -872,6 +874,89 @@ sap.ui.define([
 		QUnit.test("when the design time metadata is retrieved", function(assert) {
 			const oDesignTimeMetadata = this.oOverlay.getDesignTimeMetadata();
 			assert.equal(oDesignTimeMetadata.getData().name, "My Custom Metadata", "then the right custom data is set");
+		});
+	});
+
+	QUnit.module("getElementVisibility()", {
+		async beforeEach(assert) {
+			this.oButton = new Button({ text: "Button", visible: true });
+			this.oButton.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.oOverlay = new ElementOverlay({
+				element: this.oButton,
+				designTimeMetadata: new ElementDesignTimeMetadata({ data: {} }),
+				init: assert.async(),
+				initFailed(oEvent) {
+					assert.ok(false, `overlay init failed: ${oEvent.getParameter("error")}`);
+				}
+			});
+		},
+		afterEach() {
+			this.oOverlay.destroy();
+			this.oButton.destroy();
+		}
+	}, function() {
+		QUnit.test("when no DT isVisible is defined, it returns control's getVisible()", function(assert) {
+			assert.strictEqual(this.oOverlay.getElementVisibility(), true, "returns true when control is visible");
+			this.oButton.setVisible(false);
+			assert.strictEqual(this.oOverlay.getElementVisibility(), false, "returns false when control is invisible");
+		});
+
+		QUnit.test("when DT defines isVisible, it is preferred over the control's getVisible()", function(assert) {
+			// Even though the control itself is visible, the DT override returns false
+			this.oOverlay.setDesignTimeMetadata(new ElementDesignTimeMetadata({
+				data: { isVisible: () => false }
+			}));
+			assert.strictEqual(
+				this.oOverlay.getElementVisibility(),
+				false,
+				"DT isVisible returning false overrides control getVisible()==true"
+			);
+		});
+
+		QUnit.test("when DT defines isVisible returning true, it is preferred over a hidden control", function(assert) {
+			this.oButton.setVisible(false);
+			this.oOverlay.setDesignTimeMetadata(new ElementDesignTimeMetadata({
+				data: { isVisible: () => true }
+			}));
+			assert.strictEqual(
+				this.oOverlay.getElementVisibility(),
+				true,
+				"DT isVisible returning true overrides control getVisible()==false"
+			);
+		});
+
+		QUnit.test("when element is not a Control and DT has no isVisible, it returns undefined", function(assert) {
+			const oElement = new UIElement();
+			const oNonControlOverlay = new ElementOverlay({
+				element: oElement,
+				designTimeMetadata: new ElementDesignTimeMetadata({ data: {} })
+			});
+			assert.strictEqual(
+				oNonControlOverlay.getElementVisibility(),
+				undefined,
+				"returns undefined for non-control element without DT isVisible"
+			);
+			oNonControlOverlay.destroy();
+			oElement.destroy();
+		});
+
+		QUnit.test("when element is not a Control but DT defines isVisible, it returns the DT result", function(assert) {
+			const oElement = new UIElement();
+			const oNonControlOverlay = new ElementOverlay({
+				element: oElement,
+				designTimeMetadata: new ElementDesignTimeMetadata({
+					data: { isVisible: () => true }
+				})
+			});
+			assert.strictEqual(
+				oNonControlOverlay.getElementVisibility(),
+				true,
+				"returns DT isVisible result for non-control element"
+			);
+			oNonControlOverlay.destroy();
+			oElement.destroy();
 		});
 	});
 

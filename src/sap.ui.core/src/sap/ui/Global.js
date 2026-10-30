@@ -2,17 +2,10 @@
  * ${copyright}
  */
 
-/*global OpenAjax */
-
 sap.ui.define([
 ],
 	function() {
 		"use strict";
-
-		// Register to the OpenAjax Hub if it exists
-		if (globalThis.OpenAjax && globalThis.OpenAjax.hub) {
-			OpenAjax.hub.registerLibrary("sap", "http://www.sap.com/", "0.1", {});
-		}
 
 		/**
 		 * The <code>sap.ui</code> namespace is the central OpenAjax compliant entry
@@ -26,7 +19,7 @@ sap.ui.define([
 
 		const Global = {
 			/**
-			 * The version of the SAP UI Library
+			 * The version of the sap.ui.core library
 			 * @type string
 			 */
 			version: "${version}",

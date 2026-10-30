@@ -503,18 +503,39 @@ sap.ui.define([
 						TableRenderer.getAriaLabelledBy(this),
 						TableRenderer.getAriaAnnouncement("TABLE_INVALID")
 					].join(" ").trimLeft()
-				}).appendTo(oDomRef);
+				}).text("\u00a0").appendTo(oDomRef); // When the overlay is empty JAWS does not navigate to it in VPC Mode
 			}
 			if (oDomRef.contains(document.activeElement)) {
 				this._bIgnoreFocusIn = true;
 				$Overlay.trigger("focus");
 			}
+			this._updateAriaStateForOverlay(true);
 		} else {
+			// Remove the inert state before restoring the focus, otherwise the focus target is still inert
+			this._updateAriaStateForOverlay(false);
 			if (document.activeElement == $Overlay[0]) {
 				this.focus();
 			}
 			$Overlay.remove();
 		}
+	};
+
+	Table.prototype._updateAriaStateForOverlay = function(bOverlay) {
+		const oDomRef = this.getDomRef();
+		const sOverlayId = this.getId() + "-overlay";
+		if (!oDomRef) {
+			return;
+		}
+
+		[...oDomRef.children].forEach((oChild) => {
+			if (oChild.id !== sOverlayId) {
+				if (bOverlay) {
+					oChild.setAttribute("inert", "");
+				} else {
+					oChild.removeAttribute("inert");
+				}
+			}
+		});
 	};
 
 	/**

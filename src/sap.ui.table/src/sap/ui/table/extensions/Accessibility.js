@@ -124,12 +124,7 @@ sap.ui.define([
 
 	};
 
-	const addAriaForOverlayOrNoData = function(oTable, mAttributes, bOverlay, bNoData) {
-		const bHidden = bOverlay && oTable.getShowOverlay() || bNoData && TableUtils.isNoDataVisible(oTable);
-		if (bHidden) {
-			mAttributes["aria-hidden"] = "true";
-		}
-
+	const addAriaForOverlayOrNoData = function(mAttributes, bOverlay, bNoData) {
 		let sMarker = "";
 		if (bOverlay) {
 			sMarker = "overlay";
@@ -792,9 +787,6 @@ sap.ui.define([
 		 */
 		getAriaAttributesForTable: function(oExtension) {
 			const mAttributes = {"role": "presentation"};
-			const oTable = oExtension.getTable();
-
-			addAriaForOverlayOrNoData(oTable, mAttributes, true, true);
 			return mAttributes;
 		},
 
@@ -856,6 +848,8 @@ sap.ui.define([
 			if (oTable.isA("sap.ui.table.AnalyticalTable")) {
 				mAttributes["aria-roledescription"] = TableUtils.getResourceText("TBL_ANALYTICAL_TABLE_ROLE_DESCRIPTION");
 			}
+
+			addAriaForOverlayOrNoData(mAttributes, true, false);
 			return mAttributes;
 		},
 
@@ -870,9 +864,8 @@ sap.ui.define([
 				"role": "heading",
 				"aria-level": "2" // Level is mandatory for headings with ARIA 1.1 and the default is 2
 			};
-			const oTable = oExtension.getTable();
 
-			addAriaForOverlayOrNoData(oTable, mAttributes, true, false);
+			addAriaForOverlayOrNoData(mAttributes, true, false);
 			return mAttributes;
 		},
 
@@ -918,7 +911,6 @@ sap.ui.define([
 				mAttributes["aria-owns"].push(sTableId + "-rowacthdr");
 			}
 
-			addAriaForOverlayOrNoData(oTable, mAttributes, true, false);
 			return mAttributes;
 		},
 
@@ -931,10 +923,9 @@ sap.ui.define([
 		 */
 		getAriaAttributesForCreationRow: function(oExtension, mParams) {
 			const mAttributes = {};
-			const oTable = oExtension.getTable();
 			mAttributes["role"] = "form";
 			mAttributes["aria-labelledby"] = mParams.creationRow.getId() + "-label";
-			addAriaForOverlayOrNoData(oTable, mAttributes, true, false);
+			addAriaForOverlayOrNoData(mAttributes, true, false);
 			return mAttributes;
 		},
 
@@ -946,8 +937,7 @@ sap.ui.define([
 		 */
 		getAriaAttributesForRowHeaderCol: function(oExtension) {
 			const mAttributes = {};
-			const oTable = oExtension.getTable();
-			addAriaForOverlayOrNoData(oTable, mAttributes, true, true);
+			addAriaForOverlayOrNoData(mAttributes, true, true);
 			return mAttributes;
 		},
 
@@ -1068,7 +1058,18 @@ sap.ui.define([
 			}
 
 			mAttributes["aria-labelledby"] = aLabels;
-			addAriaForOverlayOrNoData(oTable, mAttributes, true, false);
+			return mAttributes;
+		},
+
+		/**
+		 * Gets the aria attributes for the tab elements.
+		 *
+		 * @param {sap.ui.table.extensions.Accessibility} oExtension The accessibility extension
+		 * @returns {object} An object containing the aria attributes
+		 */
+		getAriaAttributesForTabElement: function(oExtension) {
+			const mAttributes = {};
+			addAriaForOverlayOrNoData(mAttributes, true, false);
 			return mAttributes;
 		},
 
@@ -1097,9 +1098,7 @@ sap.ui.define([
 		 */
 		getAriaAttributesForTableFooter: function(oExtension) {
 			const mAttributes = {};
-			const oTable = oExtension.getTable();
-
-			addAriaForOverlayOrNoData(oTable, mAttributes, true, false);
+			addAriaForOverlayOrNoData(mAttributes, true, false);
 			return mAttributes;
 		},
 
@@ -1111,9 +1110,7 @@ sap.ui.define([
 		 */
 		getAriaAttributesForTableSubHeader: function(oExtension) {
 			const mAttributes = {};
-			const oTable = oExtension.getTable();
-
-			addAriaForOverlayOrNoData(oTable, mAttributes, true, false);
+			addAriaForOverlayOrNoData(mAttributes, true, false);
 			return mAttributes;
 		},
 
@@ -1476,13 +1473,13 @@ sap.ui.define([
 		}
 
 		if (oTable.getShowOverlay()) {
-			oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']").attr("aria-hidden", "true");
+			oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']").attr("inert", "");
 		} else {
-			oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']").removeAttr("aria-hidden");
+			oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']").removeAttr("inert");
 			if (TableUtils.isNoDataVisible(oTable)) {
-				oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']").attr("aria-hidden", "true");
+				oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']").attr("inert", "");
 			} else {
-				oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']").removeAttr("aria-hidden");
+				oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']").removeAttr("inert");
 			}
 		}
 	};

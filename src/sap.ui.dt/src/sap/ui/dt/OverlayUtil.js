@@ -4,10 +4,12 @@
 
 // Provides object sap.ui.dt.OverlayUtil.
 sap.ui.define([
+	"sap/ui/core/Control",
 	"sap/ui/core/UIArea",
 	"sap/ui/dt/ElementUtil",
 	"sap/ui/dt/OverlayRegistry"
 ], function(
+	Control,
 	UIArea,
 	ElementUtil,
 	OverlayRegistry
@@ -99,43 +101,30 @@ sap.ui.define([
 	 * @private
 	 */
 	OverlayUtil.getGeometry = function(aGeometry) {
-		let minLeft;
-		let maxRight;
-		let minTop;
-		let maxBottom;
-		aGeometry.forEach(function(oElementGeometry) {
-			if (oElementGeometry && oElementGeometry.visible) {
-				if (!minLeft || oElementGeometry.position.left < minLeft) {
-					minLeft = oElementGeometry.position.left;
-				}
-				if (!minTop || oElementGeometry.position.top < minTop) {
-					minTop = oElementGeometry.position.top;
-				}
+		const aVisibleGeometries = aGeometry.filter((oElementGeometry) => oElementGeometry && oElementGeometry.visible);
 
-				const iRight = oElementGeometry.position.left + oElementGeometry.size.width;
-				if (!maxRight || iRight > maxRight) {
-					maxRight = iRight;
-				}
-				const iBottom = oElementGeometry.position.top + oElementGeometry.size.height;
-				if (!maxBottom || iBottom > maxBottom) {
-					maxBottom = iBottom;
-				}
-			}
-		});
-
-		if (typeof minLeft === "number") {
-			return {
-				size: {
-					width: maxRight - minLeft,
-					height: maxBottom - minTop
-				},
-				position: {
-					left: minLeft,
-					top: minTop
-				},
-				visible: true
-			};
+		if (aVisibleGeometries.length === 0) {
+			return undefined;
 		}
+
+		const minLeft = Math.min(...aVisibleGeometries.map((oGeometry) => oGeometry.position.left));
+		const minTop = Math.min(...aVisibleGeometries.map((oGeometry) => oGeometry.position.top));
+		const maxRight = Math.max(...aVisibleGeometries.map((oGeometry) => oGeometry.position.left + oGeometry.size.width));
+		const maxBottom = Math.max(...aVisibleGeometries.map((oGeometry) => oGeometry.position.top + oGeometry.size.height));
+
+		return {
+			size: {
+				width: maxRight - minLeft,
+				height: maxBottom - minTop
+			},
+			position: {
+				left: minLeft,
+				top: minTop
+			},
+			// If there is at least one visible geometry, the overlay is considered visible
+			// Must be kept as an explicit boolean value to ensure a uniform interface with DOMUtil.getGeometry
+			visible: true
+		};
 	};
 
 	/**
@@ -634,6 +623,29 @@ sap.ui.define([
 	}
 
 	/**
+	 * Checks whether the given element is considered visible for the last-element checks.
+	 * If the element has an overlay, the overlay's <code>getElementVisibility</code> is used (which
+	 * allows the visibility to be overridden by the designtime of the control). If the element has no
+	 * overlay (e.g. when the aggregation is forwarded or rendered in a different place), the control's
+	 * own <code>getVisible</code> is used as fallback. Non-controls without an overlay are considered
+	 * not visible.
+	 *
+	 * @param {sap.ui.core.Element} oElement - The element to be checked
+	 * @return {boolean} Returns <code>true</code> if the element is considered visible
+	 * @private
+	 */
+	function isAggregationElementVisible(oElement) {
+		const oElementOverlay = OverlayRegistry.getOverlay(oElement);
+		if (!oElementOverlay) {
+			if (oElement instanceof Control) {
+				return oElement.getVisible();
+			}
+			return false;
+		}
+		return oElementOverlay.getElementVisibility() === true;
+	}
+
+	/**
 	 * Updates the ability to remove the last element in an aggregation if the second last element is moved or removed.
 	 * The removability of the last element is defined by the designtime of the aggregation.
 	 *
@@ -685,9 +697,7 @@ sap.ui.define([
 			oParent,
 			oElement.sParentAggregationName
 		);
-		const aVisibleSourceParentAggregationElements = aSourceParentAggregationElements?.filter(
-			(oSourceParentAggregationElement) => oSourceParentAggregationElement.getVisible?.() === true
-		);
+		const aVisibleSourceParentAggregationElements = aSourceParentAggregationElements?.filter(isAggregationElementVisible);
 		if (aVisibleSourceParentAggregationElements?.length === 1) {
 			const oLastElement = aVisibleSourceParentAggregationElements[0];
 			const oLastElementOverlay = OverlayRegistry.getOverlay(oLastElement);
@@ -718,13 +728,15 @@ sap.ui.define([
 		if (!Array.isArray(aElements)) {
 			return true;
 		}
-		// check if selected Overlays are the last visible elements in aggregation
-		const iNumberOfSelectedOverlays = aElementOverlays.length;
-		const aInvisibleElements = aElements.filter(function(oElement) {
-			const oElementOverlay = OverlayRegistry.getOverlay(oElement);
-			return !(oElementOverlay && oElementOverlay.getElementVisibility());
+		// check if selected Overlays are the last visible elements in aggregation.
+		// Elements without an overlay are considered visible as well, so that an aggregation which mixes
+		// elements with and without overlays (e.g. when an aggregation is forwarded or rendered elsewhere)
+		// is not falsely detected as having only the selected element(s) left.
+		const aSelectedElements = aElementOverlays.map((oElementOverlay) => oElementOverlay.getElement());
+		const aVisibleElements = aElements.filter(function(oAggregationElement) {
+			return isAggregationElementVisible(oAggregationElement) && !aSelectedElements.includes(oAggregationElement);
 		});
-		const bIsLastVisibleElement = (aInvisibleElements.length + iNumberOfSelectedOverlays === aElements.length);
+		const bIsLastVisibleElement = aVisibleElements.length === 0;
 		if (bIsLastVisibleElement) {
 			const oParentAggregationOverlay = oOverlay?.getParentAggregationOverlay();
 			return checkIfOverlayCanBeRemoved(oParentAggregationOverlay, oDesignTime);
