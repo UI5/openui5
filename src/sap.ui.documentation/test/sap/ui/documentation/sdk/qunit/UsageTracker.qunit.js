@@ -1,8 +1,9 @@
 /*global QUnit, sinon*/
 sap.ui.define([
 	"sap/ui/documentation/sdk/controller/util/UsageTracker",
+	"sap/ui/documentation/sdk/controller/util/DocuInfo",
 	"sap/base/i18n/Localization"],
-function (UsageTracker, Localization) {
+function (UsageTracker, DocuInfo, Localization) {
 	"use strict";
 
 	const testRouteTitle = "test title",
@@ -800,5 +801,76 @@ function (UsageTracker, Localization) {
 			return oLog.event === "errorPage";
 		});
 		assert.strictEqual(aErrorPages.length, 1, "exactly one errorPage for SampleNotFound path");
+	});
+
+	QUnit.module("pageView title — DOCUMENTATION_TOPIC route", {
+		beforeEach: function () {
+			this.oTracker = new UsageTracker(oFactory.getAppComponent());
+			this.sandbox = sinon.createSandbox();
+			this.sandbox.stub(this.oTracker, "_getSiteName").returns("ui5");
+			this.oAddToLogsSpy = this.sandbox.spy(this.oTracker, "_addToLogs");
+			this.oTracker.start(sVersionName.sapui5);
+			this.oAddToLogsSpy.resetHistory();
+		},
+		afterEach: function () {
+			this.oTracker.destroy();
+			this.oTracker = null;
+			this.sandbox.restore();
+		}
+	});
+
+	QUnit.test("pageView title is the string returned by getDocumentTitle", function (assert) {
+		var done = assert.async();
+		this.sandbox.stub(DocuInfo, "getDocumentTitle").returns(Promise.resolve("Glossary"));
+
+		this.oTracker._logRouteMatched({
+			name: "topicId",
+			config: { name: "topicId" },
+			arguments: { id: "some-topic-id" }
+		});
+
+		Promise.resolve().then(function () {
+			var oPageView = this.oAddToLogsSpy.args.map(function (a) { return a[0]; })
+				.find(function (o) { return o.event === "pageView"; });
+			assert.strictEqual(oPageView.page.title, "Glossary", "title is the resolved string");
+			done();
+		}.bind(this));
+	});
+
+	QUnit.test("pageView title is absent when getDocumentTitle rejects", function (assert) {
+		var done = assert.async();
+		this.sandbox.stub(DocuInfo, "getDocumentTitle")
+			.returns(Promise.reject({ status: 469, statusText: "<unknown status code>" }));
+
+		this.oTracker._logRouteMatched({
+			name: "topicId",
+			config: { name: "topicId" },
+			arguments: { id: "some-topic-id" }
+		});
+
+		setTimeout(function () {
+			var oPageView = this.oAddToLogsSpy.args.map(function (a) { return a[0]; })
+				.find(function (o) { return o.event === "pageView"; });
+			assert.notOk("title" in oPageView.page, "title field is absent when fetch fails");
+			done();
+		}.bind(this), 0);
+	});
+
+	QUnit.test("pageView title is absent when getDocumentTitle resolves with undefined", function (assert) {
+		var done = assert.async();
+		this.sandbox.stub(DocuInfo, "getDocumentTitle").returns(Promise.resolve(undefined));
+
+		this.oTracker._logRouteMatched({
+			name: "topicId",
+			config: { name: "topicId" },
+			arguments: { id: "unknown-topic-id" }
+		});
+
+		Promise.resolve().then(function () {
+			var oPageView = this.oAddToLogsSpy.args.map(function (a) { return a[0]; })
+				.find(function (o) { return o.event === "pageView"; });
+			assert.notOk("title" in oPageView.page, "title field is absent when topic not found in index");
+			done();
+		}.bind(this));
 	});
 });
