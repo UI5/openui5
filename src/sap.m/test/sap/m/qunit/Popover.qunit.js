@@ -1443,7 +1443,7 @@ sap.ui.define([
 		oPopover._oScroller.scrollTo(iScrollLeft, iScrollTop, 1);
 
 		//trigger content resize listener
-		oPopover._onOrientationChange();
+		oPopover._onResize();
 
 		assert.equal(oPopover._oScroller.getScrollTop(), iScrollTop, "Popover should keep vertical scroll position");
 		assert.equal(oPopover._oScroller.getScrollLeft(), iScrollLeft, "Popover should keep horizontal scroll position");
@@ -1503,7 +1503,7 @@ sap.ui.define([
 		this.oButton.firePress();
 		this.clock.tick(500);
 		var fnContentResize = this.spy(this.oPopover, "_registerContentResizeHandler");
-		this.oPopover._onOrientationChange();
+		this.oPopover._onResize();
 		assert.equal(fnContentResize.callCount, 1, "registerContentResizeHandler should called once");
 	});
 
@@ -1718,7 +1718,7 @@ sap.ui.define([
 		this.oButton.$().css({
 			top: "-200px"
 		});
-		this.oPopover._fnOrientationChange();
+		this.oPopover._fnResize();
 		this.clock.tick(500);
 		assert.ok(!this.oPopover.isOpen(), "Popover should be closed");
 
@@ -1807,7 +1807,7 @@ sap.ui.define([
 		assert.ok(this.oPopover.isOpen(), "Popover is open");
 		this.oPopover._oScroller.scrollTo(30, 20, 1);
 
-		this.oPopover._onOrientationChange();
+		this.oPopover._onResize();
 		assert.equal(this.oPopover._oScroller.getScrollLeft(), 30, "scrollLeft is restored");
 		assert.equal(this.oPopover._oScroller.getScrollTop(), 20, "scrollTop is restored");
 
@@ -1923,7 +1923,7 @@ sap.ui.define([
 
 		this.oButton.invalidate();
 		// simulate a content resize
-		this.oPopover._onOrientationChange();
+		this.oPopover._onResize();
 		this.oPopover.close();
 		this.clock.tick(400);
 		assert.ok(!this.oPopover.isOpen(), "Popover is closed");
@@ -2136,7 +2136,7 @@ sap.ui.define([
 		// Act: simulate a resize event that does not actually change the window size (as WebKit emits on open).
 		let bClosed = false;
 		this.oPopover.attachAfterClose(function () { bClosed = true; });
-		this.oPopover._onOrientationChange();
+		this.oPopover._onResize();
 
 		// Wait long enough for a potential (buggy) close animation to complete.
 		await new Promise((resolve) => { setTimeout(resolve, 600); });
@@ -3345,8 +3345,24 @@ sap.ui.define([
 		assert.notOk(hasHorizontalOverflow(this.oPopover.getDomRef("cont")), "Popover has no horizontal overflow");
 	});
 
-	QUnit.test("Calling _includeScrollWidth with no dom ref", function(assert) {
-		this.oPopover._includeScrollWidth();
+	QUnit.test("No scrollbar gutter when vertical scrolling is disabled", async function(assert) {
+		this.oPopover.setContentWidth("320px");
+		this.oPopover.setVerticalScrolling(false);
+		this.oPopover.openBy(this.oButton);
+
+		await nextAfterOpenEvent(this.oPopover);
+		await nextUIUpdate();
+
+		const oContentDomRef = this.oPopover.getDomRef("cont");
+
+		assert.ok(hasVerticalOverflow(oContentDomRef), "Content overflows vertically");
+		assert.strictEqual(window.getComputedStyle(oContentDomRef).overflowY, "hidden", "Vertical overflow is hidden");
+		assert.notOk(this.oPopover._hasVerticalScrollbar(), "Hidden overflow is not a vertical scrollbar");
+		assert.notOk(this.oPopover.$().hasClass("sapMPopoverVerticalScrollIncluded"), "No gutter class is added");
+	});
+
+	QUnit.test("Calling _updateScrollbarGutterClass with no dom ref", function(assert) {
+		this.oPopover._updateScrollbarGutterClass();
 		// assert
 		assert.ok(true, "Should not throw an error when there is no dom ref");
 	});

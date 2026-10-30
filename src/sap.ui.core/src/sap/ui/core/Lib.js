@@ -1542,7 +1542,7 @@ sap.ui.define([
 		// when the preload mode is 'auto', it will be set to 'async' or 'sync' for optimized sources
 		// depending on whether the ui5loader is configured async
 		if ( sPreloadMode === "auto" ) {
-			if (window["sap-ui-optimized"]) {
+			if (globalThis["sap-ui-optimized"]) {
 				sPreloadMode = sap.ui.loader.config().async ? "async" : "sync";
 			} else {
 				sPreloadMode = "";

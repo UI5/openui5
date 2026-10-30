@@ -9,7 +9,7 @@ sap.ui.define([], function() {
 	 * TabContainer renderer.
 	 * @namespace
 	 */
-	var TabContainerRenderer = {
+	const TabContainerRenderer = {
 		apiVersion: 2
 	};
 
@@ -20,8 +20,8 @@ sap.ui.define([], function() {
 	 * @param {sap.m.TabContainer} oControl An object representation of the control that should be rendered
 	 */
 	TabContainerRenderer.render = function(oRm, oControl) {
-		var oTabStrip = oControl._getTabStrip(),
-			oSelectedItemContent = oControl._getSelectedItemContent();
+		const oTabStrip = oControl._getTabStrip();
+		const oSelectedItemContent = oControl._getSelectedItemContent();
 
 		// start control wrapper
 		oRm.openStart("div", oControl);
@@ -73,9 +73,9 @@ sap.ui.define([], function() {
 	 * @returns {Object} Accessibility attributes for the tab content
 	 */
 	TabContainerRenderer.getTabContentAccAttributes = function (oControl) {
-		var sSelectedItemId = oControl.getSelectedItem(),
-			oTabStripSelectedItem,
-			mAccAttributes = { role: "tabpanel" };
+		const sSelectedItemId = oControl.getSelectedItem();
+		let oTabStripSelectedItem;
+		const mAccAttributes = { role: "tabpanel" };
 
 		if (sSelectedItemId) {
 			oTabStripSelectedItem = oControl._toTabStripItem(sSelectedItemId);

@@ -1,9 +1,10 @@
 <core:FragmentDefinition
-		xmlns:core="sap.ui.core"
-		xmlns="sap.m"
-		xmlns:form="sap.ui.layout.form"
-		xmlns:util="sap.ui.fl.util"
-		xmlns:layout="sap.ui.layout">
+	xmlns:core="sap.ui.core"
+	xmlns="sap.m"
+	xmlns:form="sap.ui.layout.form"
+	xmlns:util="sap.ui.fl.util"
+	xmlns:layout="sap.ui.layout"
+>
 	<Dialog
 		id="sapUiRtaAddIFrameDialog"
 		title="{dialogInfo>/dialogTitle}"
@@ -20,14 +21,16 @@
 	>
 		<content>
 			<layout:VerticalLayout
-					id="sapUiRtaAddIFrameDialog_VL"
-					width="100%"
-					class="sapUiRtaAddIFrameDialogVlWrapper">
+				id="sapUiRtaAddIFrameDialog_VL"
+				width="100%"
+				class="sapUiRtaAddIFrameDialogVlWrapper"
+			>
 				<VBox
 					id="sapUiRtaAddIFrameDialog_ContainerTitle"
 					visible="{dialogInfo>/showTitle/value}"
 					class="sapUiRtaAddIFrameDialogContainer sapUiSmallMarginTop"
-					renderType="Bare">
+					renderType="Bare"
+				>
 					<items>
 						<Label
 							id="sapUiRtaAddIFrameDialog_ContainerTitleLabel"
@@ -50,10 +53,11 @@
 					</items>
 				</VBox>
 				<layout:Grid
-						id="sapUiRtaAddIFrameDialog_EditGrid"
-						class="sapUiRtaAddIFrameDialogEditGrid"
-						containerQuery="true"
-						defaultSpan="XL6 L6 M6 S12">
+					id="sapUiRtaAddIFrameDialog_EditGrid"
+					class="sapUiRtaAddIFrameDialogEditGrid"
+					containerQuery="true"
+					defaultSpan="XL6 L6 M6 S12"
+				>
 					<VBox id="sapUiRtaAddIFrameDialog_EditUrl" class="sapUiRtaAddIFrameDialogEditUrl" renderType="Bare">
 						<Toolbar style="Clear" class="sapUiRtaAddIFrameDialogHeaderToolbar">
 							<Label
@@ -77,7 +81,8 @@
 							valueStateText="{dialogInfo>/frameUrlError/value}"
 							validateFieldGroup=".onValidateUrl"
 							liveChange=".onUrlLiveChange"
-							width="100%" />
+							width="100%"
+						/>
 					</VBox>
 					<VBox id="sapUiRtaAddIFrameDialog_Parameters" class="sapUiRtaAddIFrameDialogEditUrl sapUiRtaAddIFrameDialogParameters" width="100%" renderType="Bare">
 						<Toolbar style="Clear" class="sapUiRtaAddIFrameDialogHeaderToolbar">
@@ -87,14 +92,16 @@
 								labelFor="sapUiRtaAddIFrameDialog_ParameterTable"
 								class="sapUiRtaAddIFrameDialogParametersLabel"
 								tooltip="{i18n>IFRAME_ADDIFRAME_DIALOG_PARAMETERS_LABEL}"
-								design="Bold"/>
+								design="Bold"
+							/>
 							<Button
 								id="sapUiRtaAddIFrameDialog_ParametersInfoButton"
 								icon="sap-icon://message-information"
 								tooltip="{i18n>IFRAME_ADDIFRAME_DIALOG_PARAMETERS_INFO_TOOLTIP}"
 								class="sapUiRtaAddIFrameDialogParametersInfoButton sapUiTinyMarginBegin"
 								press=".onParameterInfoPress"
-								type="Transparent" />
+								type="Transparent"
+							/>
 						</Toolbar>
 						<SearchField
 							id="sapUiRtaAddIFrameDialog_ParametersSearch"
@@ -151,35 +158,42 @@
 						text="{i18n>IFRAME_ADDIFRAME_DIALOG_URL_INFO_TEXT}"
 						type="Information"
 						showIcon="true"
-						class="sapUiSmallMarginBottom">
+						class="sapUiSmallMarginBottom"
+					>
 						<link>
-							<Link text="{i18n>IFRAME_ADDIFRAME_DIALOG_URL_INFO_LINKTEXT}"
+							<Link
+								text="{i18n>IFRAME_ADDIFRAME_DIALOG_URL_INFO_LINKTEXT}"
 								target="_blank"
-								href="{dialogInfo>/documentationUrl/value}"/>
+								href="{dialogInfo>/documentationUrl/value}"
+							/>
 						</link>
 					</MessageStrip>
 				</VBox>
 				<VBox
 					id="sapUiRtaAddIFrameDialog_PreviewVBox"
 					class="sapUiRtaAddIFrameDialogContainer sapUiTinyMarginTop"
-					renderType="Bare">
-					<HBox id="sapUiRtaAddIFrameDialog_PreviewLinkHBox"
+					renderType="Bare"
+				>
+					<HBox
+						id="sapUiRtaAddIFrameDialog_PreviewLinkHBox"
 						class="sapUiRtaAddIFrameDialogPreviewLinkHBox"
 						justifyContent="SpaceBetween"
 						alignItems="Center"
 						width="100%"
 					>
-						<Label id="sapUiRtaAddIFrameDialog_PreviewLinkLabel"
+						<Label
+							id="sapUiRtaAddIFrameDialog_PreviewLinkLabel"
 							design="Bold"
 							text="{i18n>IFRAME_ADDIFRAME_DIALOG_PREVIEW_LABEL}"
 						/>
-						<Button text="{=${dialogInfo>/previewUrl/value} === '' ? ${i18n>IFRAME_ADDIFRAME_DIALOG_BUTTON_SHOW_PREVIEW} : ${i18n>IFRAME_ADDIFRAME_DIALOG_BUTTON_UPDATE_PREVIEW} }"
+						<Button
+							text="{=${dialogInfo>/previewUrl/value} === '' ? ${i18n>IFRAME_ADDIFRAME_DIALOG_BUTTON_SHOW_PREVIEW} : ${i18n>IFRAME_ADDIFRAME_DIALOG_BUTTON_UPDATE_PREVIEW} }"
 							id="sapUiRtaAddIFrameDialog_PreviewButton"
 							class="sapUiRtaAddIFrameDialogPreviewButton"
 							press=".onPreviewPress"
 							enabled="{= !${dialogInfo>/frameUrlError/value} &amp;&amp; ${dialogInfo>/frameUrl/value} !== '' &amp;&amp; (${dialogInfo>/previousFrameUrl/value} !== ${dialogInfo>/frameUrl/value} || ${dialogInfo>/settingsUpdate/value})}"
 							icon="{=${dialogInfo>/previousFrameUrl/value} ? 'sap-icon://refresh' : null }"
-							/>
+						/>
 					</HBox>
 					<VBox id="sapUiRtaAddIFrameDialog_PreviewLinkVBox" class="sapUiRtaAddIFrameDialogContainer sapUiTinyMarginTop" renderType="Bare">
 						<Link
@@ -196,13 +210,15 @@
 					</VBox>
 				</VBox>
 				<layout:Grid
-						id="sapUiRtaAddIFrameDialog_PreviewGrid"
-						class="sapUiRtaAddIFrameDialogPreviewGrid"
-						containerQuery="true"
-						defaultSpan="XL12 L12 M12 S12">
+					id="sapUiRtaAddIFrameDialog_PreviewGrid"
+					class="sapUiRtaAddIFrameDialogPreviewGrid"
+					containerQuery="true"
+					defaultSpan="XL12 L12 M12 S12"
+				>
 					<VBox
 						id="sapUiRtaAddIFrameDialog_PreviewGridVB"
-						renderType="Bare">
+						renderType="Bare"
+					>
 						<layoutData>
 							<FlexItemData growFactor="1"/>
 						</layoutData>
@@ -213,8 +229,8 @@
 								illustrationSize="Small"
 								title="{i18n>IFRAME_ADDIFRAME_DIALOG_BUTTON_PREVIEW_MESSAGE}"
 								enableDefaultTitleAndDescription="false"
-								visible="{= !${dialogInfo>/previewUrl/value} }">
-							</IllustratedMessage>
+								visible="{= !${dialogInfo>/previewUrl/value} }"
+							/>
 							<util:IFrame
 								id="sapUiRtaAddIFrameDialog_PreviewFrame"
 								title="{i18n>IFRAME_ADDIFRAME_DIALOG_PREVIEW_FRAME_LABEL}"
@@ -222,34 +238,50 @@
 								width="{= ${dialogInfo>/frameWidth/value} + ${dialogInfo>/frameWidthUnit/value} }"
 								height="{= ${dialogInfo>/frameHeight/value} + ${dialogInfo>/frameHeightUnit/value} }"
 								advancedSettings="{dialogInfo>/advancedSettings/value}"
-								visible="{= !!${dialogInfo>/previewUrl/value} }"/>
+								visible="{= !!${dialogInfo>/previewUrl/value} }"
+							/>
 						</items>
 					</VBox>
 				</layout:Grid>
 				<VBox id="sapUiRtaAddIFrameDialog_SizeVBox" class="sapUiRtaAddIFrameDialogSizeVBox">
 					<layout:Grid
-							id="sapUiRtaAddIFrameDialog_SizeGrid"
-							vSpacing="0"
-							hSpacing="0"
-							containerQuery="true"
-							position="Center"
-							class="sapUiRtaAddIFrameDialogSizeGrid"
-							defaultSpan="XL6 L6 M6 S12">
+						id="sapUiRtaAddIFrameDialog_SizeGrid"
+						vSpacing="0"
+						hSpacing="0"
+						containerQuery="true"
+						position="Center"
+						class="sapUiRtaAddIFrameDialogSizeGrid"
+						defaultSpan="XL6 L6 M6 S12"
+					>
 						<form:SimpleForm
-								id="sapUiRtaAddIFrameDialog_WidthForm"
-								editable="true"
-								layout="ColumnLayout"
-								class="sapUiRtaAddIFrameDialogWidthForm"
-								adjustLabelSpan="false"
-								singleContainerFullSize="false"
-								ariaLabelledBy="sapUiRtaAddIFrameDialog_WidthLabel"
-								columnsXL="2" columnsL="2" columnsM="2"
-								labelSpanXL="2" labelSpanL="2" labelSpanM="2" labelSpanS="4"
-								emptySpanXL="2" emptySpanL="2" emptySpanM="2" emptySpanS="0"
+							id="sapUiRtaAddIFrameDialog_WidthForm"
+							editable="true"
+							layout="ColumnLayout"
+							class="sapUiRtaAddIFrameDialogWidthForm"
+							adjustLabelSpan="false"
+							singleContainerFullSize="false"
+							ariaLabelledBy="sapUiRtaAddIFrameDialog_WidthLabel"
+							columnsXL="2"
+							columnsL="2"
+							columnsM="2"
+							labelSpanXL="2"
+							labelSpanL="2"
+							labelSpanM="2"
+							labelSpanS="4"
+							emptySpanXL="2"
+							emptySpanL="2"
+							emptySpanM="2"
+							emptySpanS="0"
 						>
 							<form:content>
-								<Label id="sapUiRtaAddIFrameDialog_WidthLabel" class="sapUiRtaAddIFrameDialogWidthLabel" labelFor="sapUiRtaAddIFrameDialog_WidthInput"
-									text="{i18n>IFRAME_ADDIFRAME_DIALOG_WIDTH_LABEL}" required="true" design="Bold" />
+								<Label
+									id="sapUiRtaAddIFrameDialog_WidthLabel"
+									class="sapUiRtaAddIFrameDialogWidthLabel"
+									labelFor="sapUiRtaAddIFrameDialog_WidthInput"
+									text="{i18n>IFRAME_ADDIFRAME_DIALOG_WIDTH_LABEL}"
+									required="true"
+									design="Bold"
+								/>
 								<StepInput
 									id="sapUiRtaAddIFrameDialog_WidthInput"
 									class="sapUiRtaAddIFrameDialogWidthInput"
@@ -286,13 +318,27 @@
 							adjustLabelSpan="false"
 							singleContainerFullSize="false"
 							ariaLabelledBy="sapUiRtaAddIFrameDialog_HeightLabel"
-							columnsXL="2" columnsL="2" columnsM="2"
-							labelSpanXL="2" labelSpanL="2" labelSpanM="2" labelSpanS="4"
-							emptySpanXL="2" emptySpanL="2" emptySpanM="2" emptySpanS="0"
+							columnsXL="2"
+							columnsL="2"
+							columnsM="2"
+							labelSpanXL="2"
+							labelSpanL="2"
+							labelSpanM="2"
+							labelSpanS="4"
+							emptySpanXL="2"
+							emptySpanL="2"
+							emptySpanM="2"
+							emptySpanS="0"
 						>
 							<form:content>
-								<Label id="sapUiRtaAddIFrameDialog_HeightLabel" class="sapUiRtaAddIFrameDialogHeightLabel" labelFor="sapUiRtaAddIFrameDialog_HeightInput"
-									text="{i18n>IFRAME_ADDIFRAME_DIALOG_HEIGHT_LABEL}" required="true" design="Bold"/>
+								<Label
+									id="sapUiRtaAddIFrameDialog_HeightLabel"
+									class="sapUiRtaAddIFrameDialogHeightLabel"
+									labelFor="sapUiRtaAddIFrameDialog_HeightInput"
+									text="{i18n>IFRAME_ADDIFRAME_DIALOG_HEIGHT_LABEL}"
+									required="true"
+									design="Bold"
+								/>
 								<StepInput
 									id="sapUiRtaAddIFrameDialog_HeightInput"
 									class="sapUiRtaAddIFrameDialogHeightInput"
@@ -315,10 +361,10 @@
 									change=".onSizeChange"
 									tooltip="{i18n>IFRAME_ADDIFRAME_DIALOG_UNIT_TOOLTIP}"
 								>
-										<core:ListItem key="{dialogInfo>unit}" text="{= ${dialogInfo>unit} === 'vh' ? '%' : ${dialogInfo>unit}}" additionalText="{dialogInfo>descriptionText}"/>
-										<layoutData>
-											<form:ColumnElementData cellsLarge="5" cellsSmall="5" />
-										</layoutData>
+									<core:ListItem key="{dialogInfo>unit}" text="{= ${dialogInfo>unit} === 'vh' ? '%' : ${dialogInfo>unit}}" additionalText="{dialogInfo>descriptionText}"/>
+									<layoutData>
+										<form:ColumnElementData cellsLarge="5" cellsSmall="5" />
+									</layoutData>
 								</Select>
 							</form:content>
 						</form:SimpleForm>
@@ -327,23 +373,27 @@
 				<layout:Grid
 					class="sapUiRtaAddIFrameDialogAdvancedSettingsGrid"
 					containerQuery="true"
-					defaultSpan="XL12 L12 M12 S12">
+					defaultSpan="XL12 L12 M12 S12"
+				>
 					<Panel
 						id="sapUiRtaAddIFrameDialog_AdvancedSettingsPanel"
 						expandable="true"
 						width="auto"
 						expanded="false"
-						class="sapUiResponsiveMargin sapUiRtaAddIFrameDialogAdvancedSettingsPanel">
+						class="sapUiResponsiveMargin sapUiRtaAddIFrameDialogAdvancedSettingsPanel"
+					>
 						<headerToolbar>
 							<OverflowToolbar
-									id="sapUiRtaAddIFrameDialog_AdvancedSettingsToolbar"
-									class="sapUiRtaAddIFrameDialogAdvancedSettingsToolbar"
-									height="3rem"
-									style="Clear">
+								id="sapUiRtaAddIFrameDialog_AdvancedSettingsToolbar"
+								class="sapUiRtaAddIFrameDialogAdvancedSettingsToolbar"
+								height="3rem"
+								style="Clear"
+							>
 								<Title
 									id="sapUiRtaAddIFrameDialog_AdvancedSettingsTitle"
 									class="sapUiRtaAddIFrameDialogAdvancedSettingsTitle"
-									text="{= ${dialogInfo>/focusPolicySupported/value} ? ${i18n>IFRAME_ADDIFRAME_ADVANCED_SETTINGS} : ${i18n>IFRAME_ADDIFRAME_SANDBOX_PARAMETERS} }" />
+									text="{= ${dialogInfo>/focusPolicySupported/value} ? ${i18n>IFRAME_ADDIFRAME_ADVANCED_SETTINGS} : ${i18n>IFRAME_ADDIFRAME_SANDBOX_PARAMETERS} }"
+								/>
 								<ToolbarSpacer />
 							</OverflowToolbar>
 						</headerToolbar>
@@ -351,18 +401,22 @@
 							<Panel
 								id="sapUiRtaAddIFrameDialog_SandboxParametersPanel"
 								headerText="{= ${dialogInfo>/focusPolicySupported/value} ? ${i18n>IFRAME_ADDIFRAME_SANDBOX_PARAMETERS} : '' }"
-								class="sapUiRtaAddIFrameDialogSandboxParametersPanel">
+								class="sapUiRtaAddIFrameDialogSandboxParametersPanel"
+							>
 								<content>
 									<MessageStrip
 										id="sapUiRtaAddIFrameDialog_SecurityWarningMessage"
 										text="{i18n>IFRAME_ADDIFRAME_ADDITIONAL_PARAMETERS_SECURITY_WARNING_TEXT}"
 										type="Warning"
 										showIcon="true"
-										class="sapUiSmallMarginBottom">
+										class="sapUiSmallMarginBottom"
+									>
 										<link>
-											<Link text="{i18n>IFRAME_ADDIFRAME_ADDITIONAL_PARAMETERS_WARNING_MORE_INFO_TEXT}"
+											<Link
+												text="{i18n>IFRAME_ADDIFRAME_ADDITIONAL_PARAMETERS_WARNING_MORE_INFO_TEXT}"
 												target="_blank"
-												href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#sandbox"/>
+												href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#sandbox"
+											/>
 										</link>
 									</MessageStrip>
 									<layout:Grid
@@ -373,14 +427,16 @@
 										content="{
 											path: 'dialogInfo>/advancedSettingsConfig',
 											factory: '.createAdvancedSettingsControl'
-										}"/>
+										}"
+									/>
 								</content>
 							</Panel>
 							<Panel
 								id="sapUiRtaAddIFrameDialog_FocusControlPanel"
 								headerText="{i18n>IFRAME_ADDIFRAME_FOCUS_CONTROL}"
 								class="sapUiRtaAddIFrameDialogFocusControlPanel"
-								visible="{dialogInfo>/focusPolicySupported/value}">
+								visible="{dialogInfo>/focusPolicySupported/value}"
+							>
 								<content>
 									<CheckBox
 										id="sapUiRtaAddIFrameDialog_AllowFocusCheckBox"
@@ -406,7 +462,8 @@
 				title="{i18n>IFRAME_ADDIFRAME_DIALOG_PARAMETERS_LABEL}"
 				placement="Auto"
 				contentWidth="20rem"
-				class="sapUiContentPadding sapUiRtaAddIFrameDialogParametersInfoPopover">
+				class="sapUiContentPadding sapUiRtaAddIFrameDialogParametersInfoPopover"
+			>
 				<Text text="{i18n>IFRAME_ADDIFRAME_DIALOG_PARAMETERS_INFO_TEXT}"/>
 			</Popover>
 		</dependents>

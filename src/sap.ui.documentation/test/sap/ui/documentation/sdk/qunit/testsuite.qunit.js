@@ -132,6 +132,11 @@ sap.ui.define([], function() {
 				coverage: {
 					only : ["sap/ui/documentation/sdk/util/CookiesConsentManager"]
 				}
+			},
+			"DocuInfo": {
+				coverage: {
+					only : ["sap/ui/documentation/sdk/controller/util/DocuInfo"]
+				}
 			}
 			// "Forwarding": {
 			// 	coverage: {

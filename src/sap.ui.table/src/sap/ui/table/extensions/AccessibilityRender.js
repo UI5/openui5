@@ -147,7 +147,7 @@ sap.ui.define([
 				if (Array.isArray(oValue)) {
 					oValue = oValue.join(" ");
 				}
-				if (oValue) {
+				if (oValue != null) {
 					oRm.attr(sKey.toLowerCase(), oValue);
 				}
 			}

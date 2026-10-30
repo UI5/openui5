@@ -59,10 +59,7 @@ describe('sap.m.MultiInput', function() {
 			expect(takeScreenshot()).toLookAs("suggestions_visible");
 
 			browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
-			expect(takeScreenshot()).toLookAs("group_header_focused");
-
-			browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
-			expect(takeScreenshot()).toLookAs("first_suggestion_focused");
+			expect(takeScreenshot()).toLookAs("second_suggestion_focused");
 
 			browser.actions().sendKeys("A").perform();
 			expect(takeScreenshot()).toLookAs("input_field_focused");

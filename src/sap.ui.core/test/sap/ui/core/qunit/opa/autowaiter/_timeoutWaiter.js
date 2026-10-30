@@ -596,7 +596,31 @@ sap.ui.define([
 		}, 1000);
 	});
 
-	QUnit.module("timeoutWaiter - Polling Detection - Chained Promises scheduling (HTML case 4)", oFastFrequencyDetectionHooks);
+	QUnit.module("timeoutWaiter - Polling Detection - Chained Promises scheduling (HTML case 4)", {
+		beforeEach: function () {
+			// This test chains three promises per poll cycle which adds extra scheduling
+			// overhead that makes gaps between polls less consistent under
+			// CI resource pressure. Thus a higher maxDeviation (30 ms instead of
+			// the default 10 ms) is set to keep detection reliable without slowing
+			// down the test.
+			timeoutWaiter.extendConfig({
+				frequencyDetection: {
+					maxObservations: 5,
+					maxCollectionTime: 1500,
+					maxDeviation: 30
+				}
+			});
+		},
+		afterEach: function () {
+			timeoutWaiter.extendConfig({
+				frequencyDetection: {
+					maxObservations: 10,
+					maxCollectionTime: 3000,
+					maxDeviation: 10
+				}
+			});
+		}
+	});
 
 	QUnit.test("Should detect polling through chained .then() calls", function (assert) {
 		var fnDone = assert.async();

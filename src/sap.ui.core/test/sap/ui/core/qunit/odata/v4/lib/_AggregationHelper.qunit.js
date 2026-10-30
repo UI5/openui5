@@ -2973,41 +2973,109 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-[undefined, {}].forEach((mAggregate, i) => {
-	QUnit.test("isUsedForGrandTotal: no aggregate, # " + i, function (assert) {
+	QUnit.test("isUsedForGrandTotal", function (assert) {
+		this.mock(_AggregationHelper).expects("isUsedForTotals")
+			.withExactArgs("grandTotal", "~aPaths~", "~mAggregate~")
+			.returns("~result~");
+
 		// code under test
-		assert.strictEqual(_AggregationHelper.isUsedForGrandTotal(["*"], mAggregate),
-			false);
+		assert.strictEqual(
+			_AggregationHelper.isUsedForGrandTotal("~aPaths~", "~mAggregate~"),
+			"~result~");
 	});
-});
 
 	//*********************************************************************************************
-["NoAggregate", "NoGrandTotal", "WithUnitNoGrandTotal", "Unit1", "*"].forEach((sPath) => {
-	QUnit.test("isUsedForGrandTotal: no grand total, path = " + sPath, function (assert) {
-		const mAggregate = {
-			NoGrandTotal : {},
-			WithUnitNoGrandTotal : {unit : "Unit1"}
+[false, true].forEach((bGroupLevels) => {
+	QUnit.test("isUsedForSubtotals: groupLevels=" + bGroupLevels, function (assert) {
+		const oAggregation = {
+			aggregate : "~mAggregate~",
+			groupLevels : bGroupLevels ? ["~group~"] : []
 		};
 
+		this.mock(_AggregationHelper).expects("isUsedForTotals").exactly(bGroupLevels ? 1 : 0)
+			.withExactArgs("subtotals", "~aPaths~", "~mAggregate~")
+			.returns("~result~");
+
 		// code under test
-		assert.strictEqual(_AggregationHelper.isUsedForGrandTotal([sPath], mAggregate), false);
+		assert.strictEqual(
+			_AggregationHelper.isUsedForSubtotals("~aPaths~", oAggregation),
+			bGroupLevels ? "~result~" : false);
 	});
 });
 
 	//*********************************************************************************************
-["NotUsedForGT", "WithGrandTotal", "WithUnitWithGrandTotal", "Unit2", "*"].forEach((sPath) => {
+[undefined, {}].forEach((mAggregate, i) => {
+	QUnit.test("isUsedForTotals: no aggregate, # " + i, function (assert) {
+		// code under test
+		assert.strictEqual(_AggregationHelper.isUsedForTotals("foo", ["*"], mAggregate), false);
+	});
+});
+
+	//*********************************************************************************************
+["NoAggregate", "NoTotals", "WithUnitNoTotals", "Unit1", "*"].forEach((sPath) => {
+	QUnit.test("isUsedForTotals: no totals, path = " + sPath, function (assert) {
+		const mAggregate = Object.freeze({
+			NoTotals : {},
+			WithUnitNoTotals : {unit : "Unit1"}
+		});
+
+		// code under test
+		assert.strictEqual(_AggregationHelper.isUsedForTotals("foo", [sPath], mAggregate), false);
+	});
+});
+
+	//*********************************************************************************************
+["NotUsedForGT", "WithTotals", "WithUnitWithTotals", "Unit", "*"].forEach((sPath) => {
 	QUnit.test("isUsedForGrandTotal: with grand total, path = " + sPath, function (assert) {
 		const mAggregate = {
-			WithGrandTotal : {grandTotal : true},
-			WithUnitWithGrandTotal : {grandTotal : true, unit : "Unit2"}
+			WithTotals : {foo : true},
+			WithUnitWithTotals : {foo : true, unit : "Unit"}
 		};
 
 		// code under test
 		assert.strictEqual(
-			_AggregationHelper.isUsedForGrandTotal(["notUsed", sPath, "n/a"], mAggregate),
+			_AggregationHelper.isUsedForTotals("foo", ["notUsed", sPath, "n/a"], mAggregate),
 			sPath !== "NotUsedForGT");
 	});
 });
+
+	//*********************************************************************************************
+	QUnit.test("isUsedForGroupLevels: no group levels", function (assert) {
+		this.mock(_AggregationHelper).expects("isAffected").never();
+
+		// code under test
+		assert.strictEqual(
+			_AggregationHelper.isUsedForGroupLevels("~aPaths~", {groupLevels : []}),
+			false);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("isUsedForGroupLevels: with group levels", function (assert) {
+		const oAggregation = Object.freeze({
+			aggregate : "~not used~",
+			group : {
+				AnotherNotInGroupLevels : "n/a",
+				GroupLevel1 : "~details1~",
+				GroupLevel2 : "~details2~",
+				NotInGroupLevels : "~not used~"
+			},
+			groupLevels : ["GroupLevel1", "GroupLevel2"]
+		});
+		this.mock(_AggregationHelper).expects("isAffected")
+			.withExactArgs({
+				aggregate : {},
+				group : {
+					GroupLevel1 : "~details1~",
+					GroupLevel2 : "~details2~"
+				}
+			}, [], "~aPaths~")
+			.returns("~result~");
+
+		// code under test
+		assert.strictEqual(
+			_AggregationHelper.isUsedForGroupLevels("~aPaths~", oAggregation),
+			"~result~");
+	});
 
 	//*********************************************************************************************
 	QUnit.test("createPlaceholder", function (assert) {
@@ -3568,6 +3636,81 @@ sap.ui.define([
 				});
 	});
 });
+
+	//*********************************************************************************************
+	QUnit.test("removeFromSpliced: no args", function (assert) {
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.removeFromSpliced(),
+			false, "aElements is optional, e.g. no 'spliced' recursively");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("removeFromSpliced", function (assert) {
+		const oDeleted = Object.freeze({"@$ui5._" : {parent : "~oParentCache~"}}); // rank : 1
+		const aElements = [{
+			"@$ui5._" : {parent : "~oParentCache~", rank : 0} // do not shift!
+		}, oDeleted, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 2}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 3}
+		}, {
+			"@$ui5._" : {parent : "other", rank : 42}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 99} // impossible; just to observe break!
+		}];
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.removeFromSpliced(oDeleted, aElements),
+			true);
+
+		assert.deepEqual(aElements, [{
+			"@$ui5._" : {parent : "~oParentCache~", rank : 0}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 1}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 2}
+		}, {
+			"@$ui5._" : {parent : "other", rank : 42}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 99}
+		}]);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("removeFromSpliced: recursion", function (assert) {
+		const oDeleted = Object.freeze({"@$ui5._" : {parent : "~oParentCache~"}}); // rank : 1
+		const aSpliced = [{
+			"@$ui5._" : {parent : "~oParentCache~", rank : 0} // do not shift!
+		}, oDeleted, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 2}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 3}
+		}, {
+			"@$ui5._" : {parent : "other", rank : 42}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 99} // impossible; just to observe break!
+		}];
+		const oElement = Object.freeze({"@$ui5._" : {spliced : aSpliced}});
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.removeFromSpliced(oDeleted, ["foo", oElement, "bar"]),
+			true);
+
+		assert.deepEqual(aSpliced, [{
+			"@$ui5._" : {parent : "~oParentCache~", rank : 0}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 1}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 2}
+		}, {
+			"@$ui5._" : {parent : "other", rank : 42}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 99}
+		}]);
+	});
 
 	//*********************************************************************************************
 	QUnit.test("removeUI5grand__", function (assert) {

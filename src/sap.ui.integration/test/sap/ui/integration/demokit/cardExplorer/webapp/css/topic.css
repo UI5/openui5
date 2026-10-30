@@ -237,6 +237,23 @@ code {
 	font-size: 0.875rem;
 }
 
+.microChartImgPair {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2rem;
+	align-items: flex-start;
+	margin-bottom: 1rem;
+}
+
+.microChartFigure {
+	margin: 0;
+}
+
+.microChartFigure .microChartImgLabel {
+	font-weight: bold;
+	margin-bottom: 0.5rem;
+}
+
 .overview .imageContainer {
 	display: flex;
 	flex-wrap: wrap;

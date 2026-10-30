@@ -2,19 +2,23 @@
 	controllerName="sap.ui.rta.appVariant.manageApps.webapp.controller.ManageApps"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:core="sap.ui.core"
-	xmlns="sap.m">
+	xmlns="sap.m"
+>
 
-	<Table id="Table1"
+	<Table
+		id="Table1"
 		showNoData="false"
 		inset="false"
 		growing="true"
 		growingThreshold="500"
 		sticky="ColumnHeaders"
-		items="{/appVariants}">
+		items="{/appVariants}"
+	>
 		<columns>
 			<Column
 				width="8rem"
-				hAlign="Left">
+				hAlign="Left"
+			>
 				<Text text="{i18n>MAA_DIALOG_APP_TYPE}" />
 			</Column>
 			<Column
@@ -22,21 +26,24 @@
 				minScreenWidth="tablet"
 				demandPopin="true"
 				popinDisplay="Inline"
-				hAlign="Left">
+				hAlign="Left"
+			>
 				<core:InvisibleText text="{i18n>MAA_DIALOG_ICON}" />
 			</Column>
 			<Column
 				minScreenWidth="tablet"
 				demandPopin="true"
 				popinDisplay="Inline"
-				hAlign="Left">
+				hAlign="Left"
+			>
 				<Text text="{i18n>MAA_DIALOG_TITLE}" />
 			</Column>
 			<Column
 				minScreenWidth="tablet"
 				demandPopin="true"
 				popinDisplay="Inline"
-				hAlign="Left">
+				hAlign="Left"
+			>
 				<Text text="{i18n>MAA_DIALOG_DESCRIPTION}" />
 			</Column>
 			<Column
@@ -44,7 +51,8 @@
 				minScreenWidth="Desktop"
 				demandPopin="true"
 				popinDisplay="Inline"
-				hAlign="End">
+				hAlign="End"
+			>
 				<core:InvisibleText text="{i18n>MAA_DIALOG_ACTIONS_HEADER}" />
 			</Column>
 		</columns>
@@ -53,28 +61,34 @@
 				<cells>
 					<ObjectIdentifier
 						title="{typeOfApp}"
-						text="{currentStatus}" />
+						text="{currentStatus}"
+					/>
 					<core:Icon src="{icon}" tooltip="{iconText}" class="sapUiListTableIconSize" />
 					<ObjectIdentifier
 						title="{title}"
-						text="{subTitle}" />
+						text="{subTitle}"
+					/>
 					<Text text="{description}" />
 
 					<MenuButton text="{i18n>MAA_DIALOG_ACTIONS}">
 						<menu>
 							<Menu itemSelected=".onMenuAction">
 								<items>
-									<MenuItem text="{i18n>MAA_DIALOG_ADAPT_UI}"
+									<MenuItem
+										text="{i18n>MAA_DIALOG_ADAPT_UI}"
 										visible="{parts: [{path: 'adaptUIButtonVisibility'}, {path: 'isKeyUser'}], formatter:'.formatAdaptUIButtonVisibility'}"
 										enabled="{adaptUIButtonEnabled}"
 										tooltip="{parts: [{path: 'adaptUIButtonEnabled'}, {path: 'appVarStatus'}], formatter:'.formatAdaptUIButtonTooltip'}"
-										icon="sap-icon://wrench"/>
+										icon="sap-icon://wrench"
+									/>
 									<MenuItem text="{i18n>MAA_DIALOG_COPY_ID}" tooltip="{i18n>TOOLTIP_MAA_DIALOG_COPY_ID}" icon="sap-icon://copy" />
-									<MenuItem text="{i18n>MAA_DIALOG_DELETE_APPVAR}"
+									<MenuItem
+										text="{i18n>MAA_DIALOG_DELETE_APPVAR}"
 										enabled="{delAppVarButtonEnabled}"
 										visible="{delAppVarButtonVisibility}"
 										tooltip="{parts: [{path: 'delAppVarButtonEnabled'}, {path: 'isS4HanaCloud'}], formatter:'.formatDelButtonTooltip'}"
-										icon="sap-icon://delete" />
+										icon="sap-icon://delete"
+									/>
 								</items>
 							</Menu>
 						</menu>

@@ -10,30 +10,15 @@
  * sapUiTableHScr   - display horizontal scrollbar
  */
 
-
-
-
-/* Can be used in other themes to add styles for which there are no style definitions in the base theme and therefore no theme parameters. */
 .sapUI5Scope {
 	--_sap_ui_table_Scrolling_ScrollbarSize: 16px;
 	--_sap_ui_table_Scrolling_ScrollbarSizeMobile: 8px;
 	--_sap_ui_table_Scrolling_HScrollbarHeight: var(--_sap_ui_table_Scrolling_ScrollbarSize);
 	--_sap_ui_table_Scrolling_HScrollbarHeightMobile: var(--_sap_ui_table_Scrolling_ScrollbarSizeMobile);
-	--_sap_ui_table_Scrolling_VScrollbarWidth: calc(var(--_sap_ui_table_Scrolling_ScrollbarSize) ~"+" var(--_sap_ui_table_BaseBorderWidth));
-	--_sap_ui_table_Scrolling_VScrollbarWidthMobile: calc(var(--_sap_ui_table_Scrolling_ScrollbarSizeMobile) ~"+" var(--_sap_ui_table_BaseBorderWidth));
+	--_sap_ui_table_Scrolling_VScrollbarWidth: ~"calc(var(--_sap_ui_table_Scrolling_ScrollbarSize) + var(--_sap_ui_table_BaseBorderWidth))";
+	--_sap_ui_table_Scrolling_VScrollbarWidthMobile: ~"calc(var(--_sap_ui_table_Scrolling_ScrollbarSizeMobile) + var(--_sap_ui_table_BaseBorderWidth))";
 	--_sap_ui_table_Scrolling_ScrollbarBackground: var(--sapList_HeaderBackground);
 }
-
-/* LESS variable aliases for the RowActionColumn width custom properties — used by the mixins below via @@RowActionWidth */
-@_sap_ui_table_RowActionColumnSmallWidth: var(--_sap_ui_table_RowActionColumnSmallWidth);
-@_sap_ui_table_RowActionColumnSmallWidthCozy: var(--_sap_ui_table_RowActionColumnSmallWidthCozy);
-@_sap_ui_table_RowActionColumnSmallWidthCondensed: var(--_sap_ui_table_RowActionColumnSmallWidthCondensed);
-@_sap_ui_table_RowActionColumnWidth: var(--_sap_ui_table_RowActionColumnWidth);
-@_sap_ui_table_RowActionColumnWidthCozy: var(--_sap_ui_table_RowActionColumnWidthCozy);
-@_sap_ui_table_RowActionColumnWidthCondensed: var(--_sap_ui_table_RowActionColumnWidthCondensed);
-@_sap_ui_table_RowActionColumnLargeWidth: var(--_sap_ui_table_RowActionColumnLargeWidth);
-@_sap_ui_table_RowActionColumnLargeWidthCozy: var(--_sap_ui_table_RowActionColumnLargeWidthCozy);
-@_sap_ui_table_RowActionColumnLargeWidthCondensed: var(--_sap_ui_table_RowActionColumnLargeWidthCondensed);
 
 ._sap_ui_table_Scrolling_NativeScrollbarCommon() {}
 ._sap_ui_table_Scrolling_NativeScrollbarDesktop() {}
@@ -98,45 +83,6 @@
 	}
 }
 
-._sapUiTableVScrWithActionsInnerMixin(@variant:"Width") {
-	@RowActionWidth: "_sap_ui_table_RowActionColumn@{variant}";
-	.sapUiTableHSb, .sapUiTableCtrlScr, .sapUiTableColHdrScr {
-		margin-right: calc(var(--_sap_ui_table_Scrolling_VScrollbarWidth) ~"+" @@RowActionWidth);
-	}
-
-	.sapUiTableRowActionHeaderCell {
-		margin-right: var(--_sap_ui_table_Scrolling_VScrollbarWidth);
-	}
-
-	html.sap-tablet:not(.sap-desktop) &,
-	html.sap-phone & {
-
-		.sapUiTableHSb,
-		.sapUiTableCtrlScr,
-		.sapUiTableColHdrScr {
-			margin-right: calc(var(--_sap_ui_table_Scrolling_VScrollbarWidthMobile) ~"+" @@RowActionWidth);
-		}
-
-		.sapUiTableRowActionHeaderCell {
-			margin-right: var(--_sap_ui_table_Scrolling_VScrollbarWidthMobile);
-		}
-	}
-}
-
-._sapUiTableNoVScrWithActionsInnerMixin(@variant:"Width") {
-	@RowActionWidth: "_sap_ui_table_RowActionColumn@{variant}";
-
-	.sapUiTableHSb,
-	.sapUiTableCtrlScr,
-	.sapUiTableColHdrScr {
-		margin-right: @@RowActionWidth;
-	}
-
-	.sapUiTableRowActionHeaderCell {
-		margin-right: 0px;
-	}
-}
-
 .sapUiTableVScr {
 
 	.sapUiTableHSb,
@@ -153,106 +99,96 @@
 	}
 }
 
-.sapUiTableVScr.sapUiTableRActS {
-
-	._sapUiTableVScrWithActionsInnerMixin("SmallWidth");
+.sapUiTableRActS {
+	--_sap_ui_table_Scrolling_RowActionWidth: var(--_sap_ui_table_RowActionColumnSmallWidth);
 }
 
-.sapUiSizeCozy.sapUiTableVScr.sapUiTableRActS,
-.sapUiSizeCozy .sapUiTableVScr.sapUiTableRActS {
-
-	._sapUiTableVScrWithActionsInnerMixin("SmallWidthCozy");
+.sapUiTableRActM {
+	--_sap_ui_table_Scrolling_RowActionWidth: var(--_sap_ui_table_RowActionColumnWidth);
 }
 
-.sapUiSizeCondensed.sapUiTableVScr.sapUiTableRActS,
-.sapUiSizeCondensed .sapUiTableVScr.sapUiTableRActS {
-
-	._sapUiTableVScrWithActionsInnerMixin("SmallWidthCondensed");
+.sapUiTableRActL {
+	--_sap_ui_table_Scrolling_RowActionWidth: var(--_sap_ui_table_RowActionColumnLargeWidth);
 }
 
-.sapUiTableVScr.sapUiTableRActM {
+.sapUiSizeCozy {
 
-	._sapUiTableVScrWithActionsInnerMixin();
+	&.sapUiTableRActS,
+	.sapUiTableRActS {
+		--_sap_ui_table_Scrolling_RowActionWidth: var(--_sap_ui_table_RowActionColumnSmallWidthCozy);
+	}
+
+	&.sapUiTableRActM,
+	.sapUiTableRActM {
+		--_sap_ui_table_Scrolling_RowActionWidth: var(--_sap_ui_table_RowActionColumnWidthCozy);
+	}
+
+	&.sapUiTableRActL,
+	.sapUiTableRActL {
+		--_sap_ui_table_Scrolling_RowActionWidth: var(--_sap_ui_table_RowActionColumnLargeWidthCozy);
+	}
 }
 
-.sapUiSizeCozy.sapUiTableVScr.sapUiTableRActM,
-.sapUiSizeCozy .sapUiTableVScr.sapUiTableRActM {
+.sapUiSizeCondensed {
 
-	._sapUiTableVScrWithActionsInnerMixin("WidthCozy");
+	&.sapUiTableRActS,
+	.sapUiTableRActS {
+		--_sap_ui_table_Scrolling_RowActionWidth: var(--_sap_ui_table_RowActionColumnSmallWidthCondensed);
+	}
+
+	&.sapUiTableRActM,
+	.sapUiTableRActM {
+		--_sap_ui_table_Scrolling_RowActionWidth: var(--_sap_ui_table_RowActionColumnWidthCondensed);
+	}
+
+	&.sapUiTableRActL,
+	.sapUiTableRActL {
+		--_sap_ui_table_Scrolling_RowActionWidth: var(--_sap_ui_table_RowActionColumnLargeWidthCondensed);
+	}
 }
 
-.sapUiSizeCondensed.sapUiTableVScr.sapUiTableRActM,
-.sapUiSizeCondensed .sapUiTableVScr.sapUiTableRActM {
-
-	._sapUiTableVScrWithActionsInnerMixin("WidthCondensed");
-}
-
+.sapUiTableVScr.sapUiTableRActS,
+.sapUiTableVScr.sapUiTableRActM,
 .sapUiTableVScr.sapUiTableRActL {
 
-	._sapUiTableVScrWithActionsInnerMixin("LargeWidth");
+	.sapUiTableHSb,
+	.sapUiTableCtrlScr,
+	.sapUiTableColHdrScr {
+		margin-right: ~"calc(var(--_sap_ui_table_Scrolling_VScrollbarWidth) + var(--_sap_ui_table_Scrolling_RowActionWidth))";
+	}
+
+	.sapUiTableRowActionHeaderCell {
+		margin-right: var(--_sap_ui_table_Scrolling_VScrollbarWidth);
+	}
+
+	html.sap-tablet:not(.sap-desktop) &,
+	html.sap-phone & {
+
+		.sapUiTableHSb,
+		.sapUiTableCtrlScr,
+		.sapUiTableColHdrScr {
+			margin-right: ~"calc(var(--_sap_ui_table_Scrolling_VScrollbarWidthMobile) + var(--_sap_ui_table_Scrolling_RowActionWidth))";
+		}
+
+		.sapUiTableRowActionHeaderCell {
+			margin-right: var(--_sap_ui_table_Scrolling_VScrollbarWidthMobile);
+		}
+	}
 }
 
-.sapUiSizeCozy.sapUiTableVScr.sapUiTableRActL,
-.sapUiSizeCozy .sapUiTableVScr.sapUiTableRActL {
-
-	._sapUiTableVScrWithActionsInnerMixin("LargeWidthCozy");
-}
-
-.sapUiSizeCondensed.sapUiTableVScr.sapUiTableRActL,
-.sapUiSizeCondensed .sapUiTableVScr.sapUiTableRActL {
-
-	._sapUiTableVScrWithActionsInnerMixin("LargeWidthCondensed");
-}
-
-.sapUiTableRActS:not(.sapUiTableVScr) {
-
-	._sapUiTableNoVScrWithActionsInnerMixin("SmallWidth");
-}
-
-.sapUiSizeCozy.sapUiTableRActS:not(.sapUiTableVScr),
-.sapUiSizeCozy .sapUiTableRActS:not(.sapUiTableVScr) {
-
-	._sapUiTableNoVScrWithActionsInnerMixin("SmallWidthCozy");
-}
-
-.sapUiSizeCondensed.sapUiTableRActS:not(.sapUiTableVScr),
-.sapUiSizeCondensed .sapUiTableRActS:not(.sapUiTableVScr) {
-
-	._sapUiTableNoVScrWithActionsInnerMixin("SmallWidthCondensed");
-}
-
-.sapUiTableRActM:not(.sapUiTableVScr) {
-
-	._sapUiTableNoVScrWithActionsInnerMixin();
-}
-
-.sapUiSizeCozy.sapUiTableRActM:not(.sapUiTableVScr),
-.sapUiSizeCozy .sapUiTableRActM:not(.sapUiTableVScr) {
-
-	._sapUiTableNoVScrWithActionsInnerMixin("WidthCozy");
-}
-
-.sapUiSizeCondensed.sapUiTableRActM:not(.sapUiTableVScr),
-.sapUiSizeCondensed .sapUiTableRActM:not(.sapUiTableVScr) {
-
-	._sapUiTableNoVScrWithActionsInnerMixin("WidthCondensed");
-}
-
+.sapUiTableRActS:not(.sapUiTableVScr),
+.sapUiTableRActM:not(.sapUiTableVScr),
 .sapUiTableRActL:not(.sapUiTableVScr) {
 
-	._sapUiTableNoVScrWithActionsInnerMixin("LargeWidth");
-}
+	.sapUiTableHSb,
+	.sapUiTableCtrlScr,
+	.sapUiTableColHdrScr {
+		margin-right: var(--_sap_ui_table_Scrolling_RowActionWidth);
+	}
 
-.sapUiSizeCozy.sapUiTableRActL:not(.sapUiTableVScr),
-.sapUiSizeCozy .sapUiTableRActL:not(.sapUiTableVScr) {
-
-	._sapUiTableNoVScrWithActionsInnerMixin("LargeWidthCozy");
-}
-
-.sapUiSizeCondensed.sapUiTableRActL:not(.sapUiTableVScr),
-.sapUiSizeCondensed .sapUiTableRActL:not(.sapUiTableVScr) {
-
-	._sapUiTableNoVScrWithActionsInnerMixin("LargeWidthCondensed");
+	.sapUiTableRowActionHeaderCell {
+		margin-right: 0;
+	}
 }
 
 /* Hide last border right of column header and cell when no vertical scroll is available */

@@ -620,8 +620,10 @@ sap.ui.define([
 		 * Definition of a custom currency.
 		 *
 		 * @typedef {object} module:sap/base/i18n/Formatting.CustomCurrency
-		 * @property {int} digits
+		 * @property {int} [digits]
 		 *   The number of decimal digits to be used for the currency
+		 * @property {string} [symbol]
+		 *   The symbol to be used for the currency (e.g. "$", "€")
 		 * @public
 		 */
 
@@ -634,25 +636,24 @@ sap.ui.define([
 		 * fallback.
 		 *
 		 * @returns {Object<string,module:sap/base/i18n/Formatting.CustomCurrency>|undefined}
-		 *   A map with the currency code as key and a custom currency definition containing the number of decimals as
-		 *   value; or <code>undefined</code> if there are no custom currencies
+		 *   A map with the currency code as key and a custom currency definition as value; or <code>undefined</code>
+		 *   if there are no custom currencies
 		 *
 		 * @public
-	 	 * @example <caption>A simple example for custom currencies that uses CLDR data but overrides single
-		 *   currencies</caption>
+	 	 * @example <caption>Custom currencies with symbol and digit overrides using CLDR as fallback</caption>
 		 * {
-		 *   "EUR3": {"digits": 3}
-		 *   "MYD": {"digits": 4}
+		 *   "MyCoin": {"symbol": "MC"},
+		 *   "EUR3": {"digits": 3},
+		 *   "BitCoin": {"symbol": "BTC", "digits": 8}
 		 * }
 		 *
-	 	 * @example <caption>A simple example for custom currencies that overrides all currency information from the
-		 *   CLDR</caption>
+	 	 * @example <caption>Custom currencies that override all currency information from the CLDR</caption>
 		 * {
 		 *   "DEFAULT": {"digits": 2},
 		 *   "ADP": {"digits": 0},
 		 *   ...
-		 *   "EUR3": {"digits": 3}
-		 *   "MYD": {"digits": 4},
+		 *   "EUR3": {"digits": 3},
+		 *   "MYD": {"symbol": "MYD", "digits": 4},
 		 *   ...
 		 *   "ZWD": {"digits": 0}
 		 * }

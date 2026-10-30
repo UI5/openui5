@@ -895,7 +895,6 @@ sap.ui.define([
 							{
 								title: 'Navigation from Chart Sectors',
 								key: 'chartActions',
-								experimental: true,
 								settings: {
 									rows: 5,
 									columns: 4
@@ -912,7 +911,6 @@ sap.ui.define([
 							{
 								title: 'Details Popover',
 								key: 'detailsPopover',
-								experimental: true,
 								settings: {
 									rows: 5,
 									columns: 4
@@ -934,7 +932,6 @@ sap.ui.define([
 							{
 								title: 'Popover Actions',
 								key: 'popoverActions',
-								experimental: true,
 								settings: {
 									rows: 5,
 									columns: 4
@@ -956,7 +953,6 @@ sap.ui.define([
 							{
 								title: 'Popover Extension Actions',
 								key: 'popoverExtensionActions',
-								experimental: true,
 								settings: {
 									rows: 5,
 									columns: 4

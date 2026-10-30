@@ -1,6 +1,7 @@
 <core:FragmentDefinition
 	xmlns:core="sap.ui.core"
-	xmlns="sap.m">
+	xmlns="sap.m"
+>
 	<Dialog id="manageVersionsDialog" class="sapUiRTABorder sapUiRtaManageVersionsDialog" contentWidth="60%">
 		<customHeader>
 			<Toolbar>
@@ -10,7 +11,8 @@
 					id="closeManageVersionsDialogButton"
 					icon="sap-icon://decline"
 					tooltip="{i18n>BTN_CLOSE_FEEDBACK_DIALOG}"
-					press=".closeManageVersionsDialog" />
+					press=".closeManageVersionsDialog"
+				/>
 			</Toolbar>
 		</customHeader>
 		<content>
@@ -25,7 +27,8 @@
 				class="sapUiRtaVersionsList"
 				noDataText="{i18n>NO_ADDITIONAL_VERSIONS_AVAILABLE}"
 				updateFinished=".applyDraftVersionClasses"
-				items="{versions>/versions}" >
+				items="{versions>/versions}"
+			>
 				<columns>
 					<Column width="40%">
 						<Text text="{i18n>TIT_VERSION_COLUMN}" />
@@ -47,7 +50,8 @@
 						<ObjectStatus
 							text="{parts: ['versions>type', 'versions>isPublished'], formatter: '.formatVersionStateText'}"
 							icon="{parts: ['versions>type', 'versions>isPublished'], formatter: '.formatVersionIcon'}"
-							state="{parts: ['versions>type', 'versions>isPublished'], formatter: '.formatVersionState'}" />
+							state="{parts: ['versions>type', 'versions>isPublished'], formatter: '.formatVersionState'}"
+						/>
 						<Text text="{parts: ['versions>activatedAt', 'versions>importedAt'], formatter: '.formatVersionTimeStamp'}" />
 						<Text text="{versions>activatedBy}" />
 						<Button
@@ -55,7 +59,8 @@
 							type="Transparent"
 							icon="sap-icon://navigation-right-arrow"
 							tooltip="{i18n>TOL_SWITCH_TO_VERSION}"
-							press=".versionSelected" />
+							press=".versionSelected"
+						/>
 					</ColumnListItem>
 				</items>
 			</Table>
@@ -67,7 +72,8 @@
 					keyboardMode="Edit"
 					fixedLayout="false"
 					showSeparators="None"
-					class="sapUiRtaOriginalVersionList">
+					class="sapUiRtaOriginalVersionList"
+				>
 					<columns>
 						<Column width="40%" />
 						<Column width="10%" />
@@ -78,7 +84,8 @@
 					<items>
 						<ColumnListItem
 							id="sapUiRta_originalVersionItem"
-							type="Inactive">
+							type="Inactive"
+						>
 							<Text text="{i18n>TIT_ORIGINAL_APP}" />
 							<Text text="" />
 							<Text text="" />
@@ -89,7 +96,8 @@
 								enabled="{parts: ['versions>/displayedVersion'], formatter: '.formatOriginalVersionButtonEnabled'}"
 								icon="sap-icon://navigation-right-arrow"
 								tooltip="{i18n>TIT_SWITCH_TO_ORIGINAL_APP}"
-								press=".versionSelected" />
+								press=".versionSelected"
+							/>
 						</ColumnListItem>
 					</items>
 				</Table>

@@ -8,13 +8,18 @@ sap.ui.define(["sap/ui/thirdparty/jquery", "sap/ui/documentation/sdk/util/Resour
 		"use strict";
 
 		var oCachedData;
+		var oCachedPromise;
 
 		function _getDocuIndexPromise(oConfig) {
 			if (oCachedData) {
 				return Promise.resolve(oCachedData);
 			}
 
-			return new Promise(function (resolve, reject) {
+			if (oCachedPromise) {
+				return oCachedPromise;
+			}
+
+			oCachedPromise = new Promise(function (resolve, reject) {
 				jQuery.ajax({
 					async: true,
 					url: ResourcesUtil.getResourceOriginPath(oConfig.docuPath + "index.json"),
@@ -24,11 +29,13 @@ sap.ui.define(["sap/ui/thirdparty/jquery", "sap/ui/documentation/sdk/util/Resour
 						resolve(oData);
 					},
 					error: function (oError) {
+						oCachedPromise = null; // clear so callers can retry after a transient failure (e.g. 469 error)
 						reject(oError);
 					}
 				});
 			});
 
+			return oCachedPromise;
 		}
 
 

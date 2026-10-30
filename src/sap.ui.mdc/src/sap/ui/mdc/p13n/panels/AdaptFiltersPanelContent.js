@@ -1227,8 +1227,8 @@ sap.ui.define([
 			} else if (oItems.length > 0) {
 				fnFocusFilterField(oItems[oItems.length - 1]);
 			} else {
-				// If no item is left, focus the add filter ComboBox
-				this._getAddFilterSection().getContent()[1].focus();
+				// If no item is left, focus the add filter ComboBox.
+				this._getAddFilterSection().getItems()[1].focus();
 			}
 		};
 		this._oListControl.attachEventOnce("updateFinished", fnUpdateFocusPosition);

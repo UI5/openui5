@@ -1824,15 +1824,18 @@ sap.ui.define([
 		let $OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
 		const sTableId = oTable.getId();
 
-		//Heading + Extension + Footer + 2xTable + Row Selector + 2xColumn Headers + NoData Container = 8
-		assert.strictEqual($OverlayCoveredElements.length, 8, "Number of potentionally covered elements");
+		assert.strictEqual(oTable.getDomRef("overlay").textContent, "\u00a0",
+			"Overlay contains a non-breaking space so JAWS doesn't skip it in VPC Mode");
+
+		//Heading + Extension + Footer + Content + Row Selector + 5xTabElement = 10
+		assert.strictEqual($OverlayCoveredElements.length, 10, "Number of potentionally covered elements");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
+			assert.ok(!this.hasAttribute("inert"), "No inert");
 		});
 		oTable.setShowOverlay(true);
 		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
+			assert.ok(this.hasAttribute("inert"), "inert");
 		});
 		let oElem = document.getElementById(sTableId + "-overlay");
 		assert.strictEqual(oElem.getAttribute("aria-labelledby"), oTable.getAriaLabelledBy() + " " + sTableId + "-ariainvalid", "aria-labelledby");
@@ -1840,12 +1843,12 @@ sap.ui.define([
 		await nextUIUpdate();
 		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
+			assert.ok(this.hasAttribute("inert"), "inert");
 		});
 		oTable.setShowOverlay(false);
 		$OverlayCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='overlay']");
 		$OverlayCoveredElements.each(function() {
-			assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
+			assert.ok(!this.hasAttribute("inert"), "No inert");
 		});
 
 		oTable.removeAllAriaLabelledBy();
@@ -1860,24 +1863,24 @@ sap.ui.define([
 		const done = assert.async();
 		let $NoDataCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']");
 
-		// 2xTable + Row Selector = 3
-		assert.strictEqual($NoDataCoveredElements.length, 3, "Number of potentially covered elements");
+		// Row Selector = 1
+		assert.strictEqual($NoDataCoveredElements.length, 1, "Number of potentially covered elements");
 		$NoDataCoveredElements.each(function() {
-			assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
+			assert.ok(!this.hasAttribute("inert"), "No inert");
 		});
 
 		async function onNewModelApplied() {
 			oTable.detachRowsUpdated(onNewModelApplied);
 			$NoDataCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']");
 			$NoDataCoveredElements.each(function() {
-				assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
+				assert.ok(this.hasAttribute("inert"), "inert");
 			});
 			oTable.invalidate();
 			await nextUIUpdate();
 			// eslint-disable-next-line require-atomic-updates
 			$NoDataCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']");
 			$NoDataCoveredElements.each(function() {
-				assert.ok(this.getAttribute("aria-hidden") === "true", "aria-hidden");
+				assert.ok(this.hasAttribute("inert"), "inert");
 			});
 
 			const $Elem = oTable.$("noDataCnt");
@@ -1901,7 +1904,7 @@ sap.ui.define([
 			// eslint-disable-next-line require-atomic-updates
 			$NoDataCoveredElements = oTable.$().find("[data-sap-ui-table-acc-covered*='nodata']");
 			$NoDataCoveredElements.each(function() {
-				assert.ok(!this.getAttribute("aria-hidden"), "No aria-hidden");
+				assert.ok(!this.hasAttribute("inert"), "No inert");
 			});
 			done();
 		}

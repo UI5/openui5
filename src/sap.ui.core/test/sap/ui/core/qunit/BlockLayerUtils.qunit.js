@@ -4,8 +4,10 @@ sap.ui.define([
 	"sap/ui/test/utils/nextUIUpdate",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/m/Button",
-	"sap/ui/events/KeyCodes"
-], function (Log, nextUIUpdate, QUnitUtils, Button, KeyCodes) {
+	"sap/ui/events/KeyCodes",
+	"sap/ui/core/mvc/XMLView",
+	"sap/ui/core/Placeholder"
+], function (Log, nextUIUpdate, QUnitUtils, Button, KeyCodes, XMLView, Placeholder) {
 	"use strict";
 
 	// create content div
@@ -376,6 +378,220 @@ sap.ui.define([
 		QUnitUtils.triggerKeyup(this.oButton.getFocusDomRef(), KeyCodes.ESCAPE);
 
 		assert.equal(oSpy.callCount, 1, "event should be dispatched to the control after unblocked");
+	});
+
+	// =========================================================================
+	// Nested XMLView: inert must be removed after re-render + setBusy(false)
+	// =========================================================================
+
+	QUnit.module("Inert with nested XMLView", {
+		afterEach: function() {
+			if (this.oOuterView) {
+				this.oOuterView.destroy();
+			}
+			return nextUIUpdate();
+		}
+	});
+
+	QUnit.test("inert is removed from nested XMLView after re-render during busy and setBusy(false)", function(assert) {
+		return XMLView.create({
+			id: "outerView",
+			viewName: "testdata.blocklayerutils.OuterView"
+		}).then(async (oOuterView) => {
+			this.oOuterView = oOuterView;
+			oOuterView.placeAt("content");
+			await nextUIUpdate();
+
+			// Wait for the nested XMLView to be fully loaded and rendered
+			var oInnerView = oOuterView.byId("innerView");
+			assert.ok(oInnerView, "Inner XMLView exists");
+			await oInnerView.loaded();
+			await nextUIUpdate();
+
+			assert.ok(oInnerView.getDomRef(), "Inner XMLView has DOM");
+			assert.ok(
+				oInnerView.getDomRef().hasAttribute("data-sap-ui-preserve"),
+				"Inner XMLView has preserve marker"
+			);
+
+			// Step 1: Make outer view busy (delay=0 to get immediate block layer)
+			oOuterView.setBusyIndicatorDelay(0);
+			oOuterView.setBusy(true);
+
+			assert.ok(
+				oInnerView.getDomRef().hasAttribute("inert"),
+				"Inner XMLView should be inert while outer is busy"
+			);
+
+			// Step 2: Re-render the outer view while it is busy.
+			// This triggers:
+			//   - XMLView.onBeforeRendering → preserveContent moves inner view
+			//     (with inert) to #sap-ui-preserve
+			//   - Rendering delegate onBeforeRendering → unblock removes inert from
+			//     current children of outer view, but inner view is already in
+			//     preserve area
+			//   - Rendering delegate onAfterRendering → schedules new busy indicator
+			//     with delay
+			oOuterView.invalidate();
+			await nextUIUpdate();
+
+			// Step 3: Set busy false. The rendering delegate's onAfterRendering
+			// scheduled a delayed call for the busy indicator. setBusy(false)
+			// clears that timeout. Since _oBusyBlockState was deleted during the
+			// re-render, fnRemoveBusyIndicator has nothing to unblock.
+			oOuterView.setBusy(false);
+
+			assert.ok(oInnerView.getDomRef(), "Inner XMLView still has DOM after the sequence");
+			assert.notOk(
+				oInnerView.getDomRef().hasAttribute("inert"),
+				"Inner XMLView should NOT have inert after setBusy(false)"
+			);
+
+			// Verify the inner view is usable (not in preserve area)
+			var oInnerBtn = oOuterView.byId("innerView--innerBtn");
+			assert.ok(
+				oInnerBtn && oInnerBtn.getDomRef(),
+				"Inner button should be in the live DOM"
+			);
+		});
+	});
+
+	QUnit.test("inert is removed from nested XMLView after re-render during busy with delay and setBusy(false)", function(assert) {
+		var done = assert.async();
+
+		XMLView.create({
+			id: "outerView2",
+			viewName: "testdata.blocklayerutils.OuterView"
+		}).then(async (oOuterView) => {
+			this.oOuterView = oOuterView;
+			oOuterView.placeAt("content");
+			await nextUIUpdate();
+
+			// Wait for the nested XMLView to be fully loaded and rendered
+			var oInnerView = oOuterView.byId("innerView");
+			await oInnerView.loaded();
+			await nextUIUpdate();
+
+			// Use the default busy indicator delay (1000ms).
+			// This reproduces the scenario where:
+			//  1. setBusy(true) — delayed busy indicator starts
+			//  2. After delay fires, block layer + inert are applied
+			//  3. invalidate() — re-render preserves inner view with inert
+			//  4. After re-render, new delayed call is scheduled
+			//  5. setBusy(false) during delay window — _oBusyBlockState is undefined
+			oOuterView.setBusy(true);
+
+			// Wait for the busy indicator delay to fire (default 1000ms)
+			setTimeout(async function() {
+				assert.ok(
+					oInnerView.getDomRef().hasAttribute("inert"),
+					"Inner XMLView is inert after busy indicator delay"
+				);
+
+				// Re-render outer view while busy
+				oOuterView.invalidate();
+
+				await nextUIUpdate();
+
+				oOuterView.setBusy(false);
+
+				assert.ok(oInnerView.getDomRef(), "Inner XMLView has DOM");
+				assert.notOk(
+					oInnerView.getDomRef().hasAttribute("inert"),
+					"Inner XMLView should NOT have inert after setBusy(false)"
+				);
+				done();
+			}, 1200);
+		});
+	});
+
+	// =========================================================================
+	// Placeholder: inert must be removed after re-render + hide
+	// =========================================================================
+
+	QUnit.module("Inert with Placeholder and nested XMLView", {
+		afterEach: function() {
+			if (this.oOuterView) {
+				this.oOuterView.destroy();
+			}
+			return nextUIUpdate();
+		}
+	});
+
+	QUnit.test("inert is removed from nested XMLView after Placeholder.show, re-render, and Placeholder.hide", function(assert) {
+		var oPlaceholder = new Placeholder({ html: "testdata/blocklayerutils/placeholder.fragment.html" });
+
+		return XMLView.create({
+			id: "outerViewPH",
+			viewName: "testdata.blocklayerutils.OuterView"
+		}).then(async (oOuterView) => {
+			this.oOuterView = oOuterView;
+			oOuterView.placeAt("content");
+			await nextUIUpdate();
+
+			var oInnerView = oOuterView.byId("innerView");
+			await oInnerView.loaded();
+			await nextUIUpdate();
+
+			assert.ok(oInnerView.getDomRef(), "Inner XMLView has DOM");
+			assert.ok(
+				oInnerView.getDomRef().hasAttribute("data-sap-ui-preserve"),
+				"Inner XMLView has preserve marker"
+			);
+
+			// Step 1: Show placeholder on the outer view — this calls
+			// BlockLayerUtils.block() which sets inert on the outer view's
+			// direct children, including the inner XMLView.
+			await oPlaceholder.show(oOuterView);
+
+			assert.ok(
+				oInnerView.getDomRef().hasAttribute("inert"),
+				"Inner XMLView should be inert while placeholder is shown"
+			);
+
+			// Step 2: Invalidate the outer view and call Placeholder.hide()
+			// BEFORE the rendering is flushed. This simulates the real routing
+			// scenario: Placeholder.hide (unblock) is called while the inner
+			// XMLView DOM is still inside #sap-ui-preserve from a previous
+			// re-render cycle. The key bug: unblock iterates oParentDOM.children
+			// to remove inert, but children in #sap-ui-preserve are not found,
+			// so inert stays. When the re-render restores the preserved DOM,
+			// the inner view returns with a stale inert attribute.
+			//
+			// With the MutationObserver fix: the observer tracks when children
+			// leave (removes inert) and re-enter (adds inert), and takeRecords()
+			// during unblock flushes any pending records synchronously.
+			oOuterView.invalidate();
+			// Do NOT await nextUIUpdate() here — hide() must run while the
+			// inner view is still in #sap-ui-preserve from the onBeforeRendering
+			// phase of the pending re-render.
+
+			// Force the onBeforeRendering phase which moves inner view DOM to
+			// #sap-ui-preserve, but don't wait for the full rendering to complete.
+			// We achieve this by flushing rendering synchronously up to the point
+			// where preserved content is moved out, then calling hide().
+			// Actually, we use a rendering delegate to call hide at the right time:
+			var bHideCalled = false;
+			oOuterView.addEventDelegate({
+				onBeforeRendering: function() {
+					if (!bHideCalled) {
+						bHideCalled = true;
+						// At this point, XMLView.onBeforeRendering has already run
+						// (it's a before-delegate on the XMLView) and moved the inner
+						// view DOM to #sap-ui-preserve. The placeholder is still active.
+						oPlaceholder.hide();
+					}
+				}
+			});
+
+			await nextUIUpdate();
+
+			assert.ok(oInnerView.getDomRef(), "Inner XMLView still has DOM after the sequence");
+			assert.notOk(
+				oInnerView.getDomRef().hasAttribute("inert"),
+				"Inner XMLView should NOT have inert after Placeholder.hide"
+			);
+		});
 	});
 
 });

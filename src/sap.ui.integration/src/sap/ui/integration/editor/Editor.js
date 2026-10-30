@@ -13,7 +13,6 @@ sap.ui.define([
 	"sap/ui/core/Lib",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/integration/util/Utils",
-	"sap/ui/integration/util/Destinations",
 	"sap/ui/integration/util/DataProviderFactory",
 	"sap/m/Popover",
 	"sap/base/Log",
@@ -32,7 +31,8 @@ sap.ui.define([
 	"./EditorTranslation",
 	"./EditorContext",
 	"./EditorDataLoading",
-	"./EditorSettingsLayer"
+	"./EditorSettingsLayer",
+	"./EditorDestinations"
 ], function(
 	Localization,
 	Control,
@@ -44,7 +44,6 @@ sap.ui.define([
 	Library,
 	JSONModel,
 	Utils,
-	Destinations,
 	DataProviderFactory,
 	Popover,
 	Log,
@@ -63,7 +62,8 @@ sap.ui.define([
 	EditorTranslation,
 	EditorContext,
 	EditorDataLoading,
-	EditorSettingsLayer
+	EditorSettingsLayer,
+	EditorDestinations
 ) {
 	"use strict";
 
@@ -267,6 +267,10 @@ sap.ui.define([
 		}
 
 		return oResultParams;
+	};
+
+	Editor.prototype.initDestinations = function (vHost) {
+		EditorDestinations.initDestinations(this, vHost);
 	};
 
 	Editor.prototype.resolveDestination = function (sKey) {
@@ -499,36 +503,6 @@ sap.ui.define([
 			.setAllowCustomDataType(true);
 		return oDataProvider._waitDependencies().then(function () {
 			return oDataProvider.getData();
-		});
-	};
-
-	Editor.prototype.initDestinations = function (vHost) {
-		this._oDestinationsModel = new JSONModel({});
-		this.setModel(this._oDestinationsModel, "destinations");
-		var oHostInstance = this.getHostInstance();
-
-		if (vHost && !oHostInstance) {
-			Log.error(
-				"sap.ui.integration.editor.Editor: Host with id '" + vHost + "' is not available during editor initialization. It must be available for host specific features to work.",
-				"Make sure that the host already exists, before assigning it to the editor.",
-				"sap.ui.integration.editor.Editor"
-			);
-		}
-
-		// use configurations of main manifest for destinations if current is child and useMainDestinations flag is true
-		var sConfigurationPath = this.getConfigurationPath();
-		var sPrefix = "destinations";
-		var oManifestConfig = this._oManifestModel.getProperty(sConfigurationPath + "/destinations");
-		const bUseMainDestinations = this._oManifestModel.getProperty(sConfigurationPath + "/useMainDestinations") === true;
-
-		if (this.isChild && bUseMainDestinations) {
-			sPrefix = "mainDestinations";
-			oManifestConfig = this._mainManifest.get(sConfigurationPath + "/destinations");
-		}
-		this._oDestinations = new Destinations({
-			host: oHostInstance,
-			manifestConfig: oManifestConfig,
-			prefix: sPrefix
 		});
 	};
 
@@ -1020,10 +994,10 @@ sap.ui.define([
 			that.initDataProviderFactory();
 			if (!that.isChild && (that.getMode() === Constants.EDITOR_MODE.ADMIN || that.getMode() === Constants.EDITOR_MODE.ALL)) {
 				//always add destination settings for admin and all modes if not child editor
-				that._addDestinationSettings(oConfiguration);
+				EditorDestinations.addDestinationSettings(that, oConfiguration, oDesigntime, that._oResourceBundle);
 			} else {
 				//delete destination settings in dt for other modes
-				that._deleleDestinationSettings();
+				EditorDestinations.deleteDestinationSettings(oDesigntime);
 			}
 			//create a settings model
 			that._oSettingsModel = new JSONModel(that._oDesigntimeInstance.getSettings());
@@ -1531,117 +1505,6 @@ sap.ui.define([
 		}
 	};
 
-	/**
-	 * Adds additional settings for destinations section in admin mode and all modeß
-	 * @param {object} oConfiguration
-	 */
-	Editor.prototype._addDestinationSettings = function (oConfiguration) {
-		var oSettings = this._oDesigntimeInstance.getSettings(),
-			sBasePath = this.getConfigurationPath() + "/destinations";
-		oSettings.form = oSettings.form || {};
-		oSettings.form.items = oSettings.form.items || {};
-		if (oSettings && oConfiguration && oConfiguration.destinations) {
-			this._bDestinationGroupAtTop = false;
-			var oItems = oSettings.form.items,
-				oDestinations = {},
-				oHost = this.getHostInstance();
-			var oDestinationGroup = {
-				label: this._oResourceBundle.getText("EDITOR_DESTINATIONS") || "Destinations",
-				type: "group",
-				expanded: true,
-				visible: true,
-				_settingspath: "/form/items/destination.group"
-			};
-			if (oItems["destination.group"]) {
-				// if the 1st item is destination group, set this._bDestinationGroupAtTop to true. Then render destination group at top
-				this._bDestinationGroupAtTop = Object.keys(oItems)[0] === "destination.group";
-				oDestinationGroup = merge(oDestinationGroup, oItems["destination.group"]);
-				delete oItems["destination.group"];
-			}
-			oDestinations["destination.group"] = oDestinationGroup;
-			Object.keys(oConfiguration.destinations).forEach(function (n) {
-				var oDestination = merge({
-					manifestpath: sBasePath + "/" + n + "/name", //destination points to name not value
-					visible: true,
-					type: "destination",
-					editable: true,
-					allowDynamicValues: false,
-					allowSettings: false,
-					value: oConfiguration.destinations[n].name,
-					defaultValue: oConfiguration.destinations[n].defaultUrl,
-					_settingspath: "/form/items/" + [n + ".destination"],
-					_values: [],
-					_destinationName: n
-				}, oConfiguration.destinations[n]);
-				if (typeof oDestination.label === "undefined") {
-					oDestination.label = n;
-				}
-				if (oItems[n + ".destination"]) {
-					oDestination = merge(oDestination, oItems[n + ".destination"]);
-					delete oItems[n + ".destination"];
-				}
-				oDestinations[n + ".destination"] = oDestination;
-			});
-			// reorder the items according by this._bDestinationGroupAtTop
-			if (this._bDestinationGroupAtTop) {
-				oSettings.form.items = merge(oDestinations, oItems);
-			} else {
-				oSettings.form.items = merge(oItems, oDestinations);
-			}
-			var getDestinationsDone = false;
-			if (oHost) {
-				this._oDestinationsModel.setProperty("/_loading", true);
-				this._oDestinationsModel.checkUpdate(true);
-				this.getHostInstance().getDestinations().then(function (a) {
-					getDestinationsDone = true;
-					this._oDestinationsModel.setProperty("/_values", a);
-					this._oDestinationsModel.setProperty("/_loading", false);
-					this._oDestinationsModel.setSizeLimit(a.length);
-					this._oDestinationsModel.checkUpdate(true);
-					setTimeout(function () {
-						this.fireDestinationReady();
-					}.bind(this), 100);
-				}.bind(this)).catch(function () {
-					//Fix DIGITALWORKPLACE-4359, retry once for the timeout issue
-					return this.getHostInstance().getDestinations();
-				}.bind(this)).then(function (b) {
-					if (getDestinationsDone) {
-						return;
-					}
-					this._oDestinationsModel.setProperty("/_values", b);
-					this._oDestinationsModel.setProperty("/_loading", false);
-					this._oDestinationsModel.setSizeLimit(b.length);
-					this._oDestinationsModel.checkUpdate(true);
-					setTimeout(function () {
-						this.fireDestinationReady();
-					}.bind(this), 100);
-				}.bind(this)).catch(function (e) {
-					this._oDestinationsModel.setProperty("/_loading", false);
-					this._oDestinationsModel.checkUpdate(true);
-					setTimeout(function () {
-						this.fireDestinationReady();
-					}.bind(this), 100);
-					Log.error("sap.ui.integration.editor.Editor: can not get destinations list from '" + oHost.getId() + "'.");
-				}.bind(this));
-			}
-		}
-	};
-
-	/**
-	 * Delete destinations if mode is NOT admin or all
-	 */
-	Editor.prototype._deleleDestinationSettings = function () {
-		var oSettings = this._oDesigntimeInstance.getSettings();
-		oSettings.form = oSettings.form || {};
-		oSettings.form.items = oSettings.form.items || {};
-		delete oSettings.form.items["destination.group"];
-		for (var n in oSettings.form.items) {
-			var oItem = oSettings.form.items[n];
-			if (oItem.type === "destination") {
-				delete oSettings.form.items[n];
-			}
-		}
-	};
 
 	/**
 	 * Returns the initial value that was given by the developer for the given path

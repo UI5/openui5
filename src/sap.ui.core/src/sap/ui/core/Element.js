@@ -61,8 +61,8 @@ sap.ui.define([
 		 *
 		 * Each <code>Element</code> must have an ID. If no <code>sId</code> or <code>mSettings.id</code> is
 		 * given at construction time, a new ID will be created automatically. The IDs of all elements that exist
-		 * at the same time in the same window must be different. Providing an ID which is already used by another
-		 * element throws an error.
+		 * at the same time in the same JavaScript context must be different. Providing an ID which is already
+		 * used by another element throws an error.
 		 *
 		 * When an element is created from a declarative source (e.g. XMLView), then an ID defined in that
 		 * declarative source needs to be unique only within the declarative source. Declarative views will
@@ -2094,7 +2094,7 @@ sap.ui.define([
 				var oMedia = this._getCurrentMediaContainerRange(oL.name);
 				if (oMedia && oMedia.from !== oL.media.from) {
 					oL.media = oMedia;
-					oL.callback.call(oL.listener || window, oMedia);
+					oL.callback.call(oL.listener || globalThis, oMedia);
 				}
 			}, this);
 		};

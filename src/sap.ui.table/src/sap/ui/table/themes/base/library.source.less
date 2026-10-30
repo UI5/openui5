@@ -6,26 +6,18 @@
 
 /* Note: The units might not be stable. Therefore, do not rely on Less internal math, but use CSS calc() to make calculations. */
 
-/* Kept these ThemeParameters API values as top-level LESS vars: they are read synchronously during rendering/theme-change. */
-@_sap_ui_table_NavigationIcon: navigation-right-arrow;
-@_sap_ui_table_DeleteIcon: sys-cancel;
-@_sap_ui_table_ClearSelectionIcon: clear-all;
-@_sap_ui_table_AllSelectedIcon: complete;
-@_sap_ui_table_CheckboxIcon: border;
-@_sap_ui_table_NavIndicatorWidth: 0.1875rem;
-
-@_sap_ui_table_BaseSizeCozy: 3rem;
-@_sap_ui_table_BaseSizeCompact: 2rem;
-@_sap_ui_table_BaseSizeCondensed: 1.5rem;
-@_sap_ui_table_BaseSize: @_sap_ui_table_BaseSizeCompact; /* Default, if no density is defined. */
-@_sap_ui_table_BaseBorderWidth: @sapUiElementBorderWidth;
-
 .sapUI5Scope {
-	--_sap_ui_table_NavIndicatorWidth: @_sap_ui_table_NavIndicatorWidth;
+	--_sap_ui_table_NavigationIcon: navigation-right-arrow;
+	--_sap_ui_table_DeleteIcon: sys-cancel;
+	--_sap_ui_table_ClearSelectionIcon: clear-all;
+	--_sap_ui_table_AllSelectedIcon: complete;
+	--_sap_ui_table_CheckboxIcon: border;
+	--_sap_ui_table_NavIndicatorWidth: 0.1875rem;
 
-	--_sap_ui_table_BaseSizeCozy: @_sap_ui_table_BaseSizeCozy;
-	--_sap_ui_table_BaseSizeCondensed: @_sap_ui_table_BaseSizeCondensed;
-	--_sap_ui_table_BaseSize: @_sap_ui_table_BaseSizeCompact; /* Default, if no density is defined. */
+	--_sap_ui_table_BaseSizeCozy: 3rem;
+	--_sap_ui_table_BaseSizeCompact: 2rem;
+	--_sap_ui_table_BaseSizeCondensed: 1.5rem;
+	--_sap_ui_table_BaseSize: var(--_sap_ui_table_BaseSizeCompact); /* Default, if no density is defined. */
 	--_sap_ui_table_BaseBorderWidth: var(--sapElement_BorderWidth);
 
 	--_sap_ui_table_CheckBox_Size: 1rem;

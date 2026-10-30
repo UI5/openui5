@@ -3,7 +3,8 @@
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns="sap.m"
 	xmlns:form="sap.ui.layout.form"
-	controllerName="sap.ui.rta.test.embeddedComponent.controller.Main">
+	controllerName="sap.ui.rta.test.embeddedComponent.controller.Main"
+>
 	<!--The view is is bound to EntityType01 in the controller -->
 	<Page title="{i18n>outerAppTitle}" id="page">
 		<headerContent>
@@ -11,20 +12,22 @@
 		</headerContent>
 		<content>
 			<form:SimpleForm
-					class="sapUiSmallMargin"
-					title="Outer App Simple Form" id="MainForm"
-					maxContainerCols="3"
-					layout="ResponsiveGridLayout"
-					labelSpanXL="4"
-					labelSpanL="4"
-					labelSpanM="4"
-					emptySpanXL="0"
-					emptySpanL="0"
-					emptySpanM="0"
-					columnsXL="3"
-					columnsL="2"
-					columnsM="2"
-					singleContainerFullSize="false">
+				class="sapUiSmallMargin"
+				title="Outer App Simple Form"
+				id="MainForm"
+				maxContainerCols="3"
+				layout="ResponsiveGridLayout"
+				labelSpanXL="4"
+				labelSpanL="4"
+				labelSpanM="4"
+				emptySpanXL="0"
+				emptySpanL="0"
+				emptySpanM="0"
+				columnsXL="3"
+				columnsL="2"
+				columnsM="2"
+				singleContainerFullSize="false"
+			>
 				<form:content>
 					<core:Title id="EntityType02.Title1" text="EntityType02 Title 1" />
 					<Label id="EntityType02.Label1" text="{/#EntityType02/EntityType02_Property01/@sap:label}" />
@@ -40,11 +43,11 @@
 				</form:content>
 			</form:SimpleForm>
 			<core:ComponentContainer
-					usage="reuse"
-					async="true"
-					height="75%"
-					id="idComponentContainer_RTA_SAMPLE"
-					propagateModel="true"
+				usage="reuse"
+				async="true"
+				height="75%"
+				id="idComponentContainer_RTA_SAMPLE"
+				propagateModel="true"
 			/>
 
 		</content>
