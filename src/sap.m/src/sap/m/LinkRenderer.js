@@ -52,6 +52,7 @@
 		var sTextDir = oControl.getTextDirection(),
 			sTextAlign = Renderer.getTextAlign(oControl.getTextAlign(), sTextDir),
 			bShouldHaveOwnLabelledBy = oControl._determineSelfReferencePresence(),
+			sEmptyIndicatorMode = oControl.getEmptyIndicatorMode(),
 			sHasPopupType = oControl.getAriaHasPopup(),
 			sRel = defaultLinkTypes(oControl.getRel(), oControl.getTarget()),
 			sHref = oControl.getHref(),
@@ -95,8 +96,10 @@
 			default:
 				// Set a valid non empty value for the href attribute representing that there is no navigation,
 				// so we don't confuse the screen readers.
-				sHref = sHref && oControl._isHrefValid(sHref) && oControl.getEnabled() ? sHref : "#";
-				oRm.attr("href", sHref);
+				if (sText || sEmptyIndicatorMode === EmptyIndicatorMode.Off) {
+					sHref = sHref && oControl._isHrefValid(sHref) && bEnabled ? sHref : "#";
+					oRm.attr("href", sHref);
+				}
 		}
 
 		var sTooltip = oControl.getTooltip_AsString();
