@@ -25114,6 +25114,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					LifecycleStatus : {additionally : [\'LifecycleStatusDesc\']}\
 				}\
 			},\
+			$count : true,\
 			$orderby : \'LifecycleStatusDesc asc\'\
 		}}">\
 	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>\
@@ -25858,6 +25859,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const oBinding = oTable.getBinding("rows");
 		const oHeaderContext = oBinding.getHeaderContext();
 
+		this.oLogMock.expects("warning").thrice()
+			.withExactArgs("Missing system query option $count",
+				sSalesOrderService + "SalesOrderList?sap-client=123&$expand=SO_2_BP"
+				+ "&$filter=LifecycleStatus%20gt%20'P'"
+				+ "&$select=CurrencyCode,GrossAmount,SalesOrderID",
+				"sap.ui.model.odata.v4.lib._AggregationCache");
 		this.expectChange("count", "42")
 			.expectChange("isOutdatedHeader", undefined);
 
@@ -30671,8 +30678,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				assert.strictEqual(oListBinding.isLengthFinal(), true, "length is final");
 				assert.strictEqual(oListBinding.getLength(), 27, "length includes grand total row");
+
 				// Note: header context gives count of leaves (w/o grand total)
 				that.expectChange("count", "26");
+				that.oLogMock.expects("warning").exactly(bCount ? 0 : 1)
+					.withExactArgs("Missing system query option $count",
+						"/aggregation/BusinessPartners?$apply=filter(AmountPerSale%20gt%2099)"
+						+ "/groupby((Country,Region),aggregate(SalesNumber))"
+						+ "/orderby(Region%20desc)",
+						"sap.ui.model.odata.v4.lib._AggregationCache");
 
 				that.oView.byId("count").setBindingContext(oListBinding.getHeaderContext());
 
@@ -30774,8 +30788,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 				assert.strictEqual(oListBinding.isLengthFinal(), true, "length is final");
 				assert.strictEqual(oListBinding.getLength(), 27, "length includes grand total row");
-				assert.strictEqual(oListBinding.getCount(), 26, "count of leaves");
 
+				that.oLogMock.expects("warning").exactly(bCount ? 0 : 2)
+					.withExactArgs("Missing system query option $count",
+						"/aggregation/BusinessPartners?$apply=filter(AmountPerSale%20gt%2099)"
+						+ "/groupby((Country,Region),aggregate(SalesNumber))"
+						+ "/orderby(Region%20desc)",
+						"sap.ui.model.odata.v4.lib._AggregationCache");
+				assert.strictEqual(oListBinding.getCount(), 26, "count of leaves");
 				// Note: header context gives count of leaves (w/o grand total)
 				that.expectChange("count", "26");
 
@@ -32086,6 +32106,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					},
 					search : 'covfefe'
 				},
+				$count : true,
 				$orderby : 'Region asc,SalesAmount desc'
 			}
 		}" threshold="0">
@@ -33586,7 +33607,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function (aResults) {
 			var aContexts = aResults[0];
 
+			that.oLogMock.expects("warning")
+				.withExactArgs("Missing system query option $count",
+					"/aggregation/BusinessPartners?$apply=filter(Name%20eq%20'Foo')/search(covfefe)"
+					+ "/groupby((Region),aggregate(SalesAmount,Currency))"
+					+ "/filter(SalesAmount%20gt%200)/orderby(Region)",
+					"sap.ui.model.odata.v4.lib._AggregationCache");
 			assert.strictEqual(oListBinding.getHeaderContext().getProperty("$count"), 26);
+
 			assert.deepEqual(aContexts.map(getObject), [{
 				"@$ui5.node.isExpanded" : true,
 				"@$ui5.node.isTotal" : true,

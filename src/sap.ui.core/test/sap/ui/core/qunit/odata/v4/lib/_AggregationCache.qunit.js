@@ -1675,7 +1675,10 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("fetchValue: leaf $count available without visual grouping", function (assert) {
+[false, true].forEach((bCount) => {
+	const sTitle = "fetchValue: leaf $count available without visual grouping; $count=" + bCount;
+
+	QUnit.test(sTitle, function (assert) {
 		var oAggregation = {
 				aggregate : {
 					SalesNumber : {grandTotal : true}
@@ -1683,9 +1686,12 @@ sap.ui.define([
 				group : {},
 				groupLevels : [] // Note: added by _AggregationHelper.buildApply before
 			},
-			oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {$count : true},
+			oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {$count : bCount},
 				oAggregation);
 
+		this.oLogMock.expects("warning").exactly(bCount ? 0 : 1)
+			.withExactArgs("Missing system query option $count", oCache.toString(),
+				"sap.ui.model.odata.v4.lib._AggregationCache");
 		this.mock(oCache.oFirstLevel).expects("fetchValue")
 			.withExactArgs("~oGroupLock~", "$count", "~fnDataRequested~", "~oListener~")
 			.returns("~promise~");
@@ -1697,6 +1703,7 @@ sap.ui.define([
 			oCache.fetchValue("~oGroupLock~", "$count", "~fnDataRequested~", "~oListener~"),
 			"~promise~");
 	});
+});
 
 	//*********************************************************************************************
 [false, true].forEach((bRecursiveHierarchy) => {
