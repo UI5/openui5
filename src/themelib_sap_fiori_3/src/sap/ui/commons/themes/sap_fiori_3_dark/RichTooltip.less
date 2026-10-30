@@ -5,12 +5,12 @@
 
 .sapUiRtt {
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 	border: 1px solid var(--sapContent_ForegroundBorderColor);
-	background-color: darken(@sapUiContentForegroundColor, 10);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l - 10))';
 }
 
 .sapUiRttSep {
 	height: 1px;
-	background-color: lighten(@sapUiContentForegroundColor, 3);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l + 3))';
 }
