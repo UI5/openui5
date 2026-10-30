@@ -830,7 +830,7 @@ sap.ui.define([
 
 		var sId = this.getId();
 		this._oIntervalTypeSelect = this._getHeader()._getOrCreateViewSwitch();
-		this._oIntervalTypeSelect.attachEvent("selectionChange", changeIntervalType, this);
+		this._oIntervalTypeSelect.attachEvent("selectionChange", this._changeIntervalType, this);
 
 		this._oTodayButton = this._getHeader()._getTodayButton();
 
@@ -865,7 +865,7 @@ sap.ui.define([
 			],
 			ariaLabelledBy: `${this.getId()}-Descr`
 		});
-		oTable.attachEvent("selectionChange", handleTableSelectionChange, this);
+		oTable.attachEvent("selectionChange", this._handleTableSelectionChange, this);
 
 		oTable.addDelegate({
 			onBeforeRendering: function () {
@@ -923,7 +923,7 @@ sap.ui.define([
 				});
 			}
 		}, false, this);
-		oTable.getStickyFocusOffset = getStickyFocusOffset.bind(this);
+		oTable.getStickyFocusOffset = this._getStickyFocusOffset.bind(this);
 
 		// Override setNavigationItems to exclude the popin column header (.sapMTblItemNav) from keyboard navigation
 		// In PlanningCalendar context, this element serves no interactive purpose and creates a confusing "ghost" tab stop
@@ -980,7 +980,7 @@ sap.ui.define([
 
 		this.setStartDate(UI5Date.getInstance());
 
-		this._resizeProxy = handleResize.bind(this);
+		this._resizeProxy = this._handleResize.bind(this);
 		this._fnCustomSortedAppointments = undefined; //transfers a custom appointments sorter function to the CalendarRow
 		this.iWidth = 0;
 	};
@@ -1048,7 +1048,7 @@ sap.ui.define([
 		// init interval if default one is used
 		this._adjustViewKey();
 
-		updateSelectItems.call(this);
+		this._updateSelectItems();
 
 		if (this._sUpdateCurrentTime) {
 			clearTimeout(this._sUpdateCurrentTime);
@@ -1064,7 +1064,7 @@ sap.ui.define([
 
 		this._toggleStickyClasses();
 
-		updateSelectedRows.call(this);
+		this._updateSelectedRows();
 
 		this._setProperties();
 	};
@@ -1559,7 +1559,7 @@ sap.ui.define([
 		// also it calls _updateStickyHeader function and in case of stickyHeader property set to true
 		// all needed classes will be updated
 		oEvent.size = {width: this.getDomRef().offsetWidth};
-		handleResize.call(this, oEvent, true);
+		this._handleResize(oEvent, true);
 
 		if (!this._sResizeListener) {
 			this._sResizeListener = ResizeHandler.register(this, this._resizeProxy);
@@ -2266,8 +2266,8 @@ sap.ui.define([
 			if (this.getDomRef()) {
 				// only set timer, CalendarRow will be re-rendered, so no update needed here
 				this._updateCurrentTimeVisualization(false);
-				adaptCalHeaderForWeekNumbers.call(this, this.getShowWeekNumbers(), this._viewAllowsWeekNumbers(sKey));
-				adaptCalHeaderForDayNamesLine.call(this, this.getShowDayNamesLine(), !!oInterval);
+				this._adaptCalHeaderForWeekNumbers(this.getShowWeekNumbers(), this._viewAllowsWeekNumbers(sKey));
+				this._adaptCalHeaderForDayNamesLine(this.getShowDayNamesLine(), !!oInterval);
 			}
 			this._updatePickerSelection();
 		}
@@ -2612,7 +2612,7 @@ sap.ui.define([
 
 			//update the pc header classes if needed
 			if (this.getDomRef() && this.getViewKey() === sViewKey) {
-				adaptCalHeaderForWeekNumbers.call(this, bShowWeekNumbers, bViewAllowsWeekNumbers);
+				this._adaptCalHeaderForWeekNumbers(bShowWeekNumbers, bViewAllowsWeekNumbers);
 			}
 		}, this);
 
@@ -2638,7 +2638,7 @@ sap.ui.define([
 		this._toggleAppointmentsColumnPopinState(bShowRowHeaders);
 
 		this.$().toggleClass("sapMPlanCalNoHead", !bShowRowHeaders);
-		positionSelectAllCheckBox.call(this);
+		this._positionSelectAllCheckBox();
 		this._setSelectionMode.call(this);
 
 		oTable.getItems().forEach(function(oListItem) {
@@ -2674,7 +2674,7 @@ sap.ui.define([
 				oCalDateInterval.setShowDayNamesLine(bShowDayNamesLine);
 
 				if (bRendered && intervalMetadata === sCurrentViewKey) {
-					adaptCalHeaderForDayNamesLine.call(this, bShowDayNamesLine, true);
+					this._adaptCalHeaderForDayNamesLine(bShowDayNamesLine, true);
 				}
 			}
 		}
@@ -2774,7 +2774,7 @@ sap.ui.define([
 
 		this._handleRowRemoval(oRow);
 
-		updateSelectAllCheckBox.call(this);
+		this._updateSelectAllCheckBox();
 
 		this._setSelectionMode.call(this);
 
@@ -2789,7 +2789,7 @@ sap.ui.define([
 
 		aRows.forEach(this._handleRowRemoval, this);
 
-		updateSelectAllCheckBox.call(this);
+		this._updateSelectAllCheckBox();
 
 		this._setSelectionMode.call(this);
 
@@ -2806,7 +2806,7 @@ sap.ui.define([
 
 		destroyed = this.destroyAggregation("rows");
 
-		updateSelectAllCheckBox.call(this);
+		this._updateSelectAllCheckBox();
 
 		this._setSelectionMode.call(this);
 
@@ -2818,13 +2818,13 @@ sap.ui.define([
 
 		this.setProperty("singleSelection", bSingleSelection, true);
 
-		positionSelectAllCheckBox.call(this);
+		this._positionSelectAllCheckBox();
 		this._setSelectionMode.call(this);
 
 		if (bSingleSelection) {
 			this.selectAllRows(false);
 		} else {
-			updateSelectAllCheckBox.call(this);
+			this._updateSelectAllCheckBox();
 		}
 
 		this.$().toggleClass("sapMPlanCalMultiSel", !bSingleSelection);
@@ -3245,13 +3245,13 @@ sap.ui.define([
 
 	};
 
-	function changeIntervalType(oEvent) {
+	PlanningCalendar.prototype._changeIntervalType = function(oEvent) {
 
 		this.setViewKey(oEvent.getParameter("item").getKey());
 
 		this.fireViewChange();
 
-	}
+	};
 
 	/**
 	 * Handles the <code>press</code> event of the <code>PlanningCalendar</code>'s today button
@@ -3439,7 +3439,7 @@ sap.ui.define([
 
 	};
 
-	function handleIntervalSelect(oEvent){
+	PlanningCalendar.prototype._handleIntervalSelect = function(oEvent){
 
 		var oStartDate = oEvent.getParameter("startDate");
 
@@ -3461,21 +3461,21 @@ sap.ui.define([
 
 		this.fireIntervalSelect({startDate: oStartDate, endDate: oEndDate, subInterval: bSubInterval, row: oRow});
 
-	}
+	};
 
 	PlanningCalendar.prototype._applyContextualSettings = function (oSettings) {
 		return Control.prototype._applyContextualSettings.call(this, oSettings);
 	};
 
-	function adaptCalHeaderForWeekNumbers(bShowWeekNumbers, bCurrentIntervalAllowsWeekNumbers) {
+	PlanningCalendar.prototype._adaptCalHeaderForWeekNumbers = function(bShowWeekNumbers, bCurrentIntervalAllowsWeekNumbers) {
 		this.$().toggleClass("sapMPlanCalWithWeekNumbers", bShowWeekNumbers && bCurrentIntervalAllowsWeekNumbers);
-	}
+	};
 
-	function adaptCalHeaderForDayNamesLine(bShowDayNamesLine, bCurrentIntervalAllowsDayNamesLine) {
+	PlanningCalendar.prototype._adaptCalHeaderForDayNamesLine = function(bShowDayNamesLine, bCurrentIntervalAllowsDayNamesLine) {
 		this.$().toggleClass("sapMPlanCalWithDayNamesLine", bShowDayNamesLine && bCurrentIntervalAllowsDayNamesLine);
-	}
+	};
 
-	function handleResize(oEvent, bNoRowResize) {
+	PlanningCalendar.prototype._handleResize = function(oEvent, bNoRowResize) {
 		if (oEvent.size.width <= 0) {
 			// only if visible at all
 			return;
@@ -3501,9 +3501,9 @@ sap.ui.define([
 		var oSelectedDate;
 
 		var iOldSize = this._iSize;
-		determineSize.call(this, oEvent.size.width);
+		this._determineSize(oEvent.size.width);
 		if (iOldSize != this._iSize) {
-			toggleSizeClasses.call(this, this._iSize);
+			this._toggleSizeClasses(this._iSize);
 
 			var sKey = this.getViewKey();
 			var oView = this._getView(sKey);
@@ -3569,7 +3569,7 @@ sap.ui.define([
 					throw new Error("Unknown IntervalType: " + sIntervalType + "; " + this);
 			}
 
-			positionSelectAllCheckBox.call(this);
+			this._positionSelectAllCheckBox();
 			this._updatePickerSelection();
 		} else if (!bNoRowResize) {
 			for (i = 0; i < aRows.length; i++) {
@@ -3592,9 +3592,9 @@ sap.ui.define([
 			this._adjustColumnHeadersTopOffset();
 			this._updateStickyHeader();
 		}
-	}
+	};
 
-	function handleAppointmentSelect(oEvent) {
+	PlanningCalendar.prototype._handleAppointmentSelect = function(oEvent) {
 
 		var oAppointment = oEvent.getParameter("appointment"),
 			bMultiSelect = oEvent.getParameter("multiSelect") || this.getMultipleAppointmentsSelection(),
@@ -3625,7 +3625,7 @@ sap.ui.define([
 		oEventParam = {appointment: oAppointment, appointments: aAppointments, multiSelect: bMultiSelect, domRefId: sGroupAppointmentDomRef};
 		this.fireAppointmentSelect(oEventParam);
 
-	}
+	};
 
 	/**
 	 * Sets the start dates of all calendar rows to a given date.
@@ -3899,14 +3899,14 @@ sap.ui.define([
 		oRowTimeline.setLegend(this.getLegend());
 		oRowTimeline.setAppointmentsVisualization(this.getAppointmentsVisualization());
 		oRowTimeline.setAppointmentHeight(this.getAppointmentHeight());
-		oRowTimeline.detachEvent("select", handleAppointmentSelect, this).attachEvent("select", handleAppointmentSelect, this);
+		oRowTimeline.detachEvent("select", this._handleAppointmentSelect, this).attachEvent("select", this._handleAppointmentSelect, this);
 		oRowTimeline.detachEvent("startDateChange", this._handleStartDateChange, this).attachEvent("startDateChange", this._handleStartDateChange, this);
-		oRowTimeline.detachEvent("leaveRow", handleLeaveRow, this).attachEvent("leaveRow", handleLeaveRow, this);
-		oRowTimeline.detachEvent("intervalSelect", handleIntervalSelect, this).attachEvent("intervalSelect", handleIntervalSelect, this);
+		oRowTimeline.detachEvent("leaveRow", this._handleLeaveRow, this).attachEvent("leaveRow", this._handleLeaveRow, this);
+		oRowTimeline.detachEvent("intervalSelect", this._handleIntervalSelect, this).attachEvent("intervalSelect", this._handleIntervalSelect, this);
 
-		updateSelectAllCheckBox.call(this);
+		this._updateSelectAllCheckBox();
 
-		if (isThereAnIntervalInstance.call(this)) {
+		if (this._isThereAnIntervalInstance()) {
 			sKey = this.getViewKey();
 			oView = this._getView(sKey);
 			sIntervalType = oView.getIntervalType();
@@ -3977,7 +3977,7 @@ sap.ui.define([
 					oRowTimeline.setProperty(oChanges.name, oChanges.current);
 				},
 				selected: function (oChanges) {
-					updateSelectAllCheckBox.call(this);
+					this._updateSelectAllCheckBox();
 
 					oListItem.setProperty(oChanges.name, oChanges.current);
 				}.bind(this),
@@ -4179,10 +4179,10 @@ sap.ui.define([
 	PlanningCalendar.prototype._handleRowRemoval = function(oRow) {
 		var oTimeline = getRowTimeline(oRow);
 
-		oTimeline.detachEvent("select", handleAppointmentSelect, this);
+		oTimeline.detachEvent("select", this._handleAppointmentSelect, this);
 		oTimeline.detachEvent("startDateChange", this._handleStartDateChange, this);
-		oTimeline.detachEvent("leaveRow", handleLeaveRow, this);
-		oTimeline.detachEvent("intervalSelect", handleIntervalSelect, this);
+		oTimeline.detachEvent("leaveRow", this._handleLeaveRow, this);
+		oTimeline.detachEvent("intervalSelect", this._handleIntervalSelect, this);
 
 		//the reference to the sorter function must be cleared, as it is invalid in other context
 		if (this._fnCustomSortedAppointments){
@@ -5086,46 +5086,15 @@ sap.ui.define([
 		return specialDates;
 	};
 
-	function getResizeGhost() {
-		var $ghost = jQuery("<span></span>").addClass("sapUiCalAppResizeGhost");
-		$ghost.appendTo(document.body);
-
-		setTimeout(function() { $ghost.remove(); }, 0);
-
-		return $ghost.get(0);
-	}
-
-	function getRow(oListItem) {
-		var sId = oListItem.getId();
-
-		return Element.getElementById(sId.substring(0, sId.indexOf(LISTITEM_SUFFIX)));
-	}
-
-	function getListItem(oRow) {
-		return Element.getElementById(oRow.getId() + LISTITEM_SUFFIX);
-	}
-
-	function getRowHeader(oRow) {
-		var oListItem = getListItem(oRow);
-
-		return oListItem ? oListItem.getHeader() : null;
-	}
-
-	function getRowTimeline(oRow) {
-		var oListItem = getListItem(oRow);
-
-		return oListItem ? oListItem.getTimeline() : null;
-	}
-
-	function updateSelectedRows() {
+	PlanningCalendar.prototype._updateSelectedRows = function() {
 		const aSelectedRows = this.getSelectedRows();
 
 		for (let i = 0; i < aSelectedRows.length; i++) {
 			getListItem(aSelectedRows[i]).setSelected(true);
 		}
-	}
+	};
 
-	function handleTableSelectionChange(oEvent) {
+	PlanningCalendar.prototype._handleTableSelectionChange = function(oEvent) {
 
 		var aChangedRows = [];
 		var aRows = this.getRows();
@@ -5142,16 +5111,16 @@ sap.ui.define([
 		}
 
 		if (!this.getSingleSelection()) {
-			updateSelectAllCheckBox.call(this);
+			this._updateSelectAllCheckBox();
 		}
 
 		if (aChangedRows.length > 0) {
 			this.fireRowSelectionChange({rows: aChangedRows});
 		}
 
-	}
+	};
 
-	function determineSize(iWidth) {
+	PlanningCalendar.prototype._determineSize = function(iWidth) {
 
 		if (iWidth < this._iBreakPointTablet) {
 			this._iSize = 0; // phone
@@ -5168,10 +5137,10 @@ sap.ui.define([
 		} else {
 			this._iSizeScreen = 2;
 		}
-	}
+	};
 
 	// as all our css should depend on the main container size, not screen size like sapUiMedia-Std-Tablet...
-	function toggleSizeClasses(iSize) {
+	PlanningCalendar.prototype._toggleSizeClasses = function(iSize) {
 		var sCurrentSizeClass = 'sapMSize' + iSize,
 			i,
 			sClass;
@@ -5184,9 +5153,9 @@ sap.ui.define([
 					this.removeStyleClass(sClass);
 				}
 			}
-	}
+	};
 
-	function updateSelectItems() {
+	PlanningCalendar.prototype._updateSelectItems = function() {
 
 		var aViews = this._getViews();
 		this._oIntervalTypeSelect.destroyItems();
@@ -5212,9 +5181,9 @@ sap.ui.define([
 		// Toggle interval select visibility if only one items is available there should be no select visible
 		this._oIntervalTypeSelect.setVisible(!(aViews.length === 1));
 
-	}
+	};
 
-	function handleSelectAll(oEvent) {
+	PlanningCalendar.prototype._handleSelectAll = function(oEvent) {
 
 		var bAll = oEvent.getParameter("selected");
 		var aRows = this.getRows();
@@ -5229,9 +5198,9 @@ sap.ui.define([
 
 		this.fireRowSelectionChange({rows: aRows});
 
-	}
+	};
 
-	function handleLeaveRow(oEvent){
+	PlanningCalendar.prototype._handleLeaveRow = function(oEvent){
 
 		var oTimeline = oEvent.oSource;
 		var sType = oEvent.getParameter("type");
@@ -5309,9 +5278,9 @@ sap.ui.define([
 				break;
 		}
 
-	}
+	};
 
-	function updateSelectAllCheckBox() {
+	PlanningCalendar.prototype._updateSelectAllCheckBox = function() {
 
 		if (this._oSelectAllCheckBox) {
 			var aRows = this.getRows();
@@ -5323,9 +5292,9 @@ sap.ui.define([
 			}
 		}
 
-	}
+	};
 
-	function positionSelectAllCheckBox() {
+	PlanningCalendar.prototype._positionSelectAllCheckBox = function() {
 
 		if (this.getSingleSelection()) {
 			if (this._oCalendarHeader.getAllCheckBox()) {
@@ -5338,7 +5307,7 @@ sap.ui.define([
 				this._oSelectAllCheckBox = new CheckBox(this.getId() + "-All", {
 					text: this._oRB.getText("COLUMNSPANEL_SELECT_ALL")
 				});
-				this._oSelectAllCheckBox.attachEvent("select", handleSelectAll, this);
+				this._oSelectAllCheckBox.attachEvent("select", this._handleSelectAll, this);
 			}
 			if (this._iSizeScreen < 2 || !this.getShowRowHeaders()) {
 				var iIndex = this._oInfoToolbar.indexOfContent(this._oSelectAllCheckBox);
@@ -5360,7 +5329,7 @@ sap.ui.define([
 			}
 		}
 
-	}
+	};
 
 	/**
 	 * Sets the selection mode of the inner used Table.
@@ -5436,11 +5405,11 @@ sap.ui.define([
 		return oRelativeInfo;
 	};
 
-	function isThereAnIntervalInstance() {
+	PlanningCalendar.prototype._isThereAnIntervalInstance = function() {
 		return this._oTimesRow || this._oDatesRow || this._oMonthsRow || this._oWeeksRow || this._oOneMonthsRow;
-	}
+	};
 
-	function getStickyFocusOffset() {
+	PlanningCalendar.prototype._getStickyFocusOffset = function() {
 		if (!this._getHeader()) {
 			return 0;
 		}
@@ -5455,6 +5424,37 @@ sap.ui.define([
 		}
 
 		return iPCHeaderContainerRectHeight;
+	};
+
+	function getResizeGhost() {
+		var $ghost = jQuery("<span></span>").addClass("sapUiCalAppResizeGhost");
+		$ghost.appendTo(document.body);
+
+		setTimeout(function() { $ghost.remove(); }, 0);
+
+		return $ghost.get(0);
+	}
+
+	function getRow(oListItem) {
+		var sId = oListItem.getId();
+
+		return Element.getElementById(sId.substring(0, sId.indexOf(LISTITEM_SUFFIX)));
+	}
+
+	function getListItem(oRow) {
+		return Element.getElementById(oRow.getId() + LISTITEM_SUFFIX);
+	}
+
+	function getRowHeader(oRow) {
+		var oListItem = getListItem(oRow);
+
+		return oListItem ? oListItem.getHeader() : null;
+	}
+
+	function getRowTimeline(oRow) {
+		var oListItem = getListItem(oRow);
+
+		return oListItem ? oListItem.getTimeline() : null;
 	}
 
 	function addBindingListener(oBindingInfo, sEventName, fHandler) {
