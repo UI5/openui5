@@ -1,0 +1,4 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">
+	<Button id="siblingBtn" text="Sibling" />
+	<mvc:XMLView id="innerView" viewName="testdata.blocklayerutils.InnerView" />
+</mvc:View>

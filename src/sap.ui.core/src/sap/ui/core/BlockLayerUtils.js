@@ -188,6 +188,27 @@ sap.ui.define([
 					childElement.inert = true;
 				}
 
+				// Observe child additions/removals so that:
+				//  - nodes entering the blocked section while it is active get inert
+				//  - nodes leaving (e.g. moved to #sap-ui-preserve) get inert removed
+				// This avoids stale inert attributes when DOM preservation moves
+				// children out of the blocked section and restores them later.
+				this._observer = new MutationObserver(function(aMutations) {
+					aMutations.forEach(function(oMutation) {
+						oMutation.addedNodes.forEach(function(oNode) {
+							if (oNode.nodeType === 1 /* ELEMENT */ && oNode !== oBlockLayerDOM) {
+								oNode.inert = true;
+							}
+						});
+						oMutation.removedNodes.forEach(function(oNode) {
+							if (oNode.nodeType === 1 /* ELEMENT */) {
+								oNode.removeAttribute("inert");
+							}
+						});
+					});
+				});
+				this._observer.observe(oParentDOM, { childList: true });
+
 				// The sentinel spans that used to trap the tab chain are gone. Instead, the busy
 				// indicator (block layer) is the single tab stop and all other content is inert.
 				// This handler catches focus that enters the blocked section (e.g. by clicking or
@@ -204,6 +225,28 @@ sap.ui.define([
 				Log.warning("fnHandleInteraction called with bEnabled true, but no DOMRef exists!");
 			}
 		} else {
+			if (this._observer) {
+				// Flush pending mutation records synchronously before disconnecting.
+				// MutationObserver callbacks are microtasks that fire after the current
+				// synchronous call stack. If DOM preservation moved children out of the
+				// blocked section in the same synchronous block (e.g. XMLView.onBeforeRendering
+				// followed by the rendering delegate's onBeforeRendering), the observer
+				// callback has not fired yet. takeRecords() retrieves those pending records
+				// so we can process them now — removing inert from nodes that left the
+				// parent — before disconnecting the observer.
+				var aPendingRecords = this._observer.takeRecords();
+				this._observer.disconnect();
+				delete this._observer;
+
+				aPendingRecords.forEach(function(oMutation) {
+					oMutation.removedNodes.forEach(function(oNode) {
+						if (oNode.nodeType === 1 /* ELEMENT */) {
+							oNode.removeAttribute("inert");
+						}
+					});
+				});
+			}
+
 			if (oParentDOM) {
 				for (const childElement of oParentDOM.children) {
 					childElement.removeAttribute("inert");
