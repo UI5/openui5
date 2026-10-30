@@ -3645,6 +3645,81 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
+	QUnit.test("removeFromSpliced: no args", function (assert) {
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.removeFromSpliced(),
+			false, "aElements is optional, e.g. no 'spliced' recursively");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("removeFromSpliced", function (assert) {
+		const oDeleted = Object.freeze({"@$ui5._" : {parent : "~oParentCache~"}}); // rank : 1
+		const aElements = [{
+			"@$ui5._" : {parent : "~oParentCache~", rank : 0} // do not shift!
+		}, oDeleted, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 2}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 3}
+		}, {
+			"@$ui5._" : {parent : "other", rank : 42}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 99} // impossible; just to observe break!
+		}];
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.removeFromSpliced(oDeleted, aElements),
+			true);
+
+		assert.deepEqual(aElements, [{
+			"@$ui5._" : {parent : "~oParentCache~", rank : 0}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 1}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 2}
+		}, {
+			"@$ui5._" : {parent : "other", rank : 42}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 99}
+		}]);
+	});
+
+	//*********************************************************************************************
+	QUnit.test("removeFromSpliced: recursion", function (assert) {
+		const oDeleted = Object.freeze({"@$ui5._" : {parent : "~oParentCache~"}}); // rank : 1
+		const aSpliced = [{
+			"@$ui5._" : {parent : "~oParentCache~", rank : 0} // do not shift!
+		}, oDeleted, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 2}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 3}
+		}, {
+			"@$ui5._" : {parent : "other", rank : 42}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 99} // impossible; just to observe break!
+		}];
+		const oElement = Object.freeze({"@$ui5._" : {spliced : aSpliced}});
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.removeFromSpliced(oDeleted, ["foo", oElement, "bar"]),
+			true);
+
+		assert.deepEqual(aSpliced, [{
+			"@$ui5._" : {parent : "~oParentCache~", rank : 0}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 1}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 2}
+		}, {
+			"@$ui5._" : {parent : "other", rank : 42}
+		}, {
+			"@$ui5._" : {parent : "~oParentCache~", rank : 99}
+		}]);
+	});
+
+	//*********************************************************************************************
 	QUnit.test("removeUI5grand__", function (assert) {
 		var oGrandTotal = {
 				foo : "bar",

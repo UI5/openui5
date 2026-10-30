@@ -5425,7 +5425,8 @@ sap.ui.define([
 	{lengthFinal : true, apiGroup : false, newMaxLength : 42},
 	{lengthFinal : true, apiGroup : true, newMaxLength : 41},
 	{lengthFinal : true, apiGroup : true, newMaxLength : 41, dataAggregation : true},
-	{lengthFinal : true, apiGroup : true, newMaxLength : 42, dataAggregation : true}
+	{lengthFinal : true, apiGroup : true, newMaxLength : 42, dataAggregation : true},
+	{countChanged : true, lengthFinal : true, noGroup : true} // NO: newMaxLength
 ].forEach(function (oFixture) {
 	var sTitle = "delete: kept-alive context not in the collection: " + JSON.stringify(oFixture);
 
@@ -5497,7 +5498,7 @@ sap.ui.define([
 
 		// code under test
 		oPromise = oBinding.delete(oGroupLock, "EMPLOYEES('1')", oKeptAliveContext, "oETagEntity",
-			oFixture.error || !oFixture.newMaxLength, fnUndelete);
+			(oFixture.error || !oFixture.newMaxLength) && !oFixture.countChanged, fnUndelete);
 
 		if (oGroupLock) {
 			this.mock(oGroupLock).expects("getGroupId").exactly(oFixture.newMaxLength ? 1 : 0)
@@ -5521,7 +5522,7 @@ sap.ui.define([
 			.exactly(oFixture.newMaxLength && oFixture.dataAggregation ? 1 : 0)
 			.withExactArgs().returns(42); // old count
 		const oSetOutdatedExpectation = this.mock(oBinding.oHeaderContext).expects("setOutdated")
-			.exactly(bFireChange && oFixture.dataAggregation ? 1 : 0)
+			.exactly(bFireChange && oFixture.dataAggregation || oFixture.countChanged ? 1 : 0)
 			.withExactArgs(true);
 		const oFireChangeExpectation = oBindingMock.expects("_fireChange")
 			.exactly(bFireChange ? 1 : 0)
@@ -5531,7 +5532,7 @@ sap.ui.define([
 			});
 
 		// code under test - callback
-		oDeleteFromCacheExpectation.args[0][5](undefined, -1);
+		oDeleteFromCacheExpectation.args[0][5](undefined, -1, oFixture.countChanged);
 
 		assert.notOk(fnUndelete.called);
 

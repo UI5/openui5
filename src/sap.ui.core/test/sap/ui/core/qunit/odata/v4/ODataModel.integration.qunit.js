@@ -29120,6 +29120,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Late property requests via API & UI (JIRA: CPOUI5ODATAV4-3438)
 	// Delete w/ visual grouping works on leaf level w/ $count & outdated (JIRA: CPOUI5ODATAV4-3398)
 	// Delete a kept-alive outside the collection works w/ $count (JIRA: CPOUI5ODATAV4-3724)
+	// (Grand) parent can be collapsed before deleting a leaf (JIRA: CPOUI5ODATAV4-3729)
 	//
 	// If there are no subtotals, the @$ui5.context.isOutdated at group nodes is not set when
 	// editing or deleting a single entity.
@@ -29134,8 +29135,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3702
 [false, true].forEach((bEdit) => {
 	[false, true].forEach((bWithSearchFilterSort) => {
+		[false, true, 1].forEach((bCollapse) => { // 1: grand parent
 		const sTitle = "Data Aggregation: additionally via navigation; edit before delete = "
-			+ bEdit + ", with search/filter/sort = " + bWithSearchFilterSort;
+			+ bEdit + ", with search/filter/sort = " + bWithSearchFilterSort
+			+ ", collapse before delete = " + bCollapse;
 
 	QUnit.test(sTitle, function (assert) {
 		var oArtist0,
@@ -29178,7 +29181,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		},
 		$count : true
 		${sOrderby}
-	}}" threshold="0" visibleRowCount="6">
+	}}" threshold="0" visibleRowCount="7">
 	<t:dependents><t_plugins:ODataV4Aggregation/></t:dependents>
 	<Text id="groupLevelCount" text="{= %{@$ui5.node.groupLevelCount} }"/>
 	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>
@@ -29207,6 +29210,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		//                         0 (hero content, deleted early)
 		//                         1
 		//                         2
+		//                  C
+		//                         n/a
 
 		this.expectRequest("Artists?$apply="
 				+ (bWithSearchFilterSort
@@ -29218,9 +29223,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					+ (bWithSearchFilterSort
 						? "/orderby(BestPublication/DraftAdministrativeData/InProcessByUser desc)"
 						: "")
-					+ "/concat(aggregate($count as UI5__count),top(6)))", {
+					+ "/concat(aggregate($count as UI5__count),top(7)))", {
 				value : [{
-					UI5__leaves : "5"
+					UI5__leaves : "6"
 				}, {
 					UI5__count : "2"
 				}, {
@@ -29260,9 +29265,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oIsActiveEntityTrue = oTable.getRows()[1].getBindingContext();
 			oListBinding = oIsActiveEntityTrue.getBinding();
 			const oHeaderContext = oListBinding.getHeaderContext();
-			assert.strictEqual(oListBinding.getCount(), 5);
+			assert.strictEqual(oListBinding.getCount(), 6);
 
-			that.expectChange("count", "5")
+			that.expectChange("count", "6")
 				.expectChange("isOutdatedHeader", undefined);
 
 			that.oView.byId("count").setBindingContext(oHeaderContext);
@@ -29316,9 +29321,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectRequest("#0 Artists/$count"
 					+ (bWithSearchFilterSort
 					? "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe"
-					: ""), 4)
+					: ""), 5)
 				.expectChange("isOutdatedHeader", true) // CPOUI5ODATAV4-3260
-				.expectChange("count", "4");
+				.expectChange("count", "5");
 
 			return Promise.all([
 				// code under test (JIRA: CPOUI5ODATAV4-3724)
@@ -29346,8 +29351,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						: ")/")
 					+ "groupby((Name,Address/RegionName,BestFriend/Name))"
 					+ (bWithSearchFilterSort ? "/orderby(BestFriend/Name)" : "")
-					+ "&$count=true&$skip=0&$top=6", {
-					"@odata.count" : "2",
+					+ "&$count=true&$skip=0&$top=7", {
+					"@odata.count" : "3",
 					value : [{
 						Address : {RegionName : "England"},
 						BestFriend : {Name : "A's best friend"},
@@ -29356,20 +29361,25 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						Address : {RegionName : "England"},
 						BestFriend : {Name : "B's best friend"},
 						Name : "B"
+					}, {
+						Address : {RegionName : "England"},
+						BestFriend : {Name : "C's best friend"},
+						Name : "C"
 					}]
 				})
-				.expectChange("groupLevelCount", [, 2, undefined, undefined])
-				.expectChange("isExpanded", [, true, false, false])
-				.expectChange("isOutdated", [,, undefined, undefined])
-				.expectChange("isTotal", [,, false, false])
-				.expectChange("level", [,, 2, 2])
-				.expectChange("isActiveEntity", [,, true, true])
-				.expectChange("inProcessByUser", [,, "", ""]) // Note: inherited from parent
-				.expectChange("name", [,, "A", "B"])
-				.expectChange("bestFriendName", [,, "A's best friend", "B's best friend"])
-				.expectChange("artistID", [,, null, null])
-				.expectChange("city", [,, null, null])
-				.expectChange("sendsAutographs", [,, undefined, undefined]);
+				.expectChange("groupLevelCount", [, 3, undefined, undefined, undefined])
+				.expectChange("isExpanded", [, true, false, false, false])
+				.expectChange("isOutdated", [,, undefined, undefined, undefined])
+				.expectChange("isTotal", [,, false, false, false])
+				.expectChange("level", [,, 2, 2, 2])
+				.expectChange("isActiveEntity", [,, true, true, true])
+				.expectChange("inProcessByUser", [,, "", "", ""]) // Note: inherited from parent
+				.expectChange("name", [,, "A", "B", "C"])
+				.expectChange("bestFriendName",
+					[,, "A's best friend", "B's best friend", "C's best friend"])
+				.expectChange("artistID", [,, null, null, null])
+				.expectChange("city", [,, null, null, null])
+				.expectChange("sendsAutographs", [,, undefined, undefined, undefined]);
 
 			return Promise.all([
 				// code under test
@@ -29416,7 +29426,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 							: "")
 					+ "&$select=Address/City,Address/RegionName,ArtistID,IsActiveEntity,Name"
 						+ ",sendsAutographs"
-					+ "&$skip=0&$top=6", {
+					+ "&$skip=0&$top=7", {
 					"@odata.count" : "2",
 					value : [{
 						Address : {City : "Liverpool", RegionName : "England"},
@@ -29457,18 +29467,19 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						sendsAutographs : true
 					}]
 				})
-				.expectChange("groupLevelCount", [,,, 2, undefined, undefined])
-				.expectChange("isExpanded", [,,, true, undefined, undefined])
-				.expectChange("isOutdated", [undefined, undefined], 4)
-				.expectChange("isTotal", [false, false], 4)
-				.expectChange("level", [3, 3], 4)
-				.expectChange("isActiveEntity", [true, true], 4)
-				.expectChange("inProcessByUser", ["", ""], 4)
-				.expectChange("name", ["B", "B"], 4)
-				.expectChange("bestFriendName", ["B's best friend", "B's best friend"], 4)
-				.expectChange("artistID", ["1", "2"], 4)
-				.expectChange("city", ["Liverpool", "London"], 4)
-				.expectChange("sendsAutographs", [false, true], 4);
+				.expectChange("groupLevelCount", [,,, 2,, undefined, undefined])
+				.expectChange("isExpanded", [,,, true, undefined, undefined, false])
+				.expectChange("isOutdated", [undefined, undefined], 5)
+				.expectChange("isTotal", [false, false], 5)
+				.expectChange("level", [3, 3, 2], 4)
+				.expectChange("isActiveEntity", [true, true], 5)
+				.expectChange("inProcessByUser", ["", ""], 5)
+				.expectChange("name", ["B", "B", "C"], 4)
+				.expectChange("bestFriendName",
+					["B's best friend", "B's best friend", "C's best friend"], 4)
+				.expectChange("artistID", ["1", "2", null], 4)
+				.expectChange("city", ["Liverpool", "London", null], 4)
+				.expectChange("sendsAutographs", [false, true, undefined], 4);
 
 			return Promise.all([
 				// code under test
@@ -29592,33 +29603,67 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/Artists(IsActiveEntity=true,Name='A')",
 				oNameB,
 				oArtist1,
-				"/Artists(ArtistID='2',IsActiveEntity=true)"
+				"/Artists(ArtistID='2',IsActiveEntity=true)",
+				"/Artists(IsActiveEntity=true,Name='C')"
 			], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
 				// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
 				["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
-				["2", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+				["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
 				["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
 				["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
 				["", "", "", "false", "3", "true", sInProcessByUser, "B", sBestFriendName, "1",
 					"Liverpool", "false"],
 				["", "", "", "false", "3", "true", "", "B", "B's best friend", "2", "London",
-					"true"]
+					"true"],
+				["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
 			]);
 
+			oNameB.setSelected(true); // in case grand parent is collapsed
+			oArtist1.setKeepAlive(true); // in case (grand) parent is collapsed
+
+			if (!bCollapse) {
+				return;
+			}
+
+			if (bCollapse === 1) { // collapse grand parent
+				that.expectChange("isExpanded", [, false]);
+
+				oIsActiveEntityTrue.collapse(); // (JIRA: CPOUI5ODATAV4-3689)
+			} else { // collapse parent
+				that.expectChange("isExpanded", [,,, false, false])
+					.expectChange("level", [2], 4)
+					.expectChangeIf(bEdit, "inProcessByUser", [""], 4)
+					.expectChange("name", ["C"], 4)
+					.expectChange("bestFriendName", ["C's best friend"], 4)
+					.expectChange("artistID", [null], 4)
+					.expectChange("city", [null], 4)
+					.expectChange("sendsAutographs", [undefined], 4);
+
+				oNameB.collapse(); // (JIRA: CPOUI5ODATAV4-3689)
+			}
+
+			return that.waitForChanges(assert, "collapse (grand) parent, keep 1st leaf alive");
+		}).then(function () {
 			that.expectChange("isOutdatedHeader", true)
 				.expectRequest("#0 DELETE Artists(ArtistID='1',IsActiveEntity=true)", oNO_CONTENT)
 				.expectRequest("#0 Artists/$count"
 					+ (bWithSearchFilterSort
 						? "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe"
-						: ""), 3)
-				.expectChange("count", "3")
+						: ""), 4)
+				.expectChange("count", "4");
 				//TODO: .expectChange("groupLevelCount", [,,, 1])
-				.expectChangeIf(bEdit, "inProcessByUser", [""], 4)
-				.expectChangeIf(bEdit, "bestFriendName", ["B's best friend"], 4)
-				.expectChange("artistID", ["2"], 4)
-				.expectChange("city", ["London"], 4)
-				.expectChange("sendsAutographs", [true], 4)
-				.expectChange("regionID", null);
+			if (!bCollapse) {
+				that.expectChange("isExpanded", [false], 5)
+					.expectChange("level", [2], 5)
+					.expectChangeIf(bEdit, "inProcessByUser", [""], 4)
+					.expectChange("name", ["C"], 5)
+					.expectChangeIf(bEdit, "bestFriendName", ["B's best friend"], 4)
+					.expectChange("bestFriendName", ["C's best friend"], 5)
+					.expectChange("artistID", ["2", null], 4)
+					.expectChange("city", ["London", null], 4)
+					.expectChange("sendsAutographs", [true, undefined], 4);
+			}
+			that.expectChange("regionID", null);
 
 			return Promise.all([
 				// code under test (JIRA: CPOUI5ODATAV4-3398)
@@ -29626,29 +29671,76 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				that.waitForChanges(assert, "delete 1st leaf")
 			]);
 		}).then(function () {
+			if (!bCollapse) {
+				return;
+			}
+
+			that.expectChange("isExpanded", [,,, true,, false])
+				.expectChange("isTotal", [false], 5)
+				.expectChange("level", [3, 2], 4)
+				.expectChange("isActiveEntity", [true], 5)
+				.expectChange("inProcessByUser", [""], 5)
+				.expectChange("name", ["B", "C"], 4)
+				.expectChange("bestFriendName", ["B's best friend", "C's best friend"], 4)
+				.expectChange("artistID", ["2"], 4)
+				.expectChange("city", ["London"], 4)
+				.expectChange("sendsAutographs", [true], 4);
+
+			if (bCollapse === 1) { // expand grand parent again
+				that.expectChange("isExpanded", [, true, false])
+					.expectChange("isTotal", [,, false, false, false])
+					.expectChange("level", [,, 2, 2])
+					.expectChange("isActiveEntity", [,, true, true, true])
+					.expectChange("inProcessByUser", [,, "", "", ""])
+					.expectChange("name", [,, "A", "B"])
+					.expectChange("bestFriendName", [,, "A's best friend", "B's best friend"])
+					.expectChange("groupLevelCount", [,,, 2]);
+
+				return Promise.all([
+					oIsActiveEntityTrue.expand(),
+					that.waitForChanges(assert, "expand grand parent again")
+				]);
+			}
+
+			that.expectChange("isExpanded", [undefined], 4);
+
+			return Promise.all([
+				oNameB.expand(),
+				that.waitForChanges(assert, "expand parent again")
+			]);
+		}).then(function () {
 			checkTable("after delete 1st leaf", assert, oTable, [
 				"/Artists(IsActiveEntity=false)",
 				oIsActiveEntityTrue,
 				"/Artists(IsActiveEntity=true,Name='A')",
 				oNameB,
-				"/Artists(ArtistID='2',IsActiveEntity=true)"
+				"/Artists(ArtistID='2',IsActiveEntity=true)",
+				"/Artists(IsActiveEntity=true,Name='C')"
 			], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
 				// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
 				["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
-				["2", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+				["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
 				["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
 				["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
 				["", "", "", "false", "3", "true", "", "B", "B's best friend", "2", "London",
-					"true"]
+					"true"],
+				["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
 			]);
 			const oArtist2 = oTable.getRows()[4].getBindingContext();
 
-			that.expectRequest("#0 DELETE Artists(ArtistID='2',IsActiveEntity=true)", oNO_CONTENT)
+			that.expectChange("isExpanded", [false], 4)
+				.expectChange("level", [2], 4)
+				.expectChange("name", ["C"], 4)
+				.expectChange("bestFriendName", ["C's best friend"], 4)
+				.expectChange("artistID", [null], 4)
+				.expectChange("city", [null], 4)
+				.expectChange("sendsAutographs", [undefined], 4)
+				.expectRequest("#0 DELETE Artists(ArtistID='2',IsActiveEntity=true)", oNO_CONTENT)
 				.expectRequest("#0 Artists/$count"
 					+ (bWithSearchFilterSort
 						? "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe"
-						: ""), 2)
-				.expectChange("count", "2");
+						: ""), 3)
+				.expectChange("count", "3");
 				//TODO: .expectChange("groupLevelCount", [,,, 0])
 
 			return Promise.all([
@@ -29661,18 +29753,21 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/Artists(IsActiveEntity=false)",
 				oIsActiveEntityTrue,
 				"/Artists(IsActiveEntity=true,Name='A')",
-				oNameB
+				oNameB,
+				"/Artists(IsActiveEntity=true,Name='C')"
 			], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
 				// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
 				["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
-				["2", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+				["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
 				["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
-				["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""]
-			], 4, true, [ // type|level|expandable|expanded|title
+				["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
+				["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
+			], 5, true, [ // type|level|expandable|expanded|title
 				["GroupHeader", 1, true, false, "No"],
 				["GroupHeader", 1, true, true, "Yes"],
 				["GroupHeader", 2, true, false, "A"],
-				["GroupHeader", 2, true, /*look here*/true, "B"]
+				["GroupHeader", 2, true, /*look here*/true, "B"],
+				["GroupHeader", 2, true, false, "C"]
 			]);
 
 			that.expectChange("isExpanded", [,,, false])
@@ -29689,18 +29784,21 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/Artists(IsActiveEntity=false)",
 				oIsActiveEntityTrue,
 				"/Artists(IsActiveEntity=true,Name='A')",
-				oNameB
+				oNameB,
+				"/Artists(IsActiveEntity=true,Name='C')"
 			], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
 				// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
 				["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
-				["2", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+				["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
 				["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
-				["2", "false", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""]
-			], 4, true, [ // type|level|expandable|expanded|title
+				["2", "false", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
+				["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
+			], 5, true, [ // type|level|expandable|expanded|title
 				["GroupHeader", 1, true, false, "No"],
 				["GroupHeader", 1, true, true, "Yes"],
 				["GroupHeader", 2, true, false, "A"],
-				["GroupHeader", 2, true, /*look here*/false, "B"]
+				["GroupHeader", 2, true, /*look here*/false, "B"],
+				["GroupHeader", 2, true, false, "C"]
 			]);
 
 			that.expectChange("isExpanded", [,,, true])
@@ -29718,20 +29816,24 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/Artists(IsActiveEntity=false)",
 				oIsActiveEntityTrue,
 				"/Artists(IsActiveEntity=true,Name='A')",
-				oNameB
+				oNameB,
+				"/Artists(IsActiveEntity=true,Name='C')"
 			], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
 				// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
 				["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
-				["2", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+				["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
 				["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
-				["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""]
-			], 4, true, [ // type|level|expandable|expanded|title
+				["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
+				["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
+			], 5, true, [ // type|level|expandable|expanded|title
 				["GroupHeader", 1, true, false, "No"],
 				["GroupHeader", 1, true, true, "Yes"],
 				["GroupHeader", 2, true, false, "A"],
-				["GroupHeader", 2, true, /*look here*/true, "B"]
+				["GroupHeader", 2, true, /*look here*/true, "B"],
+				["GroupHeader", 2, true, false, "C"]
 			]);
 		});
+	});
 	});
 	});
 });

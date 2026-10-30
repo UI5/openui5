@@ -122,31 +122,41 @@ sap.ui.define([
 	// @override sap.ui.model.odata.v4.lib._Cache#_delete
 	_AggregationCache.prototype._delete = function (oGroupLock, sEditUrl, sIndexOrPredicate,
 			oETagEntity, fnCallback) {
+		var oElement, oParentCache, sPredicate;
+
 		let iIndex = parseInt(sIndexOrPredicate);
 		if (isNaN(iIndex)) { // it must be a predicate because the element is not in the collection
 			if (this.oAggregation.hierarchyQualifier) {
 				throw new Error(
 					`Unsupported kept-alive entity: ${this.sResourcePath}${sIndexOrPredicate}`);
+			} // BEWARE: the code below (e.g. bCountChanged) relies on this check!
+
+			sPredicate = sIndexOrPredicate;
+			oElement = this.aElements.$byPredicate[sPredicate];
+			oParentCache = _Helper.getPrivateAnnotation(oElement, "parent");
+			if (!oParentCache) {
+				return SyncPromise.all([
+					_Cache.prototype._delete.apply(this, arguments),
+					this.readGrandTotal(oGroupLock)
+				]);
 			}
-			return SyncPromise.all([
-				_Cache.prototype._delete.apply(this, arguments),
-				this.readGrandTotal(oGroupLock)
-			]);
+		} else {
+			oElement = this.aElements[iIndex];
+			sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate");
+			if (oElement["@$ui5.node.isExpanded"]) {
+				throw new Error(`Unsupported expanded node: ${this.sResourcePath}${sPredicate}`);
+			}
+
+			oParentCache = _Helper.getPrivateAnnotation(oElement, "parent");
+			if (oElement["@$ui5.context.isTransient"]) {
+				// cancel the create (no callback function necessary)
+				return oParentCache._delete(oGroupLock, sEditUrl,
+					_Helper.getPrivateAnnotation(oElement, "transientPredicate"));
+			}
 		}
 
-		const oElement = this.aElements[iIndex];
-		const sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate");
-		if (oElement["@$ui5.node.isExpanded"]) {
-			throw new Error(`Unsupported expanded node: ${this.sResourcePath}${sPredicate}`);
-		}
-
-		const oParentCache = _Helper.getPrivateAnnotation(oElement, "parent");
-		if (oElement["@$ui5.context.isTransient"]) {
-			// cancel the create (no callback function necessary)
-			return oParentCache._delete(oGroupLock, sEditUrl,
-				_Helper.getPrivateAnnotation(oElement, "transientPredicate"));
-		}
-
+		// Note: if pending, bCountChanged becomes true below
+		const iOldCount = this.oCountPromise?.getResult();
 		if (this.oCountPromise) {
 			this.createCountPromise();
 		}
@@ -186,12 +196,19 @@ sap.ui.define([
 				// make parent a leaf (the direct predecessor)
 				this.makeLeaf(this.aElements[iIndex - 1]);
 			}
-			this.shiftRank(iIndex, -iOffset);
+			let bCountChanged;
+			if (iIndex >= 0) {
+				this.shiftRank(iIndex, -iOffset);
+			} else {
+				iIndex = undefined;
+				bCountChanged = iOldCount !== this.oCountPromise?.getResult();
+				_AggregationHelper.removeFromSpliced(oElement, this.aElements);
+			}
 			// remove in this cache
 			delete oElement["@$ui5.context.isDeleted"]; // @see #removeElement
-			this.removeElement(iIndex, sPredicate);
+			this.removeElement(iIndex, sPredicate); // Note: iIndex < 0 would also be OK here
 			// notify caller
-			fnCallback(iIndex, -1);
+			fnCallback(iIndex, -1, bCountChanged);
 		});
 	};
 
