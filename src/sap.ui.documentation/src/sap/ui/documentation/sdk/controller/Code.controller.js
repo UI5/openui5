@@ -7,6 +7,7 @@ sap.ui.define(
 		"sap/ui/documentation/sdk/controller/Sample.controller",
 		"../model/ExploreSettingsModel",
 		"sap/ui/core/Component",
+		"sap/ui/core/EventBus",
 		"sap/ui/core/Fragment",
 		"sap/ui/core/HTML",
 		"sap/ui/Device",
@@ -20,6 +21,7 @@ sap.ui.define(
 		SampleController,
 		ExploreSettingsModel,
 		Component,
+		EventBus,
 		Fragment,
 		HTML,
 		Device,
@@ -32,6 +34,9 @@ sap.ui.define(
 		"use strict";
 
 		return SampleController.extend("sap.ui.documentation.sdk.controller.Code", {
+
+			reportsResourceResolved: true,
+
 			constructor: function () {
 				SampleController.apply(this, arguments);
 				this.onFileEditorFileChangeDebounced = _debounce(this.onFileEditorFileChangeDebounced, 500);
@@ -176,6 +181,7 @@ sap.ui.define(
 				this._sEntityId = oArguments.entityId;
 				this._sFileName = formatter.routeParamsToFilePath(oArguments);
 				this.byId("splitView").setBusy(true);
+				this._oLastRouteParameters = oEvent.getParameters();
 
 				this._loadCodeAndSample();
 			},
@@ -193,6 +199,7 @@ sap.ui.define(
 							this._showCacheCleanupDialog();
 						}
 						this._showCode(aResults[0]);
+						EventBus.getInstance().publish("usageTracking", "resourceResolved", { routeParameters: this._oLastRouteParameters });
 					}.bind(this))
 					.catch(function(error) {
 						if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller || bRetrying) {

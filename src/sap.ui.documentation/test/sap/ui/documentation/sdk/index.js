@@ -15,14 +15,21 @@
 		};
 
 		Core.attachInit(function () {
-
-		sap.ui.require([
-			"sap/m/Page",
-			"sap/ui/core/ComponentContainer",
-			"sap/ui/documentation/sdk/controller/util/APIInfo"
-			], function (Page, ComponentContainer, APIInfo) {
+			sap.ui.require([
+				"sap/m/Page",
+				"sap/ui/core/ComponentContainer",
+				"sap/ui/documentation/sdk/controller/util/APIInfo",
+				"sap/ui/documentation/sdk/controller/util/CookiesConsentManager",
+				"test-resources/sap/ui/documentation/sdk/integration/ForcedUsageTrackingConsent"
+			], function (Page, ComponentContainer, APIInfo, CookiesConsentManager, ForcedUsageTrackingConsent) {
+				var bForceTracking = new URLSearchParams(window.location.search).get("sap-ui-xx-force-tracking-consent") === "true";
 
 				APIInfo._setRoot("test-resources/sap/ui/documentation/sdk/integration/mock");
+
+				if (bForceTracking) {
+					window.adobeDataLayer = [];
+					ForcedUsageTrackingConsent.applyForcedUsageTrackingConsent(CookiesConsentManager);
+				}
 
 				// initialize the UI component
 				new Page({
@@ -40,3 +47,4 @@
 		});
 	});
 })();
+

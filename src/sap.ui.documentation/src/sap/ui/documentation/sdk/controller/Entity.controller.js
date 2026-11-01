@@ -13,12 +13,15 @@ sap.ui.define([
 		"sap/m/Link",
 		"sap/m/Text",
 		"sap/m/HBox",
-		"sap/m/ObjectAttribute"
+		"sap/m/ObjectAttribute",
+		"sap/ui/core/EventBus"
 	], function (JSONModel, BaseController, ControlsInfo, EntityInfo, ToggleFullScreenHandler,
-			JSDocUtil, Label, Link, Text, HBox, ObjectAttribute) {
+			JSDocUtil, Label, Link, Text, HBox, ObjectAttribute, EventBus) {
 		"use strict";
 
 		return BaseController.extend("sap.ui.documentation.sdk.controller.Entity", {
+
+			reportsResourceResolved: true,
 
 			/* =========================================================== */
 			/* lifecycle methods										   */
@@ -194,6 +197,7 @@ sap.ui.define([
 					updateTabs.call(this);
 					this.appendPageTitle(this.getModel().getProperty("/name"));
 				}
+				EventBus.getInstance().publish("usageTracking", "resourceResolved", { routeParameters: this._oLastRouteParameters });
 
 			},
 
@@ -203,6 +207,7 @@ sap.ui.define([
 
 				this._sNewId = oEvt.getParameter("arguments").id;
 				this._sNewTab = oEvt.getParameter("arguments").sectionTab;
+				this._oLastRouteParameters = oEvt.getParameters();
 
 				ControlsInfo.loadData().then(function (oData) {
 					this._loadSample(oData);

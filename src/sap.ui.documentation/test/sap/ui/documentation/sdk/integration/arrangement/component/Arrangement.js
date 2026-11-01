@@ -1,4 +1,7 @@
-sap.ui.define(['sap/ui/test/Opa5', '../BaseArrangement'], function (Opa5, BaseArrangement) {
+sap.ui.define(['sap/ui/test/Opa5', '../BaseArrangement',
+	'sap/ui/documentation/sdk/controller/util/CookiesConsentManager',
+	'test-resources/sap/ui/documentation/sdk/integration/ForcedUsageTrackingConsent'
+], function (Opa5, BaseArrangement, CookiesConsentManager, ForcedUsageTrackingConsent) {
 	"use strict";
 
 	function addSaveForLater() {
@@ -32,6 +35,28 @@ sap.ui.define(['sap/ui/test/Opa5', '../BaseArrangement'], function (Opa5, BaseAr
 				addSaveForLater();
 			}
 			return this.iStartMyApp();
+		},
+
+		iStartMyAppComponentWithUsageTracking: function (sHash) {
+			var oConsent = ForcedUsageTrackingConsent.applyForcedUsageTrackingConsent(CookiesConsentManager);
+			window.adobeDataLayer = [];
+			var oPromise = this.iStartMyUIComponent({
+				componentConfig: {
+					name: "sap.ui.documentation.sdk",
+					manifest: true
+				},
+				hash: sHash || ""
+			});
+			return oPromise.then(function () {
+				oConsent.restore();
+			}, function (oErr) {
+				oConsent.restore();
+				return Promise.reject(oErr);
+			});
+		},
+
+		iStartMyAppWithUsageTracking: function (sHash) {
+			return this.iStartMyAppComponentWithUsageTracking(sHash);
 		}
 	});
 });

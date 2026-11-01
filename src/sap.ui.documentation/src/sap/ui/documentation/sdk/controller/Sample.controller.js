@@ -66,6 +66,9 @@ sap.ui.define([
 		};
 
 		return SampleBaseController.extend("sap.ui.documentation.sdk.controller.Sample", {
+
+			reportsResourceResolved: true,
+
 			/* =========================================================== */
 			/* lifecycle methods										   */
 			/* =========================================================== */
@@ -129,7 +132,11 @@ sap.ui.define([
 
 				this.getModel("appView").setProperty("/bHasMaster", false);
 
-				ControlsInfo.loadData().then(this._loadSample.bind(this));
+				ControlsInfo.loadData()
+					.then(this._loadSample.bind(this))
+					.then(function(bLoaded) {
+						bLoaded && EventBus.getInstance().publish("usageTracking", "resourceResolved", { routeParameters: event.getParameters() });
+					});
 			},
 
 			_loadSample: function(oData) {
@@ -145,7 +152,7 @@ sap.ui.define([
 						oPage.setBusy(false);
 					}, 0);
 					this.onRouteNotFound();
-					return;
+					return Promise.resolve(false);
 				}
 
 				// we need this property to navigate to API reference
@@ -178,7 +185,7 @@ sap.ui.define([
 						// really exist. This can happen if someone tempered with the URL manually. In this case as
 						// such sample does not exist in the context from the URL we redirect to not found page.
 						this.onRouteNotFound();
-						return;
+						return Promise.resolve(false);
 					}
 				}
 
@@ -202,7 +209,7 @@ sap.ui.define([
 					oModelData.showWarning = false;
 				}
 
-				this._createIframe()
+				return this._createIframe()
 					.then(function (oSampleConfig) {
 						// Store a reference to the currently opened sample on the application component
 						this.getOwnerComponent()._oCurrentOpenedSample = this._oHtmlControl;
@@ -236,6 +243,7 @@ sap.ui.define([
 
 						this.oModel.setData(oModelData);
 						this.appendPageTitle(this.getModel().getProperty("/name"));
+						return true;
 					}.bind(this))
 					.catch(function (oError) {
 						oPage.removeAllContent();

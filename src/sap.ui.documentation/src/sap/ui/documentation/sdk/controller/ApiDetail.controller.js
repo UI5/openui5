@@ -9,7 +9,8 @@ sap.ui.define([
 	"sap/ui/documentation/sdk/controller/util/APIInfo",
 	"sap/ui/documentation/sdk/model/formatter",
 	"sap/ui/core/mvc/XMLView",
-	"sap/base/Log"
+	"sap/base/Log",
+	"sap/ui/core/EventBus"
 ], function(
     BaseController,
 	JSONModel,
@@ -17,11 +18,14 @@ sap.ui.define([
 	APIInfo,
 	formatter,
 	XMLView,
-	Log
+	Log,
+	EventBus
 ) {
 		"use strict";
 
 		return BaseController.extend("sap.ui.documentation.sdk.controller.ApiDetail", {
+
+			reportsResourceResolved: true,
 
 			NOT_AVAILABLE: 'N/A',
 			NOT_FOUND: 'Not found',
@@ -54,6 +58,7 @@ sap.ui.define([
 
 				oArguments = this.getRouter()._decodeSpecialRouteArguments(oEvent.getParameter("arguments"));
 				oComponent = this.getOwnerComponent();
+				this._oLastRouteParameters = oEvent.getParameters();
 
 				if (this._sTopicid === oArguments.id) {
 					// if topic already displayed, do not recreate the sub-view
@@ -61,8 +66,8 @@ sap.ui.define([
 					oController = this._oView && this._oView.getController();
 					if (oController) {
 						oController.scrollToEntity(oArguments.entityType, oArguments.entityId);
+						EventBus.getInstance().publish("usageTracking", "resourceResolved", { routeParameters: this._oLastRouteParameters }); // notify that the resource referenced in the URL is available
 					}
-					// return early as the topic is already displayed
 					return;
 				}
 
@@ -139,6 +144,8 @@ sap.ui.define([
 					oContainerView: this.getView(),
 					oContainerController: this
 				});
+
+				EventBus.getInstance().publish("usageTracking", "resourceResolved", { routeParameters: this._oLastRouteParameters });
 			},
 
 			/**

@@ -244,6 +244,7 @@ sap.ui.define([
 			// Subscribe to events
 			this.bus = EventBus.getInstance();
 			this.bus.subscribe("newsChanged", "onDemoKitNewsChanged", this._syncNewsModelWithNewsInfo, this);
+			this.bus.subscribe("usageTracking", "resourceResolved", this._onResourceResolvedBeforeConsent, this);
 
 			// Init cookie settings
 			this._oConfigUtil = this.getOwnerComponent().getConfigUtil();
@@ -264,11 +265,7 @@ sap.ui.define([
 			}.bind(this));
 			this._oCookiesConsentManager.checkUserAcceptsUsageTracking(function(bAccepts) {
 				if (bAccepts) {
-					this._getVersionName().then(function(sVersionName) {
-						// start tracking, including the route visited at app-startup (before the check of the persisted consent-decision completed)
-						this.getOwnerComponent().getUsageTracker().start(sVersionName, this._aRouterCachedEventDetails);
-						this._aRouterCachedEventDetails = []; // clear the already logged route visits
-					}.bind(this));
+					this._getVersionName().then(this._startUsageTracking.bind(this));
 				}
 			}.bind(this));
 
@@ -300,6 +297,10 @@ sap.ui.define([
 				ResizeHandler.deregister(this._sResizeHandlerId);
 				this._sResizeHandlerId = null;
 			}
+
+			// Guards against the case where consent was never granted and _startUsageTracking
+			// never ran; if consent was granted this is a harmless no-op.
+			this.bus.unsubscribe("usageTracking", "resourceResolved", this._onResourceResolvedBeforeConsent, this);
 
 			this._oCookiesConsentManager = null;
 		},
@@ -338,6 +339,18 @@ sap.ui.define([
 
 		onNavToWithoutHash: function(oEvent) {
 			this._cacheRouteEventDetails(oEvent);
+		},
+
+		_startUsageTracking: function(sVersionName) {
+			// start tracking, including the route visited at app-startup
+			this.getOwnerComponent().getUsageTracker().start(sVersionName, this._aRouterCachedEventDetails);
+			this._aRouterCachedEventDetails = []; // clear already-replayed pre-consent events
+			// Pre-consent caching is no longer needed; subsequent resourceResolved events go straight to UsageTracker.
+			this.bus.unsubscribe("usageTracking", "resourceResolved", this._onResourceResolvedBeforeConsent, this);
+		},
+
+		_onResourceResolvedBeforeConsent: function(sChannel, sEvent, oData) {
+			this._aRouterCachedEventDetails.push(Object.assign({ eventId: "resourceResolved" }, oData));
 		},
 
 		onCloseImportantMessage: function (oEvent) {
