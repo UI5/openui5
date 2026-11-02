@@ -1596,5 +1596,25 @@
         "text": "sap.m.ComboBox: Dialog opens when tapping on mobile"
       }
     ]
+  },
+  "1.120.51": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "7d4aa3aabb99cb69e51f4f05d313963cef734920",
+        "type": "FIX",
+        "text": " sap.m.MaskInput: cut event does not clear value when editable/enabled is false"
+      },
+      {
+        "id": "31528cd01004b06fdf10d6121600cbbf1181d0d3",
+        "type": "FIX",
+        "text": " sap.m.IconTabFilter: fix invalid role=\"separator\" inside role=\"tab\""
+      },
+      {
+        "id": "bf1c15d7bf67b1e92157eb8a10cb70f9704ce29b",
+        "type": "FIX",
+        "text": " sap.m.Wizard: Step number is read out"
+      }
+    ]
   }
 }
