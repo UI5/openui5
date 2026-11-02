@@ -24,7 +24,8 @@
 					"Main.controller.js",
 					"Main.view.xml",
 					"manifest.json",
-					"SandboxModel.js"
+					"SandboxModel.js",
+					"data/metadata.xml"
 				]
 			}
 		},
