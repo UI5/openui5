@@ -376,11 +376,7 @@ sap.ui.define([
 					});
 
 					if (bExecuteDefault) {
-						if (oEvent.getSource().getState()) {
-							oTable.setFixedColumnCount(this._oColumn.getIndex() + 1);
-						} else {
-							oTable.setFixedColumnCount(0);
-						}
+						TableUtils.applyUserColumnFreeze(oTable, oEvent.getSource().getState() ? this._oColumn.getIndex() + 1 : 0);
 					}
 
 					this._oMenu.close();

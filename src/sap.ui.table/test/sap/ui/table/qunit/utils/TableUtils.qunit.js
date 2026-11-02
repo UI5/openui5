@@ -13,8 +13,10 @@ sap.ui.define([
 	"sap/ui/table/library",
 	"sap/ui/table/RowSettings",
 	"sap/ui/core/Control",
+	"sap/ui/core/Element",
 	"sap/ui/core/Theming",
 	"sap/ui/core/message/MessageType",
+	"sap/ui/core/Lib",
 	"sap/ui/base/Object",
 	"sap/ui/thirdparty/jquery",
 	// provides jQuery custom selectors ":sapTabbable", ":sapFocusable"
@@ -32,8 +34,10 @@ sap.ui.define([
 	TableLibrary,
 	RowSettings,
 	Control,
+	Element,
 	Theming,
 	MessageType,
+	Lib,
 	BaseObject,
 	jQuery
 ) {
@@ -900,6 +904,82 @@ sap.ui.define([
 
 		await TableUtils.showNotificationPopoverAtIndex(oTable, 999, 3);
 		assert.ok(oOpenSpy.notCalled, "the popover is not opened, because the row at index 999 does not exist");
+	});
+
+	QUnit.test("applyUserColumnFreeze", async function(assert) {
+		const oTable = this.oTable;
+
+		// Spy on setFixedColumnCount to verify it is called with the correct parameters. The call is not forwarded to
+		// the original method, so the real re-layout does not recompute _bIgnoreFixedColumnCount. This lets the test
+		// control that flag deterministically.
+		const oSetFixedColumnCountSpy = sinon.stub(oTable, "setFixedColumnCount");
+
+		function getMessageBoxes() {
+			return Element.registry.filter((oElement) =>
+				oElement.isA("sap.m.Dialog") && oElement.hasStyleClass("sapMMessageBox"));
+		}
+
+		// The message box is loaded and opened asynchronously, so wait until it appears in the element registry.
+		function waitForMessageBox() {
+			return new Promise((resolve) => {
+				const iInterval = setInterval(() => {
+					const aMessageBoxes = getMessageBoxes();
+					if (aMessageBoxes.length > 0) {
+						clearInterval(iInterval);
+						resolve(aMessageBoxes[0]);
+					}
+				}, 10);
+			});
+		}
+
+		// The fixed columns fit into the table.
+		oTable._bIgnoreFixedColumnCount = false;
+		TableUtils.applyUserColumnFreeze(oTable, 2);
+		assert.ok(oSetFixedColumnCountSpy.lastCall.calledWithExactly(2), "setFixedColumnCount is called with the correct fixed column count");
+		assert.notOk(oTable._bFixedColumnsNotActiveMessageOpen, "No message box is triggered while the fixed columns fit");
+		assert.equal(getMessageBoxes().length, 0, "No message box is open while the fixed columns fit");
+
+		// Unfreezing (a fixed column count of 0) never triggers the message box, even if the fixed columns would not fit.
+		oTable._bIgnoreFixedColumnCount = true;
+		TableUtils.applyUserColumnFreeze(oTable, 0);
+		assert.ok(oSetFixedColumnCountSpy.lastCall.calledWithExactly(0), "setFixedColumnCount is called with the correct fixed column count");
+		assert.notOk(oTable._bFixedColumnsNotActiveMessageOpen, "No message box is triggered when unfreezing");
+		assert.equal(getMessageBoxes().length, 0, "No message box is open when unfreezing");
+
+		// The fixed columns do not fit into the table.
+		oTable._bIgnoreFixedColumnCount = true;
+		TableUtils.applyUserColumnFreeze(oTable, 3);
+		assert.ok(oSetFixedColumnCountSpy.lastCall.calledWithExactly(3), "setFixedColumnCount is called with the correct fixed column count");
+
+		// The message box is created and opened asynchronously, after the "sap.m" library has been loaded.
+		const oMessageBox = await waitForMessageBox();
+		assert.ok(oTable._bFixedColumnsNotActiveMessageOpen, "The open guard is set when the fixed columns do not fit");
+
+		// A repeated call must not open a second message box, because the open guard is now set.
+		TableUtils.applyUserColumnFreeze(oTable, 3);
+		assert.equal(getMessageBoxes().length, 1, "Exactly one message box is created despite multiple triggers");
+
+		// Wait for the dialog's open lifecycle to finish before asserting on the rendered DOM.
+		if (!oMessageBox.isOpen()) {
+			await new Promise((resolve) => {
+				oMessageBox.attachEventOnce("afterOpen", resolve);
+			});
+		}
+		assert.ok(oMessageBox.isOpen(), "The message box is open");
+		assert.ok(oMessageBox.hasStyleClass("sapMMessageBoxInfo"), "The message box is of type information");
+		assert.equal(oMessageBox.$().find(".sapMMsgBoxText").text(), TableUtils.getResourceText("TBL_FIXED_COLUMNS_NOT_DISPLAYED"),
+			"The message box has the correct text");
+
+		// Closing the message box resets the open guard.
+		const pClosed = new Promise((resolve) => {
+			oMessageBox.attachAfterClose(resolve);
+		});
+		oMessageBox.close();
+		await pClosed;
+		assert.notOk(oTable._bFixedColumnsNotActiveMessageOpen, "The open guard is reset after closing the message box");
+
+		oMessageBox.destroy();
+		oSetFixedColumnCountSpy.restore();
 	});
 
 	QUnit.test("loadContexts", async function(assert) {

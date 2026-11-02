@@ -468,6 +468,7 @@ sap.ui.define([
 				fireColumnFreeze: this.stub().returns(true),
 				setFixedColumnCount: this.stub()
 			};
+			this.oApplyFreezeSpy = this.spy(TableUtils, "applyUserColumnFreeze");
 			this.stub(this.oMenu, "_getColumn").returns(this.oColumn);
 			this.stub(this.oMenu, "_getTable").returns(this.oTable);
 			this.stub(TableUtils.Column, "getHeaderSpan").returns(1);
@@ -499,7 +500,8 @@ sap.ui.define([
 		this.oMenu.getItems()[0].fireSelect();
 
 		assert.ok(this.oTable.fireColumnFreeze.calledOnce, "columnFreeze event fired");
-		assert.ok(this.oTable.setFixedColumnCount.calledOnceWithExactly(3), "setFixedColumnCount called with iColumnIndex + 1");
+		assert.ok(this.oApplyFreezeSpy.calledOnceWithExactly(this.oTable, 3),
+			"applyUserColumnFreeze is triggered with the correct parameters on user interaction");
 	});
 
 	QUnit.test("Unfreezes when the column is currently the last fixed column", function(assert) {
@@ -509,7 +511,8 @@ sap.ui.define([
 
 		this.oMenu.getItems()[0].fireSelect();
 
-		assert.ok(this.oTable.setFixedColumnCount.calledOnceWithExactly(0), "setFixedColumnCount called with 0 to unfreeze");
+		assert.ok(this.oApplyFreezeSpy.calledOnceWithExactly(this.oTable, 0),
+			"applyUserColumnFreeze is triggered with the correct parameters on user interaction");
 	});
 
 	QUnit.test("Skips execution when columnFreeze event is prevented", function(assert) {
@@ -519,7 +522,8 @@ sap.ui.define([
 
 		this.oMenu.getItems()[0].fireSelect();
 
-		assert.ok(this.oTable.setFixedColumnCount.notCalled, "setFixedColumnCount not called");
+		assert.ok(this.oApplyFreezeSpy.notCalled,
+			"applyUserColumnFreeze is not triggered when the columnFreeze event is prevented");
 	});
 
 	/**
