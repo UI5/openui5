@@ -74,6 +74,18 @@ sap.ui.define([
 						return [2, oTemplate];
 					}
 				}, {
+					key: "Disabled",
+					text: "Temporarily Disabled Actions",
+					handler() {
+						const oTemplate = new RowAction({
+							items: [
+								new RowActionItem({type: "Delete", press: fnPress, enabled: "{Available}"}),
+								new RowActionItem({icon: "sap-icon://edit", text: "Edit", press: fnPress, enabled: "{Available}"})
+							]
+						});
+						return [2, oTemplate];
+					}
+				}, {
 					key: "None",
 					text: "No Actions",
 					handler: function() {

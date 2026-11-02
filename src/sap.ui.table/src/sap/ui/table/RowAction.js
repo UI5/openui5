@@ -33,8 +33,10 @@ sap.ui.define([
 	 * If more action items are available as the available space allows to display an overflow mechanism is provided.
 	 * This control must only be used in the context of the <code>sap.ui.table.Table</code> control to define row actions.
 	 *
-	 * <b>Note</b>: The <code>RowActionItem</code> of type <code>Navigation</code> has a special role and is shown as the rightmost icon independent
-	 * of the order in the <code>items</code> aggregation.
+	 * <b>Note</b>: Items of type <code>Navigation</code> are shown at the rightmost position, independent
+	 * of their order in the <code>items</code> aggregation. When overflow is needed, one slot is reserved for the overflow icon.
+	 * The remaining slots are filled with <code>Navigation</code> items first, then with other action items.
+	 * Items that do not fit are shown in the overflow menu.
 	 *
 	 * @extends sap.ui.core.Control
 	 * @version ${version}
@@ -71,25 +73,37 @@ sap.ui.define([
 	 */
 	RowAction.prototype.getAccessibilityInfo = function() {
 		const oRow = this.getRow();
-		const iVisibleItems = this._getVisibleItems().length;
+		const aVisibleItems = this._getVisibleItems();
+		const iVisibleItems = aVisibleItems.length;
+		const iEnabledItems = aVisibleItems.filter((oItem) => oItem.getEnabled()).length;
 		const iSize = this._getSize();
 		const bActive = this.getVisible() && iVisibleItems > 0 && iSize > 0
 					  && (!oRow || (!oRow.isContentHidden() && !oRow.isGroupHeader() && !oRow.isSummary()));
-		let sText;
+		const bInteractive = bActive && (iVisibleItems > iSize || iEnabledItems > 0);
+		let sText = "";
 
-		if (bActive) {
-			sText = TableUtils.getResourceText(iVisibleItems === 1
-											   ? "TBL_ROW_ACTION_SINGLE_ACTION"
-											   : "TBL_ROW_ACTION_MULTIPLE_ACTION", [iVisibleItems]);
-		} else {
+		if (!bActive) {
 			sText = TableUtils.getResourceText("TBL_ROW_ACTION_NO_ACTION");
+		} else if (iEnabledItems > 0) {
+			sText = TableUtils.getResourceText(iEnabledItems === 1
+											   ? "TBL_ROW_ACTION_SINGLE_ACTION"
+											   : "TBL_ROW_ACTION_MULTIPLE_ACTION", [iEnabledItems]);
 		}
 
 		return {
-			focusable: bActive,
-			enabled: bActive,
+			focusable: bInteractive,
+			enabled: bInteractive,
 			description: sText
 		};
+	};
+
+	/**
+	 * @inheritDoc
+	 */
+	RowAction.prototype.enhanceAccessibilityState = function(oElement, mAriaProps) {
+		if (oElement === this._oOverflowIcon) {
+			mAriaProps.haspopup = "menu";
+		}
 	};
 
 	/**
@@ -144,11 +158,6 @@ sap.ui.define([
 				tooltip: TableUtils.getResourceText("TBL_ROW_ACTION_MORE")
 			}).addStyleClass("sapUiTableActionIcon");
 
-			this._oOverflowIcon.addDelegate({
-				onAfterRendering: function() {
-					this._oOverflowIcon.getDomRef().setAttribute("aria-haspopup", "Menu");
-				}
-			}, this);
 			this.addDependent(this._oOverflowIcon);
 		} else {
 			this._oOverflowIcon.detachPress(fnPress, this);
@@ -169,17 +178,15 @@ sap.ui.define([
 			oTable._oRowActionOverflowMenu = new Menu();
 			oTable.addAggregation("_hiddenDependents", oTable._oRowActionOverflowMenu);
 		} else {
-			oTable._oRowActionOverflowMenu.removeAllItems();
+			oTable._oRowActionOverflowMenu.destroyItems();
 		}
 
 		for (let i = iItemsBeforeOverflow; i < aItems.length; i++) {
 			oTable._oRowActionOverflowMenu.addItem(aItems[i]._getOverflowMenuItem());
 		}
 
-		if (aNavigationItems.length >= this._getSize()) {
-			for (let i = 0; i < aNavigationItems.length - this._getSize(); i++) {
-				oTable._oRowActionOverflowMenu.addItem(aNavigationItems[i]._getOverflowMenuItem());
-			}
+		for (let i = Math.max(0, this._getSize() - 1); i < aNavigationItems.length; i++) {
+			oTable._oRowActionOverflowMenu.addItem(aNavigationItems[i]._getOverflowMenuItem());
 		}
 
 		oTable._oRowActionOverflowMenu.open(true, oEvent.getSource(), Popup.Dock.CenterTop, Popup.Dock.CenterBottom, oEvent.getSource().getDomRef());

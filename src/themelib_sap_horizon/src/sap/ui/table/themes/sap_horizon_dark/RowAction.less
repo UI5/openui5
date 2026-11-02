@@ -11,12 +11,12 @@
 	color: var(--sapButton_Lite_TextColor);
 }
 
-.sapUiTableActionIcon:hover {
+.sapUiTableActionIcon:not(.sapUiTableActionItemDisabled):hover {
 	border: 1px solid var(--sapButton_Hover_BorderColor);
 	background: var(--sapButton_Hover_Background);
 }
 
-.sapUiTableActionIcon:active {
+.sapUiTableActionIcon:not(.sapUiTableActionItemDisabled):active {
 	color: var(--sapButton_Active_TextColor);
 	border: 1px solid var(--sapButton_Active_BorderColor);
 }

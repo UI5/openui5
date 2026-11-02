@@ -1338,6 +1338,22 @@ sap.ui.define([
 		}
 	});
 
+	QUnit.test("Row action description on cell focus", function(assert) {
+		const oRowAction = this.oTable.getRows()[0].getRowAction();
+		const oCell = this.oTable.qunit.getRowActionCell(0);
+		const oDataCell = this.oTable.qunit.getDataCell(0, 0);
+		const oGetAccessibilityInfo = this.stub(oRowAction, "getAccessibilityInfo");
+
+		oGetAccessibilityInfo.returns({description: "Action description"});
+		oCell.focus();
+		assert.strictEqual(this.oTable.$("cellacc").text(), "Action description", "The cell announces the row action description");
+
+		oDataCell.focus();
+		oGetAccessibilityInfo.returns({description: ""});
+		oCell.focus();
+		assert.strictEqual(this.oTable.$("cellacc").text(), ".", "An empty row action description uses the fallback text");
+	});
+
 	QUnit.test("Group header row", async function(assert) {
 		TableUtils.Grouping.setHierarchyMode(this.oTable, TableUtils.Grouping.HierarchyMode.Group);
 		await this.oTable.qunit.setRowStates([{

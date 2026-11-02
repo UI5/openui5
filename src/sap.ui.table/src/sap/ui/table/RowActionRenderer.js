@@ -43,6 +43,11 @@ sap.ui.define([
 
 		rm.openEnd();
 
+		if (oAction._getSize() === 0) {
+			rm.close("div");
+			return;
+		}
+
 		// special handling is needed for the navigation item
 		const aItems = [];
 		const aNavigationItems = [];
