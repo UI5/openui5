@@ -8,7 +8,7 @@ sap.ui.define([
 	"use strict";
 
 	// Test data
-	var aTestData = [
+	const aTestData = [
 		{Gregorian: {year: 1970, month: 0, day: 1}, Buddhist: {year: 2513, month: 0, day: 1}},
 		{Gregorian: {year: 2011, month: 5, day: 1}, Buddhist: {year: 2554, month: 5, day: 1}},
 		{Gregorian: {year: 1939, month: 2, day: 8}, Buddhist: {year: 2481, month: 2, day: 8}},
@@ -16,7 +16,7 @@ sap.ui.define([
 		{Gregorian: {year: 1902, month: 1, day: 13}, Buddhist: {year: 2444, month: 1, day: 13}},
 		{Gregorian: {year: 1902, month: 3, day: 13}, Buddhist: {year: 2445, month: 3, day: 13}}
 	];
-	var sDefaultLanguage = Localization.getLanguage();
+	const sDefaultLanguage = Localization.getLanguage();
 
 	//1. Instance related
 	QUnit.module("sap.ui.core.date.Buddhist", {
@@ -35,17 +35,15 @@ sap.ui.define([
 	});
 
 	QUnit.test("with no arguments", function (assert) {
-		var clock = sinon.useFakeTimers(); // 1, January 1970 = 1, January 2513
-		var oBuddhistDate = new Buddhist(); //1, January 2513
+		const clock = sinon.useFakeTimers(); // 1, January 1970 = 1, January 2513
+		const oBuddhistDate = new Buddhist(); //1, January 2513
 		verifyDate(assert, "Constructor with no parameters must always return the Buddhist date corresponding to the current " +
 		"Gregorian one.", oBuddhistDate, 2513, 0, 1, true);
 		clock.restore();
 	});
 
 	QUnit.test("with value parameter (timestamp)", function (assert) {
-		var oBuddhistDate;
-
-		oBuddhistDate = new Buddhist("invalid Buddhist date timestamp");
+		let oBuddhistDate = new Buddhist("invalid Buddhist date timestamp");
 		assert.ok(isInvalid(oBuddhistDate), "Constructor with invalid string as timestamp must return an invalid date");
 
 		oBuddhistDate = new Buddhist({});
@@ -56,7 +54,7 @@ sap.ui.define([
 		verifyDate(assert, "Constructor with value(timestamp)=0 must represents BuddhistDate corresponding to the date of 1st January 1970 Gregorian/(1389/10/22 Buddhist)",
 				oBuddhistDate, 2513, 0, 1, true);
 
-		var iOneDay = 24 * 60 * 60 * 1000;
+		const iOneDay = 24 * 60 * 60 * 1000;
 		oBuddhistDate = new Buddhist(iOneDay); //2, January 1970 = 1, January 2513
 		verifyDate(assert, "Constructor with value(timestamp)= 'one day after 01.01.1970' must represents BuddhistDate corresponding to the date of 2nd January 1970 Gregorian/(1389/10/23 Buddhist)",
 				oBuddhistDate, 2513, 0, 2, true);
@@ -68,9 +66,7 @@ sap.ui.define([
 
 	QUnit.test("with year, month[, day[, hour[, minutes[, seconds[, milliseconds]]]]] parameters: invalid parameter type )", function (assert) {
 		// ------------- object -----------------------------
-		var oBuddhistDate = null;
-
-		oBuddhistDate = new Buddhist("blabla", 0, 23);
+		let oBuddhistDate = new Buddhist("blabla", 0, 23);
 		assert.ok(isInvalid(oBuddhistDate), "Constructor with invalid string as year must return invalid date");
 
 		oBuddhistDate = new Buddhist(null, 0, 23);
@@ -124,15 +120,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("with year, month[, day[, hour[, minutes[, seconds[, milliseconds]]]]] parameters: valid values)", function (assert) {
-		var oBuddhistDate = null;
-		aTestData.forEach(function(oTestDate) {
-			oBuddhistDate = createBuddhistDateFromTestEntry(oTestDate);
+		aTestData.forEach((oTestDate) => {
+			const oBuddhistDate = createBuddhistDateFromTestEntry(oTestDate);
 			verifyDateWithTestDate(assert, "Constructor with valid values", oBuddhistDate, oTestDate.Buddhist);
 		});
 	});
 
 	QUnit.test("with optional parameters", function (assert) {
-		var oBuddhistDate = new Buddhist(2513, 10);
+		let oBuddhistDate = new Buddhist(2513, 10);
 		verifyDate(assert, "new Buddhist(2513, 10) must be equal to 01.11.2513", oBuddhistDate, 2513, 10, 1);
 
 		oBuddhistDate = new Buddhist(2513, 10, 2);
@@ -140,10 +135,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("Overflow/underflow of date values", function (assert) {
-		var oTestDate = aTestData[0],
-			oBuddhistDate;
+		const oTestDate = aTestData[0];
 
-		oBuddhistDate = createBuddhistDateFromTestEntry(oTestDate);
+		let oBuddhistDate = createBuddhistDateFromTestEntry(oTestDate);
 		oBuddhistDate.setMonth(12); //11 is max allowed value
 		verifyDate(assert, "setMonth(12) must overflow to next year", oBuddhistDate, 2514, 0, 1);
 
@@ -181,8 +175,8 @@ sap.ui.define([
 	});
 
 	QUnit.test("Set/Get Full Year", function (assert) {
-		var oTestDate = aTestData[0],
-			oBuddhistDate = createBuddhistDateFromTestEntry(oTestDate);
+		const oTestDate = aTestData[0];
+		const oBuddhistDate = createBuddhistDateFromTestEntry(oTestDate);
 
 		oBuddhistDate.setFullYear(2500);
 		verifyDate(assert, "setFullYear", oBuddhistDate, 2500, 0, 1);
@@ -195,15 +189,15 @@ sap.ui.define([
 	});
 
 	QUnit.test("Set/Get Year", function (assert) {
-		var oTestDate = aTestData[0],
-			oBuddhistDate = createBuddhistDateFromTestEntry(oTestDate);
+		const oTestDate = aTestData[0];
+		const oBuddhistDate = createBuddhistDateFromTestEntry(oTestDate);
 
 		oBuddhistDate.setYear(2500);
 		verifyDate(assert, "setYear", oBuddhistDate, 2500, 0, 1);
 	});
 
 	QUnit.test("Setters have to return the time since 1.1.1970", function (assert) {
-		var oDate = new Buddhist(2513, 0, 1, 8, 10, 15, 119);
+		const oDate = new Buddhist(2513, 0, 1, 8, 10, 15, 119);
 
 		function check(iTimestamp, sSetter) {
 			assert.equal(typeof iTimestamp, "number", sSetter + " did return a numeric value");
@@ -230,7 +224,7 @@ sap.ui.define([
 
 
 	QUnit.test(".Now()", function (assert) {
-		var clock = sinon.useFakeTimers(0); // 1, January 1970 = 1, January 2513
+		let clock = sinon.useFakeTimers(0); // 1, January 1970 = 1, January 2513
 		assert.equal(Buddhist.now(), 0, "Buddhist.now() must equal to the timestamp since 1 January 1970, 00:00:00 000");
 
 		clock.restore();
@@ -241,23 +235,21 @@ sap.ui.define([
 	});
 
 	QUnit.test("Convert Gregorian to Buddhist dates", function (assert) {
-		var oGregorianDate, oExpectedBuddhistDate, oCalculatedBuddhistDate;
-		for (var i = 0; i < aTestData.length; i++) {
-			oGregorianDate = createGregorianDateFromTestEntry(aTestData[i]);
-			oExpectedBuddhistDate = createBuddhistDateFromTestEntry(aTestData[i], true);
-			oCalculatedBuddhistDate = new Buddhist(oGregorianDate.getTime());
+		aTestData.forEach((oTestDate, i) => {
+			const oGregorianDate = createGregorianDateFromTestEntry(oTestDate);
+			const oExpectedBuddhistDate = createBuddhistDateFromTestEntry(oTestDate, true);
+			const oCalculatedBuddhistDate = new Buddhist(oGregorianDate.getTime());
 			compareTwoDates(assert, "Gregorian2Buddhist " + i, oCalculatedBuddhistDate, oExpectedBuddhistDate);
-		}
+		});
 	});
 
 	QUnit.test("Convert Buddhist to Gregorian dates", function (assert) {
-		var oBuddhistDate, oExpectedGregorianDate, oCalculatedGregorianDate;
-		for (var i = 0; i < aTestData.length; i++) {
-			oBuddhistDate = createBuddhistDateFromTestEntry(aTestData[i], true);
-			oExpectedGregorianDate = createGregorianDateFromTestEntry(aTestData[i]);
-			oCalculatedGregorianDate = oBuddhistDate.getJSDate();
+		aTestData.forEach((oTestDate, i) => {
+			const oBuddhistDate = createBuddhistDateFromTestEntry(oTestDate, true);
+			const oExpectedGregorianDate = createGregorianDateFromTestEntry(oTestDate);
+			const oCalculatedGregorianDate = oBuddhistDate.getJSDate();
 			compareTwoDates(assert, "Buddhist2Gregorian " + i, oCalculatedGregorianDate, oExpectedGregorianDate);
-		}
+		});
 	});
 
 	QUnit.test("getWeek (de)", function (assert) {
@@ -283,8 +275,8 @@ sap.ui.define([
 	}
 
 	function verifyDate(assert, sMessage, oDate, year, month, day, bUTC) {
-		var sExpected = formatDate(year, month + 1, day);
-		var sReal = formatDate(String(bUTC ? oDate.getUTCFullYear() : oDate.getFullYear()),
+		const sExpected = formatDate(year, month + 1, day);
+		const sReal = formatDate(String(bUTC ? oDate.getUTCFullYear() : oDate.getFullYear()),
 				String(bUTC ? (oDate.getUTCMonth() + 1) : (oDate.getMonth() + 1)),
 				String(bUTC ? oDate.getUTCDate() : oDate.getDate()));
 
@@ -298,7 +290,7 @@ sap.ui.define([
 	}
 
 	function createBuddhistDateFromTestEntry(oEntry, bUTC) {
-		var oDateEntry = oEntry.Buddhist;
+		const oDateEntry = oEntry.Buddhist;
 		if (bUTC) {
 			// eslint-disable-next-line new-cap
 			return new Buddhist(Buddhist.UTC(oDateEntry.year, oDateEntry.month, oDateEntry.day));
@@ -308,7 +300,7 @@ sap.ui.define([
 	}
 
 	function createGregorianDateFromTestEntry(oEntry) {
-		var oDateEntry = oEntry.Gregorian;
+		const oDateEntry = oEntry.Gregorian;
 		return UI5Date.getInstance(Date.UTC(oDateEntry.year, oDateEntry.month, oDateEntry.day));
 	}
 
