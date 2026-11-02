@@ -117,9 +117,9 @@
 							<mdc:ValueHelp id="FH4"
 								delegate='\{"name": "sap/ui/v4demo/delegate/ValueHelp.delegate", "payload": \{\}\}'>
 								<mdc:typeahead>
-									<mdcvh:Popover title="Title">
-										<mdcvc:MTable keyPath="title" descriptionPath="title" useAsValueHelp="false">
-											<Table id="mTable1_title" items='{path : "/Books", length: 10}'
+									<mdcvh:Popover id="FH4-Pop" title="Title">
+										<mdcvc:MTable id="FH4-Pop-MTable" keyPath="title" descriptionPath="title" useAsValueHelp="false">
+											<Table id="mTable1_title" items='{path : "/Books", length: 10, suspended: true}'
 												width="{= ${device>/system/phone} ? '100%' : '30rem'}" mode="MultiSelect">
 												<columns>
 													<Column>
@@ -140,8 +140,8 @@
 									</mdcvh:Popover>
 								</mdc:typeahead>
 								<mdc:dialog>
-									<mdcvh:Dialog title="Title">
-										<mdcvc:MDCTable keyPath="title" descriptionPath="title" forceBind="true">
+									<mdcvh:Dialog id="FH4-Dia" title="Title">
+										<mdcvc:MDCTable id="FH4-Dia-MDCTable" keyPath="title" descriptionPath="title" forceBind="true">
 											<mdcvc:filterBar>
 												<mdcvh:FilterBar id="titleVHFB" liveMode="false"
 													delegate='\{"name": "delegates/GenericVhFilterBarDelegate", "payload": \{\}\}'>
@@ -227,7 +227,7 @@
 									<mdcvh:Popover title="Title">
 										<mdcvc:MTable keyPath="title" descriptionPath="title" useFirstMatch="false"
 											useAsValueHelp="false">
-											<Table id="mTable1_2_title" items='{path : "/Books"}' growing="true"
+											<Table id="mTable1_2_title" items='{path : "/Books", suspended: true}' growing="true"
 												growingScrollToLoad="true" growingThreshold="20" width="50rem"
 												mode="SingleSelectMaster">
 												<columns>
@@ -301,7 +301,7 @@
 									<mdcvh:Popover title="Author ID">
 										<mdcvc:MTable id="FH1-Popover-MTable_defcond" keyPath="ID"
 											descriptionPath="name" useFirstMatch="false" useAsValueHelp="false">
-											<Table id="mTable1_defcond" items='{path : "/Authors", length: 10}'
+											<Table id="mTable1_defcond" items='{path : "/Authors", length: 10, suspended: true}'
 												width="50rem" mode="SingleSelectMaster">
 												<columns>
 													<Column width="5rem">
@@ -344,7 +344,7 @@
 								<mdc:typeahead>
 									<mdcvh:Popover title="Langugages">
 										<mdcvc:MTable keyPath="code" descriptionPath="name" useAsValueHelp="false">
-											<Table id="mTable1_languages" items='{path : "/Languages", length: 10}'
+											<Table id="mTable1_languages" items='{path : "/Languages", length: 10, suspended: true}'
 												width="{= ${device>/system/phone} ? '100%' : '30rem'}"
 												mode="SingleSelectMaster">
 												<columns>
@@ -420,7 +420,7 @@
 									<mdcvh:Popover title="Languages">
 										<mdcvc:MTable keyPath="code" descriptionPath="name" useFirstMatch="false">
 											<!-- useAsValueHelp="true"> -->
-											<Table id="mTable1_languages_defcond" items='{path : "/Languages"}'
+											<Table id="mTable1_languages_defcond" items='{path : "/Languages", suspended: true}'
 												growing="true" growingScrollToLoad="true" growingThreshold="20"
 												width="30rem" mode="SingleSelectMaster">
 												<columns>
@@ -454,7 +454,7 @@
 								<mdc:typeahead>
 									<mdcvh:Popover title="Classification">
 										<mdcvc:MTable keyPath="code" descriptionPath="title" useAsValueHelp="false">
-											<Table id="mTable1_classification" items='{path : "/Classification"}'
+											<Table id="mTable1_classification" items='{path : "/Classification", suspended: true}'
 												width="{= ${device>/system/phone} ? '100%' : '30rem'}"
 												mode="SingleSelectMaster">
 												<columns>
@@ -502,7 +502,7 @@
 										<mdcvc:MTable id="subGenreTypeAhead" keyPath="code" descriptionPath="title"
 											useAsValueHelp="false">
 											<Table id="mTable1_subgenre"
-												items='{path: "/SubGenres", length: 10, parameters: {$select: ["classification_code", "genre_code"]}}'
+												items='{path: "/SubGenres", length: 10, parameters: {$select: ["classification_code", "genre_code"]}, suspended: true}'
 												width="{= ${device>/system/phone} ? '100%' : '30rem'}" mode="MultiSelect">
 												<columns>
 													<Column width="10rem">
@@ -645,7 +645,7 @@
 										<mdcvc:MTable id="detailGenreTypeAhead" keyPath="code" descriptionPath="title"
 											useAsValueHelp="false">
 											<Table id="mTable1_detailgenre"
-												items='{path: "/DetailGenres", length: 10, parameters: {$select: ["classification_code", "genre_code", "subgenre_code"]}}'
+												items='{path: "/DetailGenres", length: 10, parameters: {$select: ["classification_code", "genre_code", "subgenre_code"]}, suspended: true}'
 												width="{= ${device>/system/phone} ? '100%' : '30rem'}" mode="MultiSelect">
 												<columns>
 													<Column width="10rem">
@@ -785,7 +785,7 @@
 								delegate='\{"name": "sap/ui/v4demo/delegate/ValueHelp.delegate", "payload": \{\}\}'>
 								<mdc:typeahead>
 									<mdcvh:Popover id="FH-Currency-Pop" title="Currencies">
-										<mdcvc:FixedList items="{/Currencies}" useAsValueHelp="true">
+										<mdcvc:FixedList id="FH-Currency-Pop-FL" items='{path: "/Currencies", suspended: true}' useAsValueHelp="true">
 											<mdcvc:FixedListItem key="{code}" text="{descr}" additionalText="{code}" />
 										</mdcvc:FixedList>
 									</mdcvh:Popover>
@@ -1061,8 +1061,8 @@
 								<mdcvh:Popover id="FHSubGenreSingle-Popover" title="Sub Genre">
 									<mdcvc:MTable id="FHSubGenreSingle-MTable" keyPath="code" descriptionPath="title"
 										useAsValueHelp="true">
-										<Table
-											items='{path : "/SubGenres", parameters: {$select: ["classification_code", "genre_code"]}}'
+										<Table id="FHSubGenreSingle-MTable-Table"
+											items='{path : "/SubGenres", parameters: {$select: ["classification_code", "genre_code"]}, suspended: true}'
 											width="100%" growing="true" growingScrollToLoad="true" growingThreshold="20"
 											mode="SingleSelectMaster">
 											<columns>
@@ -1112,7 +1112,7 @@
 								<mdcvh:Popover id="FHGenreSingle-Popover" title="Genre">
 									<mdcvc:MTable id="FHGenreSingle-MTable" keyPath="code" descriptionPath="title"
 										useAsValueHelp="true">
-										<Table items='{path : "/Genres", parameters: {$select: "classification_code"}}'
+										<Table id="FHGenreSingle-MTable-Table" items='{path : "/Genres", parameters: {$select: "classification_code"}, suspended: true}'
 											width="100%" growing="true" growingScrollToLoad="true" growingThreshold="20"
 											mode="SingleSelectMaster">
 											<columns>
@@ -1166,7 +1166,7 @@
 						<mdcvc:MTable id="genreTypeAhead" keyPath="code" descriptionPath="title"
 							useAsValueHelp="false">
 							<Table id="mTable1_genre"
-								items='{path : "/Genres", length: 10, parameters: {$select: "classification_code"}}'
+								items='{path : "/Genres", length: 10, parameters: {$select: "classification_code"}, suspended: true}'
 								width="{= ${device>/system/phone} ? '100%' : '30rem'}" mode="MultiSelect">
 								<columns>
 									<Column width="10rem">

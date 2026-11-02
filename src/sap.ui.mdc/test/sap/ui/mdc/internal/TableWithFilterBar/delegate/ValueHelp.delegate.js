@@ -140,12 +140,23 @@ sap.ui.define([
 	ValueHelpDelegate.retrieveContent = function (oValueHelp, oContainer) {
 
 		const aCurrentContent = oContainer && oContainer.getContent();
-		if (oContainer.isA("sap.ui.mdc.valuehelp.Dialog") && aCurrentContent?.length > 0) {
+		if (aCurrentContent?.[0]?.isA("sap.ui.mdc.valuehelp.content.FixedList")) {
+			const oBinding = aCurrentContent[0].getBinding("items");
+			if (oBinding?.isSuspended()) { // prevent fetching data before needed
+				oBinding.resume();
+			}
+		} else if (oContainer.isA("sap.ui.mdc.valuehelp.Dialog") && aCurrentContent?.length > 0) {
 			aCurrentContent.forEach(function(oCurrentContent) {
 				if (oCurrentContent.isA("sap.ui.mdc.valuehelp.content.MDCTable")) {
 					const oTable = oCurrentContent.getTable();
 					if (oTable?._setShowP13nButton) {
 						oTable._setShowP13nButton(false);
+					}
+				} if (oCurrentContent.isA("sap.ui.mdc.valuehelp.content.MTable")) {
+					const oTable = oCurrentContent.getTable();
+					const oBinding = oTable?.getBinding("items");
+					if (oBinding?.isSuspended()) { // prevent fetching data before needed
+						oBinding.resume();
 					}
 				}
 			});
