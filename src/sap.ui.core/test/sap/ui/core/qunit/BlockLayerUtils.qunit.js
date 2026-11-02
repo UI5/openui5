@@ -433,6 +433,7 @@ sap.ui.define([
 			await nextUIUpdate();
 
 			assert.ok(oInnerView.getDomRef(), "Inner XMLView has DOM");
+			/** @deprecated together with DOM preservation in XMLView */
 			assert.ok(
 				oInnerView.getDomRef().hasAttribute("data-sap-ui-preserve"),
 				"Inner XMLView has preserve marker"
@@ -558,6 +559,7 @@ sap.ui.define([
 			await nextUIUpdate();
 
 			assert.ok(oInnerView.getDomRef(), "Inner XMLView has DOM");
+			/** @deprecated together with DOM preservation in XMLView */
 			assert.ok(
 				oInnerView.getDomRef().hasAttribute("data-sap-ui-preserve"),
 				"Inner XMLView has preserve marker"
