@@ -2375,6 +2375,98 @@ sap.ui.define([
 		assert.ok(oFileUploaderChangeSpy.notCalled, "Directory uploads aborted with restrited file types");
 	});
 
+	/* ============================================ */
+	/* ACC-264.1 - Screen reader noData text fix    */
+	/* ============================================ */
+
+	QUnit.module("ACC-264.1 - Screen reader noData text announcement", {
+		beforeEach: async function () {
+			this.oUploadSet = new UploadSet("uploadSet", {
+				items: {
+					path: "/items",
+					template: TestUtils.createItemTemplate(),
+					templateShareable: false
+				}
+			}).setModel(new JSONModel(getData()));
+			this.oUploadSet.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function () {
+			this.oUploadSet.destroy();
+			this.oUploadSet = null;
+		}
+	});
+
+	QUnit.test("setNoDataText propagates to inner list so screen reader announces the correct text", async function (assert) {
+		// Arrange
+		this.oUploadSet.unbindAggregation("items");
+		await nextUIUpdate();
+
+		// Act
+		this.oUploadSet.setNoDataText("Custom no data text");
+
+		// Assert
+		assert.equal(
+			this.oUploadSet.getProperty("noDataText"),
+			"Custom no data text",
+			"noDataText property is stored on UploadSet"
+		);
+		assert.ok(
+			this.oUploadSet._oList.getNoDataText().indexOf("Custom no data text") >= 0,
+			"Inner list noDataText is updated - screen reader will announce the custom text"
+		);
+	});
+
+	QUnit.test("Inner list noDataText is non-empty when custom IllustratedMessage has no title set", async function (assert) {
+		// Arrange - app provides IllustratedMessage with only illustrationType, no title/description
+		var oCustomIllustratedMessage = new IllustratedMessage({
+			illustrationType: IllustratedMessageType.NoData
+		});
+		this.oUploadSet.setAggregation("illustratedMessage", oCustomIllustratedMessage);
+		this.oUploadSet.unbindAggregation("items");
+		this.oUploadSet.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		// Act
+		this.oUploadSet._getIllustratedMessage();
+
+		// Assert - noDataText must not be whitespace-only, otherwise .trim() makes it empty
+		// and the screen reader falls back to the SVG illustration aria text "No data"
+		var sListNoDataText = this.oUploadSet._oList.getNoDataText();
+		assert.ok(
+			sListNoDataText && sListNoDataText.trim().length > 0,
+			"Inner list noDataText is non-empty - screen reader will not fall back to 'No data'"
+		);
+		assert.ok(
+			sListNoDataText.indexOf(this.oUploadSet._oRb.getText("UPLOAD_SET_NO_DATA_TEXT")) >= 0,
+			"Inner list noDataText contains the default title 'No files found.'"
+		);
+	});
+
+	QUnit.test("_getIllustratedMessage keeps inner list noDataText in sync with the visual text", async function (assert) {
+		// Arrange
+		this.oUploadSet.unbindAggregation("items");
+		await nextUIUpdate();
+
+		var sDefaultTitle = this.oUploadSet._oRb.getText("UPLOAD_SET_NO_DATA_TEXT");
+		var sDefaultDescription = this.oUploadSet._oRb.getText("UPLOADCOLLECTION_NO_DATA_DESCRIPTION");
+
+		// Act
+		var oIllustratedMessage = this.oUploadSet._getIllustratedMessage();
+
+		// Assert - inner list noDataText must match exactly what is shown visually
+		assert.equal(
+			oIllustratedMessage.getTitle(),
+			sDefaultTitle,
+			"IllustratedMessage title is 'No files found.'"
+		);
+		assert.equal(
+			this.oUploadSet._oList.getNoDataText(),
+			sDefaultTitle + " " + sDefaultDescription,
+			"Inner list noDataText matches the visual text - screen reader announces the correct message"
+		);
+	});
+
 	return oCore.loadLibrary("sap.suite.ui.commons", { async: true })
 	.then(function() {
 		QUnit.module("Cloud File Picker", {
