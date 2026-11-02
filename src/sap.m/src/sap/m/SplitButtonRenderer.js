@@ -42,7 +42,7 @@ sap.ui.define([
 				sTitleAttribute = oButton.getTitleAttributeValue(),
 				bEnhancedTooltip = TooltipEnablement.isEnhancedTooltipEnabled(),
 				bHasShortcut = ShortcutHintsMixin.isDOMIDRegistered(oButton.getId()),
-				bRenderNativeTooltip = sTitleAttribute && !bEnhancedTooltip && !bHasShortcut,
+				bShouldShowTooltip = !!sTitleAttribute && !bEnhancedTooltip,
 				sTooltipId;
 
 			//write root DOM element
@@ -64,11 +64,11 @@ sap.ui.define([
 				oRm.class(SplitButtonRenderer.CSS_CLASS + sType);
 			}
 
-			this.writeAriaAttributes(oRm, oButton);
+			this.writeAriaAttributes(oRm, oButton, bShouldShowTooltip);
 			oRm.attr("tabindex", bEnabled ? "0" : "-1");
 
 			// add tooltip if available
-			if (bRenderNativeTooltip) {
+			if (bShouldShowTooltip && !bHasShortcut) {
 				oRm.attr("title", sTitleAttribute);
 			}
 
@@ -93,7 +93,7 @@ sap.ui.define([
 
 			oRm.close("div");
 
-			if (bRenderNativeTooltip) {
+			if (bShouldShowTooltip) {
 				sTooltipId = oButton.getId() + "-tooltip";
 				oRm.openStart("span", sTooltipId);
 				oRm.class("sapUiInvisibleText");
@@ -105,11 +105,11 @@ sap.ui.define([
 			oRm.close("div");
 		};
 
-		SplitButtonRenderer.writeAriaAttributes = function(oRm, oButton) {
+		SplitButtonRenderer.writeAriaAttributes = function(oRm, oButton, bShouldShowTooltip) {
 			var	mAccProps = {};
 
 			this.writeAriaRole(oButton, mAccProps);
-			this.writeAriaLabelledBy(oButton, mAccProps);
+			this.writeAriaLabelledBy(oButton, mAccProps, bShouldShowTooltip);
 			this.writeAriaDescribedBy(oButton, mAccProps);
 
 			oRm.accessibilityState(oButton, mAccProps);
@@ -119,11 +119,8 @@ sap.ui.define([
 			mAccProperties["role"] = "group";
 		};
 
-		SplitButtonRenderer.writeAriaLabelledBy = function(oButton, mAccProperties) {
+		SplitButtonRenderer.writeAriaLabelledBy = function(oButton, mAccProperties, bShouldShowTooltip) {
 			var sAriaLabelledByValue = "",
-				sTitleAttribute = oButton.getTitleAttributeValue(),
-				bEnhancedTooltip = TooltipEnablement.isEnhancedTooltipEnabled(),
-				bRenderNativeTooltip = sTitleAttribute && !bEnhancedTooltip,
 				sTooltipId;
 
 			if (oButton.getText()) {
@@ -131,7 +128,7 @@ sap.ui.define([
 				sAriaLabelledByValue += " ";
 			}
 
-			if (bRenderNativeTooltip) {
+			if (bShouldShowTooltip) {
 				sTooltipId = oButton.getId() + "-tooltip";
 				sAriaLabelledByValue += sTooltipId + " ";
 			}

@@ -19,7 +19,8 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/core/Core",
-	"sap/ui/Device"
+	"sap/ui/Device",
+	"sap/ui/core/ShortcutHintsMixin"
 ], function(
 	Library,
 	qutils,
@@ -40,7 +41,8 @@ sap.ui.define([
 	Label,
 	KeyCodes,
 	oCore,
-	Device
+	Device,
+	ShortcutHintsMixin
 ) {
 	"use strict";
 
@@ -353,6 +355,30 @@ sap.ui.define([
 		assert.ok(oArrowButton.getDomRef().hasAttribute("title"), "The inner '_arrowButton' button have DOM title property set to its Icon name");
 		assert.ok(sInnerButtonLabelledBy.indexOf(sInternalTooltipId) !== -1, "The ID of the hidden SPAN with tooltip is added in aria-labelledby attribute");
 		assert.ok(oInnerButton.$("tooltip").length, "The hidden SPAN with tooltip as content exists");
+	});
+
+	QUnit.test("MenuButton with tooltip and shortcut in Split mode", function (assert) {
+		//arrange
+		var sTooltip = "Some meaningful tooltip";
+		this.sut.setButtonMode(MenuButtonMode.Split);
+		this.sut.setTooltip(sTooltip);
+		ShortcutHintsMixin.addConfig(this.sut._getButtonControl(), {
+			addAccessibilityLabel: true,
+			shortcut: "Ctrl+Shift+E"
+		}, this.sut);
+		oCore.applyChanges();
+
+		var oInnerButton = this.sut._getButtonControl(),
+			sInternalTooltipId = oInnerButton.getId() + "-tooltip",
+			aAriaLabelledByIds = oInnerButton.$().attr("aria-labelledby").trim().split(" ");
+
+		//assert
+		assert.notOk(oInnerButton.getDomRef().hasAttribute("title"), "The inner split button has no title attribute when a shortcut is registered");
+		assert.ok(aAriaLabelledByIds.indexOf(sInternalTooltipId) !== -1, "The ID of the hidden SPAN with tooltip is added in aria-labelledby attribute");
+		assert.strictEqual(oInnerButton.$("tooltip").text(), sTooltip, "The hidden SPAN with tooltip as content exists");
+		aAriaLabelledByIds.forEach(function(sId) {
+			assert.ok(document.getElementById(sId), "The element referenced in aria-labelledby exists: " + sId);
+		});
 	});
 
 	QUnit.test("MenuButton IconOnly in Split mode", function (assert) {
