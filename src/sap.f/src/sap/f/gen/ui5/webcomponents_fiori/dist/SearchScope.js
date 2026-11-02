@@ -14,7 +14,7 @@ sap.ui.define(
      * @class
      * The `ui5-search-scope` represents the options for the scope in `ui5-search`.
      *
-     * @implements module:sap/f/gen/ui5/webcomponents_fiori/dist/SearchField.ISearchScope
+     * @implements module:sap/f/gen/ui5/webcomponents_fiori.dist.SearchField.ISearchScope
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private

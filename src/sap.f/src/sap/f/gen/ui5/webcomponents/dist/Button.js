@@ -36,7 +36,7 @@ sap.ui.define(
      *
      * `import "@ui5/webcomponents/dist/Button.js";`
      *
-     * @implements module:sap/f/gen/ui5/webcomponents/dist/Button.IButton
+     * @implements module:sap/f/gen/ui5/webcomponents.dist.Button.IButton
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
@@ -94,7 +94,7 @@ sap.ui.define(
            * Describes the accessibility role of the button.
            *
            * **Note:** Use <code>ButtonAccessibleRole.Link</code> role only with a press handler, which performs a navigation. In all other scenarios the default button semantics are recommended.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/ButtonAccessibleRole
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.ButtonAccessibleRole
            */
           accessibleRole: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.ButtonAccessibleRole",
@@ -103,7 +103,7 @@ sap.ui.define(
           },
           /**
            * Defines the component design.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/ButtonDesign
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.ButtonDesign
            */
           design: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.ButtonDesign",
@@ -185,7 +185,7 @@ sap.ui.define(
            * Defines whether the button has special form-related functionality.
            *
            * **Note:** This property is only applicable within the context of an HTML Form element.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/ButtonType
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.ButtonType
            */
           type: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.ButtonType",

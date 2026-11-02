@@ -77,7 +77,7 @@ sap.ui.define(
           headerText: { type: "string", mapping: "property" },
           /**
            * Determines the horizontal alignment of the menu relative to its opener control.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/PopoverHorizontalAlign
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.PopoverHorizontalAlign
            */
           horizontalAlign: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.PopoverHorizontalAlign",
@@ -106,7 +106,7 @@ sap.ui.define(
           open: { type: "boolean", mapping: "property", defaultValue: false },
           /**
            * Determines on which side the component is placed at.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/PopoverPlacement
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.PopoverPlacement
            */
           placement: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.PopoverPlacement",
@@ -132,7 +132,7 @@ sap.ui.define(
            * Defines the items of this component.
            *
            * **Note:** Use `ui5-menu-item` and `ui5-menu-separator` for their intended design.
-           * @type sap/f/gen/ui5/webcomponents/dist/Menu
+           * @type module:sap/f/gen/ui5/webcomponents.dist.Menu.IMenuItem
            */
           items: {
             type: "sap.f.gen.ui5.webcomponents.dist.Menu.IMenuItem",

@@ -29,7 +29,7 @@ sap.ui.define(
      * ### ES6 Module Import
      * `import "@ui5/webcomponents/dist/Avatar.js";`
      *
-     * @implements module:sap/f/gen/ui5/webcomponents/dist/AvatarGroup.IAvatarGroupItem
+     * @implements module:sap/f/gen/ui5/webcomponents.dist.AvatarGroup.IAvatarGroupItem
      * @extends sap.ui.core.webc.WebComponent
      * @constructor
      * @private
@@ -72,7 +72,7 @@ sap.ui.define(
           /**
            * Defines the background color of the desired image.
            * If `colorScheme` is set to `Auto`, the avatar will be displayed with the `Accent6` color.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarColorScheme
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.AvatarColorScheme
            */
           colorScheme: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarColorScheme",
@@ -161,7 +161,7 @@ sap.ui.define(
            *
            * **Note:** This property is ignored when the `interactive` property is set to `true`.
            * In that case, the avatar will always be rendered as interactive.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarMode
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.AvatarMode
            */
           mode: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarMode",
@@ -170,7 +170,7 @@ sap.ui.define(
           },
           /**
            * Defines the shape of the component.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarShape
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.AvatarShape
            */
           shape: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarShape",
@@ -179,7 +179,7 @@ sap.ui.define(
           },
           /**
            * Defines predefined size of the component.
-           * @type module:sap/f/gen/ui5/webcomponents/dist/types/AvatarSize
+           * @type module:sap/f/gen/ui5/webcomponents.dist.types.AvatarSize
            */
           size: {
             type: "sap.f.gen.ui5.webcomponents.dist.types.AvatarSize",
