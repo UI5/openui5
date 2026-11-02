@@ -1,7 +1,22 @@
 {
   "1.155.0": {
-    "date": "October 2026",
+    "date": "November 2026",
     "notes": [
+      {
+        "id": "b2f5d8010cd304c985ff1659795b4f135c734e15",
+        "type": "FIX",
+        "text": " DemoKit: prevent duplicate requests for index.json"
+      },
+      {
+        "id": "c3c72ac292593d030407329f7b3eace1f62fddb3",
+        "type": "FIX",
+        "text": " DemoKit: Prevent forward error as page title"
+      },
+      {
+        "id": "13266ec9bea572862665e27500cf65b462d51213",
+        "type": "FIX",
+        "text": " DemoKit: log a single errorPage event for unknown routes"
+      },
       {
         "id": "9bca23a10b24cc51a57aaa3f77c6f8ae23b2dbff",
         "type": "FIX",

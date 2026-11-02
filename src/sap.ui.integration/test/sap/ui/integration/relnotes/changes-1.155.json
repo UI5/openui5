@@ -1,0 +1,17 @@
+{
+  "1.155.0": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "bef1e44cf41f36dcde9b11ab6989cb5768aac005",
+        "type": "FEATURE",
+        "text": " sap.ui.integration: Micro charts feature is productized"
+      },
+      {
+        "id": "7b4ea1ef495fab0fe2e956d5fd61e999f9f6781f",
+        "type": "FEATURE",
+        "text": " sap.ui.integration: Analytical card features are productized"
+      }
+    ]
+  }
+}

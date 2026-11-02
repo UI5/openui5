@@ -1,7 +1,17 @@
 {
   "1.155.0": {
-    "date": "October 2026",
+    "date": "November 2026",
     "notes": [
+      {
+        "id": "b9b97ee94ab9dfb4740564d6ec63ead972881d3d",
+        "type": "FIX",
+        "text": " sap.f.GridContainer: Remove sentinel divs aria-hidden=\"true\""
+      },
+      {
+        "id": "bef1e44cf41f36dcde9b11ab6989cb5768aac005",
+        "type": "FEATURE",
+        "text": " sap.ui.integration: Micro charts feature is productized"
+      },
       {
         "id": "61d39ba24799e029a0683b9faab7f0d3e3723604",
         "type": "FIX",

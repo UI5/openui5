@@ -1,0 +1,12 @@
+{
+  "1.155.0": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "df99b6042d2ddff92e5db9ee3f8fef134e2a1dd3",
+        "type": "FEATURE",
+        "text": " core/IconPool: add SVG icon LESS theme configuration"
+      }
+    ]
+  }
+}

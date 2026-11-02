@@ -1,7 +1,37 @@
 {
   "1.155.0": {
-    "date": "October 2026",
+    "date": "November 2026",
     "notes": [
+      {
+        "id": "60877dcc754ff72b933bc5e4bda9341d1a935072",
+        "type": "FIX",
+        "text": " Localization: broken links are fixed"
+      },
+      {
+        "id": "df99b6042d2ddff92e5db9ee3f8fef134e2a1dd3",
+        "type": "FEATURE",
+        "text": " core/IconPool: add SVG icon LESS theme configuration"
+      },
+      {
+        "id": "e85894e2053c4f8d1d414784efe29a87a051a8e4",
+        "type": "FEATURE",
+        "text": " core/IconPool: add SVG icon assets"
+      },
+      {
+        "id": "0bc128d2d3699250768a5f8c21cd4cb925c9fd44",
+        "type": "FIX",
+        "text": " sap.ui.test: fix flaky polling detection test under CI load"
+      },
+      {
+        "id": "5f1711f58693af3948fb3d6a44b6438ad985a7b2",
+        "type": "FIX",
+        "text": " sap/base/i18n/Formatting: Allow 'symbol' in CustomCurrency typedef"
+      },
+      {
+        "id": "4b94aca88a66f52a862a3c5cc413ea11b1a8ee09",
+        "type": "FIX",
+        "text": " core/BlockLayerUtils: Use MutationObserver to track inert during DOM preservation"
+      },
       {
         "id": "8c821ce4de5cfda42b4c16996f7ebb7f1a2d9503",
         "type": "FIX",

@@ -1,7 +1,12 @@
 {
   "1.155.0": {
-    "date": "October 2026",
+    "date": "November 2026",
     "notes": [
+      {
+        "id": "dcb865f749611a4ecacd62df90e2ca2380788677",
+        "type": "FEATURE",
+        "text": " sap.ui.geomap: library and Geomap JSDoc are now expanded"
+      },
       {
         "id": "61d39ba24799e029a0683b9faab7f0d3e3723604",
         "type": "FIX",

@@ -1,7 +1,37 @@
 {
   "1.155.0": {
-    "date": "October 2026",
+    "date": "November 2026",
     "notes": [
+      {
+        "id": "510e47f8f497e94dcfb6c283c05e01b12f1d1341",
+        "type": "FIX",
+        "text": " sap.m.Link: doesn't have href attribute when EmptyIndicatorMode"
+      },
+      {
+        "id": "1e3935de9ec4ca53e556059e2cd8b3f12563ba87",
+        "type": "FIX",
+        "text": " sap.m.MessagePopover: Prevent fake timer leak in tests on headless Chrome"
+      },
+      {
+        "id": "0d868a32b1bb82c3ccca9fe647f5bc1e9d42779a",
+        "type": "FIX",
+        "text": " sap.m.MaskInput: cut event does not clear value when editable/enabled is false"
+      },
+      {
+        "id": "48df5d8052235e9bde4e999de248a8724423eeb7",
+        "type": "FIX",
+        "text": " We've now fixed the file extension being clipped in edit mode on screens with a width of 320 pixels in the UploadSet control"
+      },
+      {
+        "id": "2a3f274ce19f0f1b7c4d349caff6ad9f4eecf866",
+        "type": "FIX",
+        "text": " SelectionPanel: fix stale count header after search filter"
+      },
+      {
+        "id": "4b8ae3949976a9e7859a76cdf67111559275a522",
+        "type": "FIX",
+        "text": " sap.m.Popover: reserve scrollbar gutter for vertical scroll"
+      },
       {
         "id": "c250efe0f85904802f73da3035a412adc8415295",
         "type": "FIX",
