@@ -466,8 +466,16 @@ sap.ui.define([
 
 	function isInViewport (element) {
 		var mRect = element.getBoundingClientRect();
+		var iViewportHeight = window.innerHeight || document.documentElement.clientHeight;
+		var iViewportWidth = window.innerWidth || document.documentElement.clientWidth;
+		// Full-box containment, but the right edge is floored to absorb sub-pixel
+		// rounding: with overlay (zero-width) scrollbars the control's right edge can
+		// land a fraction of a pixel beyond innerWidth (e.g. 1024.000015 vs 1024),
+		// which a strict `right <= innerWidth` wrongly rejects (Firefox on CI uses
+		// overlay scrollbars). Math.floor tolerates the <1px overflow while still
+		// catching a genuinely clipped right edge.
 		return mRect.top >= 0 && mRect.left >= 0 &&
-			mRect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-			mRect.right <= (window.innerWidth || document.documentElement.clientWidth);
+			mRect.bottom <= iViewportHeight &&
+			Math.floor(mRect.right) <= iViewportWidth;
 	}
 });
