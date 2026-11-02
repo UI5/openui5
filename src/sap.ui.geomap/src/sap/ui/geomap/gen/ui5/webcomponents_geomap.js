@@ -18,6 +18,7 @@ sap.ui.define(
     // export the UI5 metadata along with the package
     pkg["_ui5metadata"] = {
       name: "sap/ui/geomap/gen/ui5/webcomponents_geomap",
+      npmPackage: "@ui5/webcomponents-geomap",
       version: "0.1.0",
       dependencies: ["sap.ui.core"],
       types: [
@@ -71,16 +72,17 @@ sap.ui.define(
     };
 
     // Enums
+    pkg.dist = Object.assign({}, pkg.dist);
+    pkg.dist.types = Object.assign({}, pkg.dist.types);
     /**
      * Different types of features display.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_geomap/dist/types/GeomapDisplayedFeatures
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_geomap dist.types.GeomapDisplayedFeatures
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_geomap.dist.types.GeomapDisplayedFeatures
      * @public
      * @since 1.155
      */
-    pkg["GeomapDisplayedFeatures"] = {
+    pkg.dist.types.GeomapDisplayedFeatures = {
       /**
        * All features are displayed
        *
@@ -105,18 +107,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_geomap.dist.types.GeomapDisplayedFeatures",
-      pkg["GeomapDisplayedFeatures"]
+      pkg.dist.types.GeomapDisplayedFeatures
     );
     /**
      * Different types of positions on the map.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_geomap/dist/types/GeomapMapControlPosition
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_geomap dist.types.GeomapMapControlPosition
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_geomap.dist.types.GeomapMapControlPosition
      * @public
      * @since 1.155
      */
-    pkg["Positions"] = {
+    pkg.dist.types.GeomapMapControlPosition = {
       /**
        * Position of the control at the top left corner of the map.
        *
@@ -151,18 +152,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_geomap.dist.types.GeomapMapControlPosition",
-      pkg["Positions"]
+      pkg.dist.types.GeomapMapControlPosition
     );
     /**
      * Different types of units.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_geomap/dist/types/GeomapScaleControlUnits
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_geomap dist.types.GeomapScaleControlUnits
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_geomap.dist.types.GeomapScaleControlUnits
      * @public
      * @since 1.155
      */
-    pkg["GeomapScaleControlUnits"] = {
+    pkg.dist.types.GeomapScaleControlUnits = {
       /**
        * Units metric
        *
@@ -187,18 +187,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_geomap.dist.types.GeomapScaleControlUnits",
-      pkg["GeomapScaleControlUnits"]
+      pkg.dist.types.GeomapScaleControlUnits
     );
     /**
      * Selection mode buttons available in the `ui5-geomap-selection-control`.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_geomap/dist/types/GeomapSelectionMode
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_geomap dist.types.GeomapSelectionMode
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_geomap.dist.types.GeomapSelectionMode
      * @public
      * @since 1.155
      */
-    pkg["GeomapSelectionMode"] = {
+    pkg.dist.types.GeomapSelectionMode = {
       /**
        * Freehand drawing tool.
        *
@@ -237,7 +236,7 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_geomap.dist.types.GeomapSelectionMode",
-      pkg["GeomapSelectionMode"]
+      pkg.dist.types.GeomapSelectionMode
     );
 
     // Interfaces

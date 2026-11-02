@@ -57,7 +57,7 @@ sap.ui.define(
              * Determines which features the layer will display - All (default), only not-clustered, or only clustered
              * <b>Note:</b> This property is ignored if the <code>filter</code> property is set
              * <b>Note:</b> This property only makes sense when the layer is used for clustering (displays data from a <code>ui5-geomap-cluster-source</code> element)
-             * @type module:sap/ui/geomap/gen/ui5/webcomponents_geomap/dist/types/GeomapDisplayedFeatures
+             * @type module:sap/ui/geomap/gen/ui5/webcomponents_geomap.dist.types.GeomapDisplayedFeatures
              */
             displayedFeatures: {
               type: "sap.ui.geomap.gen.ui5.webcomponents_geomap.dist.types.GeomapDisplayedFeatures",

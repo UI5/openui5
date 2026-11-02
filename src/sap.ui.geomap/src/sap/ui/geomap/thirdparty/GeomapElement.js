@@ -37,7 +37,7 @@ sap.ui.define(['sap/ui/geomap/thirdparty/webcomponents', 'sap/ui/geomap/thirdpar
             this._whenMapConnectedPromise._deferredResolve();
         }
         connectToDraw(draw) {
-            if (this.draw instanceof Geomap.to) {
+            if (this.draw instanceof Geomap.eo) {
                 return;
             }
             this.draw = draw;

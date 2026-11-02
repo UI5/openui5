@@ -17,6 +17,7 @@ sap.ui.define(
     // export the UI5 metadata along with the package
     pkg["_ui5metadata"] = {
       name: "sap/ui/geomap/gen/ui5/webcomponents_base",
+      npmPackage: "@ui5/webcomponents-base",
       version: "2.27.2",
       dependencies: ["sap.ui.core"],
       types: [
@@ -35,16 +36,17 @@ sap.ui.define(
     };
 
     // Enums
+    pkg.dist = Object.assign({}, pkg.dist);
+    pkg.dist.types = Object.assign({}, pkg.dist.types);
     /**
      * Different types of AnimationMode.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base/dist/types/AnimationMode
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_base dist.types.AnimationMode
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base.dist.types.AnimationMode
      * @public
      * @since 1.155
      */
-    pkg["AnimationMode"] = {
+    pkg.dist.types.AnimationMode = {
       /**
        * Basic
        *
@@ -76,18 +78,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_base.dist.types.AnimationMode",
-      pkg["AnimationMode"]
+      pkg.dist.types.AnimationMode
     );
     /**
      * Different calendar types.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base/dist/types/CalendarType
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_base dist.types.CalendarType
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base.dist.types.CalendarType
      * @public
      * @since 1.155
      */
-    pkg["CalendarType"] = {
+    pkg.dist.types.CalendarType = {
       /**
        * Buddhist
        *
@@ -126,18 +127,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_base.dist.types.CalendarType",
-      pkg["CalendarType"]
+      pkg.dist.types.CalendarType
     );
     /**
      * Different behavior for ItemNavigation.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base/dist/types/ItemNavigationBehavior
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_base dist.types.ItemNavigationBehavior
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base.dist.types.ItemNavigationBehavior
      * @public
      * @since 1.155
      */
-    pkg["ItemNavigationBehavior"] = {
+    pkg.dist.types.ItemNavigationBehavior = {
       /**
        * Cycling behavior: navigating past the last item continues with the first and vice versa.
        *
@@ -155,18 +155,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_base.dist.types.ItemNavigationBehavior",
-      pkg["ItemNavigationBehavior"]
+      pkg.dist.types.ItemNavigationBehavior
     );
     /**
      * Placements of a moved element relative to a target element.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base/dist/types/MovePlacement
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_base dist.types.MovePlacement
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base.dist.types.MovePlacement
      * @public
      * @since 1.155
      */
-    pkg["MovePlacement"] = {
+    pkg.dist.types.MovePlacement = {
       /**
        * After
        *
@@ -191,18 +190,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_base.dist.types.MovePlacement",
-      pkg["MovePlacement"]
+      pkg.dist.types.MovePlacement
     );
     /**
      * Different navigation modes for ItemNavigation.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base/dist/types/NavigationMode
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_base dist.types.NavigationMode
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base.dist.types.NavigationMode
      * @public
      * @since 1.155
      */
-    pkg["NavigationMode"] = {
+    pkg.dist.types.NavigationMode = {
       /**
        * Auto
        *
@@ -234,18 +232,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_base.dist.types.NavigationMode",
-      pkg["NavigationMode"]
+      pkg.dist.types.NavigationMode
     );
     /**
      * Defines the sort order.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base/dist/types/SortOrder
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_base dist.types.SortOrder
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base.dist.types.SortOrder
      * @public
      * @since 1.155
      */
-    pkg["SortOrder"] = {
+    pkg.dist.types.SortOrder = {
       /**
        * Sorting is applied in ascending order.
        *
@@ -270,18 +267,17 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_base.dist.types.SortOrder",
-      pkg["SortOrder"]
+      pkg.dist.types.SortOrder
     );
     /**
      * Different types of ValueStates.
      *
      * @enum {string}
-     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base/dist/types/ValueState
-     * @ui5-module-override sap/ui/geomap/gen/ui5/webcomponents_base dist.types.ValueState
+     * @alias module:sap/ui/geomap/gen/ui5/webcomponents_base.dist.types.ValueState
      * @public
      * @since 1.155
      */
-    pkg["ValueState"] = {
+    pkg.dist.types.ValueState = {
       /**
        * Critical
        *
@@ -320,7 +316,7 @@ sap.ui.define(
     };
     registerEnum(
       "sap.ui.geomap.gen.ui5.webcomponents_base.dist.types.ValueState",
-      pkg["ValueState"]
+      pkg.dist.types.ValueState
     );
 
     // Interfaces

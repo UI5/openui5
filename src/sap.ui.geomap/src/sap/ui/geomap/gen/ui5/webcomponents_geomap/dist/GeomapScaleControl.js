@@ -47,7 +47,7 @@ sap.ui.define(
           properties: {
             /**
              * Units of the distance for the scale control. Possible values are "Imperial", "Metric" or "Nautical".
-             * @type module:sap/ui/geomap/gen/ui5/webcomponents_geomap/dist/types/GeomapScaleControlUnits
+             * @type module:sap/ui/geomap/gen/ui5/webcomponents_geomap.dist.types.GeomapScaleControlUnits
              */
             units: {
               type: "sap.ui.geomap.gen.ui5.webcomponents_geomap.dist.types.GeomapScaleControlUnits",
