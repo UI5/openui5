@@ -18,6 +18,8 @@ sap.ui.define([
 		_TreeState, Log, SyncPromise, ODataUtils) {
 	"use strict";
 
+	const sClassName = "sap.ui.model.odata.v4.lib._AggregationCache";
+
 	//*********************************************************************************************
 	// _AggregationCache
 	//*********************************************************************************************
@@ -1244,8 +1246,7 @@ sap.ui.define([
 				return SyncPromise.resolve();
 			}
 			if (!this.mQueryOptions.$count) { // for compatibility, still provide right answer
-				Log.warning("Missing system query option $count", this.toString(),
-					"sap.ui.model.odata.v4.lib._AggregationCache");
+				Log.warning("Missing system query option $count", this.toString(), sClassName);
 			}
 
 			return this.oFirstLevel.fetchValue(oGroupLock, sPath, fnDataRequested, oListener);
@@ -3601,8 +3602,7 @@ sap.ui.define([
 	// @override sap.ui.model.odata.v4.lib._CollectionCache#fixDuplicatePredicate
 	_AggregationCache.fixDuplicatePredicate = function (oElement, sPredicate) {
 		if (sPredicate === "('')" || sPredicate.includes("=''")) {
-			Log.warning("Duplicate key predicate: " + sPredicate, this.toString(),
-				"sap.ui.model.odata.v4.lib._AggregationCache");
+			Log.warning("Duplicate key predicate: " + sPredicate, this.toString(), sClassName);
 			const sNewPredicate = sPredicate.slice(0, -1) + ",$duplicate=" + _Helper.uid() + ")";
 			_Helper.setPrivateAnnotation(oElement, "predicate", sNewPredicate);
 			if (this.aElements.$byPredicate[sPredicate] === oElement) {
