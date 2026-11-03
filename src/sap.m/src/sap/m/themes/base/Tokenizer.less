@@ -61,6 +61,12 @@ html.sap-desktop .sapMTokenizer:focus {
 	}
 }
 
+/* When nested inside a disabled InputBase (e.g. MultiComboBox, MultiInput), the parent already
+   applies disabled opacity to the whole control — reset here to avoid compounding the effect. */
+.sapMInputBaseDisabled .sapMTokenizer.sapMTokenizerDisabled {
+	opacity: 1;
+}
+
 .sapMTokenizerClip {
 	position: absolute;
 	top: 0;
