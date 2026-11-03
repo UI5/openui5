@@ -815,7 +815,10 @@
 			"location.assign",
 			"location.replace",
 			"jQuery.globalEval",
-			"jQuery.sap.globalEval"
+			"jQuery.getScript",
+			"jQuery._evalUrl",
+			"jQuery.sap.globalEval",
+			"jQuery.sap.includeScript"
 		];
 		var oLogMock = this.mock(jQuery.sap.log);
 		oLogMock.expects("error").exactly(aRestricted.length);
@@ -831,10 +834,11 @@
 		var oContext = {
 			myEval: window.eval,
 			myTimer: window.setTimeout,
-			myGlobalEval: jQuery.globalEval
+			myGlobalEval: jQuery.globalEval,
+			myLoadScript: jQuery.sap.includeScript
 		};
 		var oLogMock = this.mock(jQuery.sap.log);
-		oLogMock.expects("error").exactly(3);
+		oLogMock.expects("error").exactly(4);
 
 		var o1 = parse("{path:'something', formatter:'.myEval'}", oContext);
 		strictEqual(typeof o1.formatter, "undefined",
@@ -847,6 +851,10 @@
 		var o3 = parse("{path:'something', formatter:'.myGlobalEval'}", oContext);
 		strictEqual(typeof o3.formatter, "undefined",
 			"jQuery.globalEval via context variable must not be resolved");
+
+		var o4 = parse("{path:'something', formatter:'.myLoadScript'}", oContext);
+		strictEqual(typeof o4.formatter, "undefined",
+			"jQuery.sap.includeScript via context variable must not be resolved");
 	});
 
 	test("Globals accessed via Window context must not be resolved", function() {
@@ -857,7 +865,9 @@
 			"window.eval",
 			"self.eval",
 			"frames.eval",
-			"globalThis.eval"
+			"globalThis.eval",
+			"parent.jQuery.globalEval",
+			"top.jQuery.sap.includeScript"
 		];
 		var oLogMock = this.mock(jQuery.sap.log);
 		oLogMock.expects("error").exactly(aWindowPaths.length);
