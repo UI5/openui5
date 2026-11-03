@@ -3,8 +3,10 @@
 /* Base theme                                */
 /* ========================================= */
 
+.sapMVSD.sapMDialog:not(.sapUiResponsiveContentPadding):not(.sapUiContentPadding).sapMDialog-NoHeader .sapMDialogScroll,
 .sapMVSD.sapMDialog.sapUiPopupWithPadding:not(.sapUiNoContentPadding) .sapMDialogScrollCont,
-.sapMVSD.sapMDialog .sapMDialogScrollCont {
+.sapMVSD.sapMDialog .sapMDialogSection .sapMDialogScrollCont,
+.sapMDialog.sapMVSD .sapMDialogScrollCont {
 	padding: 0;
 }
 
@@ -70,7 +72,7 @@ html.sap-desktop .sapMTB.sapMListHdrTBar.sapMVSDFilterHeaderToolbar {
 
 .sapMVSD .sapMTitle {
 	font-size: var(--sapFontHeader5Size);
-	color: var(--sapContent_LabelColor);
+	color: var(--sapPageHeader_TextColor);
 }
 
 .sapUiSizeCompact .sapMTB.sapMListHdrTBar.sapMVSDFilterHeaderToolbar {
