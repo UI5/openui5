@@ -2210,23 +2210,59 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("requestCount: oCountPromise", function (assert) {
+	QUnit.test("requestCount: oCountPromise", async function (assert) {
 		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
 			groupLevels : ["a"] // last group level = leaf level
 		});
 		oCache.oCountPromise = "~oOldCountPromise~";
-		const oCreateCountPromiseExpectation
-			= this.mock(oCache).expects("createCountPromise").withExactArgs();
-		this.mock(oCache).expects("readCount").withExactArgs("~oGroupLock~")
-			.callsFake(() => {
-				assert.ok(oCreateCountPromiseExpectation.calledOnce);
-				// actually done by #createCountPromise, but simplifies check of timing
+		this.mock(oCache).expects("createCountPromise").withExactArgs();
+		this.mock(oCache).expects("readCount").withExactArgs("~oGroupLock~").resolves("n/a");
+		this.mock(oCache.oFirstLevel).expects("requestCount").never();
+
+		// code under test
+		const oPromise = oCache.requestCount("~oGroupLock~");
+
+		// actually done by #createCountPromise, but simplifies check of timing
+		oCache.oCountPromise = "~oNewCountPromise~";
+
+		assert.strictEqual(await oPromise, "~oNewCountPromise~");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("requestCount: readCount returns undefined", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
+			groupLevels : ["a"] // last group level = leaf level
+		});
+		oCache.oCountPromise = "~oOldCountPromise~";
+		this.mock(oCache).expects("createCountPromise").withExactArgs()
+			.callsFake(function () {
 				oCache.oCountPromise = "~oNewCountPromise~";
 			});
+		this.mock(oCache).expects("readCount").withExactArgs("~oGroupLock~")
+			.returns(undefined); // no count needs to be read
 		this.mock(oCache.oFirstLevel).expects("requestCount").never();
 
 		// code under test
 		assert.strictEqual(oCache.requestCount("~oGroupLock~"), "~oNewCountPromise~");
+	});
+
+	//*********************************************************************************************
+	QUnit.test("requestCount: readCount rejects", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, {
+			groupLevels : ["a"] // last group level = leaf level
+		});
+		oCache.oCountPromise = "~oOldCountPromise~";
+		this.mock(oCache).expects("createCountPromise").withExactArgs();
+		const oError = new Error();
+		this.mock(oCache).expects("readCount").withExactArgs("~oGroupLock~").rejects(oError);
+		this.mock(oCache.oFirstLevel).expects("requestCount").never();
+
+		// code under test
+		return oCache.requestCount("~oGroupLock~").then(function () {
+			assert.ok(false, "Unexpected success");
+		}, function (oError0) {
+			assert.strictEqual(oError0, oError);
+		});
 	});
 
 	//*********************************************************************************************
