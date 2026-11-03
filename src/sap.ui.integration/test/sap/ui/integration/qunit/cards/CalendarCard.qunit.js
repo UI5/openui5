@@ -1873,6 +1873,119 @@ sap.ui.define([
 			assert.strictEqual(aVisibleItems20191201.length, 0, "there is 0 visible appointment");
 		});
 
+		function createTodayManifest(aAppointments, iMaxItems) {
+			return {
+				"_version": "1.14.0",
+				"sap.app": {
+					"id": "test.calendar.card.today",
+					"type": "card"
+				},
+				"sap.card": {
+					"type": "Calendar",
+					"data": {
+						"json": {
+							"date": "2019-12-16",
+							"maxItems": iMaxItems,
+							"item": aAppointments.map(function (aHours) {
+								return {
+									"start": oFormatter.format(UI5Date.getInstance(2019, 11, 16, aHours[0]), true),
+									"end": oFormatter.format(UI5Date.getInstance(2019, 11, 16, aHours[1]), true),
+									"title": aHours[0] + "-" + aHours[1]
+								};
+							})
+						}
+					},
+					"content": {
+						"date": "{date}",
+						"maxItems": "{maxItems}",
+						"item": {
+							"template": {
+								"startDate": "{start}",
+								"endDate": "{end}",
+								"title": "{title}"
+							},
+							"path": "/item"
+						}
+					}
+				}
+			};
+		}
+
+		QUnit.module("Today's appointments", {
+			beforeEach: function () {
+				// only Date is faked, so that "now" is 2019-12-16 15:00 local time, while the card loads normally
+				this.oClock = sinon.useFakeTimers({
+					now: UI5Date.getInstance(2019, 11, 16, 15, 0).getTime(),
+					toFake: ["Date"]
+				});
+				this.oCard = new Card({
+					width: "400px",
+					height: "600px"
+				}).placeAt(DOM_RENDER_LOCATION);
+			},
+			afterEach: function () {
+				this.oCard.destroy();
+				this.oClock.restore();
+			},
+			getVisibleTitles: function () {
+				return this.oCard.getCardContent()._getVisibleAppointments().map(function (oApp) {
+					return oApp.getTitle();
+				});
+			}
+		});
+
+		QUnit.test("Single appointment that has already ended is shown", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(createTodayManifest([[8, 9]], 5));
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			assert.deepEqual(this.getVisibleTitles(), ["8-9"], "The past appointment is visible");
+			assert.strictEqual(this.oCard.$().find(".sapUiCalendarAppContainer").length, 1, "1 appointment is rendered");
+			assert.strictEqual(this.oCard.getModel("parameters").getProperty("/visibleItems"), 1, "visibleItems parameter matches");
+			assert.strictEqual(this.oCard.getModel("parameters").getProperty("/allItems"), 1, "allItems parameter matches");
+		});
+
+		QUnit.test("All appointments that have already ended are shown when they fit into maxItems", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(createTodayManifest([[9, 10], [8, 9], [16, 17]], 5));
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			assert.deepEqual(this.getVisibleTitles(), ["8-9", "9-10", "16-17"], "All appointments are visible, sorted by start time");
+			assert.strictEqual(this.oCard.$().find(".sapUiCalendarAppContainer").length, 3, "3 appointments are rendered");
+			assert.strictEqual(this.oCard.getModel("parameters").getProperty("/visibleItems"), 3, "visibleItems parameter matches");
+		});
+
+		QUnit.test("Upcoming appointments are prioritized when not all appointments fit into maxItems", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(createTodayManifest([[8, 9], [9, 10], [10, 11], [16, 17]], 2));
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			assert.deepEqual(this.getVisibleTitles(), ["10-11", "16-17"], "The latest past appointment fills the remaining slot");
+			assert.strictEqual(this.oCard.$().find(".sapUiCalendarAppContainer").length, 2, "2 appointments are rendered");
+			assert.strictEqual(this.oCard.getModel("parameters").getProperty("/visibleItems"), 2, "visibleItems parameter matches");
+			assert.strictEqual(this.oCard.getModel("parameters").getProperty("/allItems"), 4, "allItems parameter matches");
+		});
+
+		QUnit.test("Only upcoming appointments are shown when they fill maxItems", async function (assert) {
+			// Arrange
+			this.oCard.setManifest(createTodayManifest([[8, 9], [16, 17], [17, 18]], 2));
+
+			await nextCardReadyEvent(this.oCard);
+			await nextUIUpdate();
+
+			// Assert
+			assert.deepEqual(this.getVisibleTitles(), ["16-17", "17-18"], "Past appointment is moved out in favor of upcoming ones");
+		});
+
 		QUnit.module("Events", {
 			beforeEach: function () {
 				this.oCard = new Card({
