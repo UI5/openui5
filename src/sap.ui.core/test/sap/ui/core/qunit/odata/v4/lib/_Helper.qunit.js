@@ -1319,38 +1319,58 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	[{
-		sKeyPredicate : "('4%2F2')",
-		mKeyProperties : {ID : "'4/2'"}
-	}, {
-		bKeepSingleProperty : true,
-		sKeyPredicate : "(ID='4%2F2')",
-		mKeyProperties : {ID : "'4/2'"}
-	}, {
-		sKeyPredicate : "(Bar=42,Fo%3Do='Walter%22s%20Win''s')",
-		mKeyProperties : {Bar : "42", "Fo=o" : "'Walter\"s Win''s'"}
-	}, {
-		sKeyPredicate : undefined,
-		mKeyProperties : undefined
-	}].forEach(function (oFixture) {
-		QUnit.test("getKeyPredicate: " + oFixture.sKeyPredicate, function (assert) {
-			var oEntityInstance = {},
-				aKeyProperties = [],
-				sMetaPath = "~path~",
-				mTypeForMetaPath = {};
+[{
+	sKeyPredicate : "(foo)",
+	aKeyPredicateParts : ["foo"]
+}, {
+	sKeyPredicate : "(foo,bar)",
+	aKeyPredicateParts : ["foo", "bar"]
+}, {
+	sKeyPredicate : undefined,
+	aKeyPredicateParts : undefined
+}].forEach(function (oFixture) {
+	QUnit.test("getKeyPredicate: " + oFixture.sKeyPredicate, function (assert) {
+		this.mock(_Helper).expects("getKeyPredicateParts")
+			.withExactArgs("~oEntityInstance~", "~path~", "~mTypeForMetaPath~", "~aKeyProperties~",
+				"~bKeepSingleProperty~")
+			.returns(oFixture.aKeyPredicateParts);
 
-			this.mock(_Helper).expects("getKeyProperties")
-				.withExactArgs(sinon.match.same(oEntityInstance), sMetaPath,
-					sinon.match.same(mTypeForMetaPath), sinon.match.same(aKeyProperties), true)
-				.returns(oFixture.mKeyProperties);
-
-			// code under test
-			assert.strictEqual(
-				_Helper.getKeyPredicate(oEntityInstance, sMetaPath, mTypeForMetaPath,
-					aKeyProperties, oFixture.bKeepSingleProperty),
-				oFixture.sKeyPredicate);
-		});
+		// code under test
+		assert.strictEqual(
+			_Helper.getKeyPredicate("~oEntityInstance~", "~path~", "~mTypeForMetaPath~",
+				"~aKeyProperties~", "~bKeepSingleProperty~"),
+			oFixture.sKeyPredicate);
 	});
+});
+
+	//*********************************************************************************************
+[{
+	aKeyPredicateParts : ["'4%2F2'"],
+	mKeyProperties : {ID : "'4/2'"}
+}, {
+	bKeepSingleProperty : true,
+	aKeyPredicateParts : ["ID='4%2F2'"],
+	mKeyProperties : {ID : "'4/2'"}
+}, {
+	aKeyPredicateParts : ["Bar=42", "Fo%3Do='Walter%22s%20Win''s'"],
+	mKeyProperties : {Bar : "42", "Fo=o" : "'Walter\"s Win''s'"}
+}, {
+	aKeyPredicateParts : undefined,
+	mKeyProperties : undefined
+}].forEach(function (oFixture, i) {
+	QUnit.test("getKeyPredicateParts: #" + i, function (assert) {
+		this.mock(_Helper).expects("getKeyProperties")
+			.withExactArgs("~oInstance~", "meta/path", "~mTypeForMetaPath~", "~aKeyProperties~",
+				true)
+			.returns(oFixture.mKeyProperties);
+
+		// code under test
+		assert.deepEqual(
+			_Helper.getKeyPredicateParts("~oInstance~", "meta/path", "~mTypeForMetaPath~",
+				"~aKeyProperties~", oFixture.bKeepSingleProperty),
+			oFixture.aKeyPredicateParts);
+	});
+});
 
 	//*********************************************************************************************
 	[{
