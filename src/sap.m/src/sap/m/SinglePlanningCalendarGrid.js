@@ -1053,7 +1053,7 @@ sap.ui.define([
 			}
 			this._adjustRowHigth();
 			this._updateRowHeaderAndNowMarker();
-			_initItemNavigation.call(this);
+			this._initItemNavigation();
 		};
 
 		/**
@@ -2578,15 +2578,6 @@ sap.ui.define([
 			return oDateTimestamp >= oStartDate.getTime() && oDateTimestamp < oEndDate.getTime();
 		};
 
-		function getResizeGhost() {
-			var $ghost = jQuery("<span></span>").addClass("sapUiCalAppResizeGhost");
-			$ghost.appendTo(document.body);
-
-			setTimeout(function() { $ghost.remove(); }, 0);
-
-			return $ghost.get(0);
-		}
-
 		var IntervalPlaceholder = Control.extend("sap.m.SinglePlanningCalendarGrid._internal.IntervalPlaceholder", {
 			metadata: {
 				library: "sap.m",
@@ -2605,7 +2596,7 @@ sap.ui.define([
 			}
 		});
 
-		function _initItemNavigation(){
+		SinglePlanningCalendarGrid.prototype._initItemNavigation = function(){
 			// Collect the dom references of the items
 			var oRootRef = this.getDomRef(),
 				aCellsInRow = this.$().find(".sapMSinglePCBlockersColumn").toArray();
@@ -2645,6 +2636,15 @@ sap.ui.define([
 
 			// Set the page size
 			this._oItemNavigation.setPageSize(this._aGridCells.length);
+		};
+
+		function getResizeGhost() {
+			var $ghost = jQuery("<span></span>").addClass("sapUiCalAppResizeGhost");
+			$ghost.appendTo(document.body);
+
+			setTimeout(function() { $ghost.remove(); }, 0);
+
+			return $ghost.get(0);
 		}
 
 		return SinglePlanningCalendarGrid;
