@@ -29994,6 +29994,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[true, true, 1, "B", "", "20"],
 			[false, true, 0, "", "", "35"]
 		]);
+		assertIndices(assert, oListBinding.getCurrentContexts(), [-2, -1, 0, 1, 2]);
 
 		this.expectChange("count", "4")
 			.expectRequest("#0 POST BusinessPartners", {
@@ -30035,8 +30036,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				+ "&$select=Country,Id,SalesNumber&$skip=0&$top=5", {
 				"@odata.count" : "1",
 				value : [
+					// for simplification, provide a dummy SalesNumber allowing to easily
+					// distinguish the items in checkTable
 					{Country : "A", Id : 1, SalesNumber : 8}
-					//TODO: return creaded entities
+					//TODO: return created entities
 				]
 			});
 
@@ -30060,11 +30063,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[, false, 2, "A", "1", "8"],
 			[true, true, 1, "B", "", "20"]
 		]);
+		assertIndices(assert, oListBinding.getCurrentContexts(), [-2, -1, 0, 1, 2]);
 
 		// code under test
 		oGroupA.collapse();
 
-		await this.waitForChanges(assert, "collapse 'A'");
+		await this.waitForChanges(assert, "collapse 'A'"); // table update takes a moment
 
 		checkTable("after collapse 'A'", assert, oTable, [
 			oCreatedContext0,
