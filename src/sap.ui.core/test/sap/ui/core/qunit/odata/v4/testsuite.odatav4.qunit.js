@@ -148,6 +148,10 @@ sap.ui.define(function () {
 			"OPA.ServerDrivenPaging" : {
 				module : ["sap/ui/core/sample/odata/v4/ServerDrivenPaging/Opa.qunit"]
 			},
+			"OPA.SimpleNonDraft" : {
+				module : ["sap/ui/core/sample/odata/v4/SimpleNonDraft/Opa.qunit"],
+				realOData : false // requires stable test data
+			},
 			"OPA.Sticky" : {
 				module : ["sap/ui/core/sample/odata/v4/Sticky/Opa.qunit"],
 				realOData : false // requires stable test data
