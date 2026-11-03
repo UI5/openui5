@@ -133,7 +133,7 @@ sap.ui.define(["./PluginBase", "sap/ui/base/ManagedObjectObserver", "sap/ui/core
 		if (this._oMessageStrip) {
 			oControl.removeAriaLabelledBy(this._oMessageStrip);
 			this._oMessageStrip.destroy();
-			this._oMessageStrip = null;
+			this._oMessageStrip = this._pLoadMessageStrip = this._mPendingMessage = null;
 		}
 
 		if (this._oLink) {
@@ -190,23 +190,32 @@ sap.ui.define(["./PluginBase", "sap/ui/base/ManagedObjectObserver", "sap/ui/core
 				this.getControl().addAriaLabelledBy(this._oMessageStrip);
 			}
 		} else {
-			sap.ui.require(["sap/m/MessageStrip"], function(MessageStrip) {
-				var oControl = this.getControl();
-				this._oMessageStrip = new MessageStrip({
-					showCloseButton: true,
-					showIcon: true,
-					close: function() {
-						oControl.focus();
-						oControl.removeAriaLabelledBy(this._oMessageStrip);
-						this.fireClose();
-					}.bind(this)
-				}).addStyleClass("sapUiTinyMargin");
+			// Load once; the latest call's text/type is applied when the strip is ready
+			this._mPendingMessage = { text: sText, type: sType };
+			this._pLoadMessageStrip ??= new Promise((resolve) => {
+				sap.ui.require(["sap/m/MessageStrip"], (MessageStrip) => {
+					this._pLoadMessageStrip = null;
+					var oControl = this.getControl();
+					if (!this.isActive() || !oControl) {
+						resolve();
+						return;
+					}
+					this._oMessageStrip = new MessageStrip({
+						showCloseButton: true,
+						showIcon: true,
+						close: () => {
+							oControl.focus();
+							oControl.removeAriaLabelledBy(this._oMessageStrip);
+							this.fireClose();
+						}
+					}).addStyleClass("sapUiTinyMargin");
 
-				oControl.setAggregation("_messageStrip", this._oMessageStrip);
-				oControl.addAriaLabelledBy(this._oMessageStrip);
-				this._updateLinkControl();
-				this.showMessage(sText, sType);
-			}.bind(this));
+					oControl.setAggregation("_messageStrip", this._oMessageStrip);
+					this._updateLinkControl();
+					this.showMessage(this._mPendingMessage.text, this._mPendingMessage.type);
+					resolve();
+				});
+			});
 		}
 	};
 

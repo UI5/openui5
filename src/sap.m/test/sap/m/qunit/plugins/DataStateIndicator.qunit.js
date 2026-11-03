@@ -58,8 +58,27 @@ sap.ui.define([
 					})
 				);
 			};
+
+			// Pre-load MessageStrip and resolve its require synchronously to avoid a
+			// race between the async module load and the test assertions.
+			const fnRequire = sap.ui.require;
+			const [MessageStrip] = await new Promise((fnResolve) => {
+				sap.ui.require(["sap/m/MessageStrip"], (MessageStrip) => {
+					fnResolve([MessageStrip]);
+				});
+			});
+			sinon.stub(sap.ui, "require").callsFake((aDependencies, fnCallback) => {
+				if (aDependencies.length === 1 && aDependencies[0] === "sap/m/MessageStrip") {
+					fnCallback(MessageStrip);
+				} else {
+					return fnRequire(aDependencies, fnCallback);
+				}
+			});
 		},
 		afterEach: function() {
+			if (sap.ui.require.restore) {
+				sap.ui.require.restore();
+			}
 			this.oModel.destroy();
 			this.oList.destroy();
 		}
@@ -76,6 +95,58 @@ sap.ui.define([
 
 		this.oPlugin.showMessage("");
 		assert.notOk(this.oList.getAriaLabelledBy().includes(oMsgStrp.getId()));
+	});
+
+	QUnit.test("showMessage called twice before the strip is created", async function(assert) {
+		this.oPlugin.showMessage("First", "Error");
+		this.oPlugin.showMessage("Second", "Error");
+		await this.oAfterRendering;
+		await timeout(0);
+
+		const aLabelIds = this.oList.getAriaLabelledBy();
+		const aStripLabels = aLabelIds.filter((sId) => sap.ui.getCore().byId(sId)?.isA("sap.m.MessageStrip"));
+		assert.strictEqual(aStripLabels.length, 1, "Only one message strip is referenced by aria-labelledby");
+		assert.ok(aLabelIds.includes(this.oPlugin._oMessageStrip.getId()), "The live strip is the referenced one");
+		assert.notOk(aLabelIds.some((sId) => !sap.ui.getCore().byId(sId)), "No aria-labelledby entry points to a destroyed control");
+		assert.equal(this.oPlugin._oMessageStrip.getText(), "Second", "The strip shows the text of the latest call");
+	});
+
+	QUnit.test("showMessage after deactivate/reactivate recreates the strip", async function(assert) {
+		this.oPlugin.showMessage("First", "Error");
+		await this.oAfterRendering;
+		assert.ok(this.oPlugin._oMessageStrip, "Message strip exists after first showMessage");
+
+		this.oPlugin.setEnabled(false);
+		assert.notOk(this.oPlugin._oMessageStrip, "Message strip is destroyed on deactivate");
+
+		this.oPlugin.setEnabled(true);
+		this.oPlugin.showMessage("Second", "Error");
+		await timeout(0);
+
+		assert.ok(this.oPlugin._oMessageStrip, "Message strip is recreated after reactivate");
+		assert.equal(this.oPlugin._oMessageStrip.getText(), "Second", "Recreated strip shows the latest message");
+		assert.ok(this.oList.getAriaLabelledBy().includes(this.oPlugin._oMessageStrip.getId()), "Recreated strip is referenced by aria-labelledby");
+	});
+
+	QUnit.test("destroy before the strip is created does not create a strip", async function(assert) {
+		sap.ui.require.restore(); // real async load, so the callback fires after destroy
+		this.oPlugin.showMessage("First", "Error");
+		this.oPlugin.destroy();
+		await timeout(0);
+
+		assert.notOk(this.oPlugin._oMessageStrip, "No message strip is created after destroy");
+		assert.notOk(this.oList.isDestroyed(), "The control is not affected");
+	});
+
+	QUnit.test("deactivate before the strip is created does not create a strip", async function(assert) {
+		sap.ui.require.restore(); // real async load, so the callback fires after deactivate
+		this.oPlugin.showMessage("First", "Error");
+		this.oPlugin.setEnabled(false);
+		await timeout(0);
+
+		assert.notOk(this.oPlugin._oMessageStrip, "No message strip is created after deactivate");
+		const aStripLabels = this.oList.getAriaLabelledBy().filter((sId) => sap.ui.getCore().byId(sId)?.isA("sap.m.MessageStrip"));
+		assert.strictEqual(aStripLabels.length, 0, "aria-labelledby references no message strip");
 	});
 
 	QUnit.test("Single Message - Error", async function(assert) {
