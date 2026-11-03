@@ -5,7 +5,7 @@
 
 .sapUiRoadMap {
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 }
 
 /* Step Styles */
@@ -15,7 +15,7 @@
 
 .sapUiRoadMapStepAdd1,
 .sapUiRoadMapStepAdd2 {
-	background-color: darken(@sapUiContentForegroundColor, 10);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l - 10))';
 }
 
 .sapUiRoadMapStepBox {
@@ -30,22 +30,21 @@
 }
 
 .sapUiRoadMapSelected > .sapUiRoadMapStepBox {
-	color: @sapUiToggleButtonPressedTextColor;
-	background-color: @sapUiToggleButtonPressedBackground;
-	border-color: @sapUiToggleButtonPressedBorderColor;
+	color: var(--sapButton_Track_Selected_TextColor);
+	background-color: var(--sapSelectedColor);
+	border-color: var(--sapButton_Selected_BorderColor);
 	box-shadow: none;
-
 }
 
 .sapUiRoadMapDisabled > .sapUiRoadMapStepBox {
-	background-color: @sapUiButtonDisabledBackground;
+	background-color: var(--sapField_ReadOnly_Background);
 	color: var(--sapContent_DisabledTextColor);
-	border: 1px solid  @sapUiButtonDisabledBorderColor;
+	border: 1px solid var(--sapField_ReadOnly_BorderColor);
 	box-shadow: none;
 }
 
 .sapUiRoadMapTitle {
-	height: 30px; /*double line-height*/
+	height: 30px; /* double line-height */
 	font-size: 12px;
 	font-family: var(--sapFontFamily);
 }
@@ -113,7 +112,7 @@
 }
 
 .sapUiRoadMapStep:hover > .sapUiRoadMapTitle {
-	color: @sapUiLinkHover;
+	color: var(--sapLink_Hover_Color);
 }
 
 .sapUiRoadMapStep.sapUiRoadMapDisabled:hover > .sapUiRoadMapTitle {
@@ -133,9 +132,9 @@
 }
 
 .sapUiRoadMapStep.sapUiRoadMapDisabled:hover > .sapUiRoadMapStepBox {
-	background-color: @sapUiButtonDisabledBackground;
+	background-color: var(--sapField_ReadOnly_Background);
 	color: var(--sapContent_DisabledTextColor);
-	border: 1px solid  @sapUiButtonDisabledBorderColor;
+	border: 1px solid var(--sapField_ReadOnly_BorderColor);
 	box-shadow: none;
 }
 

@@ -4,12 +4,12 @@
 /* ======================================= */
 
 .sapUiRoadMap {
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 }
 
 /* Step Styles */
 .sapUiRoadMapDisabled {
-	color: darken(@sapUiContentDisabledTextColor, 20);
+	color: ~'hsl(from var(--sapContent_DisabledTextColor) h s calc(l - 20%))';
 }
 
 .sapUiRoadMapStepAdd1,
@@ -17,7 +17,7 @@
 	background-color: var(--sapContent_ForegroundBorderColor);
 }
 
-.sapUiRoadMapStepBox{
+.sapUiRoadMapStepBox {
 	background-color: var(--sapGroup_ContentBackground);
 	border: 1px solid var(--sapContent_ForegroundBorderColor);
 }
@@ -33,7 +33,7 @@
 
 .sapUiRoadMapDisabled > .sapUiRoadMapStepBox {
 	background-color: var(--sapField_ReadOnly_Background);
-	border: 1px solid @sapUiButtonDisabledBorderColor;
+	border: 1px solid var(--sapButton_BorderColor);
 }
 
 .sapUiRoadMapDisabled > .sapUiRoadMapStepBox:focus {
@@ -41,7 +41,7 @@
 }
 
 .sapUiRoadMapTitle {
-	height: 28px; /*double line-height*/
+	height: 28px; /* double line-height */
 	font-size: 11px;
 	font-family: var(--sapFontFamily);
 }
