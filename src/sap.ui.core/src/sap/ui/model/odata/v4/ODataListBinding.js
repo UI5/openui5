@@ -1400,6 +1400,14 @@ sap.ui.define([
 					that.oHeaderContext.setOutdated(true);
 				} else if (that.bLengthFinal && !bDoNotRequestCount) {
 					const bDataAggregation = _Helper.isDataAggregation(that.mParameters);
+					if (bDataAggregation && !that.mQueryOptions.$count
+							&& that.mParameters.$$aggregation.groupLevels.length) {
+						// Note: #getCount logs error and returns undefined for visual grouping
+						//   w/o $count! Also, #requestCount doesn't work properly then.
+						that.oHeaderContext.setOutdated(true);
+						return;
+					}
+
 					const iOldCount = bDataAggregation && that.getCount();
 					// a kept-alive context is not in aContexts -> request the count
 					that.oCache.requestCount(

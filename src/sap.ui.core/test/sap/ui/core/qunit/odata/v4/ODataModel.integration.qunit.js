@@ -21855,10 +21855,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// the binding is a suspended list binding without aggregation. Before the binding is resumed,
 	// aggregation information is set.
 	// JIRA: CPOUI5ODATAV4-2756
+	//
+	// Delete unaggregated leaf works w/ visual grouping w/o $count (JIRA: CPOUI5ODATAV4-3732)
 	QUnit.test("Data Aggregation: edge case for JIRA: CPOUI5ODATAV4-2756", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
 <Text id="isSelected" text="{= %{@$ui5.context.isSelected} }"/>
+<Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>
 <Table id="table"
 	items="{path : '/BusinessPartners',
 		filters : {path : 'Country', operator : 'NE', value1 : ''},
@@ -21868,15 +21871,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 </Table>`;
 
 		this.expectChange("isSelected")
+			.expectChange("isOutdatedHeader")
 			.expectChange("country", [])
 			.expectChange("region", []);
 
 		await this.createView(assert, sView, oModel);
 
-		this.expectChange("isSelected", false);
 		const oListBinding = this.oView.byId("table").getBinding("items");
+		const oHeaderContext = oListBinding.getHeaderContext();
 
-		this.oView.byId("isSelected").setBindingContext(oListBinding.getHeaderContext());
+		this.expectChange("isSelected", false)
+			.expectChange("isOutdatedHeader", undefined);
+
+		this.oView.byId("isSelected").setBindingContext(oHeaderContext);
+		this.oView.byId("isOutdatedHeader").setBindingContext(oHeaderContext);
 
 		await this.waitForChanges(assert, "set header context");
 
@@ -21896,13 +21904,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert, "resume")
 		]);
 
-		this.expectRequest("BusinessPartners?$apply=filter(Country eq 'A' and (Country ne ''))"
-				+ "/groupby((Region))&$count=true&$skip=0&$top=100", {
-				"@odata.count" : "1",
-				value : [{Region : "A1"}]
-			})
-			.expectChange("country", [, "A"])
-			.expectChange("region", [, "A1"]);
 		const oContextA = oListBinding.getCurrentContexts()[0];
 		assert.deepEqual(oContextA.getObject(), {
 			"@$ui5.node.isExpanded" : false,
@@ -21913,20 +21914,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"Region@$ui5.noData" : true
 		});
 
+		this.expectRequest("BusinessPartners?$apply=filter(Country eq 'A' and (Country ne ''))"
+				+ "/groupby((Region))&$count=true&$skip=0&$top=100", {
+				"@odata.count" : "1",
+				value : [{Region : "A1"}]
+			})
+			.expectChange("country", [, "A"])
+			.expectChange("region", [, "A1"]);
+
 		await Promise.all([
 			// code under test
 			oContextA.expand(),
 			this.waitForChanges(assert, "expand 'A'")
 		]);
 
-		this.expectRequest("BusinessPartners?$count=true"
-				+ "&$filter=Country eq 'A' and Region eq 'A1' and (Country ne '')"
-				+ "&$select=Country,Id,Region&$skip=0&$top=100", {
-				"@odata.count" : "1",
-				value : [{Country : "A", Id : "n/a", Region : "A1"}]
-			})
-			.expectChange("country", [,, "A"])
-			.expectChange("region", [,, "A1"]);
 		const oContextA1 = oListBinding.getCurrentContexts()[1];
 		assert.deepEqual(oContextA1.getObject(), {
 			"@$ui5.node.isExpanded" : false,
@@ -21936,6 +21937,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"Id@$ui5.noData" : true,
 			Region : "A1"
 		});
+
+		this.expectRequest("BusinessPartners?$count=true"
+				+ "&$filter=Country eq 'A' and Region eq 'A1' and (Country ne '')"
+				+ "&$select=Country,Id,Region&$skip=0&$top=100", {
+				"@odata.count" : "1",
+				value : [{Country : "A", Id : 42, Region : "A1"}]
+			})
+			.expectChange("country", [,, "A"])
+			.expectChange("region", [,, "A1"]);
 
 		await Promise.all([
 			// code under test
@@ -21948,9 +21958,21 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"@$ui5.node.isTotal" : false,
 			"@$ui5.node.level" : 3,
 			Country : "A",
-			Id : "n/a",
+			Id : 42, // Edm.Int16
 			Region : "A1"
 		});
+		oLeafContext.setKeepAlive(true);
+		oContextA1.collapse();
+
+		// Note: no request for $count
+		this.expectChange("isOutdatedHeader", true)
+			.expectRequest("DELETE BusinessPartners(42)", oNO_CONTENT);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3732)
+			oLeafContext.delete(),
+			this.waitForChanges(assert, "delete leaf while parent collapsed")
+		]);
 	});
 
 	//*********************************************************************************************
