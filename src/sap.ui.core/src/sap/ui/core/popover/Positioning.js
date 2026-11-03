@@ -15,6 +15,12 @@ sap.ui.define([
 	// Shortcut for sap.ui.core.popover.PopoverPlacement
 	const PopoverPlacement = coreLib.popover.PopoverPlacement;
 
+	// Shortcut for sap.ui.core.popover.PopoverHorizontalAlign
+	const PopoverHorizontalAlign = coreLib.popover.PopoverHorizontalAlign;
+
+	// Shortcut for sap.ui.core.popover.PopoverVerticalAlign
+	const PopoverVerticalAlign = coreLib.popover.PopoverVerticalAlign;
+
 	/**
 	 * @namespace sap.ui.core.popover.Positioning
 	 * @since 1.151
@@ -22,6 +28,22 @@ sap.ui.define([
 	 * @ui5-restricted sap.m, sap.ui.core
 	 */
 	const Positioning = {};
+
+	// Cross-axis alignment -> jquery-ui-position token. Stretch pins the near edge
+	// (begin / top) and relies on the caller to size the popover to the opener.
+	const CROSS_HORIZONTAL_TOKENS = {
+		[PopoverHorizontalAlign.Center]: "center",
+		[PopoverHorizontalAlign.Begin]: "begin",
+		[PopoverHorizontalAlign.End]: "end",
+		[PopoverHorizontalAlign.Stretch]: "begin"
+	};
+
+	const CROSS_VERTICAL_TOKENS = {
+		[PopoverVerticalAlign.Center]: "center",
+		[PopoverVerticalAlign.Top]: "top",
+		[PopoverVerticalAlign.Bottom]: "bottom",
+		[PopoverVerticalAlign.Stretch]: "top"
+	};
 
 	// Page-relative Y of the top bound: viewport top (scroll offset) for the
 	// window, or the within-area's page top.
@@ -124,6 +146,39 @@ sap.ui.define([
 	// flipping for right-to-left. `start` is Left in LTR, Right in RTL.
 	const physicalStart = (bRtl) => (bRtl ? PopoverPhysicalSide.Right : PopoverPhysicalSide.Left);
 	const physicalEnd = (bRtl) => (bRtl ? PopoverPhysicalSide.Left : PopoverPhysicalSide.Right);
+
+	/**
+	 * Maps a physical horizontal side to the logical side the clamp and margin helpers expect,
+	 * by swapping <code>Left</code> and <code>Right</code> in RTL.
+	 *
+	 * The space-based helpers ({@link sap.ui.core.popover.Positioning.computePopoverPositionCss},
+	 * {@link sap.ui.core.popover.Positioning.getEffectiveMargins}) re-derive the
+	 * physical side from the locale, as <code>sap.m.Popover</code> feeds them a
+	 * logical side. A caller that has already resolved an actual physical side (for example, the tooltip)
+	 * must undo that re-derivation by passing the logical side this returns.
+	 * <code>Top</code> and <code>Bottom</code> sides and LTR pass through unchanged.
+	 *
+	 * @param {sap.ui.core.popover.PopoverPhysicalSide} sSide The physical side.
+	 * @returns {sap.ui.core.popover.PopoverPhysicalSide} The logical side to feed the clamp or margin helpers
+	 * @public
+	 * @since 1.155
+	 * @ui5-restricted sap.m, sap.ui.core
+	 */
+	Positioning.toLogicalSide = (sSide) => {
+		if (!Localization.getRTL()) {
+			return sSide;
+		}
+
+		if (sSide === PopoverPhysicalSide.Left) {
+			return PopoverPhysicalSide.Right;
+		}
+
+		if (sSide === PopoverPhysicalSide.Right) {
+			return PopoverPhysicalSide.Left;
+		}
+
+		return sSide;
+	};
 
 	// Resolve a horizontal (Begin/End) placement from placement + flipMode.
 	// Begin resolves to the logical start side, End to the logical end side; both
@@ -539,6 +594,17 @@ sap.ui.define([
 	 *   Popover near-edge border width. When omitted it is read from
 	 *   <code>popoverRef</code> via <code>getComputedStyle</code> (0 if there is
 	 *   no ref).
+	 * @param {sap.ui.core.popover.PopoverHorizontalAlign} [oOptions.horizontalAlign]
+	 *   The cross-axis alignment used for the vertical sides (<code>Top</code>/<code>Bottom</code>),
+	 *   that is, the same value passed to {@link sap.ui.core.popover.Positioning.computeAnchor}.
+	 *   With <code>Begin</code>/<code>End</code> the arrow is pinned to the aligned
+	 *   corner (at <code>cornerInset</code>) instead of pointing at the opener's
+	 *   center. <code>Center</code>/<code>Stretch</code> keep the opener-centered
+	 *   behavior. Ignored for the horizontal sides.
+	 * @param {sap.ui.core.popover.PopoverVerticalAlign} [oOptions.verticalAlign]
+	 *   The cross-axis alignment used for the horizontal sides (<code>Left</code>/<code>Right</code>).
+	 *   With <code>Top</code>/<code>Bottom</code> the arrow is pinned to the aligned
+	 *   corner. Ignored for the vertical sides.
 	 * @returns {{along: number, cross: number, rtlRight: boolean}} the arrow offset.
 	 *   <code>along</code>: pixel offset along the popover edge. Measured from the
 	 *   near corner (top for Left/Right, left for Top/Bottom LTR) unless
@@ -589,6 +655,40 @@ sap.ui.define([
 		let iAlong;
 		let bRtlRight = false;
 
+		const bVerticalSide = side === PopoverPhysicalSide.Top || side === PopoverPhysicalSide.Bottom;
+		const sHorizontalAlign = oOptions.horizontalAlign;
+		const sVerticalAlign = oOptions.verticalAlign;
+
+		// Edge-aligned cross axis: the popover sits on the opener's start/end (or
+		// top/bottom) corner, so an opener-centered arrow would be clamped to a
+		// corner anyway — and for an opener much wider than the popover it would
+		// point away from the aligned edge. Pin the arrow to the aligned corner
+		// instead, at the same inset the clamp band uses.
+		if (bVerticalSide && (sHorizontalAlign === PopoverHorizontalAlign.Begin || sHorizontalAlign === PopoverHorizontalAlign.End)) {
+			const bNearStart = sHorizontalAlign === PopoverHorizontalAlign.Begin;
+
+			// The locale start is the left edge in LTR and the right edge in RTL;
+			// measuring from the aligned edge keeps the inset exact either way.
+			return {
+				along: placeAlong(iInset, oPopover.width, iArrowWidth),
+				cross: 0,
+				rtlRight: bRtl ? bNearStart : !bNearStart
+			};
+		}
+
+		if (!bVerticalSide && (sVerticalAlign === PopoverVerticalAlign.Top || sVerticalAlign === PopoverVerticalAlign.Bottom)) {
+			// Vertical offsets are always measured from the popover's top edge.
+			const fRaw = (sVerticalAlign === PopoverVerticalAlign.Top)
+				? iInset
+				: oPopover.height - iInset - iArrowHeight;
+
+			return {
+				along: placeAlong(fRaw, oPopover.height, iArrowHeight),
+				cross: 0,
+				rtlRight: false
+			};
+		}
+
 		if (side === PopoverPhysicalSide.Left || side === PopoverPhysicalSide.Right) {
 			// Arrow sits on the vertical edge — its offset is measured
 			// from the top of the popover downward.
@@ -629,6 +729,18 @@ sap.ui.define([
 	 *   RTL. When <code>false</code>, the caller has already resolved a TRUE physical
 	 *   <code>side</code>; the horizontal sides emit physical <code>left</code>/<code>right</code>
 	 *   tokens that pass through Popup untouched, avoiding a double flip.
+	 * @param {sap.ui.core.popover.PopoverHorizontalAlign} [oOptions.horizontalAlign]
+	 *   Cross-axis alignment for the vertical sides (<code>Top</code>/<code>Bottom</code>).
+	 *   <code>Begin</code>/<code>End</code> are emitted as locale-relative tokens that
+	 *   <code>sap.ui.core.Popup</code> flips in RTL. <code>Stretch</code> aligns like
+	 *   <code>Begin</code> — the caller is responsible for sizing the popover to the
+	 *   opener's width. Ignored for the horizontal sides. When omitted, the previous
+	 *   default is kept (<code>center</code> with an arrow, <code>begin</code> without).
+	 * @param {sap.ui.core.popover.PopoverVerticalAlign} [oOptions.verticalAlign]
+	 *   Cross-axis alignment for the horizontal sides (<code>Left</code>/<code>Right</code>).
+	 *   <code>Stretch</code> aligns like <code>Top</code> — the caller is responsible for
+	 *   sizing the popover to the opener's height. Ignored for the vertical sides.
+	 *   Defaults to <code>center</code>.
 	 * @returns {{my: string, at: string, offset: string}} the jquery-ui-position spec.
 	 * @public
 	 * @since 1.151
@@ -643,30 +755,40 @@ sap.ui.define([
 		const sStartToken = bMirror ? "end" : "right";
 		const sEndToken = bMirror ? "begin" : "left";
 
+		// Cross-axis alignment tokens. Begin/End stay logical so Popup flips them in
+		// RTL; Stretch pins the near edge and leaves the sizing to the caller.
+		let sCrossH = bShowArrow ? "center" : "begin";
+
+		if (oOptions.horizontalAlign) {
+			sCrossH = CROSS_HORIZONTAL_TOKENS[oOptions.horizontalAlign] ?? sCrossH;
+		}
+
+		const sCrossV = CROSS_VERTICAL_TOKENS[oOptions.verticalAlign] ?? "center";
+
 		if (!bShowArrow) {
 			switch (oOptions.side) {
 				case PopoverPhysicalSide.Top:
-					return { my: "begin bottom", at: "begin top", offset: "0 0" };
+					return { my: `${sCrossH} bottom`, at: `${sCrossH} top`, offset: "0 0" };
 				case PopoverPhysicalSide.Left:
-					return { my: `${sStartToken} center`, at: `${sEndToken} center`, offset: "0 0" };
+					return { my: `${sStartToken} ${sCrossV}`, at: `${sEndToken} ${sCrossV}`, offset: "0 0" };
 				case PopoverPhysicalSide.Right:
-					return { my: `${sEndToken} center`, at: `${sStartToken} center`, offset: "0 0" };
+					return { my: `${sEndToken} ${sCrossV}`, at: `${sStartToken} ${sCrossV}`, offset: "0 0" };
 				case PopoverPhysicalSide.Bottom:
 				default:
-					return { my: "begin top", at: "begin bottom", offset: "0 0" };
+					return { my: `${sCrossH} top`, at: `${sCrossH} bottom`, offset: "0 0" };
 			}
 		}
 
 		switch (oOptions.side) {
 			case PopoverPhysicalSide.Top:
-				return { my: "center bottom", at: "center top", offset: `0 ${-iArrow}` };
+				return { my: `${sCrossH} bottom`, at: `${sCrossH} top`, offset: `0 ${-iArrow}` };
 			case PopoverPhysicalSide.Left:
-				return { my: `${sStartToken} center`, at: `${sEndToken} center`, offset: `${-iArrow} 0` };
+				return { my: `${sStartToken} ${sCrossV}`, at: `${sEndToken} ${sCrossV}`, offset: `${-iArrow} 0` };
 			case PopoverPhysicalSide.Right:
-				return { my: `${sEndToken} center`, at: `${sStartToken} center`, offset: `${iArrow} 0` };
+				return { my: `${sEndToken} ${sCrossV}`, at: `${sStartToken} ${sCrossV}`, offset: `${iArrow} 0` };
 			case PopoverPhysicalSide.Bottom:
 			default:
-				return { my: "center top", at: "center bottom", offset: `0 ${iArrow}` };
+				return { my: `${sCrossH} top`, at: `${sCrossH} bottom`, offset: `0 ${iArrow}` };
 		}
 	};
 
@@ -836,6 +958,425 @@ sap.ui.define([
 	 * @since 1.151
 	 */
 	Positioning.getEffectiveMargins = resolveMargins;
+
+	// Whether the given side is one of the vertical sides (Top/Bottom), whose
+	// cross axis is horizontal. Left/Right are the horizontal sides.
+	const isVerticalSide = (sSide) =>
+		sSide === PopoverPhysicalSide.Top || sSide === PopoverPhysicalSide.Bottom;
+
+	/**
+	 * Viewport-relative bounds of the within-area, or of the document viewport
+	 * when there is no within-area (or it is the window).
+	 *
+	 * The rect is viewport-relative (no scroll offset added) so it can be compared
+	 * directly against an opener's <code>getBoundingClientRect()</code>.
+	 *
+	 * @param {Element|Window} [oWithinAreaRef] The within-area (window when omitted).
+	 * @returns {{left: number,top: number,right: number,bottom: number}} The bounds rect
+	 * @public
+	 * @since 1.155
+	 * @ui5-restricted sap.m, sap.ui.core
+	 */
+	Positioning.getWithinAreaBounds = (oWithinAreaRef) => {
+		if (oWithinAreaRef && oWithinAreaRef !== window && oWithinAreaRef.getBoundingClientRect) {
+			return oWithinAreaRef.getBoundingClientRect();
+		}
+
+		return {
+			left: 0,
+			top: 0,
+			right: document.documentElement.clientWidth,
+			bottom: document.documentElement.clientHeight
+		};
+	};
+
+	/**
+	 * Indicates whether the popover's cross axis is tied to the opener rather than centered on it, that is,
+	 * whether it was docked to an opener edge or sized to match the opener.
+	 * The generic overflow clamp is alignment-blind and would re-pin such a box to the screen edge,
+	 * silently undoing the alignment. Callers must skip the cross-axis clamp when this method
+	 * returns <code>true</code>.
+	 *
+	 * The cross axis is horizontal for the vertical sides (<code>Top</code>/<code>Bottom</code>,
+	 * driven by <code>horizontalAlign</code>) and vertical for the horizontal sides
+	 * (<code>Left</code>/<code>Right</code>, driven by <code>verticalAlign</code>).
+	 *
+	 * @param {object} oOptions The options bag.
+	 * @param {sap.ui.core.popover.PopoverPhysicalSide} oOptions.side The resolved side.
+	 * @param {sap.ui.core.popover.PopoverHorizontalAlign} [oOptions.horizontalAlign] Cross-axis alignment for the vertical sides.
+	 * @param {sap.ui.core.popover.PopoverVerticalAlign} [oOptions.verticalAlign] Cross-axis alignment for the horizontal sides.
+	 * @returns {boolean} Whether the cross axis is opener-bound
+	 * @public
+	 * @since 1.155
+	 * @ui5-restricted sap.m, sap.ui.core
+	 */
+	Positioning.isCrossAxisOpenerBound = (oOptions) => {
+		if (isVerticalSide(oOptions.side)) {
+			return oOptions.horizontalAlign !== PopoverHorizontalAlign.Center;
+		}
+
+		return oOptions.verticalAlign !== PopoverVerticalAlign.Center;
+	};
+
+	/**
+	 * Resolves the effective cross-axis alignment by flipping an edge-bound alignment
+	 * to its opposite when the popover does not fit in its growth direction and
+	 * the opposite direction has more room.
+	 *
+	 * An edge-bound alignment docks the popover's near edge to an opener edge and
+	 * lets the box grow towards the other side: <code>Begin</code> grows towards the
+	 * locale end, <code>End</code> towards the locale start; <code>Top</code> grows
+	 * downwards, <code>Bottom</code> upwards. When that growth direction is cramped
+	 * (opener near the far within-area edge) the box would be size-capped into a
+	 * sliver, so this flips to the opposite alignment where there is more room —
+	 * mirroring the {@link sap.ui.core.popover.PopoverFlipMode.MoreSpace} semantics
+	 * used for the main placement axis.
+	 *
+	 * The requested value is returned unchanged for <code>Center</code>/<code>Stretch</code>,
+	 * for an unknown value, when refs are missing, and when the popover fits.
+	 * If the popover fits neither direction, the preference is kept on a tie,
+	 * like <code>calcHorizontal</code>/<code>calcVertical</code>.
+	 *
+	 * @param {object} oOptions The options bag.
+	 * @param {sap.ui.core.popover.PopoverPhysicalSide} oOptions.side The resolved side.
+	 * @param {Element} oOptions.openerRef The opener DOM element, measured internally.
+	 * @param {Element} oOptions.popoverRef The popover DOM element; its cross-axis extent is measured internally.
+	 * @param {Element|Window} [oOptions.withinAreaRef] The within-area (window when omitted).
+	 * @param {sap.ui.core.popover.PopoverHorizontalAlign} [oOptions.horizontalAlign] Cross-axis alignment for the vertical sides.
+	 * @param {sap.ui.core.popover.PopoverVerticalAlign} [oOptions.verticalAlign] Cross-axis alignment for the horizontal sides.
+	 * @param {number} [oOptions.edgeMargin=0] Gap kept from the opposite within-area edge.
+	 * @returns {sap.ui.core.popover.PopoverHorizontalAlign|sap.ui.core.popover.PopoverVerticalAlign}
+	 *   The effective alignment for the active axis
+	 * @public
+	 * @since 1.155
+	 * @ui5-restricted sap.m, sap.ui.core
+	 */
+	Positioning.resolveCrossAxisAlign = (oOptions) => {
+		const bVertical = isVerticalSide(oOptions.side);
+		const sAlign = bVertical ? oOptions.horizontalAlign : oOptions.verticalAlign;
+
+		if (!oOptions.openerRef || !oOptions.popoverRef) {
+			return sAlign;
+		}
+
+		const iEdgeMargin = oOptions.edgeMargin ?? 0;
+		const oBounds = Positioning.getWithinAreaBounds(oOptions.withinAreaRef);
+		const oHostRect = oOptions.openerRef.getBoundingClientRect();
+		const oTipRect = oOptions.popoverRef.getBoundingClientRect();
+
+		if (bVertical) {
+			if (sAlign !== PopoverHorizontalAlign.Begin && sAlign !== PopoverHorizontalAlign.End) {
+				return sAlign;
+			}
+
+			// The requested alignment pins one opener edge and grows towards the other
+			// within-area bound; the opposite alignment pins the other edge and grows
+			// the other way. In RTL the locale start is the right edge, so Begin grows
+			// leftwards instead.
+			const bGrowsRight = (sAlign === PopoverHorizontalAlign.Begin) !== Localization.getRTL();
+			const iRequestedRoom = (bGrowsRight ? oBounds.right - oHostRect.left : oHostRect.right - oBounds.left) - iEdgeMargin;
+			const iOppositeRoom = (bGrowsRight ? oHostRect.right - oBounds.left : oBounds.right - oHostRect.left) - iEdgeMargin;
+
+			if (oTipRect.width > iRequestedRoom && iOppositeRoom > iRequestedRoom) {
+				return sAlign === PopoverHorizontalAlign.Begin ? PopoverHorizontalAlign.End : PopoverHorizontalAlign.Begin;
+			}
+
+			return sAlign;
+		}
+
+		if (sAlign !== PopoverVerticalAlign.Top && sAlign !== PopoverVerticalAlign.Bottom) {
+			return sAlign;
+		}
+
+		const bGrowsDown = sAlign === PopoverVerticalAlign.Top;
+		const iRequestedRoom = (bGrowsDown ? oBounds.bottom - oHostRect.top : oHostRect.bottom - oBounds.top) - iEdgeMargin;
+		const iOppositeRoom = (bGrowsDown ? oHostRect.bottom - oBounds.top : oBounds.bottom - oHostRect.top) - iEdgeMargin;
+
+		if (oTipRect.height > iRequestedRoom && iOppositeRoom > iRequestedRoom) {
+			return sAlign === PopoverVerticalAlign.Top ? PopoverVerticalAlign.Bottom : PopoverVerticalAlign.Top;
+		}
+
+		return sAlign;
+	};
+
+	/**
+	 * Resolves the placement side and the effective cross-axis alignment in a single measured call.
+	 * {@link sap.ui.core.popover.Positioning.resolvePlacement} picks the strict side,
+	 * then {@link sap.ui.core.popover.Positioning.resolveCrossAxisAlign} flips an edge-bound alignment to
+	 * its opposite on the side's cross axis when that axis is cramped.
+	 *
+	 * Only the active axis's alignment can change — the vertical sides
+	 * (<code>Top</code>/<code>Bottom</code>) own <code>horizontalAlign</code>, the
+	 * horizontal sides own <code>verticalAlign</code>; the inactive axis is returned
+	 * as requested. Callers that resolve a physical side (no Popup RTL mirror) get the
+	 * side back unchanged and can feed it to {@link sap.ui.core.popover.Positioning.toLogicalSide}
+	 * for the clamp/margin helpers.
+	 *
+	 * @param {object} oOptions The options bag — the union of
+	 *   {@link sap.ui.core.popover.Positioning.resolvePlacement}'s and
+	 *   {@link sap.ui.core.popover.Positioning.resolveCrossAxisAlign}'s inputs.
+	 * @param {sap.ui.core.popover.PopoverPlacement} [oOptions.placement] Preferred placement.
+	 * @param {sap.ui.core.popover.PopoverFlipMode} [oOptions.flipMode] How to react when the side does not fit.
+	 * @param {boolean} [oOptions.auto] When set, the side is picked automatically by coverage.
+	 * @param {Element} oOptions.openerRef The opener DOM element, measured internally.
+	 * @param {Element} oOptions.popoverRef The popover DOM element, measured internally.
+	 * @param {Element|Window} [oOptions.withinAreaRef] The within-area (window when omitted).
+	 * @param {{top: number,right: number,bottom: number,left: number}} oOptions.margin Screen-edge margins.
+	 * @param {number} oOptions.arrowSize Distance in px reserved between opener and popover for the arrow.
+	 * @param {number} [oOptions.offsetX=0] Extra horizontal opener offset.
+	 * @param {number} [oOptions.offsetY=0] Extra vertical opener offset.
+	 * @param {sap.ui.core.popover.PopoverHorizontalAlign} [oOptions.horizontalAlign] Cross-axis alignment for the vertical sides.
+	 * @param {sap.ui.core.popover.PopoverVerticalAlign} [oOptions.verticalAlign] Cross-axis alignment for the horizontal sides.
+	 * @param {number} [oOptions.edgeMargin=0] Gap kept from the opposite within-area edge for the alignment flip.
+	 * @returns {{side: sap.ui.core.popover.PopoverPhysicalSide, horizontalAlign: sap.ui.core.popover.PopoverHorizontalAlign, verticalAlign: sap.ui.core.popover.PopoverVerticalAlign}}
+	 *   The resolved side and the effective alignments for both axes
+	 * @public
+	 * @since 1.155
+	 * @ui5-restricted sap.m, sap.ui.core
+	 */
+	Positioning.resolvePlacementAndAlign = (oOptions) => {
+		const sSide = Positioning.resolvePlacement(oOptions);
+		const sEffective = Positioning.resolveCrossAxisAlign(Object.assign({}, oOptions, { side: sSide }));
+		const bVertical = isVerticalSide(sSide);
+
+		return {
+			side: sSide,
+			horizontalAlign: bVertical ? sEffective : oOptions.horizontalAlign,
+			verticalAlign: bVertical ? oOptions.verticalAlign : sEffective
+		};
+	};
+
+	/**
+	 * Size limit imposed on the cross axis by an opener-bound alignment.
+	 *
+	 * With <code>Begin</code>/<code>End</code> (resp. <code>Top</code>/<code>Bottom</code>)
+	 * the popover's near edge is docked to an opener edge, so the room it has is
+	 * only what remains between that edge and the opposite within-area bound — not
+	 * the full within-area. Without this cap a long content would keep its natural
+	 * size, overflow the bound, and then get yanked back by the position clamp,
+	 * silently breaking the alignment. Capping instead makes the content wrap and
+	 * keeps the box docked where it was aligned.
+	 *
+	 * <code>Stretch</code> reports the opener's own extent so a caller that sized
+	 * the box to the opener is not then cut down by a theme <code>max-width</code>.
+	 *
+	 * @param {object} oOptions The options bag.
+	 * @param {sap.ui.core.popover.PopoverPhysicalSide} oOptions.side The resolved side.
+	 * @param {Element} oOptions.openerRef The opener DOM element, measured internally.
+	 * @param {Element|Window} [oOptions.withinAreaRef] The within-area (window when omitted).
+	 * @param {sap.ui.core.popover.PopoverHorizontalAlign} [oOptions.horizontalAlign] Cross-axis alignment for the vertical sides.
+	 * @param {sap.ui.core.popover.PopoverVerticalAlign} [oOptions.verticalAlign] Cross-axis alignment for the horizontal sides.
+	 * @param {number} [oOptions.edgeMargin=0] Gap kept from the opposite within-area edge.
+	 * @returns {{maxWidth: (number|undefined), maxHeight: (number|undefined)}}
+	 *   The limit for the cross axis, empty for the centered alignments
+	 * @public
+	 * @since 1.155
+	 * @ui5-restricted sap.m, sap.ui.core
+	 */
+	Positioning.computeAlignedMaxSize = (oOptions) => {
+		if (!oOptions.openerRef) {
+			return {};
+		}
+
+		const iEdgeMargin = oOptions.edgeMargin ?? 0;
+		const oBounds = Positioning.getWithinAreaBounds(oOptions.withinAreaRef);
+		const oHostRect = oOptions.openerRef.getBoundingClientRect();
+
+		if (isVerticalSide(oOptions.side)) {
+			const sAlign = oOptions.horizontalAlign;
+
+			if (sAlign === PopoverHorizontalAlign.Stretch) {
+				return { maxWidth: oHostRect.width };
+			}
+
+			if (sAlign !== PopoverHorizontalAlign.Begin && sAlign !== PopoverHorizontalAlign.End) {
+				return {};
+			}
+
+			// The pinned edge is the opener's locale start for Begin and its locale
+			// end for End; the room is what is left towards the other side.
+			const bPinnedLeft = (sAlign === PopoverHorizontalAlign.Begin) !== Localization.getRTL();
+
+			return {
+				maxWidth: bPinnedLeft
+					? oBounds.right - oHostRect.left - iEdgeMargin
+					: oHostRect.right - oBounds.left - iEdgeMargin
+			};
+		}
+
+		const sVerticalAlign = oOptions.verticalAlign;
+
+		if (sVerticalAlign === PopoverVerticalAlign.Stretch) {
+			return { maxHeight: oHostRect.height };
+		}
+
+		if (sVerticalAlign === PopoverVerticalAlign.Top) {
+			return { maxHeight: oBounds.bottom - oHostRect.top - iEdgeMargin };
+		}
+
+		if (sVerticalAlign === PopoverVerticalAlign.Bottom) {
+			return { maxHeight: oHostRect.bottom - oBounds.top - iEdgeMargin };
+		}
+
+		return {};
+	};
+
+	/**
+	 * Combines the within-area content cap ({@link sap.ui.core.popover.Positioning.computeMaxContentSize})
+	 * with the opener-bound alignment cap ({@link sap.ui.core.popover.Positioning.computeAlignedMaxSize})
+	 * into the single maximum size a popover may take.
+	 *
+	 * The two caps are folded with <code>Math.min</code>: the box may never exceed the
+	 * room left inside the within-area, and an edge-bound alignment shrinks it further
+	 * to the room on the side it grows towards. The raw aligned values are returned
+	 * alongside (<code>alignedWidth</code>/<code>alignedHeight</code>, <code>undefined</code>
+	 * when the alignment imposes no cap) so a caller can distinguish a genuine alignment cap
+	 * apart from the within-area cap and decide whether to apply it unconditionally.
+	 *
+	 * @param {object} o The options bag — the union of
+	 *   {@link sap.ui.core.popover.Positioning.computeMaxContentSize}'s and
+	 *   {@link sap.ui.core.popover.Positioning.computeAlignedMaxSize}'s inputs.
+	 * @param {{top: number,right: number,bottom: number,left: number}} o.margin Base screen-edge margins.
+	 * @param {Element|Window} [o.withinAreaRef] Within-area.
+	 * @param {sap.ui.core.popover.PopoverPhysicalSide} [o.side] Resolved side (logical, as the clamp helpers expect).
+	 * @param {Element} [o.openerRef] Opener element.
+	 * @param {number} [o.arrowSize] Arrow gap.
+	 * @param {number} [o.offsetX] Horizontal opener offset.
+	 * @param {number} [o.offsetY] Vertical opener offset.
+	 * @param {number} [o.reservedWidth=0] Fixed non-content width.
+	 * @param {number} [o.reservedHeight=0] Fixed non-content height.
+	 * @param {sap.ui.core.popover.PopoverHorizontalAlign} [o.horizontalAlign] Cross-axis alignment for the vertical sides.
+	 * @param {sap.ui.core.popover.PopoverVerticalAlign} [o.verticalAlign] Cross-axis alignment for the horizontal sides.
+	 * @param {number} [o.edgeMargin=0] Gap kept from the opposite within-area edge for the alignment cap.
+	 * @returns {{maxWidth: number, maxHeight: number, alignedWidth: (number|undefined), alignedHeight: (number|undefined)}}
+	 *   The folded caps plus the raw aligned values
+	 * @public
+	 * @since 1.155
+	 * @ui5-restricted sap.m, sap.ui.core
+	 */
+	Positioning.computeFittedMaxSize = (o) => {
+		const oBoxMax = Positioning.computeMaxContentSize(o);
+		const oAligned = Positioning.computeAlignedMaxSize(o);
+
+		return {
+			maxWidth: Math.min(oBoxMax.maxWidth, oAligned.maxWidth ?? Infinity),
+			maxHeight: Math.min(oBoxMax.maxHeight, oAligned.maxHeight ?? Infinity),
+			alignedWidth: oAligned.maxWidth,
+			alignedHeight: oAligned.maxHeight
+		};
+	};
+
+	/**
+	 * Computes the two CSS edge names that span a side's cross axis: <code>["left", "right"]</code>
+	 * for the vertical sides (<code>Top</code>/<code>Bottom</code>) and
+	 * <code>["top", "bottom"]</code> for the horizontal sides (<code>Left</code>/<code>Right</code>).
+	 *
+	 * The alignment-blind position clamp would re-pin these edges to the screen and
+	 * undo an opener-bound alignment, so a caller that keeps the Popup's cross-axis
+	 * dock skips exactly these edges when applying the clamp.
+	 *
+	 * @param {sap.ui.core.popover.PopoverPhysicalSide} sSide The resolved side.
+	 * @returns {string[]} The near or far CSS edge names of the cross axis
+	 * @public
+	 * @since 1.155
+	 * @ui5-restricted sap.m, sap.ui.core
+	 */
+	Positioning.computeCrossAxisEdges = (sSide) => {
+		return isVerticalSide(sSide) ? ["left", "right"] : ["top", "bottom"];
+	};
+
+	/**
+	 * Computes the shift needed to re-dock an opener-bound cross axis on the opener's live rect.
+	 *
+	 * A Popup dock cannot be trusted to land exactly on the aligned edge: size caps
+	 * applied afterwards may have changed the box's extent, and a
+	 * <code>right</code>/<code>bottom</code> dock is computed against the viewport
+	 * while the box is laid out against its offset parent — a scrollbar between the
+	 * two shifts it. Both surface as a few pixels of drift on the axis the alignment
+	 * owns. The caller applies the returned <code>delta</code> to whichever of
+	 * <code>near</code>/<code>far</code> its dock actually set. The far edge grows
+	 * against the delta, so its sign is flipped by the caller.
+	 *
+	 * The delta docks the box on the opener's aligned edge, then clamps the docked
+	 * box inside the within-area (keeping <code>edgeMargin</code> from each bound):
+	 * an edge-bound alignment pins the box to an opener edge and the generic
+	 * position clamp is skipped on this axis, so without this a partially-visible
+	 * opener would drag the box off-screen with it. The clamp is a no-op whenever
+	 * the opener is fully visible, so a valid alignment is never disturbed. The box
+	 * is kept inside the near bound first, so when it is wider than the visible band
+	 * it overflows the far edge rather than disappearing past the near one.
+	 *
+	 * @param {object} oOptions The options bag.
+	 * @param {sap.ui.core.popover.PopoverPhysicalSide} oOptions.side The resolved side.
+	 * @param {Element} oOptions.openerRef The opener DOM element, measured internally.
+	 * @param {Element} oOptions.popoverRef The popover DOM element, measured internally.
+	 * @param {Element|Window} [oOptions.withinAreaRef] The within-area (window when omitted).
+	 * @param {sap.ui.core.popover.PopoverHorizontalAlign} [oOptions.horizontalAlign] Cross-axis alignment for the vertical sides.
+	 * @param {sap.ui.core.popover.PopoverVerticalAlign} [oOptions.verticalAlign] Cross-axis alignment for the horizontal sides.
+	 * @param {number} [oOptions.edgeMargin=0] Gap kept from each within-area edge by the clamp.
+	 * @returns {{near: string, far: string, delta: number}|null} The CSS edge names
+	 * spanning the cross axis and the pixel delta to apply, or <code>null</code>
+	 * when the cross axis is not opener-bound
+	 * @public
+	 * @since 1.155
+	 * @ui5-restricted sap.m, sap.ui.core
+	 */
+	Positioning.computeCrossAxisDockDelta = (oOptions) => {
+		if (!oOptions.openerRef || !oOptions.popoverRef || !Positioning.isCrossAxisOpenerBound(oOptions)) {
+			return null;
+		}
+
+		const oHostRect = oOptions.openerRef.getBoundingClientRect();
+		const oTipRect = oOptions.popoverRef.getBoundingClientRect();
+		const oBounds = Positioning.getWithinAreaBounds(oOptions.withinAreaRef);
+		const iEdgeMargin = oOptions.edgeMargin ?? 0;
+
+		// Add to fDockDelta the extra shift that keeps the docked box inside the
+		// within-area. fNear/fFar are the box's near/far cross-axis edges AFTER the
+		// dock; iLoBound/iHiBound are the visible band (inset by the edge margin).
+		// Pull in against the near bound first so an over-wide box overflows the far
+		// edge instead of vanishing past the near one.
+		const clampDock = (fDockDelta, fNear, fFar, iLoBound, iHiBound) => {
+			const fDockedNear = fNear + fDockDelta;
+			const fDockedFar = fFar + fDockDelta;
+			let fClamp = 0;
+
+			if (fDockedFar > iHiBound) {
+				fClamp = iHiBound - fDockedFar;
+			}
+
+			if (fDockedNear + fClamp < iLoBound) {
+				fClamp = iLoBound - fDockedNear;
+			}
+
+			return fDockDelta + fClamp;
+		};
+
+		if (isVerticalSide(oOptions.side)) {
+			// Stretch docks like Begin; only End pins the locale end.
+			const bPinnedLeft = (oOptions.horizontalAlign !== PopoverHorizontalAlign.End) !== Localization.getRTL();
+			const fDockDelta = bPinnedLeft
+				? oHostRect.left - oTipRect.left
+				: oHostRect.right - oTipRect.right;
+
+			return {
+				near: "left",
+				far: "right",
+				delta: clampDock(fDockDelta, oTipRect.left, oTipRect.right, oBounds.left + iEdgeMargin, oBounds.right - iEdgeMargin)
+			};
+		}
+
+		// Stretch docks like Top; only Bottom pins the lower edge.
+		const fDockDelta = oOptions.verticalAlign === PopoverVerticalAlign.Bottom
+			? oHostRect.bottom - oTipRect.bottom
+			: oHostRect.top - oTipRect.top;
+
+		return {
+			near: "top",
+			far: "bottom",
+			delta: clampDock(fDockDelta, oTipRect.top, oTipRect.bottom, oBounds.top + iEdgeMargin, oBounds.bottom - iEdgeMargin)
+		};
+	};
 
 	return Positioning;
 });

@@ -9,6 +9,8 @@ sap.ui.define([
 	"use strict";
 
 	const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
+	const PopoverHorizontalAlign = coreLibrary.popover.PopoverHorizontalAlign;
+	const PopoverVerticalAlign = coreLibrary.popover.PopoverVerticalAlign;
 
 	// Plain rect helper used by the computeArrowOffset tests, which accept
 	// pre-measured openerRect/popoverRect rects directly (no DOM needed).
@@ -1122,5 +1124,488 @@ sap.ui.define([
 		});
 		assert.strictEqual(o.maxWidth, 500, "no reservedWidth = full width");
 		assert.strictEqual(o.maxHeight, 400, "no reservedHeight = full height");
+	});
+
+	// ---------------------------------------------------------------------
+	QUnit.module("getWithinAreaBounds", { afterEach: restoreViewport });
+
+	QUnit.test("returns the document viewport when there is no within-area", (assert) => {
+		stubViewport(1000, 800);
+		const o = Positioning.getWithinAreaBounds();
+		assert.deepEqual(o, { left: 0, top: 0, right: 1000, bottom: 800 }, "falls back to the viewport");
+	});
+
+	QUnit.test("returns the document viewport for the window", (assert) => {
+		stubViewport(640, 480);
+		const o = Positioning.getWithinAreaBounds(window);
+		assert.deepEqual(o, { left: 0, top: 0, right: 640, bottom: 480 }, "window = viewport");
+	});
+
+	QUnit.test("returns the within-area's rect when one is given", (assert) => {
+		const oWithin = makeWithinArea(300, 200);
+		const o = Positioning.getWithinAreaBounds(oWithin);
+		// makeWithinArea pins the element at top-left (0,0).
+		assert.strictEqual(o.left, 0, "left from the within-area rect");
+		assert.strictEqual(o.top, 0, "top from the within-area rect");
+		assert.strictEqual(o.right, 300, "right from the within-area rect");
+		assert.strictEqual(o.bottom, 200, "bottom from the within-area rect");
+	});
+
+	// ---------------------------------------------------------------------
+	QUnit.module("isCrossAxisOpenerBound");
+
+	QUnit.test("vertical sides are driven by horizontalAlign", (assert) => {
+		["Top", "Bottom"].forEach((sSide) => {
+			assert.notOk(
+				Positioning.isCrossAxisOpenerBound({ side: sSide, horizontalAlign: PopoverHorizontalAlign.Center }),
+				sSide + " + Center is not opener-bound"
+			);
+			[PopoverHorizontalAlign.Begin, PopoverHorizontalAlign.End, PopoverHorizontalAlign.Stretch].forEach((sAlign) => {
+				assert.ok(
+					Positioning.isCrossAxisOpenerBound({ side: sSide, horizontalAlign: sAlign }),
+					sSide + " + " + sAlign + " is opener-bound"
+				);
+			});
+		});
+	});
+
+	QUnit.test("horizontal sides are driven by verticalAlign", (assert) => {
+		["Left", "Right"].forEach((sSide) => {
+			assert.notOk(
+				Positioning.isCrossAxisOpenerBound({ side: sSide, verticalAlign: PopoverVerticalAlign.Center }),
+				sSide + " + Center is not opener-bound"
+			);
+			[PopoverVerticalAlign.Top, PopoverVerticalAlign.Bottom, PopoverVerticalAlign.Stretch].forEach((sAlign) => {
+				assert.ok(
+					Positioning.isCrossAxisOpenerBound({ side: sSide, verticalAlign: sAlign }),
+					sSide + " + " + sAlign + " is opener-bound"
+				);
+			});
+		});
+	});
+
+	// ---------------------------------------------------------------------
+	QUnit.module("computeAlignedMaxSize", { afterEach: restoreViewport });
+
+	QUnit.test("returns empty without an opener", (assert) => {
+		assert.deepEqual(Positioning.computeAlignedMaxSize({ side: "Bottom" }), {}, "no opener = no limit");
+	});
+
+	QUnit.test("Center alignments impose no limit", (assert) => {
+		stubViewport(1000, 800);
+		const oOpener = makeOpener(100, 300, 180, 60);
+		assert.deepEqual(
+			Positioning.computeAlignedMaxSize({ side: "Bottom", openerRef: oOpener, horizontalAlign: PopoverHorizontalAlign.Center }),
+			{},
+			"Top/Bottom + Center = no width limit"
+		);
+		assert.deepEqual(
+			Positioning.computeAlignedMaxSize({ side: "Left", openerRef: oOpener, verticalAlign: PopoverVerticalAlign.Center }),
+			{},
+			"Left/Right + Center = no height limit"
+		);
+	});
+
+	QUnit.test("Begin leaves only the room towards the end of the within-area", (assert) => {
+		stubViewport(1000, 800);
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const o = Positioning.computeAlignedMaxSize({
+			side: "Bottom",
+			openerRef: oOpener,
+			horizontalAlign: PopoverHorizontalAlign.Begin,
+			edgeMargin: 10
+		});
+		assert.strictEqual(o.maxWidth, 1000 - 300 - 10, "measured from the opener's left edge to the right bound");
+		assert.strictEqual(o.maxHeight, undefined, "no height limit on a vertical side");
+	});
+
+	QUnit.test("End leaves only the room towards the start of the within-area", (assert) => {
+		stubViewport(1000, 800);
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const o = Positioning.computeAlignedMaxSize({
+			side: "Top",
+			openerRef: oOpener,
+			horizontalAlign: PopoverHorizontalAlign.End,
+			edgeMargin: 10
+		});
+		// opener right edge = 300 + 180 = 480, left bound = 0.
+		assert.strictEqual(o.maxWidth, 480 - 0 - 10, "measured from the opener's right edge to the left bound");
+	});
+
+	QUnit.test("Begin/End are mirrored in RTL", (assert) => {
+		stubViewport(1000, 800);
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		const oBegin = Positioning.computeAlignedMaxSize({
+			side: "Bottom", openerRef: oOpener, horizontalAlign: PopoverHorizontalAlign.Begin, edgeMargin: 10
+		});
+		oStub.restore();
+		// In RTL, Begin pins the opener's right edge and keeps the room towards the left.
+		assert.strictEqual(oBegin.maxWidth, 480 - 0 - 10, "RTL Begin measured from the opener's right edge");
+	});
+
+	QUnit.test("Stretch reports the opener's own width", (assert) => {
+		stubViewport(1000, 800);
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const o = Positioning.computeAlignedMaxSize({
+			side: "Bottom", openerRef: oOpener, horizontalAlign: PopoverHorizontalAlign.Stretch, edgeMargin: 10
+		});
+		assert.strictEqual(o.maxWidth, 180, "maxWidth = opener width (edgeMargin ignored)");
+	});
+
+	QUnit.test("vertical Top/Bottom cap the height towards the opposite bound", (assert) => {
+		stubViewport(1000, 800);
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const oTop = Positioning.computeAlignedMaxSize({
+			side: "Left", openerRef: oOpener, verticalAlign: PopoverVerticalAlign.Top, edgeMargin: 10
+		});
+		assert.strictEqual(oTop.maxHeight, 800 - 100 - 10, "Top: opener top edge to the bottom bound");
+
+		const oBottom = Positioning.computeAlignedMaxSize({
+			side: "Left", openerRef: oOpener, verticalAlign: PopoverVerticalAlign.Bottom, edgeMargin: 10
+		});
+		// opener bottom edge = 100 + 60 = 160, top bound = 0.
+		assert.strictEqual(oBottom.maxHeight, 160 - 0 - 10, "Bottom: opener bottom edge to the top bound");
+
+		const oStretch = Positioning.computeAlignedMaxSize({
+			side: "Left", openerRef: oOpener, verticalAlign: PopoverVerticalAlign.Stretch, edgeMargin: 10
+		});
+		assert.strictEqual(oStretch.maxHeight, 60, "Stretch: opener height");
+	});
+
+	// ---------------------------------------------------------------------
+	QUnit.module("computeFittedMaxSize", { afterEach: restoreViewport });
+
+	QUnit.test("without an alignment cap it equals the within-area cap and reports no aligned values", (assert) => {
+		stubViewport(1000, 800);
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const oArgs = {
+			margin: { top: 10, right: 10, bottom: 10, left: 10 },
+			side: "Bottom",
+			openerRef: oOpener,
+			horizontalAlign: PopoverHorizontalAlign.Center
+		};
+		const oBox = Positioning.computeMaxContentSize(oArgs);
+		const o = Positioning.computeFittedMaxSize(oArgs);
+		assert.strictEqual(o.maxWidth, oBox.maxWidth, "maxWidth = within-area width cap");
+		assert.strictEqual(o.maxHeight, oBox.maxHeight, "maxHeight = within-area height cap");
+		assert.strictEqual(o.alignedWidth, undefined, "no aligned width cap");
+		assert.strictEqual(o.alignedHeight, undefined, "no aligned height cap");
+	});
+
+	QUnit.test("folds the aligned cap in with Math.min and reports the raw aligned width", (assert) => {
+		stubViewport(1000, 800);
+		// opener left 300 → Begin aligned cap = 1000 - 300 - 10 = 690, tighter than the
+		// within-area width cap.
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const oArgs = {
+			margin: { top: 10, right: 10, bottom: 10, left: 10 },
+			side: "Bottom",
+			openerRef: oOpener,
+			horizontalAlign: PopoverHorizontalAlign.Begin,
+			edgeMargin: 10
+		};
+		const oBox = Positioning.computeMaxContentSize(oArgs);
+		const o = Positioning.computeFittedMaxSize(oArgs);
+		assert.strictEqual(o.alignedWidth, 1000 - 300 - 10, "raw aligned width reported");
+		assert.strictEqual(o.maxWidth, Math.min(oBox.maxWidth, 690), "maxWidth folds to the tighter aligned cap");
+		assert.strictEqual(o.maxHeight, oBox.maxHeight, "height still the within-area cap on a vertical side");
+	});
+
+	// ---------------------------------------------------------------------
+	QUnit.module("computeCrossAxisEdges");
+
+	QUnit.test("vertical sides span the left/right edges", (assert) => {
+		assert.deepEqual(Positioning.computeCrossAxisEdges("Top"), ["left", "right"], "Top");
+		assert.deepEqual(Positioning.computeCrossAxisEdges("Bottom"), ["left", "right"], "Bottom");
+	});
+
+	QUnit.test("horizontal sides span the top/bottom edges", (assert) => {
+		assert.deepEqual(Positioning.computeCrossAxisEdges("Left"), ["top", "bottom"], "Left");
+		assert.deepEqual(Positioning.computeCrossAxisEdges("Right"), ["top", "bottom"], "Right");
+	});
+
+	// ---------------------------------------------------------------------
+	QUnit.module("computeCrossAxisDockDelta");
+
+	QUnit.test("returns null when the cross axis is not opener-bound", (assert) => {
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const oPopover = makePopover(120, 40);
+		assert.strictEqual(
+			Positioning.computeCrossAxisDockDelta({
+				side: "Bottom", openerRef: oOpener, popoverRef: oPopover, horizontalAlign: PopoverHorizontalAlign.Center
+			}),
+			null,
+			"Center = no dock correction"
+		);
+	});
+
+	QUnit.test("returns null without opener/popover refs", (assert) => {
+		assert.strictEqual(
+			Positioning.computeCrossAxisDockDelta({ side: "Bottom", horizontalAlign: PopoverHorizontalAlign.Begin }),
+			null,
+			"missing refs = null"
+		);
+	});
+
+	QUnit.test("vertical side Begin docks the left edges", (assert) => {
+		// opener left = 300, popover left = 320 → shift left by -20 to align.
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const oPopover = makeOpener(200, 320, 120, 40);
+		const o = Positioning.computeCrossAxisDockDelta({
+			side: "Bottom", openerRef: oOpener, popoverRef: oPopover, horizontalAlign: PopoverHorizontalAlign.Begin
+		});
+		assert.strictEqual(o.near, "left", "near edge = left");
+		assert.strictEqual(o.far, "right", "far edge = right");
+		assert.strictEqual(o.delta, 300 - 320, "delta = opener.left - popover.left");
+	});
+
+	QUnit.test("vertical side End docks the right edges", (assert) => {
+		// opener right = 480, popover right = 440 → shift right by +40.
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const oPopover = makeOpener(200, 320, 120, 40);
+		const o = Positioning.computeCrossAxisDockDelta({
+			side: "Bottom", openerRef: oOpener, popoverRef: oPopover, horizontalAlign: PopoverHorizontalAlign.End
+		});
+		assert.strictEqual(o.delta, (300 + 180) - (320 + 120), "delta = opener.right - popover.right");
+	});
+
+	QUnit.test("vertical side is mirrored in RTL (Begin pins the right edge)", (assert) => {
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const oPopover = makeOpener(200, 320, 120, 40);
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		const o = Positioning.computeCrossAxisDockDelta({
+			side: "Bottom", openerRef: oOpener, popoverRef: oPopover, horizontalAlign: PopoverHorizontalAlign.Begin
+		});
+		oStub.restore();
+		assert.strictEqual(o.delta, (300 + 180) - (320 + 120), "RTL Begin = opener.right - popover.right");
+	});
+
+	QUnit.test("horizontal side Top docks the top edges", (assert) => {
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const oPopover = makeOpener(120, 500, 120, 40);
+		const o = Positioning.computeCrossAxisDockDelta({
+			side: "Right", openerRef: oOpener, popoverRef: oPopover, verticalAlign: PopoverVerticalAlign.Top
+		});
+		assert.strictEqual(o.near, "top", "near edge = top");
+		assert.strictEqual(o.far, "bottom", "far edge = bottom");
+		assert.strictEqual(o.delta, 100 - 120, "delta = opener.top - popover.top");
+	});
+
+	QUnit.test("horizontal side Bottom docks the bottom edges", (assert) => {
+		const oOpener = makeOpener(100, 300, 180, 60);
+		const oPopover = makeOpener(120, 500, 120, 40);
+		const o = Positioning.computeCrossAxisDockDelta({
+			side: "Right", openerRef: oOpener, popoverRef: oPopover, verticalAlign: PopoverVerticalAlign.Bottom
+		});
+		assert.strictEqual(o.delta, (100 + 60) - (120 + 40), "delta = opener.bottom - popover.bottom");
+	});
+
+	QUnit.test("clamps the docked box inside the within-area near bound (Begin, opener off-screen start)", (assert) => {
+		// Within-area [0, 500]; opener's left edge is at -40 (partially off-screen
+		// start). Docking Begin on the opener's left would push the box to -40, so
+		// the clamp pulls its left edge back to the edge margin (10).
+		const oWithin = makeWithinArea(500, 400);
+		const oOpener = makeOpener(100, -40, 180, 60);
+		const oPopover = makeOpener(200, 20, 120, 40);
+		const o = Positioning.computeCrossAxisDockDelta({
+			side: "Bottom", openerRef: oOpener, popoverRef: oPopover,
+			withinAreaRef: oWithin, horizontalAlign: PopoverHorizontalAlign.Begin, edgeMargin: 10
+		});
+		// popover.left (20) + delta must land on the near bound (0 + 10).
+		assert.strictEqual(20 + o.delta, 10, "box left edge clamped to within-area left + margin");
+	});
+
+	QUnit.test("clamps the docked box inside the within-area far bound (End, opener off-screen end)", (assert) => {
+		// Within-area [0, 500]; opener's right edge is at 540 (past the end bound).
+		// Docking End on the opener's right would push the box past 540, so the
+		// clamp pulls its right edge back to within-area right - margin (490).
+		const oWithin = makeWithinArea(500, 400);
+		const oOpener = makeOpener(100, 360, 180, 60);
+		const oPopover = makeOpener(200, 300, 120, 40);
+		const o = Positioning.computeCrossAxisDockDelta({
+			side: "Bottom", openerRef: oOpener, popoverRef: oPopover,
+			withinAreaRef: oWithin, horizontalAlign: PopoverHorizontalAlign.End, edgeMargin: 10
+		});
+		// popover.right (420) + delta must land on the far bound (500 - 10).
+		assert.strictEqual(420 + o.delta, 490, "box right edge clamped to within-area right - margin");
+	});
+
+	QUnit.test("no clamp when the docked box fits inside the within-area", (assert) => {
+		// Opener fully visible: the raw dock delta is kept untouched.
+		const oWithin = makeWithinArea(500, 400);
+		const oOpener = makeOpener(100, 200, 120, 60);
+		const oPopover = makeOpener(200, 240, 100, 40);
+		const o = Positioning.computeCrossAxisDockDelta({
+			side: "Bottom", openerRef: oOpener, popoverRef: oPopover,
+			withinAreaRef: oWithin, horizontalAlign: PopoverHorizontalAlign.Begin, edgeMargin: 10
+		});
+		assert.strictEqual(o.delta, 200 - 240, "delta = opener.left - popover.left, unclamped");
+	});
+
+	QUnit.test("over-wide box overflows the far edge, never the near edge (Begin)", (assert) => {
+		// Box wider than the visible band: pin the near (left) edge to the margin
+		// and let the far edge overflow, so the box is never dragged off the near side.
+		const oWithin = makeWithinArea(200, 400);
+		const oOpener = makeOpener(100, -30, 120, 60);
+		const oPopover = makeOpener(200, 10, 300, 40);
+		const o = Positioning.computeCrossAxisDockDelta({
+			side: "Bottom", openerRef: oOpener, popoverRef: oPopover,
+			withinAreaRef: oWithin, horizontalAlign: PopoverHorizontalAlign.Begin, edgeMargin: 10
+		});
+		assert.strictEqual(10 + o.delta, 10, "box left edge pinned to within-area left + margin");
+	});
+
+	QUnit.test("clamps the docked box inside the within-area (vertical align, horizontal side)", (assert) => {
+		// Horizontal side (Left/Right) → vertical cross axis. Opener's top is above
+		// the top bound, so docking Top would push the box off-screen upward.
+		const oWithin = makeWithinArea(500, 400);
+		const oOpener = makeOpener(-20, 300, 120, 60);
+		const oPopover = makeOpener(40, 500, 120, 40);
+		const o = Positioning.computeCrossAxisDockDelta({
+			side: "Right", openerRef: oOpener, popoverRef: oPopover,
+			withinAreaRef: oWithin, verticalAlign: PopoverVerticalAlign.Top, edgeMargin: 10
+		});
+		assert.strictEqual(o.near, "top", "near edge = top");
+		assert.strictEqual(40 + o.delta, 10, "box top edge clamped to within-area top + margin");
+	});
+
+	// ---------------------------------------------------------------------
+	QUnit.module("resolveCrossAxisAlign", { afterEach: restoreViewport });
+
+	QUnit.test("returns the requested align without refs", (assert) => {
+		assert.strictEqual(
+			Positioning.resolveCrossAxisAlign({ side: "Bottom", horizontalAlign: PopoverHorizontalAlign.Begin }),
+			PopoverHorizontalAlign.Begin,
+			"missing refs → unchanged"
+		);
+	});
+
+	QUnit.test("Center and Stretch never flip", (assert) => {
+		stubViewport(500, 500);
+		const oWithin = makeWithinArea(500, 500);
+		const oOpener = makeOpener(0, 450, 50, 50); // opener at the right edge
+		const oPopover = makePopover(300, 50);      // too wide to grow right
+
+		[PopoverHorizontalAlign.Center, PopoverHorizontalAlign.Stretch].forEach((sAlign) => {
+			assert.strictEqual(
+				Positioning.resolveCrossAxisAlign({
+					side: "Bottom", openerRef: oOpener, popoverRef: oPopover,
+					withinAreaRef: oWithin, horizontalAlign: sAlign
+				}),
+				sAlign,
+				sAlign + " is not flipped"
+			);
+		});
+	});
+
+	QUnit.test("Begin keeps Begin when the end-side room fits (LTR)", (assert) => {
+		stubViewport(500, 500);
+		const oWithin = makeWithinArea(500, 500);
+		const oOpener = makeOpener(0, 50, 50, 50); // room to the right (450)
+		const oPopover = makePopover(100, 50);     // fits the end-side room
+		assert.strictEqual(
+			Positioning.resolveCrossAxisAlign({
+				side: "Bottom", openerRef: oOpener, popoverRef: oPopover,
+				withinAreaRef: oWithin, horizontalAlign: PopoverHorizontalAlign.Begin
+			}),
+			PopoverHorizontalAlign.Begin,
+			"fits → stays Begin"
+		);
+	});
+
+	QUnit.test("Begin flips to End when the end-side room is too small and the start side has more (LTR)", (assert) => {
+		stubViewport(500, 500);
+		const oWithin = makeWithinArea(500, 500);
+		// opener left edge at 450 → end-side room = 50; start-side room = 500 (opener right).
+		const oOpener = makeOpener(0, 450, 50, 50);
+		const oPopover = makePopover(200, 50); // wider than the 50px end-side room
+		assert.strictEqual(
+			Positioning.resolveCrossAxisAlign({
+				side: "Bottom", openerRef: oOpener, popoverRef: oPopover,
+				withinAreaRef: oWithin, horizontalAlign: PopoverHorizontalAlign.Begin
+			}),
+			PopoverHorizontalAlign.End,
+			"no end-side room, more start-side room → End"
+		);
+	});
+
+	QUnit.test("End flips to Begin symmetrically (LTR)", (assert) => {
+		stubViewport(500, 500);
+		const oWithin = makeWithinArea(500, 500);
+		// opener right edge at 50 → End grows towards start, room = 50; Begin side room = 450.
+		const oOpener = makeOpener(0, 0, 50, 50);
+		const oPopover = makePopover(200, 50);
+		assert.strictEqual(
+			Positioning.resolveCrossAxisAlign({
+				side: "Bottom", openerRef: oOpener, popoverRef: oPopover,
+				withinAreaRef: oWithin, horizontalAlign: PopoverHorizontalAlign.End
+			}),
+			PopoverHorizontalAlign.Begin,
+			"no start-side room, more end-side room → Begin"
+		);
+	});
+
+	QUnit.test("keeps the requested align when neither side fits", (assert) => {
+		stubViewport(500, 500);
+		const oWithin = makeWithinArea(500, 500);
+		const oOpener = makeOpener(0, 225, 50, 50); // centered → 275 each side
+		const oPopover = makePopover(400, 50);      // fits neither side
+		assert.strictEqual(
+			Positioning.resolveCrossAxisAlign({
+				side: "Bottom", openerRef: oOpener, popoverRef: oPopover,
+				withinAreaRef: oWithin, horizontalAlign: PopoverHorizontalAlign.Begin
+			}),
+			PopoverHorizontalAlign.Begin,
+			"neither fits → keep Begin"
+		);
+	});
+
+	QUnit.test("the horizontal flip is mirrored in RTL", (assert) => {
+		stubViewport(500, 500);
+		const oWithin = makeWithinArea(500, 500);
+		// RTL: Begin grows towards the left (locale start = right edge). opener left-edge
+		// at 0 → leftwards room = 50; rightwards room = 500 → flip to End.
+		const oOpener = makeOpener(0, 0, 50, 50);
+		const oPopover = makePopover(200, 50);
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		const sResult = Positioning.resolveCrossAxisAlign({
+			side: "Bottom", openerRef: oOpener, popoverRef: oPopover,
+			withinAreaRef: oWithin, horizontalAlign: PopoverHorizontalAlign.Begin
+		});
+		oStub.restore();
+		assert.strictEqual(sResult, PopoverHorizontalAlign.End, "RTL Begin with no leftwards room → End");
+	});
+
+	QUnit.test("Top flips to Bottom on a horizontal side when the downward room is too small", (assert) => {
+		stubViewport(500, 500);
+		const oWithin = makeWithinArea(500, 500);
+		// opener top edge at 450 → downward room = 50; upward room = 500.
+		const oOpener = makeOpener(450, 0, 50, 50);
+		const oPopover = makePopover(50, 200);
+		assert.strictEqual(
+			Positioning.resolveCrossAxisAlign({
+				side: "Right", openerRef: oOpener, popoverRef: oPopover,
+				withinAreaRef: oWithin, verticalAlign: PopoverVerticalAlign.Top
+			}),
+			PopoverVerticalAlign.Bottom,
+			"no downward room → Bottom"
+		);
+	});
+
+	QUnit.test("Bottom flips to Top on a horizontal side symmetrically", (assert) => {
+		stubViewport(500, 500);
+		const oWithin = makeWithinArea(500, 500);
+		// opener bottom edge at 50 → upward room = 50; downward room = 450.
+		const oOpener = makeOpener(0, 0, 50, 50);
+		const oPopover = makePopover(50, 200);
+		assert.strictEqual(
+			Positioning.resolveCrossAxisAlign({
+				side: "Left", openerRef: oOpener, popoverRef: oPopover,
+				withinAreaRef: oWithin, verticalAlign: PopoverVerticalAlign.Bottom
+			}),
+			PopoverVerticalAlign.Top,
+			"no upward room → Top"
+		);
 	});
 });

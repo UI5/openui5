@@ -91,6 +91,8 @@ sap.ui.define([
 			 "sap.ui.core.dnd.DropLayout",
 			 "sap.ui.core.dnd.DropPosition",
 			 "sap.ui.core.popover.PopoverPlacement",
+			 "sap.ui.core.popover.PopoverHorizontalAlign",
+			 "sap.ui.core.popover.PopoverVerticalAlign",
 			 "sap.ui.core.mvc.ViewType",
 			 "sap.ui.core.routing.HistoryDirection"
 		 ],
@@ -2409,6 +2411,92 @@ sap.ui.define([
 		End : "End"
 	};
 	DataType.registerEnum("sap.ui.core.popover.PopoverPlacement", thisLib.popover.PopoverPlacement);
+
+	/**
+	 * Horizontal alignment of a popover / tooltip relative to its opener.
+	 *
+	 * Only relevant for the horizontal cross axis, that is,
+	 * when the popover is placed above or below its opener.
+	 *
+	 * @enum {string}
+	 * @private
+	 * @ui5-restricted sap.m, sap.ui.core
+	 * @since 1.155
+	 */
+	thisLib.popover.PopoverHorizontalAlign = {
+
+		/**
+		 * Centered on the opener.
+		 * @private
+		 * @ui5-restricted sap.m, sap.ui.core
+		 */
+		Center : "Center",
+
+		/**
+		 * Aligned with the locale-relative start of the opener (left in LTR, right in RTL).
+		 * @private
+		 * @ui5-restricted sap.m, sap.ui.core
+		 */
+		Begin : "Begin",
+
+		/**
+		 * Aligned with the locale-relative end of the opener (right in LTR, left in RTL).
+		 * @private
+		 * @ui5-restricted sap.m, sap.ui.core
+		 */
+		End : "End",
+
+		/**
+		 * Stretched to the width of the opener.
+		 * @private
+		 * @ui5-restricted sap.m, sap.ui.core
+		 */
+		Stretch : "Stretch"
+	};
+	DataType.registerEnum("sap.ui.core.popover.PopoverHorizontalAlign", thisLib.popover.PopoverHorizontalAlign);
+
+	/**
+	 * Vertical alignment of a popover / tooltip relative to its opener.
+	 *
+	 * Only relevant for the vertical cross axis,
+	 * that is, when the popover is placed at the start or end of its opener.
+	 *
+	 * @enum {string}
+	 * @private
+	 * @ui5-restricted sap.m, sap.ui.core
+	 * @since 1.155
+	 */
+	thisLib.popover.PopoverVerticalAlign = {
+
+		/**
+		 * Centered on the opener.
+		 * @private
+		 * @ui5-restricted sap.m, sap.ui.core
+		 */
+		Center : "Center",
+
+		/**
+		 * Aligned with the top of the opener.
+		 * @private
+		 * @ui5-restricted sap.m, sap.ui.core
+		 */
+		Top : "Top",
+
+		/**
+		 * Aligned with the bottom of the opener.
+		 * @private
+		 * @ui5-restricted sap.m, sap.ui.core
+		 */
+		Bottom : "Bottom",
+
+		/**
+		 * Stretched to the height of the opener.
+		 * @private
+		 * @ui5-restricted sap.m, sap.ui.core
+		 */
+		Stretch : "Stretch"
+	};
+	DataType.registerEnum("sap.ui.core.popover.PopoverVerticalAlign", thisLib.popover.PopoverVerticalAlign);
 
 	/**
 	 * Configuration options for the layout of the droppable controls.

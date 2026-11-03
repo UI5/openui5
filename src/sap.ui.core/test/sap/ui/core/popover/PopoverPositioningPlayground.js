@@ -37,6 +37,8 @@ sap.ui.define([
 
 	const PlacementType = mLibrary.PlacementType;
 	const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
+	const PopoverHorizontalAlign = coreLibrary.popover.PopoverHorizontalAlign;
+	const PopoverVerticalAlign = coreLibrary.popover.PopoverVerticalAlign;
 
 	// ---- Configuration --------------------------------------------------
 	const aPopoverPlacements = [
@@ -57,6 +59,8 @@ sap.ui.define([
 		PlacementType.Auto
 	];
 	const aTooltipPlacements = Object.values(PopoverPlacement);
+	const aHorizontalAligns = Object.values(PopoverHorizontalAlign);
+	const aVerticalAligns = Object.values(PopoverVerticalAlign);
 
 	const mContent = {
 		"short": "Short tooltip text.",
@@ -89,6 +93,8 @@ sap.ui.define([
 
 	let sControl = "Popover";
 	let sPlacement = PlacementType.Top;
+	let sHorizontalAlign = PopoverHorizontalAlign.Center;
+	let sVerticalAlign = PopoverVerticalAlign.Center;
 	let sSize = "medium";
 	let bWithinArea = false;
 	let bShowArrow = true;
@@ -215,7 +221,13 @@ sap.ui.define([
 		const sText = mContent[sSize];
 
 		if (sControl === "Tooltip") {
-			oCurrent = new Tooltip({ placement: sPlacement, text: sText, delay: 0 });
+			oCurrent = new Tooltip({
+				placement: sPlacement,
+				horizontalAlign: sHorizontalAlign,
+				verticalAlign: sVerticalAlign,
+				text: sText,
+				delay: 0
+			});
 			oCurrent.attachAfterClose(function () { oCurrent = null; });
 			oCurrent.openBy(oOpener, 0);
 		} else {
@@ -267,6 +279,50 @@ sap.ui.define([
 		oPlacementSelect.setSelectedKey(sPlacement);
 	}
 
+	// horizontalAlign / verticalAlign are core Tooltip properties; sap.m.Popover
+	// has no equivalent, so these selects are only shown for the Tooltip control.
+	const oHorizontalAlignSelect = new Select({
+		id: "ppp-halign",
+		selectedKey: sHorizontalAlign,
+		items: aHorizontalAligns.map(function (s) {
+			return new Item({ key: s, text: s });
+		}),
+		change: function (oEvent) {
+			sHorizontalAlign = oEvent.getParameter("selectedItem").getKey();
+			closeCurrent();
+		}
+	});
+
+	const oHorizontalAlignLabel = new Label({ text: "horizontalAlign", showColon: true });
+	oHorizontalAlignLabel.addStyleClass("sapUiTinyMarginBegin sapUiTinyMarginEnd");
+
+	const oVerticalAlignSelect = new Select({
+		id: "ppp-valign",
+		selectedKey: sVerticalAlign,
+		items: aVerticalAligns.map(function (s) {
+			return new Item({ key: s, text: s });
+		}),
+		change: function (oEvent) {
+			sVerticalAlign = oEvent.getParameter("selectedItem").getKey();
+			closeCurrent();
+		}
+	});
+
+	const oVerticalAlignLabel = new Label({ text: "verticalAlign", showColon: true });
+	oVerticalAlignLabel.addStyleClass("sapUiTinyMarginBegin sapUiTinyMarginEnd");
+
+	// Toggle visibility of the align selects with the active control.
+	function syncAlignVisibility() {
+		const bTooltip = sControl === "Tooltip";
+		oHorizontalAlignLabel.setVisible(bTooltip);
+		oHorizontalAlignSelect.setVisible(bTooltip);
+		oVerticalAlignLabel.setVisible(bTooltip);
+		oVerticalAlignSelect.setVisible(bTooltip);
+	}
+
+	// Default control is Popover, so hide the Tooltip-only align selects up front.
+	syncAlignVisibility();
+
 	const oControlSwitch = new SegmentedButton({
 		id: "ppp-control",
 		contentMode: "ContentFit",
@@ -279,6 +335,7 @@ sap.ui.define([
 			sControl = oEvent.getParameter("item").getKey();
 			oShowArrowCheck.setVisible(sControl === "Popover");
 			syncPlacementItems();
+			syncAlignVisibility();
 			closeCurrent();
 		}
 	});
@@ -369,7 +426,11 @@ sap.ui.define([
 				items: [
 					new Label({ text: "PopoverPlacement", showColon: true }).addStyleClass("sapUiTinyMarginEnd"),
 					oPlacementSelect,
-					oShowArrowCheck.addStyleClass("sapUiTinyMarginBegin")
+					oShowArrowCheck.addStyleClass("sapUiTinyMarginBegin"),
+					oHorizontalAlignLabel,
+					oHorizontalAlignSelect,
+					oVerticalAlignLabel,
+					oVerticalAlignSelect
 				]
 			}).addStyleClass("sapUiTinyMarginTop")
 		]
