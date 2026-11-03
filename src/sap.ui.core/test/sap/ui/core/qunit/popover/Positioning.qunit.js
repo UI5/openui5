@@ -4,8 +4,9 @@ sap.ui.define([
 	"sap/ui/core/library",
 	"sap/ui/core/popover/PopoverFlipMode",
 	"sap/base/i18n/Localization",
-	"sap/ui/dom/getScrollbarSize"
-], (Positioning, coreLibrary, FlipMode, Localization, getScrollbarSize) => {
+	"sap/ui/dom/getScrollbarSize",
+	"sap/base/Log"
+], (Positioning, coreLibrary, FlipMode, Localization, getScrollbarSize, Log) => {
 	"use strict";
 
 	const PopoverPlacement = coreLibrary.popover.PopoverPlacement;
@@ -586,6 +587,76 @@ sap.ui.define([
 			margin: NO_MARGINS,
 			arrowSize: 0
 		}), "Bottom", "tie honours the preferred Bottom");
+	});
+
+	// ---------------------------------------------------------------------
+	QUnit.module("resolvePlacement — absent popoverRef");
+
+	QUnit.test("null popoverRef does not throw and resolves from opener geometry", (assert) => {
+		const oWithin = makeWithinArea(500, 500);
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.PureSpace,
+			openerRef: makeOpener(50, 0, 50, 50), // high on screen → more room below
+			popoverRef: null,                     // not rendered yet
+			withinAreaRef: oWithin,
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Bottom", "opener high on screen → Bottom, no crash");
+
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.PureSpace,
+			openerRef: makeOpener(450, 0, 50, 50), // low on screen → more room above
+			popoverRef: null,
+			withinAreaRef: oWithin,
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Top", "opener low on screen → Top, no crash");
+	});
+
+	QUnit.test("null popoverRef with strict Begin (Never) still returns Left", (assert) => {
+		assert.strictEqual(Positioning.resolvePlacement({
+			placement: PopoverPlacement.Begin,
+			flipMode: FlipMode.Never,
+			openerRef: makeOpener(0, 200, 10, 10),
+			popoverRef: null,
+			withinAreaRef: makeWithinArea(400, 400),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		}), "Left", "strict side resolves without measuring the popover");
+	});
+
+	QUnit.test("null popoverRef matches an explicit zero-size popover", (assert) => {
+		const makeOpts = (popoverRef) => ({
+			placement: PopoverPlacement.Bottom,
+			flipMode: FlipMode.MoreSpace,
+			openerRef: makeOpener(50, 0, 50, 50),
+			popoverRef,
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		});
+		const sWithNull = Positioning.resolvePlacement(makeOpts(null));
+		const sWithZero = Positioning.resolvePlacement(makeOpts(makePopover(0, 0)));
+		assert.strictEqual(sWithNull, sWithZero, "absent popoverRef is equivalent to a 0×0 popover");
+	});
+
+	QUnit.test("a missing popoverRef logs a warning", (assert) => {
+		const oWarningSpy = sinon.spy(Log, "warning");
+
+		Positioning.resolvePlacement({
+			placement: PopoverPlacement.Top,
+			flipMode: FlipMode.PureSpace,
+			openerRef: makeOpener(50, 0, 50, 50),
+			popoverRef: null,
+			withinAreaRef: makeWithinArea(500, 500),
+			margin: NO_MARGINS,
+			arrowSize: 0
+		});
+
+		assert.ok(oWarningSpy.calledWithMatch(/popoverRef is missing/), "Log.warning was called for the missing popoverRef");
+		oWarningSpy.restore();
 	});
 
 	// ---------------------------------------------------------------------
