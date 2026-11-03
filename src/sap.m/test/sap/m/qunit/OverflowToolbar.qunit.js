@@ -41,7 +41,8 @@ sap.ui.define([
 	"sap/m/SegmentedButton",
 	"sap/m/SegmentedButtonItem",
 	"sap/ui/core/Core",
-	"sap/ui/qunit/utils/nextUIUpdate"
+	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/Device"
 ], function(
 	Library,
 	DomUnitsRem,
@@ -82,7 +83,8 @@ sap.ui.define([
 	SegmentedButton,
 	SegmentedButtonItem,
 	oCore,
-	nextUIUpdate
+	nextUIUpdate,
+	Device
 ) {
 	"use strict";
 
@@ -4177,5 +4179,28 @@ sap.ui.define([
 		assert.strictEqual(oPopoverButton.getType(), sNewType, "Changed button type is correctly applied in the Popover");
 
 		oOTB.destroy();
+	});
+
+	QUnit.module("Overflow popover opening");
+
+	QUnit.test("pressing the overflow button opens the overflow popover on phone", function(assert) {
+		// Arrange
+		const bPhone = Device.system.phone;
+		Device.system.phone = true;
+
+		const oOTB = createOverflowToolbar({}, [
+			getButton("B1", OverflowToolbarPriority.AlwaysOverflow),
+			getButton("B2", OverflowToolbarPriority.AlwaysOverflow)
+		]);
+
+		// Act
+		oOTB._getOverflowButton().firePress();
+
+		// Assert
+		assert.ok(oOTB._getPopover().isOpen(), "The overflow popover is open");
+
+		// Clean up
+		oOTB.destroy();
+		Device.system.phone = bPhone;
 	});
 });

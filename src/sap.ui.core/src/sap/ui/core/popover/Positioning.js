@@ -3,13 +3,14 @@
  */
 
 sap.ui.define([
+	"sap/base/Log",
 	"sap/base/util/clamp",
 	"sap/base/i18n/Localization",
 	"sap/ui/dom/getScrollbarSize",
 	"sap/ui/core/popover/PopoverPhysicalSide",
 	"sap/ui/core/popover/PopoverFlipMode",
 	"sap/ui/core/library"
-], (clamp, Localization, getScrollbarSize, PopoverPhysicalSide, PopoverFlipMode, coreLib) => {
+], (Log, clamp, Localization, getScrollbarSize, PopoverPhysicalSide, PopoverFlipMode, coreLib) => {
 	"use strict";
 
 	// Shortcut for sap.ui.core.popover.PopoverPlacement
@@ -473,7 +474,16 @@ sap.ui.define([
 			return sPlacement; // Top | Bottom pass through
 		}
 
-		const oPopoverRect = getOpenerRect(oOptions.popoverRef);
+		if (!oOptions.openerRef) {
+			Log.warning("Positioning.resolvePlacement: openerRef is missing", null, "sap.ui.core.popover.Positioning");
+		}
+		if (!oOptions.popoverRef) {
+			Log.warning("Positioning.resolvePlacement: popoverRef is missing", null, "sap.ui.core.popover.Positioning");
+		}
+
+		const oPopoverRect = oOptions.popoverRef
+			? getOpenerRect(oOptions.popoverRef)
+			: { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 };
 		const oOpts = Object.assign({}, oOptions, {
 			openerRect: getOpenerRect(oOptions.openerRef),
 			popoverSize: { width: oPopoverRect.width, height: oPopoverRect.height },
