@@ -168,7 +168,8 @@ sap.ui.define([
 			{ name: "getContext", args: { controlId: "c1", actionId: "a1" } },
 			{ name: "saveChanges", args: undefined },
 			{ name: "saveAndReloadApp", args: undefined },
-			{ name: "saveAndActivateChanges", args: { title: "v1" } }
+			{ name: "saveAndActivateChanges", args: { title: "v1" } },
+			{ name: "stopRTA", args: undefined }
 		].forEach(function(oCase) {
 			QUnit.test(`when ${oCase.name} is called before startRTA`, async function(assert) {
 				const oResult = await FrontendActionsAPI[oCase.name](oCase.args);
@@ -584,6 +585,50 @@ sap.ui.define([
 				"then the failure carries the GENERIC_ERROR code"
 			);
 			assert.strictEqual(oResult.error.getMessage(), "reload boom", "then the failure carries the underlying error message");
+		});
+
+		QUnit.test("when stopRTA is called", async function(assert) {
+			await FrontendActionsAPI.startRTA({ agentName: "TestAgent" });
+			const oRtaInstance = this.aStartedInstances[0];
+			// Spy (not stub) so the real stop lifecycle runs — the instance is torn
+			// down and FrontendActionsAPI's own stop handler resets the module state.
+			const oStopSpy = sandbox.spy(oRtaInstance, "stop");
+
+			const oResult = await FrontendActionsAPI.stopRTA();
+
+			assert.strictEqual(oResult.isSuccess, true, "then a success envelope is returned");
+			assert.strictEqual(oStopSpy.callCount, 1, "then RTA is stopped");
+			assert.deepEqual(
+				oStopSpy.getCall(0).args,
+				[false, false, false],
+				"then stop is called the same way the toolbar Exit action does (prompting to save)"
+			);
+			assert.strictEqual(RuntimeAuthoring.getCurrentInstance(), undefined, "then no RTA instance remains current");
+		});
+
+		QUnit.test("when stopRTA is called and stop resolves without firing the stop event (user cancelled)", async function(assert) {
+			await FrontendActionsAPI.startRTA({ agentName: "TestAgent" });
+			const oRtaInstance = this.aStartedInstances[0];
+			// RuntimeAuthoring.stop() always resolves — it swallows user-cancel and internal errors
+			// internally, never rethrowing. The cancel/fail path is detected by checking whether
+			// oRta was cleared (which only happens when the "stop" event fires on success).
+			// Simulate: stop() resolves but the "stop" event never fires (user clicked Cancel).
+			const oStopStub = sandbox.stub(oRtaInstance, "stop").resolves();
+
+			const oResult = await FrontendActionsAPI.stopRTA();
+
+			assert.strictEqual(oResult.isSuccess, false, "then a failure envelope is returned when stop resolved without the stop event");
+			assert.strictEqual(
+				oResult.error.getCode(),
+				FrontendActionError.ErrorCodes.GENERIC_ERROR,
+				"then the failure carries the GENERIC_ERROR code"
+			);
+
+			// The stubbed stop left oRta intact, so restore and stop for real here;
+			// otherwise afterEach's cleanup would hang on the live RTA instance.
+			oStopStub.restore();
+			await stopRta(oRtaInstance);
+			this.aStartedInstances.length = 0;
 		});
 
 		QUnit.test("when callAction applies a change that introduces a reload requirement", async function(assert) {
