@@ -667,6 +667,11 @@ function(
 			this._$dialog = this.$();
 
 			if (!this.isOpen() && !this._bDuringOpenCalled) {
+				// Ensure scroll enablement is initialized before setting the initial focus.
+				if (this._oScroller && !this._oScroller._$Container) {
+					this._oScroller.onAfterRendering();
+				}
+
 				this._duringOpen();
 			}
 
