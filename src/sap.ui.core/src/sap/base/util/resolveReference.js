@@ -39,8 +39,8 @@ sap.ui.define(["sap/base/util/ObjectPath"], function(ObjectPath) {
 		return vValue === eval || vValue === setTimeout || vValue === setInterval
 			|| vValue === document.write || vValue === document.writeln
 			|| vValue === location.assign || vValue === location.replace
-			|| (oJQuery && vValue === oJQuery.globalEval)
-			|| (oJQuery && oJQuery.sap && vValue === oJQuery.sap.globalEval);
+			|| (oJQuery && (vValue === oJQuery.globalEval || vValue === oJQuery.getScript || vValue === oJQuery._evalUrl))
+			|| (oJQuery && oJQuery.sap && (vValue === oJQuery.sap.globalEval || vValue === oJQuery.sap.includeScript));
 	}
 
 	/**
