@@ -1039,6 +1039,7 @@ function(
 		NumericInput.prototype.onsappageup = function (oEvent) {
 			// prevent document scrolling when page up key is pressed
 			oEvent.preventDefault();
+			oEvent.setMarked();
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
@@ -1055,6 +1056,7 @@ function(
 		NumericInput.prototype.onsappagedown = function (oEvent) {
 			// prevent document scrolling when page down key is pressed
 			oEvent.preventDefault();
+			oEvent.setMarked();
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
@@ -1069,6 +1071,7 @@ function(
 		 * @param {jQuery.Event} oEvent Event object
 		 */
 		NumericInput.prototype.onsappageupmodifiers = function (oEvent) {
+			oEvent.setMarked();
 			if (this.getEditable() && this._isNumericLike(this._getMax()) && !(oEvent.ctrlKey || oEvent.metaKey || oEvent.altKey) && oEvent.shiftKey) {
 				this._bDelayedEventFire = true;
 				this._fTempValue = this._parseNumber(this._getInput().getValue());
@@ -1083,6 +1086,7 @@ function(
 		 * @param {jQuery.Event} oEvent Event object
 		 */
 		NumericInput.prototype.onsappagedownmodifiers = function (oEvent) {
+			oEvent.setMarked();
 			if (this.getEditable() && this._isNumericLike(this._getMin()) && !(oEvent.ctrlKey || oEvent.metaKey || oEvent.altKey) && oEvent.shiftKey) {
 				this._bDelayedEventFire = true;
 				this._fTempValue = this._parseNumber(this._getInput().getValue());
@@ -1098,12 +1102,12 @@ function(
 		 */
 		NumericInput.prototype.onsapup = function (oEvent) {
 			oEvent.preventDefault(); //prevents the value to increase by one (Chrome and Firefox default behavior)
+			oEvent.setMarked();
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
 				this._changeValueWithStep(1, true);
 				this._verifyValueIfNeeded();
-				oEvent.setMarked();
 			}
 		};
 
@@ -1114,12 +1118,12 @@ function(
 		 */
 		NumericInput.prototype.onsapdown = function (oEvent) {
 			oEvent.preventDefault(); //prevents the value to decrease by one (Chrome and Firefox default behavior)
+			oEvent.setMarked();
 
 			if (this.getEditable()) {
 				this._bDelayedEventFire = true;
 				this._changeValueWithStep(-1, true);
 				this._verifyValueIfNeeded();
-				oEvent.setMarked();
 			}
 		};
 
@@ -1148,11 +1152,13 @@ function(
 				fMin;
 
 			if (!this.getEditable()) {
+				oEvent.setMarked();
 				return;
 			}
 
 			if (oEvent.which === KeyCodes.ENTER && this._fTempValue !== this.getValue()) {
 				oEvent.preventDefault();
+				oEvent.setMarked();
 				this._changeValue();
 				return;
 			}
@@ -1184,6 +1190,7 @@ function(
 			// do change if there is any step set
 			if (fStep !== undefined) {
 				oEvent.preventDefault();
+				oEvent.setMarked();
 				if (fStep !== 0) {
 					this._bDelayedEventFire = true;
 					this._changeValueWithStep(fStep);
@@ -1200,6 +1207,9 @@ function(
 			if (this._fOldValue !== this._fTempValue) {
 				this._applyValue(this._fOldValue);
 				this._bNeedsVerification = true;
+			}
+			if (oEvent) {
+				oEvent.setMarked();
 			}
 		};
 

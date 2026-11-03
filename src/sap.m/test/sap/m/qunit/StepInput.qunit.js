@@ -1691,6 +1691,122 @@ sap.ui.define([
 	});
 
 
+	QUnit.module("Keyboard Handling - no double fire on bubble", {
+		beforeEach: function () {
+			this.stepInput = new StepInput({
+				value: 4,
+				step: 1,
+				largerStep: 2,
+				max: 10,
+				min: -4
+			});
+			this.stepInput.placeAt("qunit-fixture");
+			oCore.applyChanges();
+			this.oNumericInput = this.stepInput._getNumericInput();
+
+			this.makeEvent = function(bMarked, oExtra) {
+				var oEvent = Object.assign({
+					preventDefault: function() {},
+					setMarked: function() { this._marked = true; },
+					isMarked: function() { return !!this._marked; },
+					shiftKey: false, altKey: false, ctrlKey: false, metaKey: false,
+					which: 0
+				}, oExtra || {});
+				if (bMarked) {
+					oEvent._marked = true;
+					oEvent.setMarked = function() {};
+					oEvent.isMarked = function() { return true; };
+				}
+				return oEvent;
+			};
+		},
+		afterEach: function () {
+			this.stepInput.destroy();
+		}
+	});
+
+	QUnit.test("onsapup: skips NumericInput and value unchanged for marked event", function (assert) {
+		var oSpy = this.spy(this.oNumericInput, "onsapup");
+
+		this.stepInput.onsapup(this.makeEvent(true));
+		this.clock.tick(1000);
+
+		assert.strictEqual(oSpy.callCount, 0, "NumericInput.onsapup not called");
+		assert.strictEqual(this.oNumericInput._fTempValue, 4, "Pending value unchanged");
+	});
+
+	QUnit.test("onsapdown: skips NumericInput and value unchanged for marked event", function (assert) {
+		var oSpy = this.spy(this.oNumericInput, "onsapdown");
+
+		this.stepInput.onsapdown(this.makeEvent(true));
+		this.clock.tick(1000);
+
+		assert.strictEqual(oSpy.callCount, 0, "NumericInput.onsapdown not called");
+		assert.strictEqual(this.oNumericInput._fTempValue, 4, "Pending value unchanged");
+	});
+
+	QUnit.test("onsappageup: skips NumericInput and value unchanged for marked event", function (assert) {
+		var oSpy = this.spy(this.oNumericInput, "onsappageup");
+
+		this.stepInput.onsappageup(this.makeEvent(true));
+		this.clock.tick(1000);
+
+		assert.strictEqual(oSpy.callCount, 0, "NumericInput.onsappageup not called");
+		assert.strictEqual(this.oNumericInput._fTempValue, 4, "Pending value unchanged");
+	});
+
+	QUnit.test("onsappagedown: skips NumericInput and value unchanged for marked event", function (assert) {
+		var oSpy = this.spy(this.oNumericInput, "onsappagedown");
+
+		this.stepInput.onsappagedown(this.makeEvent(true));
+		this.clock.tick(1000);
+
+		assert.strictEqual(oSpy.callCount, 0, "NumericInput.onsappagedown not called");
+		assert.strictEqual(this.oNumericInput._fTempValue, 4, "Pending value unchanged");
+	});
+
+	QUnit.test("onsappageupmodifiers: skips NumericInput and value unchanged for marked event", function (assert) {
+		var oSpy = this.spy(this.oNumericInput, "onsappageupmodifiers");
+
+		this.stepInput.onsappageupmodifiers(this.makeEvent(true, { shiftKey: true }));
+		this.clock.tick(1000);
+
+		assert.strictEqual(oSpy.callCount, 0, "NumericInput.onsappageupmodifiers not called");
+		assert.strictEqual(this.oNumericInput._fTempValue, 4, "Pending value unchanged");
+	});
+
+	QUnit.test("onsappagedownmodifiers: skips NumericInput and value unchanged for marked event", function (assert) {
+		var oSpy = this.spy(this.oNumericInput, "onsappagedownmodifiers");
+
+		this.stepInput.onsappagedownmodifiers(this.makeEvent(true, { shiftKey: true }));
+		this.clock.tick(1000);
+
+		assert.strictEqual(oSpy.callCount, 0, "NumericInput.onsappagedownmodifiers not called");
+		assert.strictEqual(this.oNumericInput._fTempValue, 4, "Pending value unchanged");
+	});
+
+	QUnit.test("onkeydown: skips NumericInput and value unchanged for marked event", function (assert) {
+		var oSpy = this.spy(this.oNumericInput, "onkeydown");
+
+		this.stepInput.onkeydown(this.makeEvent(true, { which: KeyCodes.ARROW_UP, shiftKey: true }));
+		this.clock.tick(1000);
+
+		assert.strictEqual(oSpy.callCount, 0, "NumericInput.onkeydown not called");
+		assert.strictEqual(this.oNumericInput._fTempValue, 4, "Pending value unchanged");
+	});
+
+	QUnit.test("onsapescape: skips NumericInput and display unchanged for marked event", function (assert) {
+		var oSpy = this.spy(this.oNumericInput, "onsapescape");
+		var oApplySpy = this.spy(this.oNumericInput, "_applyValue");
+		this.oNumericInput._fOldValue = 4;
+		this.oNumericInput._fTempValue = 7;
+
+		this.stepInput.onsapescape(this.makeEvent(true));
+
+		assert.strictEqual(oSpy.callCount, 0, "NumericInput.onsapescape not called");
+		assert.ok(oApplySpy.notCalled, "_applyValue not called");
+	});
+
 	function calcTime(oStepInput, val) {
 		var time = 0;
 		// initialize values needed for _calcWaitTimeout function

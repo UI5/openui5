@@ -552,39 +552,58 @@ function(
 		};
 
 		StepInput.prototype.onsapup = function (oEvent) {
-			this._getNumericInput().onsapup(oEvent);
+			if (!oEvent.isMarked || !oEvent.isMarked()) {
+				this._getNumericInput().onsapup(oEvent);
+			}
 		};
 
 		StepInput.prototype.onsapdown = function (oEvent) {
-			this._getNumericInput().onsapdown(oEvent);
+			if (!oEvent.isMarked || !oEvent.isMarked()) {
+				this._getNumericInput().onsapdown(oEvent);
+			}
 		};
 
 		StepInput.prototype.onsappageup = function (oEvent) {
-			this._getNumericInput().onsappageup(oEvent);
+			if (!oEvent.isMarked || !oEvent.isMarked()) {
+				this._getNumericInput().onsappageup(oEvent);
+			}
 		};
 
 		StepInput.prototype.onsappagedown = function (oEvent) {
-			this._getNumericInput().onsappagedown(oEvent);
+			if (!oEvent.isMarked || !oEvent.isMarked()) {
+				this._getNumericInput().onsappagedown(oEvent);
+			}
 		};
 
 		StepInput.prototype.onsappageupmodifiers = function (oEvent) {
-			this._getNumericInput().onsappageupmodifiers(oEvent);
+			if (!oEvent.isMarked || !oEvent.isMarked()) {
+				this._getNumericInput().onsappageupmodifiers(oEvent);
+			}
 		};
 
 		StepInput.prototype.onsappagedownmodifiers = function (oEvent) {
-			this._getNumericInput().onsappagedownmodifiers(oEvent);
+			if (!oEvent.isMarked || !oEvent.isMarked()) {
+				this._getNumericInput().onsappagedownmodifiers(oEvent);
+			}
 		};
 
 		StepInput.prototype.onkeydown = function (oEvent) {
-			this._getNumericInput().onkeydown(oEvent);
+			if (!oEvent.isMarked || !oEvent.isMarked()) {
+				this._getNumericInput().onkeydown(oEvent);
+			}
 		};
 
 		StepInput.prototype.onsapescape = function (oEvent) {
-			this._getNumericInput().onsapescape(oEvent);
+			if (!oEvent || !oEvent.isMarked || !oEvent.isMarked()) {
+				this._getNumericInput().onsapescape(oEvent);
+			}
 		};
 
 		StepInput.prototype.onfocusout = function (oEvent) {
-			this._getNumericInput().onfocusout(oEvent);
+			const oNumericInput = this._getNumericInput();
+			if (!oNumericInput.getDomRef() || !oNumericInput.getDomRef().contains(oEvent.target)) {
+				oNumericInput.onfocusout(oEvent);
+			}
 		};
 
 		StepInput.prototype.bindProperty = function (sName, vBindingInfo) {
