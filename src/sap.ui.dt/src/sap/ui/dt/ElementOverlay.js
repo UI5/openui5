@@ -368,8 +368,31 @@ sap.ui.define([
 	/**
 	 * @override
 	 */
+	ElementOverlay.prototype._setSize = function(...aArgs) {
+		const [oTarget, oGeometry] = aArgs;
+		// Apply the Overlay size first (identical behavior for all targets)
+		Overlay.prototype._setSize.apply(this, aArgs);
+
+		// Only the main overlay is grown. Scroll-container overlays are passed a different
+		// target (see _setPosition below) and must keep their original size.
+		if (oTarget !== this.getDomRef()) {
+			return;
+		}
+		const mOutset = this._mCachedOutsets ?? this._getOverlayOutsets();
+		const iDeltaWidth = mOutset.left + mOutset.right;
+		const iDeltaHeight = mOutset.top + mOutset.bottom;
+		if (iDeltaWidth === 0 && iDeltaHeight === 0) {
+			return;
+		}
+		oTarget.style.width = `${oGeometry.size.width + iDeltaWidth}px`;
+		oTarget.style.height = `${oGeometry.size.height + iDeltaHeight}px`;
+	};
+
+	/**
+	 * @override
+	 */
 	ElementOverlay.prototype._setPosition = function(...aArgs) {
-		const [, , , bForceScrollbarSync] = aArgs;
+		const [, oGeometry, oParent, bForceScrollbarSync] = aArgs;
 		// Apply Overlay position first, then extra logic based on this new position
 		Overlay.prototype._setPosition.apply(this, aArgs);
 
@@ -394,10 +417,31 @@ sap.ui.define([
 				oScrollContainerOverlayDomRef.style.display = "none";
 			}
 		});
+
+		// Shift the main overlay outward to match the size growth applied in _setSize, so the
+		// overlay extends beyond the control on the requested sides while the opposite edge stays.
+		const mOutset = this._mCachedOutsets ?? this._getOverlayOutsets();
+		if (mOutset.left || mOutset.right || mOutset.top || mOutset.bottom) {
+			// The overlay box's top-left corner is positioned via the translate computed by
+			// DOMUtil.getOffsetFromParent (which already accounts for RTL). Growing the box width
+			// in _setSize extends its right edge and growing the height extends its bottom edge,
+			// both regardless of text direction. So a left outset additionally needs the box
+			// shifted left (to extend its left edge outward) and a top outset shifted up; right
+			// and bottom outsets are achieved by the size growth alone.
+			const iShiftX = -mOutset.left;
+			const iShiftY = -mOutset.top;
+			if (iShiftX || iShiftY) {
+				const mPosition = DOMUtil.getOffsetFromParent(oGeometry, oParent);
+				this.getDomRef().style.transform =
+					`translate(${mPosition.left + iShiftX}px, ${mPosition.top + iShiftY}px)`;
+			}
+		}
 	};
 
 	ElementOverlay.prototype._applySizes = async function(...aArgs) {
+		this._mCachedOutsets = this._getOverlayOutsets();
 		await Overlay.prototype._applySizes.apply(this, aArgs);
+		this._mCachedOutsets = undefined;
 		this._sortChildren(this.getChildrenDomRef());
 		if (!this.bIsDestroyed) {
 			const oDesignTimeMetadata = this.getDesignTimeMetadata();
@@ -970,6 +1014,49 @@ sap.ui.define([
 			return oElement.getVisible();
 		}
 		return undefined;
+	};
+
+	/**
+	 * Resolves the per-side overlay outset (in pixels) declared by the associated element's
+	 * design-time metadata via the <code>overlayOutsets</code> key. The value may be a plain object
+	 * with any subset of the physical sides (<code>left</code>, <code>top</code>, <code>right</code>,
+	 * <code>bottom</code>) or a function receiving the element and returning such an object.
+	 * Missing, invalid or throwing values result in no outset. Negative values are clamped to zero.
+	 *
+	 * The outset grows the main overlay outward beyond the control's bounding box on the given sides
+	 * and shifts it so the opposite edge stays put. It is applied purely to the overlay DOM styles;
+	 * the cached geometry is not modified. Used e.g. by <code>sap.m.IconTabFilter</code> to give the
+	 * flush first/last tab of an <code>sap.m.IconTabHeader</code> the same visual breathing room
+	 * between the selection border and the tab content as the middle tabs, whose own padding the
+	 * flush tab drops on its outer edge.
+	 *
+	 * @returns {{left: number, top: number, right: number, bottom: number}} Outset per physical side in pixels, zeros if none
+	 * @private
+	 * @since 1.155
+	 */
+	ElementOverlay.prototype._getOverlayOutsets = function() {
+		let vOutsets = this.getDesignTimeMetadata()?.getData().overlayOutsets;
+		if (typeof vOutsets === "function") {
+			try {
+				vOutsets = vOutsets(this.getElement());
+			} catch (oError) {
+				// A control's design-time function must never break overlay styling
+				Log.error(Util.createError(
+					"ElementOverlay#_getOverlayOutsets",
+					`An error occurred while evaluating overlayOutsets: ${oError}`
+				));
+				vOutsets = undefined;
+			}
+		}
+		if (!vOutsets || typeof vOutsets !== "object") {
+			return { left: 0, top: 0, right: 0, bottom: 0 };
+		}
+		return {
+			left: Math.max(0, Number(vOutsets.left) || 0),
+			top: Math.max(0, Number(vOutsets.top) || 0),
+			right: Math.max(0, Number(vOutsets.right) || 0),
+			bottom: Math.max(0, Number(vOutsets.bottom) || 0)
+		};
 	};
 
 	ElementOverlay.prototype.isElementVisible = function() {

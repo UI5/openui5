@@ -2290,6 +2290,134 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("Given _getOverlayOutsets with various designtime metadata", {
+		beforeEach() {
+			this.oButton = new Button({ text: "Button" });
+			this.makeOverlay = function(vOverlayOutsets) {
+				return new ElementOverlay({
+					element: this.oButton,
+					designTimeMetadata: new ElementDesignTimeMetadata({
+						data: vOverlayOutsets === undefined ? {} : { overlayOutsets: vOverlayOutsets }
+					})
+				});
+			}.bind(this);
+		},
+		afterEach() {
+			this.oButton.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when no overlayOutsets is defined", function(assert) {
+			const oOverlay = this.makeOverlay(undefined);
+			assert.deepEqual(oOverlay._getOverlayOutsets(), { left: 0, top: 0, right: 0, bottom: 0 }, "returns all zeros (inert)");
+			oOverlay.destroy();
+		});
+
+		QUnit.test("when overlayOutsets is a static object with a subset of sides", function(assert) {
+			const oOverlay = this.makeOverlay({ left: 16, right: 8 });
+			assert.deepEqual(oOverlay._getOverlayOutsets(), { left: 16, top: 0, right: 8, bottom: 0 }, "missing sides default to zero");
+			oOverlay.destroy();
+		});
+
+		QUnit.test("when overlayOutsets is a function", function(assert) {
+			const oOverlay = this.makeOverlay(function(oElement) {
+				assert.strictEqual(oElement, this.oButton, "the function receives the element");
+				return { right: 16 };
+			}.bind(this));
+			assert.deepEqual(oOverlay._getOverlayOutsets(), { left: 0, top: 0, right: 16, bottom: 0 }, "resolves the function result");
+			oOverlay.destroy();
+		});
+
+		QUnit.test("when overlayOutsets has negative or invalid values", function(assert) {
+			const oOverlay = this.makeOverlay({ left: -5, right: "nope", top: 10 });
+			assert.deepEqual(oOverlay._getOverlayOutsets(), { left: 0, top: 10, right: 0, bottom: 0 }, "negatives clamped to zero, invalid treated as zero");
+			oOverlay.destroy();
+		});
+
+		QUnit.test("when the overlayOutsets function throws", function(assert) {
+			const oOverlay = this.makeOverlay(function() {
+				throw new Error("boom");
+			});
+			assert.deepEqual(oOverlay._getOverlayOutsets(), { left: 0, top: 0, right: 0, bottom: 0 }, "a throwing function results in no outset");
+			oOverlay.destroy();
+		});
+	});
+
+	QUnit.module("Given an Overlay with overlayOutsets is rendered", {
+		async beforeEach() {
+			this.oButton = new Button({ text: "Button", width: "200px" });
+			this.oButton.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			this.createOverlay = function(mData) {
+				return new Promise((resolve) => {
+					const oOverlay = new ElementOverlay({
+						isRoot: true,
+						element: this.oButton,
+						designTimeMetadata: new ElementDesignTimeMetadata({ data: mData }),
+						init() {
+							oOverlay.placeInOverlayContainer();
+							oOverlay.attachEventOnce("geometryChanged", function() {
+								resolve(oOverlay);
+							});
+						}
+					});
+					oOverlay.attachEvent("applyStylesRequired", oOverlay.applyStyles.bind(oOverlay));
+				});
+			}.bind(this);
+		},
+		afterEach() {
+			this.oButton.destroy();
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("when overlayOutsets grows left and right", async function(assert) {
+			const oOverlay = await this.createOverlay({ overlayOutsets: { left: 16, right: 16 } });
+			const oControlRect = this.oButton.getDomRef().getBoundingClientRect();
+			const oOverlayRect = oOverlay.getDomRef().getBoundingClientRect();
+			assert.strictEqual(Math.round(oOverlayRect.width), Math.round(oControlRect.width) + 32, "overlay width is grown by left+right outset");
+			assert.strictEqual(Math.round(oOverlayRect.left), Math.round(oControlRect.left) - 16, "overlay left edge extends 16px beyond the control on the left");
+			assert.strictEqual(Math.round(oOverlayRect.right), Math.round(oControlRect.right) + 16, "overlay right edge extends 16px beyond the control on the right");
+			oOverlay.destroy();
+		});
+
+		QUnit.test("when overlayOutsets is absent the overlay matches the control (inert)", async function(assert) {
+			const oOverlay = await this.createOverlay({});
+			const oControlRect = this.oButton.getDomRef().getBoundingClientRect();
+			const oOverlayRect = oOverlay.getDomRef().getBoundingClientRect();
+			assert.strictEqual(Math.round(oOverlayRect.width), Math.round(oControlRect.width), "overlay width equals control width");
+			assert.strictEqual(Math.round(oOverlayRect.left), Math.round(oControlRect.left), "overlay left equals control left");
+			oOverlay.destroy();
+		});
+
+		QUnit.test("when overlayOutsets grows the left side the right edge stays put", async function(assert) {
+			const oOverlay = await this.createOverlay({ overlayOutsets: { left: 16 } });
+			const oControlRect = this.oButton.getDomRef().getBoundingClientRect();
+			const oOverlayRect = oOverlay.getDomRef().getBoundingClientRect();
+			assert.strictEqual(Math.round(oOverlayRect.width), Math.round(oControlRect.width) + 16, "overlay width grows by the left outset");
+			assert.strictEqual(Math.round(oOverlayRect.left), Math.round(oControlRect.left) - 16, "overlay left edge extends 16px to the left of the control");
+			assert.strictEqual(Math.round(oOverlayRect.right), Math.round(oControlRect.right), "overlay right edge is unchanged");
+			oOverlay.destroy();
+		});
+
+		QUnit.test("when overlayOutsets grows the right side (size growth only)", async function(assert) {
+			// A right (or bottom) outset is realized purely by growing the overlay box, which
+			// extends the right/bottom edge in every text direction. No translate shift is applied,
+			// so the box's left edge stays on the control's positioned origin. This holds regardless
+			// of RTL; the RTL-specific translate itself lives in DOMUtil.getOffsetFromParent.
+			const oOverlayNoOutset = await this.createOverlay({});
+			const iBaseLeft = Math.round(oOverlayNoOutset.getDomRef().getBoundingClientRect().left);
+			oOverlayNoOutset.destroy();
+
+			const oOverlay = await this.createOverlay({ overlayOutsets: { right: 16 } });
+			const oControlRect = this.oButton.getDomRef().getBoundingClientRect();
+			const oOverlayRect = oOverlay.getDomRef().getBoundingClientRect();
+			assert.strictEqual(Math.round(oOverlayRect.width), Math.round(oControlRect.width) + 16, "overlay width is grown by the right outset");
+			assert.strictEqual(Math.round(oOverlayRect.left), iBaseLeft, "overlay left edge is unchanged by a right-only outset (no translate shift)");
+			oOverlay.destroy();
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});
