@@ -1844,6 +1844,34 @@ function(
 		oGrid.destroy();
 	});
 
+	QUnit.test("#focusItem should keep grid matrix position when called with an event", function (assert) {
+		// Arrange
+		const oBtn1 = new Button({ text: "1" }),
+			oBtn2 = new Button({ text: "2" }),
+			oGrid = new GridContainer({
+				items: [ oBtn1, oBtn2 ]
+			});
+
+		oGrid.placeAt(DOM_RENDER_LOCATION);
+		Core.applyChanges();
+
+		const oItemNavigation = oGrid._oItemNavigation,
+			oResetSpy = this.spy(oItemNavigation, "resetFocusPosition"),
+			mPosition = { row: 0, column: 0 };
+
+		oItemNavigation.setFocusPosition(mPosition);
+
+		// Act - call focusItem with an event, as it happens during keyboard arrow navigation
+		oItemNavigation.focusItem(1, { type: "keydown" });
+
+		// Assert - position should be preserved, reset should not be triggered by focusItem
+		assert.notOk(oResetSpy.called, "Matrix position should not be reset when an event is provided");
+		assert.strictEqual(oItemNavigation._mCurrentPosition, mPosition, "Matrix position should be kept");
+
+		// Clean up
+		oGrid.destroy();
+	});
+
 	QUnit.module("Accessibility", {
 		beforeEach: function () {
 			this.oGrid = new GridContainer({
@@ -1988,6 +2016,38 @@ function(
 
 		// Assert
 		assert.ok(oSpy.called, "'borderReached' event is fired");
+	});
+
+	QUnit.test("Programmatic focusItem after arrow navigation should reset the matrix position", function (assert) {
+		// Arrange
+		this.oGrid.getItems()[0].getLayoutData().setColumns(2);
+		this.oGrid.getItems()[0].getLayoutData().setRows(2);
+		this.oGrid.invalidate();
+		Core.applyChanges();
+
+		const oItemNavigation = this.oGrid._oItemNavigation;
+
+		// focus the first item to establish a matrix position
+		this.oGrid.getItems()[0].getDomRef().focus();
+		Core.applyChanges();
+
+		qutils.triggerKeydown(document.activeElement, KeyCodes.ARROW_RIGHT, false, false, false);
+
+		// Assert - a matrix position is set after keyboard navigation
+		assert.ok(oItemNavigation._mCurrentPosition, "Matrix position is set after arrow navigation");
+
+		qutils.triggerKeydown(document.activeElement, KeyCodes.ARROW_RIGHT, false, false, false);
+		qutils.triggerKeydown(document.activeElement, KeyCodes.ARROW_RIGHT, false, false, false);
+
+		// Act - focus an item programmatically (no event), e.g. from a 'borderReached' handler or app code
+		this.oGrid.focusItem(3);
+
+		// Assert - a matrix position is set after keyboard navigation
+		assert.notOk(oItemNavigation._mCurrentPosition, "Matrix position is reset");
+
+		qutils.triggerKeydown(document.activeElement, KeyCodes.ARROW_RIGHT, false, false, false);
+
+		assert.strictEqual(document.activeElement, this.oGrid.getItems()[4].getDomRef(), "Focus is moved to the correct item");
 	});
 
 	QUnit.test("Navigation between items of different size based on starting position top", function (assert) {
