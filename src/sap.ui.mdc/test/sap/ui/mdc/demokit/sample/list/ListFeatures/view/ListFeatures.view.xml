@@ -64,8 +64,12 @@
 						<SegmentedButtonItem key="None" icon="sap-icon://cancel" tooltip="No Selection"/>
 					</items>
 				</SegmentedButton>
-				<!-- boxMinWidth input (GridListType only) -->
-				<Input id="inputBoxMinWidth" width="8rem" placeholder="Box min width" value="16rem" change=".onBoxMinWidthChange" />
+				<!-- Sliders build a GridBasicLayout for the layout aggregation: box width sizes the cards, gap spaces them (GridListType only) -->
+				<ToolbarSeparator id="sepGridLayout" />
+				<Label id="lblBoxWidth" text="Box width" labelFor="sliderBoxWidth" />
+				<Slider id="sliderBoxWidth" width="8rem" min="8" max="30" step="1" value="16" liveChange=".onGridLayoutChange" ariaLabelledBy="lblBoxWidth" />
+				<Label id="lblGap" text="Gap" labelFor="sliderGap" />
+				<Slider id="sliderGap" width="8rem" min="0" max="5" step="0.5" value="0.5" liveChange=".onGridLayoutChange" ariaLabelledBy="lblGap" />
 			</mdc:actions>
 			<mdc:contextMenu>
 				<Menu>

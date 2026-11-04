@@ -4,11 +4,12 @@
 
 sap.ui.define([
 	"./ListTypeBase",
+	"../mixin/DeferredAggregationForwardMixin",
 	"sap/m/Button",
 	"sap/m/HBox",
 	"sap/ui/core/Lib",
 	"sap/base/Log"
-], (ListTypeBase, Button, HBox, Library, Log) => {
+], (ListTypeBase, DeferredAggregationForwardMixin, Button, HBox, Library, Log) => {
 	"use strict";
 
 	let InnerGridList;
@@ -43,8 +44,9 @@ sap.ui.define([
 				 * <b>Note:</b> When <code>boxWidth</code> is set, this property has no effect.
 				 *
 				 * @see sap.ui.layout.cssgrid.GridBoxLayout#boxMinWidth
+				 * @deprecated As of version 1.155. Use the <code>layout</code> aggregation instead.
 				 */
-				boxMinWidth: {type: "sap.ui.core.CSSSize", group: "Appearance", defaultValue: "16rem"},
+				boxMinWidth: {type: "sap.ui.core.CSSSize", group: "Appearance", defaultValue: "16rem", deprecated: true},
 				/**
 				 * Defines the width of each grid list item card.
 				 * The value is passed to the <code>sap.ui.layout.cssgrid.GridBoxLayout</code> as <code>boxWidth</code>.
@@ -52,8 +54,9 @@ sap.ui.define([
 				 * <b>Note:</b> When this property is set, <code>boxMinWidth</code> has no effect.
 				 *
 				 * @see sap.ui.layout.cssgrid.GridBoxLayout#boxWidth
+				 * @deprecated As of version 1.155. Use the <code>layout</code> aggregation instead.
 				 */
-				boxWidth: {type: "sap.ui.core.CSSSize", group: "Appearance", defaultValue: ""},
+				boxWidth: {type: "sap.ui.core.CSSSize", group: "Appearance", defaultValue: "", deprecated: true},
 				/**
 				 * Defines the number of grid list item cards per row for extra large, large, medium, and small screens.
 				 * The value is passed to the <code>sap.ui.layout.cssgrid.GridBoxLayout</code> as <code>boxesPerRowConfig</code>.
@@ -61,8 +64,20 @@ sap.ui.define([
 				 * <b>Note:</b> This property has no effect when <code>boxMinWidth</code> or <code>boxWidth</code> is set.
 				 *
 				 * @see sap.ui.layout.cssgrid.GridBoxLayout#boxesPerRowConfig
+				 * @deprecated As of version 1.155. Use the <code>layout</code> aggregation instead.
 				 */
-				boxesPerRowConfig: {type: "sap.ui.layout.BoxesPerRowConfig", group: "Behavior", defaultValue: "XL7 L6 M4 S2"}
+				boxesPerRowConfig: {type: "sap.ui.layout.BoxesPerRowConfig", group: "Behavior", defaultValue: "XL7 L6 M4 S2", deprecated: true}
+			},
+			aggregations: {
+				/**
+				 * Defines a custom grid layout for the inner <code>sap.f.GridList</code>.
+				 *
+				 * When set, this layout takes precedence over the deprecated <code>boxMinWidth</code>, <code>boxWidth</code>,
+				 * and <code>boxesPerRowConfig</code> properties, which are then ignored.
+				 *
+				 * @since 1.155
+				 */
+				layout: {type: "sap.ui.layout.cssgrid.GridLayoutBase", multiple: false}
 			}
 		}
 	});
@@ -100,7 +115,7 @@ sap.ui.define([
 	GridListType.prototype.getListSettings = function() {
 		return {
 			...ListTypeBase.prototype.getListSettings.apply(this, arguments),
-			customLayout: new GridBoxLayout({
+			customLayout: this.getLayout() || new GridBoxLayout({
 				boxMinWidth: this.getBoxMinWidth(),
 				boxWidth: this.getBoxWidth(),
 				boxesPerRowConfig: this.getBoxesPerRowConfig()
@@ -121,7 +136,9 @@ sap.ui.define([
 			return null;
 		}
 
-		return new InnerGridList(this.getListSettings());
+		const oGridList = new InnerGridList(this.getListSettings());
+		this._registerForwardingTarget(oGridList);
+		return oGridList;
 	};
 
 	/**
@@ -129,13 +146,15 @@ sap.ui.define([
 	 * @protected
 	 */
 	GridListType.prototype.updateListByProperty = function(sProperty, vValue) {
-		const oLayout = this.getInnerControl()?.getCustomLayout();
-		if (sProperty === "boxMinWidth") {
-			oLayout?.setBoxMinWidth(vValue);
-		} else if (sProperty === "boxWidth") {
-			oLayout?.setBoxWidth(vValue);
-		} else if (sProperty === "boxesPerRowConfig") {
-			oLayout?.setBoxesPerRowConfig(vValue);
+		if (!this.getLayout()) {
+			const oLayout = this.getInnerControl()?.getCustomLayout();
+			if (sProperty === "boxMinWidth") {
+				oLayout?.setBoxMinWidth(vValue);
+			} else if (sProperty === "boxWidth") {
+				oLayout?.setBoxWidth(vValue);
+			} else if (sProperty === "boxesPerRowConfig") {
+				oLayout?.setBoxesPerRowConfig(vValue);
+			}
 		}
 	};
 
@@ -331,6 +350,13 @@ sap.ui.define([
 	GridListType.prototype.getStyleClasses = function() {
 		return ["sapUiMdcListGridList"];
 	};
+
+	DeferredAggregationForwardMixin.call(GridListType.prototype, [{
+		aggregation: "layout",
+		applyToTarget: function(oLayout) {
+			this.getInnerControl()?.setCustomLayout(oLayout);
+		}
+	}]);
 
 	return GridListType;
 });
