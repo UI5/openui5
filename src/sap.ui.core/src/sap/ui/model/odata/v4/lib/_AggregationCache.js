@@ -157,9 +157,7 @@ sap.ui.define([
 			}
 		}
 
-		// Note: if pending, bCountChanged becomes true below
-		const iOldCount = this.oCountPromise?.getResult();
-		if (this.oCountPromise) {
+		if (this.oCountPromise && this.oAggregation.hierarchyQualifier) {
 			this.createCountPromise();
 		}
 
@@ -203,12 +201,20 @@ sap.ui.define([
 				this.shiftRank(iIndex, -iOffset);
 			} else {
 				iIndex = undefined;
-				bCountChanged = iOldCount !== this.oCountPromise?.getResult();
+				// Note: when having groupLevels, tell the caller "$count" has already changed, so
+				// the caller must not send another count request
+				bCountChanged = !!this.oCountPromise;
 				_AggregationHelper.removeFromSpliced(oElement, this.aElements);
 			}
 			// remove in this cache
 			delete oElement["@$ui5.context.isDeleted"]; // @see #removeElement
 			this.removeElement(iIndex, sPredicate); // Note: iIndex < 0 would also be OK here
+			if (!this.oAggregation.hierarchyQualifier) {
+				// Data aggregation maintains "$count" on the client side; no additional GET.
+				// Note: imitates the flow w/o groupLevels where "$count" is updated in
+				// #removeElement; to be done before the caller is notified
+				this.addToCount(-1);
+			}
 			// notify caller
 			fnCallback(iIndex, -1, bCountChanged);
 		});

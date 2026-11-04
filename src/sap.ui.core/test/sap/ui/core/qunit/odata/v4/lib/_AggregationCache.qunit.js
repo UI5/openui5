@@ -8127,20 +8127,20 @@ sap.ui.define([
 ].forEach(function (oFixture) {
 	[false, true].forEach((bCreated) => {
 		[false, true].forEach((bCount) => {
-			[false, true].forEach((bCountChanged) => {
-				[false, true].forEach((bGroupLock) => {
+			[false, true].forEach((bGroupLock) => {
 	const sTitle = `_delete: ${JSON.stringify(oFixture)}, created=${bCreated}`
-		+ `, count=${bCount}, count changed=${bCountChanged}, w/ oGroupLock=${bGroupLock}`;
+		+ `, count=${bCount}, w/ oGroupLock=${bGroupLock}`;
 
 	if (oFixture.noParentCache && (oFixture.firstLevel || oFixture.parentLeaf)) {
 		throw new Error("Unsupported combination!");
 	}
-	if (oFixture.outside && !bGroupLock || bCountChanged && !bCount) {
+	if (oFixture.outside && !bGroupLock) {
 		return;
 	}
 
 	QUnit.test(sTitle, function (assert) {
-		var oCountExpectation, oRemoveExpectation;
+		var oAddToCountExpectation, oCountExpectation, oRemoveElementExpectation,
+			oRemoveElementOnParentCacheExpectation;
 
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {},
 			oFixture.isDataAggregation ? {groupLevels : ["group"]} : {hierarchyQualifier : "X"});
@@ -8174,11 +8174,8 @@ sap.ui.define([
 		oHelperMock.expects("getPrivateAnnotation").exactly(oFixture.outside ? 0 : 1)
 			.withExactArgs(sinon.match.same(oElement), "predicate")
 			.returns("~predicate~");
-		this.mock(oCache).expects("createCountPromise").exactly(bCount ? 1 : 0).withExactArgs()
-			.callsFake(() => {
-				oCache.oCountPromise
-					= SyncPromise.resolve(Promise.resolve(bCountChanged ? 41 : 42));
-			});
+		this.mock(oCache).expects("createCountPromise")
+			.exactly(bCount && !oFixture.isDataAggregation ? 1 : 0).withExactArgs();
 		const oParentCacheMock = this.mock(oParentCache);
 		const mock = () => {
 			this.mock(oCache.removeKeptElement).expects("bind")
@@ -8192,7 +8189,7 @@ sap.ui.define([
 			oHelperMock.expects("getPrivateAnnotation")
 				.exactly(oFixture.noParentCache ? 0 : 1)
 				.withExactArgs(sinon.match.same(oElement), "rank", 0).returns("~rank~");
-			oRemoveExpectation = oParentCacheMock.expects("removeElement")
+			oRemoveElementOnParentCacheExpectation = oParentCacheMock.expects("removeElement")
 				.exactly(oFixture.noParentCache ? 0 : 1)
 				.withExactArgs("~rank~", "~predicate~").returns("~iIndexInParentCache~");
 			oHelperMock.expects("getPrivateAnnotation")
@@ -8211,11 +8208,13 @@ sap.ui.define([
 				.withExactArgs("~oParent~");
 			this.mock(oCache).expects("shiftRank").exactly(oFixture.outside ? 0 : 1)
 				.withExactArgs(4, oFixture.firstLevel ? -4 : -1);
-			this.mock(oCache).expects("removeElement")
+			oRemoveElementExpectation = this.mock(oCache).expects("removeElement")
 				.withExactArgs(oFixture.outside ? undefined : 4, "~predicate~")
 				.callsFake(() => {
 					assert.notOk("@$ui5.context.isDeleted" in oElement);
 				});
+			oAddToCountExpectation = this.mock(oCache).expects("addToCount")
+				.exactly(oFixture.isDataAggregation ? 1 : 0).withExactArgs(-1);
 			this.mock(_AggregationHelper).expects("removeFromSpliced")
 				.exactly(oFixture.outside ? 1 : 0)
 				.withExactArgs(sinon.match.same(oElement), sinon.match.same(oCache.aElements));
@@ -8249,14 +8248,18 @@ sap.ui.define([
 			assert.deepEqual(fnCallback.args[0], [
 				oFixture.outside ? undefined : 4,
 				-1,
-				oFixture.outside ? bCountChanged : undefined
+				oFixture.outside ? bCount : undefined
 			]);
 			if (!oFixture.firstLevel && !oFixture.noParentCache) {
-				sinon.assert.callOrder(oRemoveExpectation, oCountExpectation);
+				sinon.assert.callOrder(oRemoveElementOnParentCacheExpectation,
+					oCountExpectation);
+			}
+			if (oFixture.isDataAggregation) {
+				sinon.assert.callOrder(oRemoveElementExpectation, oAddToCountExpectation,
+					fnCallback);
 			}
 		});
 	});
-				});
 			});
 		});
 	});

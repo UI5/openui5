@@ -29151,6 +29151,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Delete a kept-alive outside the collection works w/ $count (JIRA: CPOUI5ODATAV4-3724)
 	// Such deletes even work in parallel (JIRA: CPOUI5ODATAV4-3730)
 	// (Grand) parent can be collapsed before deleting a leaf (JIRA: CPOUI5ODATAV4-3729)
+	// The $count is maintained on the client side, no additional GET (JIRA: CPOUI5ODATAV4-3711)
 	//
 	// If there are no subtotals, the @$ui5.context.isOutdated at group nodes is not set when
 	// editing or deleting a single entity.
@@ -29688,10 +29689,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		}).then(function () {
 			that.expectChange("isOutdatedHeader", true)
 				.expectRequest("#0 DELETE Artists(ArtistID='1',IsActiveEntity=true)", oNO_CONTENT)
-				.expectRequest("#0 Artists/$count"
-					+ (bWithSearchFilterSort
-						? "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe"
-						: ""), 4)
 				.expectChange("count", "4");
 				//TODO: .expectChange("groupLevelCount", [,,, 1])
 			if (!bCollapse) {
@@ -29778,10 +29775,6 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("city", [null], 4)
 				.expectChange("sendsAutographs", [undefined], 4)
 				.expectRequest("#0 DELETE Artists(ArtistID='2',IsActiveEntity=true)", oNO_CONTENT)
-				.expectRequest("#0 Artists/$count"
-					+ (bWithSearchFilterSort
-						? "?$filter=Name ne 'TAFKAP' and sendsAutographs ge false&$search=covfefe"
-						: ""), 3)
 				.expectChange("count", "3");
 				//TODO: .expectChange("groupLevelCount", [,,, 0])
 
