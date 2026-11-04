@@ -2359,4 +2359,63 @@ sap.ui.define([
 
 	});
 
+	QUnit.module("DateTime with timezone - showing timezone only", {
+		beforeEach: async () => {
+			FieldBaseDelegateODataDefaultTypes.enable();
+			oModel = new JSONModel({
+				dateTime: null,
+				timezone: null
+			});
+
+			oType = new DateTimeWithTimezoneType({showTime: false, showDate: false, showTimezone: true});
+			oType._bMyType = true;
+			oType2 = new DateTimeOffsetType({}, {V4: true});
+			oType2._bMyType = true;
+			oType3 = new StringType();
+			oType3._bMyType = true;
+
+			oField = new Field("F1", {
+				value: {parts: [{path: "/dateTime", type: oType2}, {path: "/timezone", type: oType3}], type: oType},
+				change: _myChangeHandler,
+				models: oModel
+			}).placeAt("content");
+
+			await nextUIUpdate();
+		},
+		afterEach() {
+			FieldBaseDelegateODataDefaultTypes.disable();
+			oField.destroy();
+			oField = undefined;
+			oModel.destroy();
+			oModel = undefined;
+			oType.destroy();
+			oType = undefined;
+			oType2.destroy();
+			oType2 = undefined;
+			oType3.destroy();
+			oType3 = undefined;
+			_cleanupEvents();
+		}
+	});
+
+	QUnit.test("Do not change value if Condition initially created", async (assert) => {
+
+		sinon.spy(oField, "setProperty");
+
+		oModel.setData({ // initialize
+			dateTime: null,
+			timezone: "Europe/Berlin"
+		});
+		await new Promise((resolve) => {setTimeout(resolve, 0);}); // wait for binding update
+
+		const aConditions = oField.getConditions();
+		assert.equal(oField.setProperty.withArgs("value").getCalls().length, 1, "value updated only once");
+		assert.notOk(oField.setProperty.withArgs("value").calledWith("value", [undefined, "Europe/Berlin"]), "value not updated with undefined as dateTime");
+		assert.ok(oField.setProperty.withArgs("value").calledWith("value", [null, "Europe/Berlin"]), "value updated with null as dateTime");
+		assert.equal(aConditions.length, 1, "One Condition");
+		assert.deepEqual(aConditions[0]?.values[0], [null, "Europe/Berlin"], "Value of Condition");
+		assert.deepEqual(oField.getValue(), [null, "Europe/Berlin"], "Value of Field");
+
+	});
+
 });
