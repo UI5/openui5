@@ -528,10 +528,6 @@ sap.ui.define([
 			aIds.push(this._getUnitOfMeasurement().getId());
 		}
 
-		if (this.getIconSrc() || this.getIconInitials()) {
-			aIds.push(this._getAvatar().getId());
-		}
-
 		if (this.getNumber() || this.getScale()) {
 			aIds.push(this._getNumericIndicators()._getMainIndicator().getId());
 		}
