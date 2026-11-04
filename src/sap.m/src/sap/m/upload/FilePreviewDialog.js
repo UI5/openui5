@@ -195,6 +195,11 @@ sap.ui.define([
 				this.fireEvent("beforePreviewDialogOpen", {oDialog: this._oDialog});
 
 				this._oDialog.open();
+				// pageChanged does not fire for the initial active page, so InvisibleMessage covers the initial page
+				InvisibleMessage.getInstance().announce(
+					this._previewItem.getFileName(),
+					InvisibleMessageMode.Polite
+				);
 			}
 		},
 
@@ -377,6 +382,14 @@ sap.ui.define([
 
 				oPage = !this.isFileSizeWithinMaxLimit(oItem) ? this._getMaxSizePageIllustration(oItem) : oPage;
 
+				// Set aria-label on the carousel page for reliable focus announcement.
+				const sFileName = oItem.getFileName();
+				oPage.addEventDelegate({
+					onAfterRendering: function() {
+						oPage.getDomRef()?.setAttribute("aria-label", sFileName);
+					}
+				});
+
 				sActivePageId = oItem?.getId() === oPreviewItem?.getId() ? oPage?.getId() : sActivePageId;
 
 				oActivePage =  oItem?.getId() === oPreviewItem?.getId() ? oPage : oActivePage;
@@ -411,7 +424,6 @@ sap.ui.define([
 					// oCarousel.setActivePage(oTargetPage);
 
 					const sNewDialogTitle = aItems[iIndex].getFileName();
-					InvisibleMessage.getInstance().announce(sNewDialogTitle, InvisibleMessageMode.Polite);
 
 					var oTitle = this._oDialog?.getCustomHeader()?.getContentLeft()[0];
 					oTitle?.setText(sNewDialogTitle);
