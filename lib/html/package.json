@@ -17,11 +17,12 @@
     "ui5-tooling-modules": "^3.38.2"
   },
   "engines": {
-    "node": "^24.15.0"
+    "node": "^20.17.0 || >=22.9.0",
+    "npm": ">= 8"
   },
   "private": true,
   "devDependencies": {
-    "@types/node": "^24.2.0",
+    "@types/node": "^26.0.0",
     "@types/webidl2": "^24.4.4",
     "custom-elements-manifest": "^2.1.0",
     "typescript": "^7.0.0"
