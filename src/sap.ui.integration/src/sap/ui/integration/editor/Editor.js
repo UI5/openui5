@@ -24,15 +24,14 @@ sap.ui.define([
 	"./Manifest",
 	"./Merger",
 	"./Constants",
-	"sap/m/Tree",
-	"sap/m/StandardTreeItem",
 	"./EditorRenderer",
 	"./EditorFieldManager",
 	"./EditorTranslation",
 	"./EditorContext",
 	"./EditorDataLoading",
 	"./EditorSettingsLayer",
-	"./EditorDestinations"
+	"./EditorDestinations",
+	"./EditorChildTree"
 ], function(
 	Localization,
 	Control,
@@ -55,15 +54,14 @@ sap.ui.define([
 	Manifest,
 	Merger,
 	Constants,
-	Tree,
-	StandardTreeItem,
 	EditorRenderer,
 	EditorFieldManager,
 	EditorTranslation,
 	EditorContext,
 	EditorDataLoading,
 	EditorSettingsLayer,
-	EditorDestinations
+	EditorDestinations,
+	EditorChildTree
 ) {
 	"use strict";
 
@@ -649,254 +647,6 @@ sap.ui.define([
 	};
 
 	/**
-	 * Create the tree of Child editors
-	 *
-	 * @param {*} oChildNodes
-	 */
-	Editor.prototype.createChildTree = function (oChildNodes) {
-		var that = this;
-		var sBaseUrl = this.getBaseUrl();
-
-		var sMainManifest = that._vIdOrSettings.manifest;
-		if (typeof that._vIdOrSettings.manifest === "object") {
-			sMainManifest = JSON.stringify(that._vIdOrSettings.manifest);
-		}
-		var mainTitle = this._oManifest.get("/sap.app/title") || this._oResourceBundle.getText("EDITOR_CHILD_TREE_MAIN_NODE_TEXT");
-		// Create data model with main node
-		var oData = [{
-			text: mainTitle,
-			baseUrl: sBaseUrl,
-			manifest: sMainManifest,
-			path: "",
-			selected: true,
-			textReady: true,
-			dataReady: false,
-			nodes: []
-		}];
-		var oModel = new JSONModel(oData);
-
-		// check if all texts are ready
-		var checkTextsReady = function (oDataNode) {
-			oDataNode = oDataNode || oData[0];
-			if (!oDataNode.textReady) {
-				return false;
-			}
-			var oNodes = oDataNode.nodes;
-			for (var i = 0; i < oNodes.length; i++) {
-				if (!checkTextsReady(oNodes[i])) {
-					return false;
-				}
-			}
-			return true;
-		};
-
-		var loadChildNode = function (sName, oChildConfig, sPath, sBaseUrl, sParentName) {
-			// calculate base url and manifest path for childs
-			var sManifestPath = sBaseUrl + oChildConfig.manifest;
-			sBaseUrl = sManifestPath.substring(0, sManifestPath.lastIndexOf("/") + 1);
-			var oNode = {
-				text: sName,
-				baseUrl: sBaseUrl,
-				manifest: sManifestPath,
-				isChild: true,
-				path: sPath,
-				selected: false,
-				textReady: false,
-				nodes: []
-			};
-			if (oChildConfig.manifest) {
-				try {
-					var sManifestUrl = that._sAppId.replace(/\./g, "/");
-					if (sParentName) {
-						sManifestUrl += "/" + sParentName;
-					}
-					sManifestUrl += "/" + oChildConfig.manifest;
-					// load child manifest to get title and sub child nodes
-					LoaderExtensions.loadResource(sManifestUrl, {
-						dataType: "json",
-						async: true,
-						failOnError: false
-					}).then(function (oManifest) {
-						if (oManifest && oManifest["sap.card"]?.configuration?.childCards) {
-							var oSubChildNodes = oManifest["sap.card"].configuration.childCards;
-							for (var sSubName in oSubChildNodes) {
-								var oSubNode = loadChildNode(sSubName, oSubChildNodes[sSubName], sPath ? (sPath + "/" + sSubName) : sSubName, sBaseUrl, sName);
-								oNode.nodes.push(oSubNode);
-							}
-						}
-						if (oManifest) {
-							oNode.text = oChildConfig.title || oManifest["sap.app"].title || oNode.text;
-						} else if (oChildConfig.title) {
-							oNode.text = oChildConfig.title;
-						}
-						oNode.textReady = true;
-						// check if all texts are ready. If true, set dataReady true and fire event
-						if (checkTextsReady()) {
-							oData[0].dataReady = true;
-							oModel.checkUpdate(true);
-							that.fireChildTreeDataReady();
-						} else {
-							oModel.checkUpdate(true);
-						}
-					});
-				} catch (e) {
-					if (oChildConfig.title) {
-						oNode.text = oChildConfig.title;
-					}
-					oNode.textReady = true;
-					// check if all texts are ready. If true, set dataReady true and fire event
-					if (checkTextsReady()) {
-						oData[0].dataReady = true;
-						oModel.checkUpdate(true);
-						that.fireChildTreeDataReady();
-					} else {
-						oModel.checkUpdate(true);
-					}
-					Log.error("sap.ui.integration.editor.Editor: child edtior tree manifest load error: " + e);
-				}
-			} else if (oChildConfig.title) {
-				oNode.text = oChildConfig.title;
-				oNode.textReady = true;
-				// check if all texts are ready. If true, set dataReady true and fire event
-				if (checkTextsReady()) {
-					oData[0].dataReady = true;
-					oModel.checkUpdate(true);
-					that.fireChildTreeDataReady();
-				} else {
-					oModel.checkUpdate(true);
-				}
-			}
-			return oNode;
-		};
-
-		for (var sChildNodeName in oChildNodes) {
-			var oNode = loadChildNode(sChildNodeName, oChildNodes[sChildNodeName], sChildNodeName, sBaseUrl);
-			oData[0].nodes.push(oNode);
-		}
-		that._oChildTree = new Tree({
-			items: {
-				path: "/",
-				template: new StandardTreeItem({
-					title: "{text}",
-					tooltip: "{text}",
-					type: "Active",
-					highlight: "{= ${selected} ? 'Information' : 'None'}"
-				})
-			},
-			toggleOpenState: that.onToggleOpenState,
-			itemPress: that.onTreeItemPress.bind(that)
-		}).addStyleClass("sapUiIntegrationEditorChildTreeItem");
-		that._oChildTree.setModel(oModel);
-	};
-
-	Editor.prototype.onToggleOpenState = function(oEvent) {
-		var oControl = oEvent.getSource();
-		var bExpanded = oEvent.getParameter("expanded");
-		if (bExpanded) {
-			Log.info("sap.ui.integration.editor.Editor: child edtior tree item expanded: " + oEvent.getParameter("itemIndex"));
-			oControl.expand([oEvent.getParameter("itemIndex")]);
-		} else {
-			Log.info("sap.ui.integration.editor.Editor: child edtior tree item collapsed: " + oEvent.getParameter("itemIndex"));
-			oControl.collapse([oEvent.getParameter("itemIndex")]);
-		}
-	};
-
-	/**
-	 * process the pressed tree item event
-	 * @param {sap.ui.base.Event} oEvent the event object
-	 */
-	Editor.prototype.onTreeItemPress = function(oEvent) {
-		// get the pressed item
-		var oItem = oEvent.getParameter("srcControl");
-		if (!oItem || !oItem.getBindingContext() || !oItem.getBindingContext().getObject()) {
-			Log.error("sap.ui.integration.editor.Editor: child editor tree item pressed without binding context or binding object");
-			return;
-		}
-
-		// get the binding object and the manifest
-		var oItemObject = oItem.getBindingContext().getObject();
-		var oManifest = oItemObject.manifest;
-		if (!oManifest) {
-			Log.error("sap.ui.integration.editor.Editor: child editor tree item pressed without manifest");
-			return;
-		}
-		// check if manifest is json
-		try {
-			oManifest = JSON.parse(oManifest);
-		} catch (e) {
-			//manifest is not json
-			Log.info("sap.ui.integration.editor.Editor: child editor tree item pressed with manifest not json");
-		}
-		// check if same item pressed, if yes do nothing
-		var path = oItemObject.path || "/";
-		this._oChildTree._path = this._oChildTree._path || "/";
-		if (this._oChildTree._path === path) {
-			Log.info("sap.ui.integration.editor.Editor: same item pressed, do nothing");
-			return;
-		}
-
-		// update current settings to manifest changes (main editor or Child editor)
-		var oCurrentSettings = this.getCurrentSettings(true);
-		this._oChildEditorChanges = this._oChildEditorChanges || {};
-		this._aMainEditorChanges = this._aMainEditorChanges || [];
-		var sLayer = oCurrentSettings[":layer"];
-		var oMatchedChange, oMatchedChangeCloned;
-		if (!this.isChild) {
-			// find current layer change in main editor changes
-			oMatchedChange = this._aMainEditorChanges.find(function(oChange) {
-				return oChange[":layer"] === sLayer;
-			});
-			if (oMatchedChange) {
-				oMatchedChangeCloned = merge({}, oMatchedChange, oCurrentSettings);
-				var iIndex = this._aMainEditorChanges.indexOf(oMatchedChange);
-				if (iIndex > -1) {
-					this._aMainEditorChanges.splice(iIndex, 1);
-				}
-				oMatchedChange = oMatchedChangeCloned;
-			} else {
-				oMatchedChange = oCurrentSettings;
-			}
-			this._aMainEditorChanges.push(oMatchedChange);
-		} else {
-			this._oChildEditorChanges[this._oChildTree._path] = this._oChildEditorChanges[this._oChildTree._path] || [];
-			var aChildChanges = this._oChildEditorChanges[this._oChildTree._path];
-			// find current layer change in Child editor changes
-			oMatchedChange = aChildChanges.find(function(oChange) {
-				return oChange[":layer"] === sLayer;
-			});
-			if (oMatchedChange) {
-				oMatchedChangeCloned = merge({}, oMatchedChange, oCurrentSettings);
-				var iIndex = aChildChanges.indexOf(oMatchedChange);
-				if (iIndex > -1) {
-					aChildChanges.splice(iIndex, 1);
-				}
-				oMatchedChange = oMatchedChangeCloned;
-			} else {
-				oMatchedChange = oCurrentSettings;
-			}
-			aChildChanges.push(oMatchedChange);
-		}
-
-		// clean editor and reset flags
-		this.cleanAndReset();
-
-		// switch to the pressed editor
-		this.switchToEditor(oManifest, oItemObject, path);
-
-		// unHighlignt the previous selected item and highlight the current selected item
-		var oTreeModel = this._oChildTree.getModel();
-		var sCurrentItemIndex = this._oChildTree._itemIndex || "/0";
-		oTreeModel.setProperty(sCurrentItemIndex + "/selected", false);
-		oItemObject.selected = true;
-		oTreeModel.checkUpdate(true);
-
-		// update the item index and path
-		this._oChildTree._itemIndex = oItem.getBindingContext().getPath();
-		this._oChildTree._path = path;
-		Log.info("sap.ui.integration.editor.Editor: child editor tree item pressed");
-	};
-
-	/**
 	 * Switch to another editor based on the manifest and item object
 	 *
 	 * @param {*} oManifest the manifest of the editor to switch to
@@ -904,36 +654,7 @@ sap.ui.define([
 	 * @param {string} sPath the path of the pressed tree item
 	 */
 	Editor.prototype.switchToEditor = function(oManifest, oItemObject, sPath) {
-		// save the current settings, to avoid creating new instance when switching between child editors
-		this._oChildTreeSettings = this._oChildTreeSettings || {};
-		if (!this._oChildTreeSettings[this._oChildTree._path]) {
-			this._oChildTreeSettings[this._oChildTree._path] = deepClone(this._vIdOrSettings, 500);
-		}
-
-		// keep current manifest as main manifest if it is not a child
-		var bDestoryCurrentManifest = !!this.isChild;
-		if (!bDestoryCurrentManifest) {
-			this._mainManifest = this._oManifest;
-		}
-		// get settings for the pressed item
-		this.isChild = oItemObject.isChild;
-		var oManifestChanges;
-		if (!this.isChild) {
-			oManifestChanges = this._aMainEditorChanges;
-		} else {
-			oManifestChanges = this._oChildEditorChanges[sPath] || [];
-		}
-		if (this._oChildTreeSettings[sPath]) {
-			this._vIdOrSettings = this._oChildTreeSettings[sPath];
-		} else {
-			this._vIdOrSettings.baseUrl = oItemObject.baseUrl;
-			this._vIdOrSettings.manifest = oManifest;
-		}
-		this._vIdOrSettings.manifestChanges = oManifestChanges;
-		this._vIdOrSettings.destoryManifest = bDestoryCurrentManifest;
-
-		// switch to the pressed editor
-		this.setJson(this._vIdOrSettings, true); //suppress rerendering as the editor will be rerendered anyway
+		EditorChildTree.switchToEditor(this, oManifest, oItemObject, sPath);
 	};
 
 	/**
@@ -951,7 +672,7 @@ sap.ui.define([
 			// create Child editors tree if Child editors are defined and tree not created yet
 			var oChildEditors = that._oManifest.get(sConfigurationPath + "/childCards");
 			if (oChildEditors && typeof oChildEditors === "object") {
-				that.createChildTree(oChildEditors);
+				EditorChildTree.createChildTree(that, oChildEditors);
 			}
 		}
 		//load the designtime control and bundles lazy
