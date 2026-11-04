@@ -1719,7 +1719,7 @@ sap.ui.define([
 
 	/**
 	 * Determines the list of elements determined by the given predicates. All other elements are
-	 * turned into placeholders (lazily), except transient ones.
+	 * turned into placeholders (lazily), except transient ones and totals.
 	 *
 	 * @param {string[]} aPredicates
 	 *   The key predicates of the elements to request side effects for
@@ -1741,8 +1741,8 @@ sap.ui.define([
 		return Object.values(this.aElements.$byPredicate).filter(function (oElement) {
 			var sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate");
 
-			if (!sPredicate) {
-				return; // keep transient elements "as is"
+			if (!sPredicate || oElement["@$ui5.node.isTotal"]) {
+				return; // keep transient elements and totals "as is"
 			}
 
 			if (mPredicates[sPredicate]) {
@@ -2887,11 +2887,13 @@ sap.ui.define([
 	// Additionally the grand total row is refreshed. The resulting promise resolves without a
 	// defined result when the side effects and the grand total are updated; rejects if one of these
 	// requests fails.
-	_AggregationCache.prototype.requestSideEffects = function (oGroupLock, aPaths/*, ...*/) {
+	_AggregationCache.prototype.requestSideEffects = function (oGroupLock, aPaths, aPredicates,
+			bSingle, bWithMessages, _bSortSystemQueryOptions) {
 		// "super" call (like @borrows ...)
 		const fnSuper = this.oFirstLevel.requestSideEffects;
 		return SyncPromise.all([
-			fnSuper.apply(this, arguments),
+			fnSuper.call(this, oGroupLock, aPaths, aPredicates, bSingle, bWithMessages,
+				/*bSortSystemQueryOptions*/!this.oAggregation.hierarchyQualifier),
 			_AggregationHelper.isUsedForGrandTotal(aPaths, this.oAggregation.aggregate)
 				&& this.readGrandTotal(oGroupLock)
 		]);

@@ -377,9 +377,27 @@ sap.ui.define([
 			}
 		},
 
+		onRefreshFlightDates : async function () {
+			try {
+				await this.byId("table").getBinding("rows").getHeaderContext()
+					.requestSideEffects(["FlightDate"]);
+			} catch (oError) {
+				MessageBox.error(oError.message);
+			}
+		},
+
 		onRefreshFlightPrice : async function () {
 			try {
 				await this.byId("details").getBindingContext().requestSideEffects(["FlightPrice"]);
+			} catch (oError) {
+				MessageBox.error(oError.message);
+			}
+		},
+
+		onRefreshFlightPrices : async function () {
+			try {
+				await this.byId("table").getBinding("rows").getHeaderContext()
+					.requestSideEffects(["FlightPrice"]);
 			} catch (oError) {
 				MessageBox.error(oError.message);
 			}

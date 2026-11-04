@@ -167,8 +167,18 @@ sap.ui.define([
 			this.byId("details").getBindingContext().requestSideEffects(["FlightDate"]);
 		},
 
+		onRefreshFlightDates : function () {
+			this.byId("table").getBinding("rows").getHeaderContext()
+				.requestSideEffects(["FlightDate"]);
+		},
+
 		onRefreshFlightPrice : function () {
 			this.byId("details").getBindingContext().requestSideEffects(["FlightPrice"]);
+		},
+
+		onRefreshFlightPrices : function () {
+			this.byId("table").getBinding("rows").getHeaderContext()
+				.requestSideEffects(["FlightPrice"]);
 		},
 
 		onSearch : function () {

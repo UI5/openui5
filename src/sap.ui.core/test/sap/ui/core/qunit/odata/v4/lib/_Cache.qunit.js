@@ -11428,7 +11428,8 @@ sap.ui.define([
 								return "~aUsedPaths~";
 							});
 						that.mock(that.oRequestor).expects("buildQueryString")
-							.withExactArgs("/TEAMS/Foo", mQueryOptions1, false, true)
+							.withExactArgs("/TEAMS/Foo", mQueryOptions1, false, true,
+								"~bSortSystemQueryOptions~")
 							.returns("?bar");
 						that.oRequestorMock.expects("request").withExactArgs("GET",
 								"TEAMS('42')/Foo?bar", sinon.match.same(oGroupLock), undefined,
@@ -11452,7 +11453,7 @@ sap.ui.define([
 
 					// code under test
 					return oCache.requestSideEffects(oGroupLock, aPaths, aPredicates,
-							/*bSingle*/false, "~bWithMessages~")
+							/*bSingle*/false, "~bWithMessages~", "~bSortSystemQueryOptions~")
 						.then(function () {
 							var oElement,
 								sKeys = "";
@@ -11647,7 +11648,8 @@ sap.ui.define([
 			.withExactArgs("~aPaths~", "~mMergeableQueryOptions~")
 			.returns("~aUsedPaths~");
 		const oBuildQueryStringExpectation = this.mock(this.oRequestor).expects("buildQueryString")
-			.withExactArgs("/TEAMS/Foo", mExpectedQueryOptions, false, true).returns("?bar");
+			.withExactArgs("/TEAMS/Foo", mExpectedQueryOptions, false, true,
+				"~bSortSystemQueryOptions~").returns("?bar");
 		this.oRequestorMock.expects("request").withExactArgs("GET", "TEAMS('42')/Foo('a')?bar",
 				"~oGroupLock~", undefined, undefined, undefined, undefined, oCache.sMetaPath,
 				undefined, false, "~mMergeableQueryOptions~", sinon.match.same(oCache),
@@ -11666,7 +11668,7 @@ sap.ui.define([
 
 		// code under test
 		await oCache.requestSideEffects("~oGroupLock~", "~aPaths~", ["('a')", "n/a"],
-			/*bSingle*/true, "~bWithMessages~");
+			/*bSingle*/true, "~bWithMessages~", "~bSortSystemQueryOptions~");
 
 		sinon.assert.callOrder(oExtractMergeableQueryOptionsExpectation,
 			oBuildQueryStringExpectation);
@@ -11851,7 +11853,7 @@ sap.ui.define([
 						sinon.match.same(mMergeableQueryOptions))
 					.returns(aUsedPaths);
 				that.mock(that.oRequestor).expects("buildQueryString")
-					.withExactArgs("/TEAMS/Foo", mExpectedQueryOptions, false, true)
+					.withExactArgs("/TEAMS/Foo", mExpectedQueryOptions, false, true, undefined)
 					.returns("?bar");
 				that.oRequestorMock.expects("request")
 					.withExactArgs("GET",
@@ -11935,7 +11937,7 @@ sap.ui.define([
 							sinon.match.same(mMergeableQueryOptions))
 						.returns("~aUsedPaths~");
 					that.mock(that.oRequestor).expects("buildQueryString")
-						.withExactArgs("/TEAMS/Foo", {$filter : "~key_filter~"}, false, true)
+						.withExactArgs("/TEAMS/Foo", {$filter : "~key_filter~"}, false, true, false)
 						.returns("?bar");
 					that.oRequestorMock.expects("request")
 						.withExactArgs("GET", "TEAMS('42')/Foo?bar", sinon.match.same(oGroupLock),
@@ -11946,8 +11948,8 @@ sap.ui.define([
 					oCacheMock.expects("visitResponse").never();
 
 					// code under test
-					return oCache
-						.requestSideEffects(oGroupLock, aPaths, ["('c')"])
+					return oCache.requestSideEffects(oGroupLock, aPaths, ["('c')"], undefined,
+							undefined, false)
 						.then(function () {
 							assert.ok(false, "Unexpected success");
 						}, function (oError) {
@@ -12020,7 +12022,7 @@ sap.ui.define([
 				.withExactArgs(sinon.match.same(aPaths), sinon.match.same(mMergeableQueryOptions))
 				.returns(aUsedPaths);
 			this.mock(this.oRequestor).expects("buildQueryString")
-				.withExactArgs("/TEAMS/Foo", mQueryOptionsForExtract, false, true)
+				.withExactArgs("/TEAMS/Foo", mQueryOptionsForExtract, false, true, undefined)
 				.returns("?bar");
 			this.oRequestorMock.expects("request")
 				.withExactArgs("GET", bSingle ? "TEAMS('42')/Foo('c')?bar" : "TEAMS('42')/Foo?bar",

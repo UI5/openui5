@@ -5723,21 +5723,27 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-[
-	["~oGroupLock~", "~aPaths~"],
-	["~oGroupLock~", "~aPaths~", "~anyOtherParameter~"]
-].forEach((aArguments, i) => {
-	[true, false].forEach((bUsedForGrandTotal) => {
-		const sTitle = `requestSideEffects: bUsedForGrandTotal=${bUsedForGrandTotal}, #${i}`;
+[false, true].forEach((bRecursiveHierarchy) => {
+	[false, true].forEach((bUsedForGrandTotal) => {
+		const sTitle = "requestSideEffects: bRecursiveHierarchy=" + bRecursiveHierarchy
+			+ ", bUsedForGrandTotal=" + bUsedForGrandTotal;
+		if (bUsedForGrandTotal && bRecursiveHierarchy) {
+			return; // unrealistic
+		}
 
 	QUnit.test(sTitle, function (assert) {
-		const oAggregation = { // filled before by buildApply
-			aggregate : {foo : {grandTotal : true}},
-			groupLevels : [] /* data aggregation always has groupLevels */
-		};
+		const oAggregation = bRecursiveHierarchy
+			? {hierarchyQualifier : "X"}
+			: { // filled before by buildApply
+				aggregate : {foo : {grandTotal : true}}, // Note: needed to create _AC!
+				group : {},
+				groupLevels : []
+			};
 		const oCache = _AggregationCache.create(this.oRequestor, "~", "", {}, oAggregation);
 		this.mock(oCache.oFirstLevel).expects("requestSideEffects").on(oCache)
-			.withExactArgs(...aArguments).returns("promise0");
+			.withExactArgs("~oGroupLock~", "~aPaths~", "~aPredicates~", "~bSingle~",
+				"~bWithMessages~", /*bSortSystemQueryOptions*/!bRecursiveHierarchy)
+			.returns("promise0");
 		this.mock(_AggregationHelper).expects("isUsedForGrandTotal")
 			.withExactArgs("~aPaths~", sinon.match.same(oCache.oAggregation.aggregate))
 			.returns(bUsedForGrandTotal);
@@ -5750,7 +5756,8 @@ sap.ui.define([
 
 		assert.strictEqual(
 			// code under test
-			oCache.requestSideEffects(...aArguments),
+			oCache.requestSideEffects("~oGroupLock~", "~aPaths~", "~aPredicates~", "~bSingle~",
+				"~bWithMessages~", /*bSortSystemQueryOptions*/false),
 			"~result~", "without a defined result");
 	});
 	});
@@ -6647,6 +6654,10 @@ sap.ui.define([
 			aResult;
 
 		aElements.$byPredicate = {
+			"()" : {
+				"@$ui5._" : {predicate : "()"},
+				"@$ui5.node.isTotal" : true // must be ignored
+			},
 			"('A')" : oElementA,
 			"('B')" : {
 				"@$ui5._" : {predicate : "('B')"}
