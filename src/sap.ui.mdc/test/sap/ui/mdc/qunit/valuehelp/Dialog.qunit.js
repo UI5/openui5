@@ -559,7 +559,7 @@ sap.ui.define([
 					let oDomRef = oPanel.getDomRef();
 					assert.equal(oDomRef.getAttribute("role"), "region", "Tokenizer panel: role");
 					assert.equal(oDomRef.getAttribute("aria-labelledby"), oHeaderText.getId(), "Tokenizer panel: aria-labelledby");
-					oDomRef = oHeaderText.getDomRef();
+					oDomRef = oHeaderText.getLayoutData().getDomRef();
 					assert.equal(oDomRef.getAttribute("role"), "status", "Tokenizer header: role");
 					assert.equal(oDomRef.getAttribute("aria-live"), "polite", "Tokenizer header: aria-live");
 					assert.equal(oDomRef.getAttribute("aria-atomic"), "true", "Tokenizer header: aria-atomic");
