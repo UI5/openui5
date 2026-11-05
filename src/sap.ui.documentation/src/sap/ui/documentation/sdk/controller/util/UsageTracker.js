@@ -6,8 +6,8 @@
  * @class Utility class for tracking user navigation events and sending them to Adobe Analytics.
  */
 sap.ui.define(
-    ["sap/ui/base/Object", "sap/base/i18n/Localization", "./DocuInfo", "sap/base/Log"],
-    function (BaseObject, Localization, DocuInfo, Log) {
+    ["sap/ui/base/Object", "sap/base/i18n/Localization", "./DocuInfo", "sap/base/Log", "sap/ui/core/EventBus"],
+    function (BaseObject, Localization, DocuInfo, Log, EventBus) {
         "use strict";
 
         var oUserLanguageTag;
@@ -71,6 +71,7 @@ sap.ui.define(
                     this._oConfig = oComponent.getConfig();
                     this._oLastRouteParameters = null;
                     this._sLastLoggedPageUrl = null;
+                    this._bAwaitingResourceResolved = false;
                     this._isStarted = false;
                 },
                 start: function(sVersionName, aRouterEventsToLog) {
@@ -80,6 +81,7 @@ sap.ui.define(
                     this._initRemoteServiceConnector(sVersionName);
 
                     this._attachListenersForUserNavigations();
+                    EventBus.getInstance().subscribe("usageTracking", "resourceResolved", this._onResourceResolved, this);
 
                     this._updateLanguageTag();
                     Localization.attachChange(this._updateLanguageTag);
@@ -92,10 +94,12 @@ sap.ui.define(
                         return;
                     }
                     this._detachListenersForUserNavigations();
+                    EventBus.getInstance().unsubscribe("usageTracking", "resourceResolved", this._onResourceResolved, this);
                     Localization.detachChange(this._updateLanguageTag);
                     this._isStarted = false;
                     this._oLastRouteParameters = null;
                     this._sLastLoggedPageUrl = null;
+                    this._bAwaitingResourceResolved = false;
                 },
                 _initRemoteServiceConnector: function(sVersionName) {
                     window.adobeDataLayer = window.adobeDataLayer || [];
@@ -103,23 +107,29 @@ sap.ui.define(
                     this._logSessionStarted(sSiteName);
                 },
                 _logPrecedingRouteVisits: function(aRouterEventsToLog) {
-                    if (aRouterEventsToLog) {
-                        aRouterEventsToLog.forEach(function(oEventParameters) {
-                            switch (oEventParameters.eventId) {
-                                case "routeMatched": {
-                                    this._logRouteMatched(oEventParameters);
-                                    break;
-                                }
-                                case "bypassed": {
-                                    this._logRouteNotFound(oEventParameters);
-                                    break;
-                                }
-                                case "_navToWithoutHash": {
-                                    this._logNavToWithoutHash(oEventParameters);
-                                    break;
-                                }
+                    if (aRouterEventsToLog && aRouterEventsToLog.length) {
+                        // at most one route can be visited pre-consent, as the concent dialog is modal
+                        var oEventParameters = aRouterEventsToLog[aRouterEventsToLog.length - 1]; // the last one holds the outcome
+                        switch (oEventParameters.eventId) {
+                            case "routeMatched": {
+                                this._logRouteMatched(oEventParameters);
+                                break;
                             }
-                        }, this);
+                            case "bypassed": {
+                                this._logRouteNotFound(oEventParameters);
+                                break;
+                            }
+                            case "_navToWithoutHash": {
+                                this._logNavToWithoutHash(oEventParameters);
+                                break;
+                            }
+                            case "resourceResolved": {
+                                // the cached event carries the route fields nested under routeParameters
+                                // (the publishers send { routeParameters: ... } as the EventBus payload)
+                                this._getPageInfoAndLog(oEventParameters.routeParameters);
+                                break;
+                            }
+                        }
                     }
                 },
                 _onRouteMatched: function (oEvent) {
@@ -130,7 +140,7 @@ sap.ui.define(
                         // prevent logging the same page visit multiple times
                         // that happens when the router fires multiple events for the same route
                         // (e.g. when the app calls BOTH 'navTo' and 'linkClickHandler' of DocumentationRouter to load the same route)
-                        // untill the issue is fixed in the router
+                        // until the issue is fixed in the router
                         return;
                     }
                     if (this._isLegacyRoute(oEventParameters)) {
@@ -138,18 +148,48 @@ sap.ui.define(
                         return;
                     }
                     this._oLastRouteParameters = oEventParameters;
+
+                    if (this._checkPageNeedsResourceResolved(oEventParameters)) {
+                        // defer: the resourceResolved handler (subscribed in start())
+                        // will log the pageView once this route's resource resolves.
+                        this._bAwaitingResourceResolved = true;
+                    } else {
+                        this._bAwaitingResourceResolved = false;
+                        this._getPageInfoAndLog(oEventParameters);
+                    }
+                },
+                _checkPageNeedsResourceResolved: function(oEventParameters) {
+                    return this._getViewControllersForRoute(oEventParameters).some(function(oController) {
+                        return oController && oController.reportsResourceResolved === true;
+                    });
+                },
+                _onResourceResolved: function(sChannel, sEvent, oData) {
+                    if (!this._bAwaitingResourceResolved) {
+                        return; // ignore stale resolve from a superseded route
+                    }
+                    if (oData && oData.routeParameters && this._areEqualRoutes(oData.routeParameters, this._oLastRouteParameters)) {
+                        this._bAwaitingResourceResolved = false;
+                        this._getPageInfoAndLog(oData.routeParameters);
+                    }
+                },
+                _getPageInfoAndLog: function(oEventParameters) {
                     this._getPageInfoFromRoute(oEventParameters, function(oPageInfo) {
                         this._logPageVisit(oPageInfo);
                         this._sLastLoggedPageUrl = oPageInfo.url;
-                        this._publishLoggedInfo(true);
                     }.bind(this));
+                },
+                _getViewControllersForRoute: function(oEventParameters) {
+                    var aViews = oEventParameters.views ||
+                                 (oEventParameters.view ? [oEventParameters.view] : []);
+                    return aViews.map(function(oView) {
+                        return oView && oView.getController && oView.getController();
+                    }).filter(Boolean);
                 },
                 _onRouteNotFound: function (oEvent) {
                     this._logRouteNotFound(oEvent.getParameters());
                 },
                 _logRouteNotFound: function(oEventParameters) {
                     this._logPageNotFound(oEventParameters.hash);
-                    this._publishLoggedInfo(true);
                 },
                 _onNavToWithoutHash: function (oEvent) {
                     this._logNavToWithoutHash(oEvent.getParameters());
@@ -158,7 +198,6 @@ sap.ui.define(
                     var sViewName = oEventParameters.viewName;
                     if (aNotFoundViews.includes(sViewName)) {
                         this._logPageDataNotFound();
-                        this._publishLoggedInfo(true);
                     }
                 },
                 _areEqualRoutes: function(oRoute1Parameters, oRoute2Parameters) {
@@ -243,17 +282,22 @@ sap.ui.define(
                     window.adobeDataLayer.push(oLog);
                 },
                 _logPageVisit: function (oPageInfo) {
-                    this._addToLogs({
+                    var oLog = {
                         event: "pageView",
                         page: oPageInfo.toObject()
-                    });
+                    };
+                    if (this._isPageAlreadyLogged(oLog)) {
+                        return;
+                    }
+                    this._addToLogs(oLog);
+                    this._publishLoggedInfo(true);
                 },
                 /**
                  * Triggered when router does not find the route
                  */
                 _logPageNotFound: function (sHash) {
                     const sNormalized = normalizeHash(sHash) || "/";
-                    this._addToLogs({
+                    var oLog = {
                         event: "errorPage",
                         page: {
                             name: "notFound",
@@ -265,7 +309,14 @@ sap.ui.define(
                             pageName: sNormalized,
                             description: "page not found"
                         }
-                    });
+                    };
+                    if (this._isPageAlreadyLogged(oLog)) {
+                        return;
+                    }
+                    this._addToLogs(oLog);
+                    this._publishLoggedInfo(true);
+                    // the resource was not found — cancel any pending deferred pageView for this route
+                    this._bAwaitingResourceResolved = false;
                 },
                 /**
                  * Triggered when route found but subsequently page data is not found (after loading the page view)
@@ -283,8 +334,7 @@ sap.ui.define(
                             section: "/"
                         };
                     }
-
-                    this._addToLogs({
+                    var oLog = {
                         event: "errorPage",
                         page: {
                             name: "notFound",
@@ -297,8 +347,15 @@ sap.ui.define(
                             pageSection: oPageInfo.section,
                             description: "page data not found"
                         }
-                    });
-                    this._oLastRouteParameters = null; // clear last route parameters after logging
+                    };
+
+                    if (this._isPageAlreadyLogged(oLog)) {
+                        return;
+                    }
+                    this._addToLogs(oLog);
+                    this._publishLoggedInfo(true);
+                    // the resource was not found — cancel any pending deferred pageView for this route
+                    this._bAwaitingResourceResolved = false;
                 },
                 /**
                  * Logs an Activity Map click event to Adobe Analytics.
@@ -328,6 +385,15 @@ sap.ui.define(
                             : "stlBeaconReady"
                     });
                 },
+                _isPageAlreadyLogged: function (oLog) {
+                    // The DocumentationRouter fires duplicate router events for the same navigation when
+                    // the browser back/forward buttons are used or when the user manually changes the URL hash
+                    // (DocumentationRouter.popstateHandler handling causes duplicate events)
+                    // This is a design constraint for SEO purposes => need to workaround it here
+                    var aLogs = window.adobeDataLayer;
+                    var oLastPageLog = aLogs?.length > 1 ? aLogs[aLogs.length - 2] : null;
+                    return JSON.stringify(oLastPageLog) === JSON.stringify(oLog);
+                },
                 _updateLanguageTag: function () {
                     oUserLanguageTag = Localization.getLanguageTag();
                 },
@@ -347,7 +413,7 @@ sap.ui.define(
                 _detachListenersForUserNavigations() {
                     this._oRouter.detachRouteMatched(this._onRouteMatched, this);
                     this._oRouter.detachBypassed(this._onRouteNotFound, this);
-                    this._oRouter.detachEvent("_navToWithoutHash", this._onNavToWithoutHash);
+                    this._oRouter.detachEvent("_navToWithoutHash", this._onNavToWithoutHash, this);
                 },
                 exit: function () {
                     this.stop();

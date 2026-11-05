@@ -23,7 +23,8 @@ sap.ui.define([
 		"sap/ui/dom/includeScript",
 		"sap/ui/util/openWindow",
 		"sap/ui/documentation/sdk/controller/util/Highlighter",
-		"sap/ui/events/KeyCodes"
+		"sap/ui/events/KeyCodes",
+		"sap/ui/core/EventBus"
 	],
 	function (
 		jQuery,
@@ -46,12 +47,14 @@ sap.ui.define([
 		includeScript,
 		openWindow,
 		Highlighter,
-		KeyCodes
+		KeyCodes,
+		EventBus
 	) {
 		"use strict";
 
 		return BaseController.extend("sap.ui.documentation.sdk.controller.TopicDetail", {
 
+			reportsResourceResolved: true,
 
 			/* =========================================================== */
 			/* lifecycle methods										   */
@@ -268,6 +271,8 @@ sap.ui.define([
 				this.searchResultsButtonVisibilitySwitch(this.byId("topicDetailBackToSearch"));
 
 				this.appendPageTitle(this.getModel().getProperty("/topictitle1"));
+
+				EventBus.getInstance().publish("usageTracking", "resourceResolved", { routeParameters: this._oLastRouteParameters });
 			},
 
 			/**
@@ -285,6 +290,7 @@ sap.ui.define([
 				this.sSubTopicId = oTopicInfo.subTopicId;
 				this.sTopicURL = oTopicInfo.topicURL;
 				this.sQueryFromUrl = oOptions && oOptions.q ? decodeURIComponent(oOptions.q) : "";
+				this._oLastRouteParameters = event.getParameters();
 
 				DocumentationLoader.getInstance(this._oConfig).fetch(this.sTopicURL)
 					.then(this._onHtmlResourceLoaded.bind(this))

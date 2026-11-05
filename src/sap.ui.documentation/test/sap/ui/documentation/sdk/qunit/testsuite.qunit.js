@@ -31,15 +31,32 @@ sap.ui.define([], function() {
 			autostart: true					// Whether to call QUnit.start() when the test setup is done
 		},
 		tests: {
+			"AppController": {
+				coverage: {
+					only : ["sap/ui/documentation/sdk/controller/App.controller"]
+				}
+			},
 			"ApiDetailIndexDeprecatedExperimentalController": {
 				coverage: {
 					only : ["sap/ui/documentation/sdk/controller/ApiDetailIndexDeprecatedExperimental.controller"]
 				}
 			},
 
+			"ApiDetailController": {
+				coverage: {
+					only : ["sap/ui/documentation/sdk/controller/ApiDetail.controller"]
+				}
+			},
+
 			"TopicDetailController": {
 				coverage: {
 					only : ["sap/ui/documentation/sdk/controller/TopicDetail.controller"]
+				}
+			},
+
+			"EntityController": {
+				coverage: {
+					only : ["sap/ui/documentation/sdk/controller/Entity.controller"]
 				}
 			},
 

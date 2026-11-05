@@ -1,11 +1,13 @@
-/*global QUnit*/
+/*global QUnit, sinon*/
 sap.ui.define([
 	"sap/ui/documentation/sdk/controller/Sample.controller",
-	"sap/ui/documentation/sdk/util/Resources"
+	"sap/ui/documentation/sdk/util/Resources",
+	"sap/ui/core/EventBus"
 ],
 function (
 	SampleController,
-	ResourcesUtil
+	ResourcesUtil,
+	EventBus
 ) {
 	"use strict";
 
@@ -171,6 +173,126 @@ function (
 		// Assert
 		assert.ok(spy.calledWith("message", this.controller._fnOnMessage),
 			"removeEventListener should be called with 'message' event and the bound handler");
+	});
+
+	function filterResourceResolvedPublishes(spy) {
+		return spy.args.filter(function (a) {
+			return a[0] === "usageTracking" && a[1] === "resourceResolved";
+		});
+	}
+
+	function makeValidSamplesData(sId) {
+		var oSamples = {};
+		oSamples[sId] = {
+			id: sId,
+			name: "Test Sample",
+			entityId: "entity.id",
+			library: "sap.m",
+			description: "A test sample"
+		};
+		return { samples: oSamples };
+	}
+
+	QUnit.module("Sample.controller — reportsResourceResolved", {
+		beforeEach: function () {
+			this.oController = new SampleController();
+		},
+		afterEach: function () {
+			this.oController.destroy();
+			this.oController = null;
+		}
+	});
+
+	QUnit.test("reportsResourceResolved is true", function (assert) {
+		assert.strictEqual(this.oController.reportsResourceResolved, true,
+			"Sample.controller declares reportsResourceResolved: true");
+	});
+
+	QUnit.module("Sample.controller — _loadSample resourceResolved", {
+		beforeEach: function () {
+			this.oPublishSpy = sinon.spy(EventBus.getInstance(), "publish");
+			this.oController = new SampleController();
+			this.oController._sId = sSampleId;
+			this.oController._sEntityId = null;
+
+			var oFakePage = {
+				setBusy: function () {},
+				removeAllContent: function () {},
+				addContent: function () {},
+				setProperty: function () {}
+			};
+			this.oController._getPage = function () { return oFakePage; };
+
+			var oFakeModel = {
+				getData: function () { return {}; },
+				setData: function () {},
+				getProperty: function () { return "Test Sample"; }
+			};
+			this.oController.oModel = oFakeModel;
+			this.oController.getModel = function () { return oFakeModel; };
+
+			this.oController._createIframe = function () {
+				return Promise.resolve({});
+			};
+
+			this.oController.getOwnerComponent = function () {
+				return { _oCurrentOpenedSample: null };
+			};
+
+			this.oController.getAPIReferenceCheckPromise = function () {
+				return Promise.resolve(false);
+			};
+
+			this.oController.getView = function () {
+				return { byId: function () { return { setVisible: function () {} }; } };
+			};
+
+			this.oController.appendPageTitle = function () {};
+			this.oController.onRouteNotFound = sinon.spy();
+		},
+		afterEach: function () {
+			this.oPublishSpy.restore();
+			this.oController.destroy();
+			this.oController = null;
+		}
+	});
+
+	QUnit.test("valid sample — _loadSample resolves truthy → resourceResolved published once", function (assert) {
+		var done = assert.async();
+		var oController = this.oController;
+		var oPublishSpy = this.oPublishSpy;
+
+		oController._loadSample(makeValidSamplesData(sSampleId))
+			.then(function (bLoaded) {
+				if (bLoaded) {
+					EventBus.getInstance().publish("usageTracking", "resourceResolved");
+				}
+			})
+			.then(function () {
+				assert.strictEqual(filterResourceResolvedPublishes(oPublishSpy).length, 1,
+					"resourceResolved published exactly once for a valid sample");
+				done();
+			});
+	});
+
+	QUnit.test("sample not found — _loadSample resolves falsy → no resourceResolved", function (assert) {
+		var done = assert.async();
+		var oController = this.oController;
+		var oPublishSpy = this.oPublishSpy;
+
+		oController._loadSample({ samples: {} })
+			.then(function (bLoaded) {
+				if (bLoaded) {
+					EventBus.getInstance().publish("usageTracking", "resourceResolved");
+				}
+			})
+			.then(function () {
+				assert.strictEqual(filterResourceResolvedPublishes(oPublishSpy).length, 0,
+					"resourceResolved not published when sample is not found");
+				assert.ok(oController.onRouteNotFound.calledOnce,
+					"onRouteNotFound called when sample is not found");
+				done();
+			});
 	});
 
 });

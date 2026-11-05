@@ -30,6 +30,22 @@ sap.ui.define([
 
 		var BaseController = Controller.extend("sap.ui.documentation.sdk.controller.BaseController", {
 
+			/**
+			 * When set to <code>true</code>, the controller <strong>must</strong> publish
+			 * <code>EventBus.publish("usageTracking", "resourceResolved")</code>
+			 * to indicate that the resource specified in the URL is available.
+			 * This includes the already-displayed / revisit early-return cases.
+			 *
+			 * Enable in controllers that handle routes with a resource identifier in the URL
+			 * (for example API symbol or sample ID).
+			 *
+			 * Never publish <code>resourceResolved</code> if the resource is not available or an error occurs.
+			 *
+			 * @type {boolean}
+			 * @since 1.155
+			 */
+			reportsResourceResolved: false,
+
 			// Prerequisites
 			_oCore: Core,
 

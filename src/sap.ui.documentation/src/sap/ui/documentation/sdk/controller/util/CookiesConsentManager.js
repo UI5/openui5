@@ -116,10 +116,12 @@ sap.ui.define(
                 waitForPreferencesSubmission: function () {
                     throw new Error("Not supported. Check supportsWaitForPreferencesSubmission method first.");
                 },
-                exit: function () {
+                destroy: function () {
                     if (this._oConsentDialogComponent) {
                         this._oConsentDialogComponent.destroy();
+                        this._oConsentDialogComponent = null;
                     }
+                    BaseObject.prototype.destroy.apply(this, arguments);
                 }
             }
         );

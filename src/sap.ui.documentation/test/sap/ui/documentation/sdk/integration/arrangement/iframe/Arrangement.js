@@ -12,6 +12,23 @@ sap.ui.define(['sap/ui/test/Opa5', '../BaseArrangement'], function (Opa5, BaseAr
 			}
 			sAdditionalUrlParameters = sAdditionalUrlParameters || "";
 			return this.iStartMyAppInAFrame(appRootURL + "?sap-ui-language=en&sap-ui-animation=false&serverDelay=0&sap-ui-xx-tracking=false&cookie-settings-dialog=false&" + sAdditionalUrlParameters);
+		},
+
+		iStartMyAppIFrameWithUsageTracking: function (sHash) {
+			let appRootURL = sap.ui.require.toUrl("test-resources/sap/ui/documentation/sdk/index.html");
+
+			if (typeof window["sap-ui-documentation-test-config"] === "object") {
+				appRootURL = window["sap-ui-documentation-test-config"].appRootURL;
+			}
+			var sUrl = appRootURL + "?sap-ui-language=en&sap-ui-animation=false&serverDelay=0&sap-ui-xx-tracking=false&cookie-settings-dialog=false&sap-ui-xx-force-tracking-consent=true";
+			if (sHash) {
+				sUrl += "#" + sHash;
+			}
+			return this.iStartMyAppInAFrame(sUrl);
+		},
+
+		iStartMyAppWithUsageTracking: function (sHash) {
+			return this.iStartMyAppIFrameWithUsageTracking(sHash);
 		}
 	});
 });
