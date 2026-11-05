@@ -10,7 +10,7 @@ sap.ui.define([
 	"use strict";
 
 	// Test data
-	var aTestData = [
+	const aTestData = [
 		{Gregorian: {year: 1970, month: 0, day: 1}, Japanese: {era: 234, year: 45, month: 0, day: 1}},
 		{Gregorian: {year: 2011, month: 0, day: 1}, Japanese: {era: 235, year: 23, month: 0, day: 1}},
 		{Gregorian: {year: 1989, month: 0, day: 8}, Japanese: {era: 235, year: 1, month:0, day: 8}},
@@ -26,7 +26,7 @@ sap.ui.define([
 		{Gregorian: {year: 2019, month: 4, day: 1}, Japanese: {era: 236, year: 1, month:4, day: 1}},
 		{Gregorian: {year: 2032, month: 9, day: 1}, Japanese: {era: 236, year: 14, month:9, day: 1}}
 	];
-	var sDefaultLanguage = Localization.getLanguage();
+	const sDefaultLanguage = Localization.getLanguage();
 
 	//1. Instance related
 	QUnit.module("sap.ui.core.date.Japanese", {
@@ -39,23 +39,21 @@ sap.ui.define([
 			this.oLogMock.expects("warning").never();
 			Localization.setLanguage("en_US");
 		},
-		afterEach: function () {
+		afterEach() {
 			Localization.setLanguage(sDefaultLanguage);
 		}
 	});
 
 	QUnit.test("with no arguments", function (assert) {
-		var clock = sinon.useFakeTimers(); // 1, January 1970 = 1, January 45 Showa
-		var oJapaneseDate = new Japanese(); //1, January 45 Showa
+		const clock = sinon.useFakeTimers(); // 1, January 1970 = 1, January 45 Showa
+		const oJapaneseDate = new Japanese(); //1, January 45 Showa
 		verifyDate(assert, "Constructor with no parameters must always return the Japanese date corresponding to the current " +
 		"Gregorian one.", oJapaneseDate, 234, 45, 0, 1, true);
 		clock.restore();
 	});
 
 	QUnit.test("with value parameter (timestamp)", function (assert) {
-		var oJapaneseDate;
-
-		oJapaneseDate = new Japanese("invalid Japanese date timestamp");
+		let oJapaneseDate = new Japanese("invalid Japanese date timestamp");
 		assert.ok(isInvalid(oJapaneseDate), "Constructor with invalid string as timestamp must return an invalid date");
 
 		oJapaneseDate = new Japanese({});
@@ -66,7 +64,7 @@ sap.ui.define([
 		verifyDate(assert, "Constructor with value(timestamp)=0 must represents JapaneseDate corresponding to the date of 1st January 1970 Gregorian/(1389/10/22 Japanese)",
 				oJapaneseDate, 234, 45, 0, 1, true);
 
-		var iOneDay = 24 * 60 * 60 * 1000;
+		const iOneDay = 24 * 60 * 60 * 1000;
 		oJapaneseDate = new Japanese(iOneDay); //2, January 1970 = 1, January 45 Showa
 		verifyDate(assert, "Constructor with value(timestamp)= 'one day after 01.01.1970' must represents JapaneseDate corresponding to the date of 2nd January 1970 Gregorian/(1389/10/23 Japanese)",
 				oJapaneseDate, 234, 45, 0, 2, true);
@@ -78,9 +76,7 @@ sap.ui.define([
 
 	QUnit.test("with year, month[, day[, hour[, minutes[, seconds[, milliseconds]]]]] parameters: invalid parameter type )", function (assert) {
 		// ------------- object -----------------------------
-		var oJapaneseDate = null;
-
-		oJapaneseDate = new Japanese("blabla", 0, 23);
+		let oJapaneseDate = new Japanese("blabla", 0, 23);
 		assert.ok(isInvalid(oJapaneseDate), "Constructor with invalid string as year must return invalid date");
 
 		oJapaneseDate = new Japanese(null, 0, 23);
@@ -134,40 +130,36 @@ sap.ui.define([
 	});
 
 	QUnit.test("with era, year, month[, day[, hour[, minutes[, seconds[, milliseconds]]]]] parameters: valid values)", function (assert) {
-		var oJapaneseDate = null;
-		aTestData.forEach(function(oTestDate) {
-			oJapaneseDate = createJapaneseDateFromTestEntry(oTestDate);
+		aTestData.forEach((oTestDate) => {
+			const oJapaneseDate = createJapaneseDateFromTestEntry(oTestDate);
 			verifyDateWithTestDate(assert, "Constructor with valid values", oJapaneseDate, oTestDate.Japanese);
 		});
 	});
 
 	QUnit.test("with gregorian year, month[, day[, hour[, minutes[, seconds[, milliseconds]]]]] parameters: valid values)", function (assert) {
-		var oJapaneseDate = null;
-		aTestData.forEach(function(oTestDate) {
-			oJapaneseDate = createJapaneseDateFromGregorianTestEntry(oTestDate);
+		aTestData.forEach((oTestDate) => {
+			const oJapaneseDate = createJapaneseDateFromGregorianTestEntry(oTestDate);
 			verifyDateWithTestDate(assert, "Constructor with valid values", oJapaneseDate, oTestDate.Japanese);
 		});
 	});
 
 	QUnit.test("with year without era, when year is in current era and less than 100", function (assert) {
-		var oJapaneseDate = null,
-			iCurrentEra = UniversalDate.getCurrentEra(CalendarType.Japanese),
-			oJapanese;
-		aTestData.forEach(function(oTestDate) {
+		const iCurrentEra = UniversalDate.getCurrentEra(CalendarType.Japanese);
+		aTestData.forEach((oTestDate) => {
 			if (oTestDate.Japanese.era == iCurrentEra) {
-				oJapanese = oTestDate.Japanese;
+				const oJapanese = oTestDate.Japanese;
 				oTestDate = {
 					Gregorian: oJapanese,
 					Japanese: oJapanese
 				};
-				oJapaneseDate = createJapaneseDateFromGregorianTestEntry(oTestDate);
+				const oJapaneseDate = createJapaneseDateFromGregorianTestEntry(oTestDate);
 				verifyDateWithTestDate(assert, "Constructor with valid values", oJapaneseDate, oTestDate.Japanese);
 			}
 		});
 	});
 
 	QUnit.test("with optional parameters", function (assert) {
-		var oJapaneseDate = new Japanese([235, 23], 10);
+		let oJapaneseDate = new Japanese([235, 23], 10);
 		verifyDate(assert, "new Japanese([235, 23], 10) must be equal to 01.11.23H", oJapaneseDate, 235, 23, 10, 1);
 
 		oJapaneseDate = new Japanese([235, 23], 10, 2);
@@ -175,10 +167,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("Overflow/underflow of date values", function (assert) {
-		var oTestDate = aTestData[1],
-			oJapaneseDate;
+		const oTestDate = aTestData[1];
 
-		oJapaneseDate = createJapaneseDateFromTestEntry(oTestDate);
+		let oJapaneseDate = createJapaneseDateFromTestEntry(oTestDate);
 		oJapaneseDate.setMonth(12); //11 is max allowed value
 		verifyDate(assert, "setMonth(12) must overflow to next year", oJapaneseDate, 235, 24, 0, 1);
 
@@ -216,11 +207,9 @@ sap.ui.define([
 	});
 
 	QUnit.test("Overflow/underflow of date values close to era borders", function (assert) {
-		var oTestDate, oJapaneseDate;
+		let oTestDate = aTestData[3]; // end of Showa
 
-		oTestDate = aTestData[3]; // end of Showa
-
-		oJapaneseDate = createJapaneseDateFromTestEntry(oTestDate);
+		let oJapaneseDate = createJapaneseDateFromTestEntry(oTestDate);
 		oJapaneseDate.setMonth(1); //11 is max allowed value
 		verifyDate(assert, "setMonth(1) must overflow to next era", oJapaneseDate, 235, 1, 1, 7);
 
@@ -252,8 +241,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Set/Get Era", function (assert) {
-		var oTestDate = aTestData[0],
-			oJapaneseDate = createJapaneseDateFromTestEntry(oTestDate);
+		const oJapaneseDate = createJapaneseDateFromTestEntry(aTestData[0]);
 
 		oJapaneseDate.setEra(235);
 		verifyDate(assert, "setEra sets to first day of era", oJapaneseDate, 235, 1, 0, 8);
@@ -269,8 +257,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Set/Get Full Year", function (assert) {
-		var oTestDate = aTestData[0],
-			oJapaneseDate = createJapaneseDateFromTestEntry(oTestDate);
+		const oJapaneseDate = createJapaneseDateFromTestEntry(aTestData[0]);
 
 		oJapaneseDate.setFullYear(5);
 		verifyDate(assert, "setFullYear", oJapaneseDate, 234, 5, 0, 1);
@@ -283,15 +270,14 @@ sap.ui.define([
 	});
 
 	QUnit.test("Set/Get Year", function (assert) {
-		var oTestDate = aTestData[0],
-			oJapaneseDate = createJapaneseDateFromTestEntry(oTestDate);
+		const oJapaneseDate = createJapaneseDateFromTestEntry(aTestData[0]);
 
 		oJapaneseDate.setYear(5);
 		verifyDate(assert, "setYear", oJapaneseDate, 234, 5, 0, 1);
 	});
 
 	QUnit.test("Setters have to return the time since 1.1.1970", function (assert) {
-		var oDate = new Japanese([235, 23], 0, 1, 8, 10, 15, 119);
+		const oDate = new Japanese([235, 23], 0, 1, 8, 10, 15, 119);
 
 		function check(iTimestamp, sSetter) {
 			assert.equal(typeof iTimestamp, "number", sSetter + " did return a numeric value");
@@ -320,7 +306,7 @@ sap.ui.define([
 
 
 	QUnit.test(".Now()", function (assert) {
-		var clock = sinon.useFakeTimers(0); // 1, January 1970 = 22 Shawwal 1389(22.10.1389)
+		let clock = sinon.useFakeTimers(0); // 1, January 1970 = 22 Shawwal 1389(22.10.1389)
 		assert.equal(Japanese.now(), 0, "Japanese.now() must equal to the timestamp since 1 January 1970, 00:00:00 000");
 
 		clock.restore();
@@ -331,27 +317,25 @@ sap.ui.define([
 	});
 
 	QUnit.test("Convert Gregorian to Japanese dates", function (assert) {
-		var oGregorianDate, oExpectedJapaneseDate, oCalculatedJapaneseDate;
-		for (var i = 0; i < aTestData.length; i++) {
-			oGregorianDate = createGregorianDateFromTestEntry(aTestData[i], true);
-			oExpectedJapaneseDate = createJapaneseDateFromTestEntry(aTestData[i], true);
-			oCalculatedJapaneseDate = new Japanese(oGregorianDate.getTime());
+		aTestData.forEach((oTestDate, i) => {
+			const oGregorianDate = createGregorianDateFromTestEntry(oTestDate, true);
+			const oExpectedJapaneseDate = createJapaneseDateFromTestEntry(oTestDate, true);
+			const oCalculatedJapaneseDate = new Japanese(oGregorianDate.getTime());
 			compareTwoDates(assert, "Gregorian2Japanese " + i, oCalculatedJapaneseDate, oExpectedJapaneseDate);
-		}
+		});
 	});
 
 	QUnit.test("Convert Japanese to Gregorian dates", function (assert) {
-		var oJapaneseDate, oExpectedGregorianDate, oCalculatedGregorianDate;
-		for (var i = 0; i < aTestData.length; i++) {
-			oJapaneseDate = createJapaneseDateFromTestEntry(aTestData[i], true);
-			oExpectedGregorianDate = createGregorianDateFromTestEntry(aTestData[i], true);
-			oCalculatedGregorianDate = oJapaneseDate.getJSDate();
+		aTestData.forEach((oTestDate, i) => {
+			const oJapaneseDate = createJapaneseDateFromTestEntry(oTestDate, true);
+			const oExpectedGregorianDate = createGregorianDateFromTestEntry(oTestDate, true);
+			const oCalculatedGregorianDate = oJapaneseDate.getJSDate();
 			compareTwoJSDates(assert, "Japanese2Gregorian " + i, oCalculatedGregorianDate, oExpectedGregorianDate);
-		}
+		});
 	});
 
-[false, true].forEach(function (bUTC) {
-	var sMethodeName = bUTC ? "getUTCWeek" : "getWeek";
+[false, true].forEach((bUTC) => {
+	const sMethodeName = bUTC ? "getUTCWeek" : "getWeek";
 
 	QUnit.test(sMethodeName + " (de)", function (assert) {
 		function createDate(aYear, iMonth, iOneDay) {
@@ -406,8 +390,8 @@ sap.ui.define([
 	}
 
 	function verifyDate(assert, sMessage, oDate, era, year, month, day, bUTC) {
-		var sExpected = formatDate(era, year, month + 1, day);
-		var sReal = formatDate(String(bUTC ? oDate.getUTCEra() : oDate.getEra()),
+		const sExpected = formatDate(era, year, month + 1, day);
+		const sReal = formatDate(String(bUTC ? oDate.getUTCEra() : oDate.getEra()),
 				String(bUTC ? oDate.getUTCFullYear() : oDate.getFullYear()),
 				String(bUTC ? (oDate.getUTCMonth() + 1) : (oDate.getMonth() + 1)),
 				String(bUTC ? oDate.getUTCDate() : oDate.getDate()));
@@ -427,8 +411,8 @@ sap.ui.define([
 	}
 
 	function verifyJSDate(assert, sMessage, oDate, year, month, day, bUTC) {
-		var sExpected = formatJSDate(year, month + 1, day);
-		var sReal = formatJSDate(String(bUTC ? oDate.getUTCFullYear() : oDate.getFullYear()),
+		const sExpected = formatJSDate(year, month + 1, day);
+		const sReal = formatJSDate(String(bUTC ? oDate.getUTCFullYear() : oDate.getFullYear()),
 				String(bUTC ? (oDate.getUTCMonth() + 1) : (oDate.getMonth() + 1)),
 				String(bUTC ? oDate.getUTCDate() : oDate.getDate()));
 
@@ -442,7 +426,7 @@ sap.ui.define([
 	}
 
 	function createJapaneseDateFromTestEntry(oEntry, bUTC) {
-		var oDateEntry = oEntry.Japanese;
+		const oDateEntry = oEntry.Japanese;
 		if (bUTC) {
 			// eslint-disable-next-line new-cap
 			return new Japanese(Japanese.UTC([oDateEntry.era, oDateEntry.year], oDateEntry.month, oDateEntry.day));
@@ -452,7 +436,7 @@ sap.ui.define([
 	}
 
 	function createGregorianDateFromTestEntry(oEntry, bUTC) {
-		var oDateEntry = oEntry.Gregorian;
+		const oDateEntry = oEntry.Gregorian;
 		if (bUTC) {
 			return UI5Date.getInstance(Date.UTC(oDateEntry.year, oDateEntry.month, oDateEntry.day));
 		} else {
@@ -461,7 +445,7 @@ sap.ui.define([
 	}
 
 	function createJapaneseDateFromGregorianTestEntry(oEntry) {
-		var oDateEntry = oEntry.Gregorian;
+		const oDateEntry = oEntry.Gregorian;
 		return new Japanese(oDateEntry.year, oDateEntry.month, oDateEntry.day);
 	}
 
