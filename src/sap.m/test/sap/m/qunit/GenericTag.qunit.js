@@ -303,6 +303,18 @@ sap.ui.define([
 		this.assertCalledOnceWithExactParam(this.oToggleActiveGenericTagSpy, true, assert);
 	});
 
+	QUnit.test("ontouchstart should mark the event so parent controls (e.g. ListItemBase) do not fire their own press", function(assert) {
+		//setup
+		const oEvent = { setMarked: function () {} };
+		const oSpy = this.spy(oEvent, "setMarked");
+
+		//act
+		this.oGenericTag.ontouchstart(oEvent);
+
+		//assert
+		assert.ok(oSpy.calledOnce, "setMarked is called on touchstart");
+	});
+
 	QUnit.test("onkeydown should apply the active class - ENTER", function(assert) {
 		//act
 		qutils.triggerKeydown(this.oGenericTag, KeyCodes.ENTER);
