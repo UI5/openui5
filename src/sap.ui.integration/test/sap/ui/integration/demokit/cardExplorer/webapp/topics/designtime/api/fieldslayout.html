@@ -30,15 +30,19 @@
 			display: none ! important;
 		}
 
-		td[data-sample],
-		td[data-sample] .sapUiIntegrationEditor {
-			width: 400px;
-			height: 120px;
+		td[data-sample] {
+			vertical-align: top;
 		}
 
-		div[data-sample] .sapUiIntegrationEditor {
-			width: 800px;
-			height: 400px;
+		td[data-sample] .sapUiIntegrationEditor {
+			width: 400px;
+			height: 120px !important;
+			overflow: hidden;
+		}
+
+		td[data-sample] .sapUiIntegrationEditor .sapUiIntegrationEditorForm {
+			height: 120px !important;
+			overflow-y: auto;
 		}
 	</style>
 	<script>
@@ -176,10 +180,11 @@
 <body class="sapUiBody sapUiSizeCompact topicBody">
 	<div class="topic">
 		<div class="content">
-
+	
 			<h1 id="overview">Controlling Fields and Layout</h1>
 			<p>
-				The Configuration Editor comes with many default visualizations for fields for basic type. The below examples can
+				The Configuration Editor comes with many default visualizations for fields for basic type. The below
+				examples can
 				help to
 				find the matching field configurations based on your needs.
 			</p>
@@ -195,8 +200,8 @@
 					</tr>
 					<tr>
 						<td>Simple String field</td>
-
-
+	
+	
 						<td data-sample="1">
 							Loading...
 						</td>
@@ -210,8 +215,8 @@
 					</tr>
 					<tr>
 						<td>String field with translation button</td>
-
-
+	
+	
 						<td data-item="string" data-sample>
 							Loading...
 						</td>
@@ -226,8 +231,8 @@
 					</tr>
 					<tr>
 						<td>Simple Boolean field</td>
-
-
+	
+	
 						<td data-sample="2">
 							Loading...
 						</td>
@@ -241,8 +246,8 @@
 					</tr>
 					<tr>
 						<td>Simple Integer field</td>
-
-
+	
+	
 						<td data-sample="3">
 							Loading...
 						</td>
@@ -256,8 +261,8 @@
 					</tr>
 					<tr>
 						<td>Simple Date field</td>
-
-
+	
+	
 						<td data-sample="4">
 							Loading...
 						</td>
@@ -273,8 +278,8 @@
 					</tr>
 					<tr>
 						<td>Simple Date Time field</td>
-
-
+	
+	
 						<td data-sample="5">
 							Loading...
 						</td>
@@ -290,8 +295,8 @@
 					</tr>
 					<tr>
 						<td>Simple String Array field (MultiComboBox)</td>
-
-
+	
+	
 						<td data-sample="6">
 							Loading...
 						</td>
@@ -322,8 +327,8 @@
 					</tr>
 					<tr>
 						<td>Simple String Array field (MultiInput)</td>
-
-
+	
+	
 						<td data-sample="7">
 							Loading...
 						</td>
@@ -455,7 +460,8 @@
 					<tr>
 						<td>Simple Object field with value from Json list (Table)</td>
 						<td>
-							<a href="#objectWithPropertiesDefinedAndValueFromJsonList">Visualization for Object Field with value from Json list</a>
+							<a href="#objectWithPropertiesDefinedAndValueFromJsonList">Visualization for Object Field with
+								value from Json list</a>
 						</td>
 						<td>
 							<pre class="lang-js" style="height:350px">
@@ -597,7 +603,8 @@
 					<tr>
 						<td>Simple Object field with value from requested file (Table)</td>
 						<td>
-							<a href="#objectWithPropertiesDefinedAndValueFromRequestedFile">Visualization for Object Field with value from requested file</a>
+							<a href="#objectWithPropertiesDefinedAndValueFromRequestedFile">Visualization for Object Field
+								with value from requested file</a>
 						</td>
 						<td>
 							<pre class="lang-js" style="height:350px">
@@ -659,7 +666,8 @@
 					<tr>
 						<td>Simple Object field with value from OData request (Table)</td>
 						<td>
-							<a href="#objectWithPropertiesDefinedAndValueFromODataRequest">Visualization for Object Field with value from oData Request</a>
+							<a href="#objectWithPropertiesDefinedAndValueFromODataRequest">Visualization for Object Field
+								with value from oData Request</a>
 						</td>
 						<td>
 							<pre class="lang-js" style="height:350px">
@@ -739,7 +747,8 @@
 					<tr>
 						<td>Simple Object Array field (Table)</td>
 						<td>
-							<a href="#objectsWithPropertiesDefined">Visualization for Object Array Field with object properties defined only</a>
+							<a href="#objectsWithPropertiesDefined">Visualization for Object Array Field with object
+								properties defined only</a>
 						</td>
 						<td>
 							<pre class="lang-js" style="height:350px">
@@ -863,7 +872,8 @@
 					<tr>
 						<td>Simple Object Array field with value from Json list (Table)</td>
 						<td>
-							<a href="#objectsWithPropertiesDefinedAndValueFromJsonList">Visualization for Object Array Field with value from Json list</a>
+							<a href="#objectsWithPropertiesDefinedAndValueFromJsonList">Visualization for Object Array Field
+								with value from Json list</a>
 						</td>
 						<td>
 							<pre class="lang-js" style="height:350px">
@@ -980,7 +990,8 @@
 					<tr>
 						<td>Simple Object Array field with value from requested file (Table)</td>
 						<td>
-							<a href="#objectsWithPropertiesDefinedAndValueFromRequestedFile">Visualization for Object Array Field with value from requested file</a>
+							<a href="#objectsWithPropertiesDefinedAndValueFromRequestedFile">Visualization for Object Array
+								Field with value from requested file</a>
 						</td>
 						<td>
 							<pre class="lang-js" style="height:350px">
@@ -1042,7 +1053,8 @@
 					<tr>
 						<td>Simple Object Array field with value from OData request (Table)</td>
 						<td>
-							<a href="#objectsWithPropertiesDefinedAndValueFromODataRequest">Visualization for Object Array Field with value from oData Request</a>
+							<a href="#objectsWithPropertiesDefinedAndValueFromODataRequest">Visualization for Object Array
+								Field with value from oData Request</a>
 						</td>
 						<td>
 							<pre class="lang-js" style="height:350px">
@@ -1108,8 +1120,8 @@
 					<tr>
 						<td>Two columns with fields.<br>If fields semantically belong together, put them next to
 							each other</td>
-
-
+	
+	
 						<td data-sample="8">
 							Loading...
 						</td>
@@ -1132,7 +1144,7 @@
 					</tr>
 					<tr>
 						<td>Group header before a field</td>
-
+	
 						<td data-sample="9">
 							Loading...
 						</td>
@@ -1152,8 +1164,8 @@
 					</tr>
 					<tr>
 						<td>Simple Separator field</td>
-
-
+	
+	
 						<td data-sample="10">
 							Loading...
 						</td>
@@ -1211,8 +1223,8 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (
 					<tr>
 						<td>Showing a Slider for an integer field<br>Please define "Slider" as type in your
 							designtime.js file.</td>
-
-
+	
+	
 						<td data-item="integer" data-sample>
 							Loading...
 						</td>
@@ -1252,8 +1264,8 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (
 					<tr>
 						<td>Showing a Switch for an boolean field.<br>Please define "Switch" as type in your
 							designtime.js file.</td>
-
-
+	
+	
 						<td data-item="boolean" data-sample>
 							Loading...
 						</td>
@@ -1288,8 +1300,8 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (
 					</tr>
 					<tr>
 						<td>Showing the fields with layout property.</td>
-
-
+	
+	
 						<td data-sample="11">
 							Loading...
 						</td>
@@ -1369,29 +1381,27 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (
 							Loading...
 						</td>
 						<td>
-							<pre class="lang-js" data-sample="12" style="height:250px">
-	{
-		"param0": {
-			"manifestpath": "/sap.card/configuration/parameters/param0/value",
-			"label": "Parameter 0",
-			"type": "string"
-		},
-		"subGroup1": {
-			"type": "group",
-			"label": "Sub group 1",
-			"level": "1",
-			"expanded": true,
-			"visualization": {
-				"type": "Panel"
-			}
-		},
-		"param1": {
-			"manifestpath": "/sap.card/configuration/parameters/param1/value",
-			"label": "Parameter 1",
-			"type": "string"
+							<pre class="lang-js" data-sample="12" style="height:250px">{
+	"param0": {
+		"manifestpath": "/sap.card/configuration/parameters/param0/value",
+		"label": "Parameter 0",
+		"type": "string"
+	},
+	"subGroup1": {
+		"type": "group",
+		"label": "Sub group 1",
+		"level": "1",
+		"expanded": true,
+		"visualization": {
+			"type": "Panel"
 		}
+	},
+	"param1": {
+		"manifestpath": "/sap.card/configuration/parameters/param1/value",
+		"label": "Parameter 1",
+		"type": "string"
 	}
-							</pre>
+}</pre>
 						</td>
 					</tr>
 					<tr>
@@ -1400,78 +1410,62 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (
 							Loading...
 						</td>
 						<td>
-							<pre class="lang-js" data-sample="13" style="height:250px">
-	{
-		"param0": {
-			"manifestpath": "/sap.card/configuration/parameters/param0/value",
-			"label": "Parameter 0",
-			"type": "string"
-		},
-		"subGroup1": {
-			"type": "group",
-			"label": "Sub group 1",
-			"level": "1",
-			"expanded": true,
-			"visualization": {
-				"type": "Tab"
-			}
-		},
-		"param1": {
-			"manifestpath": "/sap.card/configuration/parameters/param1/value",
-			"label": "Parameter 1",
-			"type": "string"
+							<pre class="lang-js" data-sample="13" style="height:250px">{
+	"param0": {
+		"manifestpath": "/sap.card/configuration/parameters/param0/value",
+		"label": "Parameter 0",
+		"type": "string"
+	},
+	"subGroup1": {
+		"type": "group",
+		"label": "Sub group 1",
+		"level": "1",
+		"expanded": true,
+		"visualization": {
+			"type": "Tab"
 		}
+	},
+	"param1": {
+		"manifestpath": "/sap.card/configuration/parameters/param1/value",
+		"label": "Parameter 1",
+		"type": "string"
 	}
-							</pre>
+}</pre>
 						</td>
 					</tr>
 				</table>
 			</div>
-		</div>
-	</div>
-	<div class="content">
-		<h2 id="visualizations">Visualizations for special Fields</h2>
-	</div>
-	<div class="content">
-		<h3 id="objectWithPropertiesDefinedAndValueFromJsonList">Visualization for Object Field with value from Json list</h3>
-		<div data-item="objectWithPropertiesDefinedAndValueFromJsonList" data-sample>
-			Loading...
-		</div>
-	</div>
-	<div class="content">
-		<h3 id="objectWithPropertiesDefinedAndValueFromRequestedFile">Visualization for Object Field with value from requested file</h3>
-		<div data-item="objectWithPropertiesDefinedAndValueFromRequestedFile" data-sample>
-			Loading...
-		</div>
-	</div>
-	<div class="content">
-		<h3 id="objectWithPropertiesDefinedAndValueFromODataRequest">Visualization for Object Field with value from oData Request</h3>
-		<div data-item="objectWithPropertiesDefinedAndValueFromODataRequest" data-sample>
-			Loading...
-		</div>
-	</div>
-	<div class="content">
-		<h3 id="objectsWithPropertiesDefined">Visualization for Object Array Field with object properties defined only</h3>
-		<div data-item="objectsWithPropertiesDefined" data-sample>
-			Loading...
-		</div>
-	</div>
-	<div class="content">
-		<h3 id="objectsWithPropertiesDefinedAndValueFromJsonList">Visualization for Object Array Field with value from Json list</h3>
-		<div data-item="objectsWithPropertiesDefinedAndValueFromJsonList" data-sample>
-			Loading...
-		</div>
-	</div>
-	<div class="content">
-		<h3 id="objectsWithPropertiesDefinedAndValueFromRequestedFile">Visualization for Object Array Field with value from requested file</h3>
-		<div data-item="objectsWithPropertiesDefinedAndValueFromRequestedFile" data-sample>
-			Loading...
-		</div>
-	</div>
-	<div class="content">
-		<h3 id="objectsWithPropertiesDefinedAndValueFromODataRequest">Visualization for Object Array Field with value from oData Request</h3>
-		<div data-item="objectsWithPropertiesDefinedAndValueFromODataRequest" data-sample>
-			Loading...
+			<h2 id="visualizations">Visualizations for special Fields</h2>
+			<h3 id="objectWithPropertiesDefinedAndValueFromJsonList">Object Field with value from Json list</h3>
+			<div data-item="objectWithPropertiesDefinedAndValueFromJsonList" data-sample>
+				Loading...
+			</div>
+			<h3 id="objectWithPropertiesDefinedAndValueFromRequestedFile">Object Field with value from requested file</h3>
+			<div data-item="objectWithPropertiesDefinedAndValueFromRequestedFile" data-sample>
+				Loading...
+			</div>
+			<h3 id="objectWithPropertiesDefinedAndValueFromODataRequest">Object Field with value from oData Request</h3>
+			<div data-item="objectWithPropertiesDefinedAndValueFromODataRequest" data-sample>
+				Loading...
+			</div>
+			<h3 id="objectsWithPropertiesDefined">Object Array Field with object properties defined only</h3>
+			<div data-item="objectsWithPropertiesDefined" data-sample>
+				Loading...
+			</div>
+			<h3 id="objectsWithPropertiesDefinedAndValueFromJsonList">Object Array Field with value from Json list</h3>
+			<div data-item="objectsWithPropertiesDefinedAndValueFromJsonList" data-sample>
+				Loading...
+			</div>
+			<h3 id="objectsWithPropertiesDefinedAndValueFromRequestedFile">Object Array Field with value from requested file
+			</h3>
+			<div data-item="objectsWithPropertiesDefinedAndValueFromRequestedFile" data-sample>
+				Loading...
+			</div>
+			<h3 id="objectsWithPropertiesDefinedAndValueFromODataRequest">Object Array Field with value from oData Request
+			</h3>
+			<div data-item="objectsWithPropertiesDefinedAndValueFromODataRequest" data-sample>
+				Loading...
+			</div>
 		</div>
 	</div>
 </body>
