@@ -18,10 +18,10 @@
 	background-color: rgba(222, 222, 222, 0.3) !important;
 }
 
-.childsTreeContainer .sapMList {
+.sapUiIntegrationEditor .childsTreeContainer .sapMList {
     margin: -0.3rem 0 0 0
 }
-.childsTreeContainer .sapMListUl {
+.sapUiIntegrationEditor .childsTreeContainer .sapMListUl {
 	border-right: 1px solid var(--sapList_BorderColor);
 }
 
@@ -34,7 +34,7 @@
 }
 
 .sapUiIntegrationEditor .sapUiIntegrationEditorForm {
-	height: var(--sapUiIntegrationEditorFormHeight, 350px);;
+	height: var(--sapUiIntegrationEditorFormHeight, 350px);
 	width: var(--sapUiIntegrationEditorFormWidth, 100%);
 	box-sizing: border-box;
 	/* margin:0 0.5rem;*/
@@ -54,7 +54,7 @@
 	padding: 0.625rem 1rem 1.375rem 0rem;
 }
 
-.sapUiIntegrationEditorSubTab {
+.sapUiIntegrationEditor .sapUiIntegrationEditorSubTab {
 	margin-top: 0.625rem;
 }
 
@@ -88,7 +88,7 @@
 }
 
 .sapUiIntegrationEditor.sapUiIntegrationEditorDark .sapUiIntegrationEditorForm:hover::-webkit-scrollbar-thumb {
-	background-color: var(--sapUiChartScrollbarBorderColor, rgba(222, 222, 222, 0.2))!important;;
+	background-color: var(--sapUiChartScrollbarBorderColor, rgba(222, 222, 222, 0.2))!important;
 }
 
 .sapUiIntegrationEditor .sapUiIntegrationEditorItem {
@@ -110,7 +110,7 @@
 }
 
 /** force inputs with no border **/
-.sapUiIntegrationEditor input, .sapUiComponentContainer input, #sap-ui-static input {
+.sapUiIntegrationEditor input {
 	border: none;
 	height: 100%;
 }
@@ -120,10 +120,6 @@ html[data-sap-ui-browser^="sf"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::selection {
 	background-color: var(--sapField_Focus_BorderColor, inherit) !important;
 	color: var(--sapField_Focus_Background, inherit) !important;
-}
-
-#sap-ui-static .sapMSliderTooltip {
-	min-width: 3.2rem;
 }
 
 .sapUiIntegrationEditor .sapUiIntegrationEditorItem .sapUiLocalBusyIndicatorAnimation {
@@ -354,7 +350,7 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 	padding: 0.5rem 0 0.5rem 0.5rem;
 }
 
-.sapUiIntegrationFieldTranslationText {
+.sapUiIntegrationEditor .sapUiIntegrationFieldTranslationText {
 	padding: 0.4rem 1rem 0.5rem 0;
 }
 
@@ -424,7 +420,7 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 	width: calc(100% - 2rem) !important;
 }
 
-.tableHdr .sapMListTblHeaderCell {
+.sapUiIntegrationFieldSettings .tableHdr .sapMListTblHeaderCell {
 	padding: 0rem;
 }
 
@@ -664,22 +660,19 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 .sapUiIntegrationEditor .sapUiIntegrationEditorHint *{
 	font-size: 0.75rem;
 }
-.sapUiIntegrationEditorItem > .sapMFT {
+.sapUiIntegrationEditor .sapUiIntegrationEditorItem > .sapMFT {
 	margin-bottom:0.5rem;
 }
-.sapUiIntegrationEditorItem .sapUiIntegrationEditorSpacerWithLine {
+.sapUiIntegrationEditor .sapUiIntegrationEditorItem .sapUiIntegrationEditorSpacerWithLine {
 	height: 10px;
 	border-bottom: ridge !important;
 	margin-bottom: 5px !important;
 }
-.sapUiIntegrationEditorItem .sapUiIntegrationEditorSpacerWithoutLine {
+.sapUiIntegrationEditor .sapUiIntegrationEditorItem .sapUiIntegrationEditorSpacerWithoutLine {
 	height: 15px;
 }
-.sapUiIntegrationEditorItem .sapUiIntegrationEditorFieldAlignEnd {
+.sapUiIntegrationEditor .sapUiIntegrationEditorItem .sapUiIntegrationEditorFieldAlignEnd {
 	text-align: end;
-}
-.sapUiIntegrationEditorItem .sapUiIntegrationEditorSettingBox {
-	max-width: 5rem;
 }
 
 /* Color Select */
@@ -704,34 +697,21 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 	color: var(--colorValue);
 }
 
-.errorBTNImage .sapMBtnIcon  {
+.sapUiIntegrationEditor .errorBTNImage .sapMBtnIcon  {
 	color: #b00 !important;
 	font-size: 12px !important;
 }
 
-.warningBTNImage .sapMBtnIcon  {
+.sapUiIntegrationEditor .warningBTNImage .sapMBtnIcon  {
 	color: var(--sapUiCriticalText, darkorange) !important;
 	font-size: 12px !important;
 }
 
-.validationBTNMargin .sapMITBFilterExpandBtn {
-	margin-left: 0.1rem !important;
-}
-
-.cardEditorIconTabBarBG {
-	background-color: lightgrey;
-}
-
-.errorBTN .sapMBtnInner {
+.sapUiIntegrationEditor .errorBTN .sapMBtnInner {
 	border: none !important;
 	background-color: inherit !important;
 }
 
-.errorBTNDisabled {
+.sapUiIntegrationEditor .errorBTNDisabled {
 	opacity: unset !important;
-}
-
-.tabMessageStrip .sapMText {
-	font-size: 0.875rem !important;
-	font-weight: normal !important;
 }
