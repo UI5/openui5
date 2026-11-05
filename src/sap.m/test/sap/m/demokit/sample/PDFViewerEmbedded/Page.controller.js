@@ -1,7 +1,8 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
-	"sap/ui/model/json/JSONModel"
-], function(Controller, JSONModel) {
+	"sap/ui/model/json/JSONModel",
+	"sap/m/MessageToast"
+], function(Controller, JSONModel, MessageToast) {
 	"use strict";
 
 	var PageController = Controller.extend("sap.m.sample.PDFViewerEmbedded.Page", {
@@ -23,6 +24,12 @@ sap.ui.define([
 
 		onIncorrectPathClick: function() {
 			this._oModel.setProperty("/Source", this._sInvalidPath);
+		},
+
+		onPDFViewerError: function (oEvent) {
+			if (oEvent.getParameter("errorType") === "PLUGIN_NOT_ENABLED") {
+				MessageToast.show("Your browser does not support PDF preview. To download the file, choose Download.");
+			}
 		}
 	});
 

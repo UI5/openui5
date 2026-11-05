@@ -41,8 +41,11 @@ sap.ui.define([
 			loaded: function () {
 				assert.ok(false, "'loaded' should not be fired");
 			},
-			error: function () {
+			error: function (oEvent) {
 				assert.ok(true, "'error' event should be fired");
+				assert.ok(oEvent, "Error event object should not be null");
+				assert.strictEqual(oEvent.getParameter("errorType"), "PLUGIN_NOT_ENABLED",
+					"'errorType' parameter should be 'PLUGIN_NOT_ENABLED' when the browser disables inline PDF display");
 			}
 		};
 

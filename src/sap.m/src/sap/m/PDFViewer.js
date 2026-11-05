@@ -175,7 +175,18 @@ sap.ui.define([
 								/**
 								 * The iframe element.
 								 */
-								target: { type: "any" }
+								target: { type: "any" },
+								/**
+								 * Indicates the type of error that occurred.
+								 * Possible values:
+								 * <ul>
+								 *   <li><code>"PLUGIN_NOT_ENABLED"</code>: The browser is configured to download PDFs
+								 *   instead of displaying them inline. The PDF itself is valid and can still be
+								 *   downloaded using the toolbar.</li>
+								 * </ul>
+								 * @since 1.155
+								 */
+								errorType: { type: "string" }
 							}
 						},
 						/**
