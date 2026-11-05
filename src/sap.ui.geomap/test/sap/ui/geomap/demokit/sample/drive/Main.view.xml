@@ -1,0 +1,94 @@
+<mvc:View controllerName="sap.ui.geomap.sample.drive.Main"
+		width="100%" height="100%"
+		xmlns:mvc="sap.ui.core.mvc"
+		xmlns="sap.m"
+		xmlns:gm="sap.ui.geomap">
+
+	<App id="MyApp" defaultTransitionName="show">
+		<Page id="P0" title="Drive on a map" titleLevel="H1">
+			<HBox class="sapUiResponsiveMargin" alignItems="Center" wrap="Wrap">
+				<Button id="startBtn" text="Drive now!" press=".onStartDrive"/>
+				<Label text="Speed (km/h):" class="sapUiSmallMarginBegin sapUiSmallMarginEnd"/>
+				<StepInput id="speedInput" value="80" step="10" min="10" max="200" width="120px"/>
+				<Label text="Travelled:" class="sapUiSmallMarginBegin sapUiSmallMarginEnd"/>
+				<Input id="distanceDisplay" value="" editable="false" width="130px"/>
+				<Label text="Travel time:" class="sapUiSmallMarginBegin sapUiSmallMarginEnd"/>
+				<Input id="timeDisplay" value="" editable="false" width="130px"/>
+			</HBox>
+			<gm:Geomap id="map"
+				width="100%"
+				height="80%"
+				centerLat="49.35223172425867"
+				centerLng="8.655243637778995"
+				zoom="10.674114221202869">
+				<gm:mapControls>
+					<gm:GeomapProvider id="mapProvider"></gm:GeomapProvider>
+					<gm:GeomapNavigationControl></gm:GeomapNavigationControl>
+					<gm:GeomapScaleControl position="BottomLeft"></gm:GeomapScaleControl>
+					<gm:GeomapCopyrightControl position="BottomRight">
+						<Text class="copyright" text="Map data from "/>
+						<Link class="sapUiTinyMarginBegin" target="_blank" text="OpenStreetMap" href="https://www.openstreetmap.org/copyright"/>
+					</gm:GeomapCopyrightControl>
+				</gm:mapControls>
+
+				<!-- Full route from Heidelberg to Walldorf -->
+				<gm:GeomapLine id="route" color="rgb(255,0,255)" width="4">
+					<gm:GeomapPoint lng="8.670950768079507" lat="49.394402020060994"/>
+					<gm:GeomapPoint lng="8.673532762101104" lat="49.39972327291761"/>
+					<gm:GeomapPoint lng="8.668368774057882" lat="49.3937018122904"/>
+					<gm:GeomapPoint lng="8.663635118350356" lat="49.39062077951618"/>
+					<gm:GeomapPoint lng="8.65588913628386"  lat="49.38529854045461"/>
+					<gm:GeomapPoint lng="8.650294815902441" lat="49.37969556065721"/>
+					<gm:GeomapPoint lng="8.6472824895435"   lat="49.376053281189854"/>
+					<gm:GeomapPoint lng="8.655028471609967" lat="49.373811744273326"/>
+					<gm:GeomapPoint lng="8.659331794980176" lat="49.371009679374794"/>
+					<gm:GeomapPoint lng="8.665786780035404" lat="49.368767912452"/>
+					<gm:GeomapPoint lng="8.671381100416824" lat="49.355034859379"/>
+					<gm:GeomapPoint lng="8.67267209742809"  lat="49.35195140196092"/>
+					<gm:GeomapPoint lng="8.676545088460898" lat="49.34774637579784"/>
+					<gm:GeomapPoint lng="8.677836085472137" lat="49.34129797091424"/>
+					<gm:GeomapPoint lng="8.679127082483319" lat="49.33344659824158"/>
+					<gm:GeomapPoint lng="8.679987747157156" lat="49.32503302332262"/>
+					<gm:GeomapPoint lng="8.683000073516155" lat="49.31409322625436"/>
+					<gm:GeomapPoint lng="8.679557414820692" lat="49.3076404118643"/>
+					<gm:GeomapPoint lng="8.675254091450483" lat="49.300344908220836"/>
+					<gm:GeomapPoint lng="8.671381100416824" lat="49.293328982224324"/>
+					<gm:GeomapPoint lng="8.669659771069092" lat="49.288838265465046"/>
+					<gm:GeomapPoint lng="8.658471130306282" lat="49.28968030601769"/>
+					<gm:GeomapPoint lng="8.650294815902441" lat="49.29473224731936"/>
+					<gm:GeomapPoint lng="8.64427016318453"  lat="49.29641611270151"/>
+					<gm:GeomapPoint lng="8.636093848780689" lat="49.29725802382103"/>
+					<gm:GeomapPoint lng="8.625765872692568" lat="49.300344908220836"/>
+					<gm:GeomapPoint lng="8.627917534377673" lat="49.30876270116988"/>
+					<gm:GeomapPoint lng="8.630069196062777" lat="49.31156831258815"/>
+					<gm:GeomapPoint lng="8.63136019307396"  lat="49.30707925762462"/>
+					<gm:GeomapPoint lng="8.633511854759064" lat="49.303712197967684"/>
+					<gm:GeomapPoint lng="8.642548833835946" lat="49.30427339055538"/>
+				</gm:GeomapLine>
+
+				<!-- Travelled portion of the route, filled dynamically -->
+				<gm:GeomapLine id="routeTravelled" color="rgb(83,83,83)" width="4"></gm:GeomapLine>
+
+				<!-- Start marker in Heidelberg -->
+				<gm:GeomapSpot lng="8.67275058386528" lat="49.40027640637996"></gm:GeomapSpot>
+
+				<!-- Destination marker in Walldorf — click opens an info popover -->
+				<gm:GeomapContainer id="destination" lng="8.642764" lat="49.303150999">
+					<Button icon="sap-icon://home" tooltip="Walldorf" press=".onDestinationPress"
+						type="Emphasized" width="32px"/>
+				</gm:GeomapContainer>
+
+				<!-- Car marker, moves along the route during animation -->
+				<gm:GeomapCircle id="car"
+					lng="8.67275058386528"
+					lat="49.40027640637996"
+					radius="5"
+					fillColor="red"
+					outlineColor="white"
+					outlineWidth="2">
+				</gm:GeomapCircle>
+			</gm:Geomap>
+		</Page>
+	</App>
+
+</mvc:View>

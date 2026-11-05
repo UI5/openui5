@@ -1,0 +1,30 @@
+<mvc:View controllerName="sap.ui.geomap.sample.dynamic.Main"
+		width="100%" height="100%"
+		xmlns:mvc="sap.ui.core.mvc"
+		xmlns="sap.m"
+		xmlns:gm="sap.ui.geomap">
+
+	<App id="MyApp" defaultTransitionName="show">
+		<Page id="P0" title="Dynamic data" titleLevel="H1">
+			<Text class="sapUiResponsiveMargin" text="Earthquake data from USGS updated every second. Circle size and color reflect earthquake magnitude." />
+			<gm:Geomap id="map"
+				width="100%"
+				height="90%"
+				centerLat="47.2538497518260"
+				centerLng="-118.75757337396215"
+				zoom="3">
+				<gm:mapControls>
+					<gm:GeomapProvider id="mapProvider"></gm:GeomapProvider>
+					<gm:GeomapNavigationControl></gm:GeomapNavigationControl>
+				</gm:mapControls>
+				<!-- GeomapSource holds the GeoJSON feature collection assigned in the controller -->
+				<gm:GeomapSource id="earthquakeSource"></gm:GeomapSource>
+				<!-- Circle layer: radius, fillColor, and source are set in the controller -->
+				<gm:GeomapCircleLayer id="earthquakeLayer" opacity="0.5"></gm:GeomapCircleLayer>
+				<!-- Symbol layer: text and source are set in the controller -->
+				<gm:GeomapSymbolLayer id="earthquakeLabels" textSize="8"></gm:GeomapSymbolLayer>
+			</gm:Geomap>
+		</Page>
+	</App>
+
+</mvc:View>

@@ -15,7 +15,7 @@
 				zoom="12.47447780">
 				<gm:mapControls>
 					<!-- MAP PROVIDER - defines where the map is fetched from -->
-					<gm:GeomapProvider id="mapProvider" styleUrl="https://basemaps-api.arcgis.com/arcgis/rest/services/styles/ArcGIS:Streets?type=style&amp;token="></gm:GeomapProvider>
+					<gm:GeomapProvider id="mapProvider" ></gm:GeomapProvider>
 					<!-- Show the navigation controls -->
 					<gm:GeomapNavigationControl></gm:GeomapNavigationControl>
 					<!-- Show the scale controls at bottom left-->
