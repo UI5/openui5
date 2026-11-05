@@ -9,6 +9,11 @@
 	white-space: nowrap;
 	outline: none;
 	margin: 0 0 0.5rem 0;
+	/* Clip instead of overflowing the parent during the ~200ms ResizeHandler latency,
+	so that shrinking the container does not produce a transient horizontal scrollbar
+	before the links are redistributed into the overflow Select. */
+	max-width: 100%;
+	overflow: hidden;
 
 	> ol {
 		display: flex;
