@@ -232,7 +232,12 @@ sap.ui.define([
 					// measured call; the alignment flips away from a cramped growth
 					// direction. Cache both for the sizing / anchor / arrow steps.
 					const oResolved = oTooltip._resolvePlacementAndAlign();
-					const sSide = oResolved.side;
+					// oResolved.side is a LOGICAL side under the Popup mirror convention;
+					// invert it to the true physical side the tooltip docks with
+					// (computeAnchor mirror:false). toLogicalSide is its own inverse
+					// (swaps Left/Right in RTL, identity in LTR). The alignment fields
+					// are axis values, not sides, and stay as-is.
+					const sSide = Positioning.toLogicalSide(oResolved.side);
 					oTooltip._sCalcedPos = sSide;
 					oTooltip._sEffectiveHAlign = oResolved.horizontalAlign;
 					oTooltip._sEffectiveVAlign = oResolved.verticalAlign;
@@ -607,10 +612,14 @@ sap.ui.define([
 			// resolved to a physical side without measurement (flipMode Never). The
 			// Popup renders the content, then the _applyPosition override measures
 			// the real DOM, resolves the final side, and re-anchors before paint.
-			const sProvisionalSide = Positioning.resolvePlacement({
+			// resolvePlacement returns a LOGICAL side under the Popup mirror
+			// convention; invert it to the true physical side here — the tooltip docks
+			// without Popup's RTL mirroring (computeAnchor mirror:false). toLogicalSide
+			// is its own inverse (swaps Left/Right in RTL, identity in LTR).
+			const sProvisionalSide = Positioning.toLogicalSide(Positioning.resolvePlacement({
 				placement: this.getPlacement(),
 				flipMode: PopoverFlipMode.Never
-			});
+			}));
 			const oAnchor = Positioning.computeAnchor({
 				side: sProvisionalSide,
 				arrowSize: this._arrowProtrusion,
