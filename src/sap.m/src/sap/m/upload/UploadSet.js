@@ -800,6 +800,14 @@ sap.ui.define([
 		return sNoDataText;
 	};
 
+	UploadSet.prototype.setNoDataText = function (sNoDataText) {
+		this.setProperty("noDataText", sNoDataText, true);
+		if (this._oList) {
+			this._oList.setNoDataText(this._setListNoDataText(sNoDataText));
+		}
+		return this;
+	};
+
 	UploadSet.prototype.getNoDataDescription = function () {
 		var sNoDataDescription = this.getProperty("noDataDescription");
 		sNoDataDescription = sNoDataDescription || this._oRb.getText("UPLOADCOLLECTION_NO_DATA_DESCRIPTION");
@@ -1070,6 +1078,9 @@ sap.ui.define([
 			}
 		}
 
+		if (this._oList) {
+			this._oList.setNoDataText(this._setListNoDataText());
+		}
 		return oAggregation;
 	};
 
