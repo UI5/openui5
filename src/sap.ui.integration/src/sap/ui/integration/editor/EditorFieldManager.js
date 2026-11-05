@@ -837,11 +837,11 @@ sap.ui.define([
 		Promise.all(oEditor._aFieldReadyPromise).then(function () {
 			oEditor._fieldReady = true;
 			oEditor.fireFieldReady();
-			if (oEditor.getMode() !== Constants.EDITOR_MODE.ADMIN && oEditor.getMode() !== Constants.EDITOR_MODE.ALL) {
-				setTimeout(function () {
-					oEditor.fireDestinationReady();
-				}, 100);
-			}
+		});
+
+		Promise.all(oEditor._aFieldDataReadyPromise).then(function () {
+			oEditor._aFieldDataReadyPromise = [];
+			oEditor.fireFieldDataReady();
 		});
 	};
 

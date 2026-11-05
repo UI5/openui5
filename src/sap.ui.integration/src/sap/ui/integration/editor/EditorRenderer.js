@@ -73,10 +73,7 @@ sap.ui.define([
 		}
 		// render the Child editors tree
 		var oRef = oControl.getId() + "_childsTreeContainer";
-		var bChildTreeRendered;
-		var renderChildsTreePromise;
 		if (oControl.isFieldReady() && oControl._oChildTree) {
-			bChildTreeRendered = false;
 			// render the container for Child editors tree
 			oRm.openStart("div", oRef);
 			oRm.class("childsTreeContainer");
@@ -99,12 +96,11 @@ sap.ui.define([
 			});
 
 			// wait for the container to be created and then render the nodes tree
-			renderChildsTreePromise = waitForContainer.then((container) => {
+			waitForContainer.then((container) => {
 				// create a UIArea for the container and render the tree into it
 				var oUIArea = UIArea.create(oRef);
 				oUIArea.addContent(oControl._oChildTree);
 				// focus the selected item in the nodes tree
-				var expandTreeItemPromise = new Promise(function (resolve, reject) {
 					setTimeout(function () {
 						if (oControl._oChildTree._itemIndex) {
 							var oItem = oControl._oChildTree.getItems().find(function(item) {
@@ -119,13 +115,7 @@ sap.ui.define([
 						} else {
 							oControl._oChildTree.expand(0);
 						}
-						bChildTreeRendered = true;
-						setTimeout(function () {
-							resolve({});
-						}, 100);
 					}, 100);
-				});
-				return expandTreeItemPromise;
 			});
 		}
 		if (oControl.isFieldReady()) {
@@ -657,62 +647,6 @@ sap.ui.define([
 				oRm.renderControl(oPreview);
 			}
 			oRm.close("div");
-		}
-		if (oControl.isFieldReady() && !oControl.isReady()) {
-			oControl.fireUIReady();
-			if (oControl._aFieldDataReadyPromise.length > 0) {
-				Promise.all(oControl._aFieldDataReadyPromise).then(function () {
-					oControl._aFieldDataReadyPromise = [];
-					// check ready status again since this is in async promise
-					if (!oControl.isReady()) {
-						if (bChildTreeRendered === false && renderChildsTreePromise) {
-							renderChildsTreePromise.then(function() {
-								if (oControl._oChildTree.getModel().getData()[0].dataReady) {
-									// add a timeout to make sure all UI updates are done before firing ready
-									setTimeout(function () {
-										oControl._ready = true;
-										oControl.fireReady();
-									}, 200);
-								} else {
-									// attach to child tree data ready event, then fire ready
-									oControl.attachEventOnce("childTreeDataReady", function() {
-										// add a timeout to make sure all UI updates are done before firing ready
-										setTimeout(function () {
-											oControl._ready = true;
-											oControl.fireReady();
-										}, 200);
-									});
-								}
-							});
-						} else {
-							oControl._ready = true;
-							oControl.fireReady();
-						}
-					}
-				});
-			} else if (bChildTreeRendered === false && renderChildsTreePromise) {
-				renderChildsTreePromise.then(function() {
-					if (oControl._oChildTree.getModel().getData()[0].dataReady) {
-						// add a timeout to make sure all UI updates are done before firing ready
-						setTimeout(function () {
-							oControl._ready = true;
-							oControl.fireReady();
-						}, 200);
-					} else {
-						// attach to child tree data ready event, then fire ready
-						oControl.attachEventOnce("childTreeDataReady", function() {
-							// add a timeout to make sure all UI updates are done before firing ready
-							setTimeout(function () {
-								oControl._ready = true;
-								oControl.fireReady();
-							}, 200);
-						});
-					}
-				});
-			} else {
-				oControl._ready = true;
-				oControl.fireReady();
-			}
 		}
 	};
 
