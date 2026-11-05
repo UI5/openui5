@@ -1359,122 +1359,175 @@ function(
 		var oGrid = this.getAggregation("_grid"),
 			oGridMV = this.getAggregation("_mvgrid");
 
-		var fnHandleHeadersSelect = function(oEvent) {
-			this.fireHeaderDateSelect({
-				date: oEvent.getSource()._oDate.toLocalJSDate()
-			});
-		};
-		var fnHandleAppointmentSelect = function(oEvent) {
-			this.fireAppointmentSelect({
-				appointment: oEvent.getParameter("appointment"),
-				appointments: oEvent.getParameter("appointments"),
-				originalEvent: oEvent.getParameter("originalEvent")
-			});
-		};
-		var fnHandleAppointmentDrop = function(oEvent) {
-			this.fireAppointmentDrop({
-				appointment: oEvent.getParameter("appointment"),
-				startDate: oEvent.getParameter("startDate"),
-				endDate: oEvent.getParameter("endDate"),
-				copy: oEvent.getParameter("copy")
-			});
-		};
-		var fnHandleAppointmentResize = function(oEvent) {
-			this.fireAppointmentResize({
-				appointment: oEvent.getParameter("appointment"),
-				startDate: oEvent.getParameter("startDate"),
-				endDate: oEvent.getParameter("endDate")
-			});
-		};
-		var fnHandleAppointmentCreate = function(oEvent) {
-			this.fireAppointmentCreate({
-				startDate: oEvent.getParameter("startDate"),
-				endDate: oEvent.getParameter("endDate")
-			});
-		};
-		var fnHandleCellPress = function(oEvent) {
-			this.fireEvent("cellPress", {
-				startDate: oEvent.getParameter("startDate"),
-				endDate: oEvent.getParameter("endDate"),
-				originalEvent: oEvent.getParameter("originalEvent")
-			});
-		};
-		var fnHandleMoreLinkPress = function(oEvent) {
-			this.fireEvent("moreLinkPress", {
-				date: oEvent.getParameter("date"),
-				sourceLink: oEvent.getParameter("sourceLink")
-			});
-		};
-		var fnHandleWeekNumberPress = function(oEvent) {
-			this.fireEvent("weekNumberPress", {
-				weekNumber: oEvent.getParameter("weekNumber")
-			});
-		};
-		var fnHandleSelectedDatesChange = function(oEvent) {
-			const bExecuteDefault = this.fireSelectedDatesChange({ selectedDates: oEvent.getParameter("selectedDates")});
-			if (!bExecuteDefault) {
-				oEvent.preventDefault();
-			}
-		};
+		oGrid._getColumnHeaders().attachEvent("select", this._fnHandleHeadersSelect.bind(this));
 
-		var fnHandleBorderReached = function(oEvent) {
-			var oGrid = this.getAggregation("_grid"),
-				oFormat = oGrid._getDateFormatter(),
-				iNavDelta = this._getSelectedView().getScrollEntityCount() - oGrid._getColumns() + 1,
-				oCellStartDate = UI5Date.getInstance(oEvent.getParameter("startDate")),
-				bFullDay = oEvent.getParameter("fullDay"),
-				oNavDate = this.getStartDate();
+		oGrid.attachEvent("appointmentSelect", this._fnHandleAppointmentSelect.bind(this));
+		oGridMV.attachEvent("appointmentSelect", this._fnHandleAppointmentSelect.bind(this));
 
-			if (oEvent.getParameter("next")) {
-				oCellStartDate.setDate(oCellStartDate.getDate() + iNavDelta);
-				oNavDate = UI5Date.getInstance(oNavDate.setDate(oNavDate.getDate() + this._getSelectedView().getScrollEntityCount()));
-				this.setStartDate(oNavDate);
-			} else {
-				oCellStartDate.setDate(oCellStartDate.getDate() - iNavDelta);
-				oNavDate = UI5Date.getInstance(oNavDate.setDate(oNavDate.getDate() - this._getSelectedView().getScrollEntityCount()));
-				this.setStartDate(oNavDate);
-			}
+		oGrid.attachEvent("appointmentDrop", this._fnHandleAppointmentDrop.bind(this));
+		oGridMV.attachEvent("appointmentDrop", this._fnHandleAppointmentDrop.bind(this));
 
-			this._sGridCellFocusSelector = bFullDay ?
-				"[data-sap-start-date='" + oFormat.format(oCellStartDate) + "'].sapMSinglePCBlockersColumn" :
-				"[data-sap-start-date='" + oFormat.format(oCellStartDate) + "'].sapMSinglePCRow";
-		};
-		var fnHandleBorderReachedMonthView = function(oEvent) {
-			var oDate = UI5Date.getInstance(oEvent.getParameter("startDate")),
-				oCalNextDate = CalendarDate.fromLocalJSDate(oDate),
-				oNextDate;
+		oGrid.attachEvent("appointmentResize", this._fnHandleAppointmentResize.bind(this));
 
-			oCalNextDate.setDate(oCalNextDate.getDate() + oEvent.getParameter("offset"));
-			oNextDate = oCalNextDate.toLocalJSDate();
+		oGrid.attachEvent("appointmentCreate", this._fnHandleAppointmentCreate.bind(this));
 
-			this.setStartDate(oNextDate);
+		oGrid.attachEvent("cellPress", this._fnHandleCellPress.bind(this));
+		oGridMV.attachEvent("cellPress", this._fnHandleCellPress.bind(this));
+		oGridMV.attachEvent("moreLinkPress", this._fnHandleMoreLinkPress.bind(this));
+		oGridMV.attachEvent("weekNumberPress", this._fnHandleWeekNumberPress.bind(this));
+		oGridMV.attachEvent("selectedDatesChange", this._fnHandleSelectedDatesChange.bind(this));
 
-			this._sGridCellFocusSelector =
-				"[sap-ui-date='" + oCalNextDate.valueOf() + "'].sapMSPCMonthDay";
-		};
-
-		oGrid._getColumnHeaders().attachEvent("select", fnHandleHeadersSelect, this);
-
-		oGrid.attachEvent("appointmentSelect", fnHandleAppointmentSelect, this);
-		oGridMV.attachEvent("appointmentSelect", fnHandleAppointmentSelect, this);
-
-		oGrid.attachEvent("appointmentDrop", fnHandleAppointmentDrop, this);
-		oGridMV.attachEvent("appointmentDrop", fnHandleAppointmentDrop, this);
-
-		oGrid.attachEvent("appointmentResize", fnHandleAppointmentResize, this);
-
-		oGrid.attachEvent("appointmentCreate", fnHandleAppointmentCreate, this);
-
-		oGrid.attachEvent("cellPress", fnHandleCellPress, this);
-		oGridMV.attachEvent("cellPress", fnHandleCellPress, this);
-		oGridMV.attachEvent("moreLinkPress", fnHandleMoreLinkPress, this);
-		oGridMV.attachEvent("weekNumberPress", fnHandleWeekNumberPress, this);
-		oGridMV.attachEvent("selectedDatesChange", fnHandleSelectedDatesChange, this);
-
-		oGrid.attachEvent("borderReached", fnHandleBorderReached, this);
-		oGridMV.attachEvent("borderReached", fnHandleBorderReachedMonthView, this);
+		oGrid.attachEvent("borderReached", this._fnHandleBorderReached.bind(this));
+		oGridMV.attachEvent("borderReached", this._fnHandleBorderReachedMonthView.bind(this));
 
 		return this;
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The header selection event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleHeadersSelect = function(oEvent) {
+		this.fireHeaderDateSelect({
+			date: oEvent.getSource()._oDate.toLocalJSDate()
+		});
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The appointment selection event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleAppointmentSelect = function(oEvent) {
+		this.fireAppointmentSelect({
+			appointment: oEvent.getParameter("appointment"),
+			appointments: oEvent.getParameter("appointments"),
+			originalEvent: oEvent.getParameter("originalEvent")
+		});
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The appointment drop event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleAppointmentDrop = function(oEvent) {
+		this.fireAppointmentDrop({
+			appointment: oEvent.getParameter("appointment"),
+			startDate: oEvent.getParameter("startDate"),
+			endDate: oEvent.getParameter("endDate"),
+			copy: oEvent.getParameter("copy")
+		});
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The appointment resize event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleAppointmentResize = function(oEvent) {
+		this.fireAppointmentResize({
+			appointment: oEvent.getParameter("appointment"),
+			startDate: oEvent.getParameter("startDate"),
+			endDate: oEvent.getParameter("endDate")
+		});
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The appointment creation event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleAppointmentCreate = function(oEvent) {
+		this.fireAppointmentCreate({
+			startDate: oEvent.getParameter("startDate"),
+			endDate: oEvent.getParameter("endDate")
+		});
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The cell press event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleCellPress = function(oEvent) {
+		this.fireEvent("cellPress", {
+			startDate: oEvent.getParameter("startDate"),
+			endDate: oEvent.getParameter("endDate"),
+			originalEvent: oEvent.getParameter("originalEvent")
+		});
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The more link press event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleMoreLinkPress = function(oEvent) {
+		this.fireEvent("moreLinkPress", {
+			date: oEvent.getParameter("date"),
+			sourceLink: oEvent.getParameter("sourceLink")
+		});
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The week number press event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleWeekNumberPress = function(oEvent) {
+		this.fireEvent("weekNumberPress", {
+			weekNumber: oEvent.getParameter("weekNumber")
+		});
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The selected dates change event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleSelectedDatesChange = function(oEvent) {
+		const bExecuteDefault = this.fireSelectedDatesChange({ selectedDates: oEvent.getParameter("selectedDates")});
+		if (!bExecuteDefault) {
+			oEvent.preventDefault();
+		}
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The grid border reached event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleBorderReached = function(oEvent) {
+		var oGrid = this.getAggregation("_grid"),
+			oFormat = oGrid._getDateFormatter(),
+			iNavDelta = this._getSelectedView().getScrollEntityCount() - oGrid._getColumns() + 1,
+			oCellStartDate = UI5Date.getInstance(oEvent.getParameter("startDate")),
+			bFullDay = oEvent.getParameter("fullDay"),
+			oNavDate = this.getStartDate();
+
+		if (oEvent.getParameter("next")) {
+			oCellStartDate.setDate(oCellStartDate.getDate() + iNavDelta);
+			oNavDate = UI5Date.getInstance(oNavDate.setDate(oNavDate.getDate() + this._getSelectedView().getScrollEntityCount()));
+			this.setStartDate(oNavDate);
+		} else {
+			oCellStartDate.setDate(oCellStartDate.getDate() - iNavDelta);
+			oNavDate = UI5Date.getInstance(oNavDate.setDate(oNavDate.getDate() - this._getSelectedView().getScrollEntityCount()));
+			this.setStartDate(oNavDate);
+		}
+
+		this._sGridCellFocusSelector = bFullDay ?
+			"[data-sap-start-date='" + oFormat.format(oCellStartDate) + "'].sapMSinglePCBlockersColumn" :
+			"[data-sap-start-date='" + oFormat.format(oCellStartDate) + "'].sapMSinglePCRow";
+	};
+
+	/**
+	 * @param {sap.ui.base.Event} oEvent The month grid border reached event
+	 * @private
+	 */
+	SinglePlanningCalendar.prototype._fnHandleBorderReachedMonthView = function(oEvent) {
+		var oDate = UI5Date.getInstance(oEvent.getParameter("startDate")),
+			oCalNextDate = CalendarDate.fromLocalJSDate(oDate),
+			oNextDate;
+
+		oCalNextDate.setDate(oCalNextDate.getDate() + oEvent.getParameter("offset"));
+		oNextDate = oCalNextDate.toLocalJSDate();
+
+		this.setStartDate(oNextDate);
+
+		this._sGridCellFocusSelector =
+			"[sap-ui-date='" + oCalNextDate.valueOf() + "'].sapMSPCMonthDay";
 	};
 
 	/**
