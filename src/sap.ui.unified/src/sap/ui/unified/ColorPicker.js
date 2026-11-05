@@ -579,12 +579,12 @@ sap.ui.define([
 		var sCircleSizeCSSParameter = Parameters.get({
 			name: sCircleSizeCSSParameterName,
 			callback: function (_mParams) {
-				this._iCPCursorSize = parseInt(_mParams);
+				this._iCPCursorSize = parseFloat(_mParams) * 16; // recalulate to px from rem;
 			}.bind(this)
 		});
 
 		if (sCircleSizeCSSParameter) {
-			this._iCPCursorSize = parseInt(sCircleSizeCSSParameter);
+			this._iCPCursorSize = parseFloat(sCircleSizeCSSParameter) * 16; // recalulate to px from rem;
 		}
 
 		// Init _processChanges and _bHSLMode according to default control mode
