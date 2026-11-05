@@ -35,9 +35,13 @@ sap.ui.define([
 	});
 
 	opaTest("Should apply Auto theme (light or dark based on OS)", function (Given, When, Then) {
+		// "auto" resolves to the dark or light Horizon theme depending on the OS
+		// color scheme (see ThemePicker._updateAppearance), so the expected theme
+		// must be derived the same way instead of being hard-coded to the light one.
+		var bIsDark = Opa5.getWindow().matchMedia("(prefers-color-scheme: dark)").matches;
 		When.onTheAppPage.iPressTheSettingsMenuButton();
 		When.onTheAppPage.iSelectAppearanceOption("auto");
-		Then.onTheAppPage.iShouldSeeThemeApplied("sap_horizon");
+		Then.onTheAppPage.iShouldSeeThemeApplied(bIsDark ? "sap_horizon_dark" : "sap_horizon");
 		Then.iTeardownMyApp();
 	});
 });
