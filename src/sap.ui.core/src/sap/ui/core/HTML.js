@@ -39,6 +39,12 @@ sap.ui.define([
 	 * For further hints about usage restrictions for this control, see also the documentation of the
 	 * <code>content</code> property.
 	 *
+	 * <b>Note:</b>
+	 * For embedding static HTML5 markup in a view, prefer the {@link sap.html} library, which exposes typed
+	 * HTML elements and should be used instead of <code>sap.ui.core.HTML</code> whenever possible.
+	 * Use <code>sap.ui.core.HTML</code> only in scenarios where more than static HTML5 markup content needs to be added.
+	 * For more information, see {@link topic:be54950cae1041f59d4aa97a6bade2d8 Using Native HTML in XML Views}.
+	 *
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
