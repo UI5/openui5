@@ -45,6 +45,16 @@
             "reviewers": ["SAPUISOFIA_PIRIN_REVIEWS"]
         },
         {
+            "matchPackageNames": [
+                "postcss-less",
+                "stylelint",
+                "stylelint-config-standard",
+                "@stylistic/stylelint-plugin"
+            ],
+            "groupName": "Theme related devDependencies",
+            "reviewers": ["SAP UI Theming"]
+        },
+        {
             "matchDepTypes": ["overrides"],
             "enabled": false
         }
