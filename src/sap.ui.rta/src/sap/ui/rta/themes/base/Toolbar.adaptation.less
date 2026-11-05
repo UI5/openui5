@@ -10,7 +10,6 @@
 @_sap_ui_rta_Toolbar_Adaptation_FocusOutlineColor: var(--sapContent_FocusColor); /* #000 */
 
 .sapUiRtaManageVersionsDialog {
-	max-height: 50% !important;
 
 	.sapUiRtaVersionsList .sapUiRtaDraftVersionAccent .sapMText {
 		color: @_sap_ui_rta_Toolbar_Adaptation_DraftVersionColor;
@@ -30,6 +29,62 @@
 			padding: 0 0.5rem;
 			.sapMBarChild.sapMBarChildFirstChild {
 				margin-left: 0.5rem;
+			}
+		}
+	}
+
+	// Expandable search in the dialog title.
+	// .sapUiRtaVersionsSearchContainer always reserves the expanded width so the header
+	// never reflows; it clips its children with overflow:hidden when collapsed and switches
+	// to overflow:visible when expanded so the SearchField border/shadow can bleed out.
+	// - Collapsed: the container clips to just the magnifier toggle; the field is hidden.
+	// - Expanded: the SearchField slides open to fill the space left of the magnifier toggle.
+	// The magnifier toggle always sits at the end; the field expands to its left.
+	.sapUiRtaVersionsSearchContainer {
+		width: 15rem;
+		max-width: 100%;
+		box-sizing: border-box;
+		min-width: 0;
+		overflow: hidden;
+
+		// .sapUiRtaVersionsSearchField is the SearchField root (.sapMSF). Collapsed it is
+		// clipped to zero width (max-width animates); expanded it flexes to fill all the
+		// space left of the magnifier toggle, so the whole field stays visible and shrinks
+		// gracefully when the header gets narrower.
+		// Collapse (expanded -> icon): the box slides closed first, then the field fades
+		// out (opacity is delayed by the slide duration) so the slide stays visible.
+		// visibility: hidden removes the field from the tab order when it is not visible.
+		// The visibility transition is delayed to 0.35s on collapse so the close animation
+		// finishes before the element becomes hidden, but is instant on expand so the field
+		// enters the tab order as soon as the user opens the search bar.
+		.sapUiRtaVersionsSearchField {
+			flex: 1 1 auto;
+			min-width: 0;
+			max-width: 0;
+			opacity: 0;
+			visibility: hidden;
+			transition: max-width 0.2s ease-in-out, opacity 0.15s ease-in-out 0.2s,
+				visibility 0s linear 0.35s;
+		}
+
+		.sapUiRtaVersionsSearchToggle {
+			flex: 0 0 auto;
+		}
+
+		&.sapUiRtaVersionsSearchExpanded {
+			overflow: visible;
+
+			.sapUiRtaVersionsSearchField {
+				max-width: 100%;
+				opacity: 1;
+				visibility: visible;
+				// Expand (icon -> field): opacity ramps while the field is still clipped
+				// at zero width (invisible), then the fully-opaque field slides open -
+				// an exact reverse of the collapse (slide, then fade).
+				// visibility has no delay on expand so the field is in the tab order
+				// as soon as the animation starts.
+				transition: max-width 0.2s ease-in-out 0.15s, opacity 0.15s ease-in-out,
+					visibility 0s;
 			}
 		}
 	}

@@ -1,12 +1,34 @@
 <core:FragmentDefinition
 	xmlns:core="sap.ui.core"
-	xmlns="sap.m"
->
-	<Dialog id="manageVersionsDialog" class="sapUiRTABorder sapUiRtaManageVersionsDialog" contentWidth="60%">
+	xmlns="sap.m">
+	<Dialog id="manageVersionsDialog" class="sapUiRTABorder sapUiRtaManageVersionsDialog" contentWidth="60%" contentHeight="25rem">
 		<customHeader>
 			<Toolbar>
 				<Title level="H1" text="{i18n>TIT_MANAGE_VERSIONS}" />
 				<ToolbarSpacer />
+				<HBox
+					id="manageVersionsSearchContainer"
+					class="sapUiRtaVersionsSearchContainer"
+					renderType="Bare"
+					alignItems="Center"
+					justifyContent="End">
+					<SearchField
+						id="manageVersionsSearchField"
+						class="sapUiRtaVersionsSearchField sapUiTinyMarginEnd"
+						width="100%"
+						showSearchButton="false"
+						placeholder="{i18n>PLC_SEARCH_VERSIONS}"
+						tooltip="{i18n>TOL_SEARCH_VERSIONS_FIELD}"
+						search=".onSearchVersions"
+						liveChange=".onSearchVersions" />
+					<Button
+						id="manageVersionsSearchToggle"
+						class="sapUiRtaVersionsSearchToggle"
+						icon="sap-icon://search"
+						type="Transparent"
+						tooltip="{i18n>TOL_SEARCH_VERSIONS}"
+						press=".toggleVersionSearch" />
+				</HBox>
 				<Button
 					id="closeManageVersionsDialogButton"
 					icon="sap-icon://decline"
@@ -36,8 +58,17 @@
 					<Column width="10%">
 						<Text text="{i18n>TIT_VERSION_STATE}" />
 					</Column>
-					<Column width="20%">
-						<Text text="{i18n>TIT_CHANGEVISUALIZATION_DATE}" />
+					<Column id="versionListDateColumn" width="20%">
+						<HBox renderType="Bare" alignItems="Center">
+							<Text text="{i18n>TIT_CHANGEVISUALIZATION_DATE}" />
+							<Button
+								id="versionListDateSortButton"
+								class="sapUiRtaVersionsDateSortButton sapUiTinyMarginBegin"
+								type="Transparent"
+								icon="sap-icon://sort-descending"
+								tooltip="{i18n>TOL_SORT_VERSIONS_BY_DATE}"
+								press=".sortVersionsByDate" />
+						</HBox>
 					</Column>
 					<Column width="24%">
 						<Text text="{i18n>TIT_CHANGEVISUALIZATION_USER}" />

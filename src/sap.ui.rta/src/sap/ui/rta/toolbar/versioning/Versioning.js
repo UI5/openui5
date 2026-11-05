@@ -11,6 +11,8 @@ sap.ui.define([
 	"sap/ui/core/ResizeHandler",
 	"sap/ui/core/library",
 	"sap/ui/fl/initial/api/Version",
+	"sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator",
 	"sap/ui/rta/Utils"
 ], function(
 	mLibrary,
@@ -21,6 +23,8 @@ sap.ui.define([
 	ResizeHandler,
 	coreLibrary,
 	Version,
+	Filter,
+	FilterOperator,
 	Utils
 ) {
 	"use strict";
@@ -28,6 +32,8 @@ sap.ui.define([
 	// shortcut for sap.ui.core.ValueState
 	const { ValueState } = coreLibrary;
 	const { ButtonType } = mLibrary;
+	const SORT_ICON_ASC = "sap-icon://sort-ascending";
+	const SORT_ICON_DESC = "sap-icon://sort-descending";
 
 	var DRAFT_ACCENT_COLOR = "sapUiRtaDraftVersionAccent";
 	var ACTIVE_ACCENT_COLOR = "sapUiRtaActiveVersionAccent";
@@ -237,6 +243,86 @@ sap.ui.define([
 		this.oDialog.close();
 	}
 
+	function toggleVersionSearch() {
+		const oSearchField = this.getToolbar().getControl("manageVersionsDialog--manageVersionsSearchField");
+		const oContainer = this.getToolbar().getControl("manageVersionsDialog--manageVersionsSearchContainer");
+		const bExpanded = oContainer.hasStyleClass("sapUiRtaVersionsSearchExpanded");
+		if (bExpanded) {
+			oContainer.removeStyleClass("sapUiRtaVersionsSearchExpanded");
+			oSearchField.setValue("");
+			filterVersions.call(this, "");
+		} else {
+			oContainer.addStyleClass("sapUiRtaVersionsSearchExpanded");
+			oSearchField.focus();
+		}
+	}
+
+	function filterVersions(sQuery) {
+		const oVersionList = this.getToolbar().getControl("manageVersionsDialog--versionList");
+		const oBinding = oVersionList.getBinding("items");
+		if (!oBinding) {
+			return;
+		}
+		if (!sQuery) {
+			oBinding.filter([]);
+			return;
+		}
+		oBinding.filter(new Filter({
+			filters: [
+				new Filter({ path: "title", operator: FilterOperator.Contains, value1: sQuery, caseSensitive: false }),
+				new Filter({ path: "activatedBy", operator: FilterOperator.Contains, value1: sQuery, caseSensitive: false })
+			],
+			and: false
+		}));
+	}
+
+	function onSearchVersions(oEvent) {
+		filterVersions.call(this, oEvent.getParameter("query") ?? oEvent.getParameter("newValue") ?? "");
+	}
+
+	// Returns the effective sort timestamp for a version object, mirroring the
+	// priority used by formatVersionTimeStamp: importedAt takes precedence over
+	// activatedAt. The trailing "Z" is normalised so string comparison is safe.
+	function getEffectiveTimestamp(oVersion) {
+		const sRaw = oVersion.importedAt || oVersion.activatedAt || "";
+		if (!sRaw) {
+			return "";
+		}
+		return sRaw.includes("Z") ? sRaw : `${sRaw}Z`;
+	}
+
+	function sortVersionsByDate() {
+		const oVersionsModel = this.getToolbar().getModel("versions");
+		const aVersions = oVersionsModel.getProperty("/versions");
+		if (!aVersions?.length) {
+			return;
+		}
+		const oSortButton = this.getToolbar().getControl("manageVersionsDialog--versionListDateSortButton");
+		// Toggle: descending → ascending; ascending → descending.
+		const bDescending = oSortButton.getIcon() === SORT_ICON_ASC;
+
+		// Snapshot the original order before the first sort so afterClose can restore it.
+		this._aVersionsSortBackup ||= [...aVersions];
+
+		const aSorted = [...aVersions].sort((a, b) => {
+			const bADraft = a.type === Version.Type.Draft;
+			const bBDraft = b.type === Version.Type.Draft;
+			// The draft has no date yet but represents the newest (unsaved) state, so it is
+			// pinned as the newest entry regardless of the date values
+			if (bADraft !== bBDraft) {
+				return bADraft === bDescending ? -1 : 1;
+			}
+			const sA = getEffectiveTimestamp(a);
+			const sB = getEffectiveTimestamp(b);
+			if (sA < sB) { return bDescending ? 1 : -1; }
+			if (sA > sB) { return bDescending ? -1 : 1; }
+			return 0;
+		});
+
+		oVersionsModel.setProperty("/versions", aSorted);
+		oSortButton.setIcon(bDescending ? SORT_ICON_DESC : SORT_ICON_ASC);
+	}
+
 	function formatVersionState(sType, bIsPublished) {
 		if (sType === Version.Type.Active && !bIsPublished) {
 			return ValueState.Success;
@@ -285,6 +371,9 @@ sap.ui.define([
 					formatOriginalAppHighlightText: formatOriginalAppHighlightText.bind(this),
 					versionSelected: versionSelected.bind(this),
 					closeManageVersionsDialog: closeManageVersionsDialog.bind(this),
+					toggleVersionSearch: toggleVersionSearch.bind(this),
+					onSearchVersions: onSearchVersions.bind(this),
+					sortVersionsByDate: sortVersionsByDate.bind(this),
 					formatVersionState: formatVersionState.bind(this),
 					formatVersionIcon: formatVersionIcon.bind(this),
 					formatVersionStateText: formatVersionStateText.bind(this),
@@ -304,6 +393,22 @@ sap.ui.define([
 				if (this._iManageVersionsResizeHandler) {
 					ResizeHandler.deregister(this._iManageVersionsResizeHandler);
 					delete this._iManageVersionsResizeHandler;
+				}
+				// reset the search so the dialog reopens collapsed and unfiltered
+				const oContainer = this.getToolbar().getControl("manageVersionsDialog--manageVersionsSearchContainer");
+				if (oContainer.hasStyleClass("sapUiRtaVersionsSearchExpanded")) {
+					oContainer.removeStyleClass("sapUiRtaVersionsSearchExpanded");
+					this.getToolbar().getControl("manageVersionsDialog--manageVersionsSearchField").setValue("");
+					filterVersions.call(this, "");
+				}
+				// reset the date sort so the dialog reopens in natural (descending) order
+				const oSortButton = this.getToolbar().getControl("manageVersionsDialog--versionListDateSortButton");
+				if (oSortButton.getIcon() !== SORT_ICON_DESC) {
+					oSortButton.setIcon(SORT_ICON_DESC);
+				}
+				if (this._aVersionsSortBackup) {
+					this.getToolbar().getModel("versions").setProperty("/versions", this._aVersionsSortBackup);
+					delete this._aVersionsSortBackup;
 				}
 			});
 			this.getToolbar().addDependent(this.oDialog);

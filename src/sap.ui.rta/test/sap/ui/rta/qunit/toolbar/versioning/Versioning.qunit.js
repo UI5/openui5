@@ -129,15 +129,426 @@ sap.ui.define([
 				oTextResources.getText("TIT_CHANGEVISUALIZATION_USER")
 			];
 
+			// The date column header is an HBox (Text + sort Button); all others are plain Text.
+			// This helper resolves either case to the visible label text.
+			function getHeaderText(oHeader) {
+				if (typeof oHeader.getText === "function") {
+					return oHeader.getText();
+				}
+				const oText = oHeader.getItems?.().find((oItem) => typeof oItem.getText === "function");
+				return oText?.getText() ?? "";
+			}
+
 			aExpectedTitles.forEach((sExpectedTitle, iIndex) => {
 				const oHeader = aColumns[iIndex].getHeader();
 				assert.ok(oHeader, `column ${iIndex} has a header control`);
-				assert.strictEqual(oHeader.getText(), sExpectedTitle, `column ${iIndex} shows the expected title`);
-				assert.ok(oHeader.getText().length > 0, `column ${iIndex} title is not empty`);
+				assert.strictEqual(getHeaderText(oHeader), sExpectedTitle, `column ${iIndex} shows the expected title`);
+				assert.ok(getHeaderText(oHeader).length > 0, `column ${iIndex} title is not empty`);
 			});
 
 			// the trailing action column (switch-to-version button) has no header by design
 			assert.notOk(aColumns[4].getHeader(), "the trailing action column has no header title (by design)");
+		});
+
+		QUnit.test("the search field has a stable id and starts collapsed", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+			const oContainer = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchContainer");
+			assert.ok(oSearchField, "the search field exists");
+			assert.ok(oSearchField.getId().endsWith("manageVersionsSearchField"), "the search field has a stable id");
+			assert.notOk(
+				oContainer.hasStyleClass("sapUiRtaVersionsSearchExpanded"),
+				"the search container starts collapsed"
+			);
+		});
+
+		QUnit.test("toggling the search button expands and collapses the search field", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			const oContainer = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchContainer");
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+			const oToggle = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchToggle");
+
+			oToggle.firePress();
+			assert.ok(oContainer.hasStyleClass("sapUiRtaVersionsSearchExpanded"), "the container is expanded after the first press");
+
+			oSearchField.setValue("something");
+			oToggle.firePress();
+			assert.notOk(oContainer.hasStyleClass("sapUiRtaVersionsSearchExpanded"), "the container is collapsed after the second press");
+			assert.strictEqual(oSearchField.getValue(), "", "the search value is cleared on collapse");
+		});
+
+		QUnit.test("the search field is not keyboard-focusable when collapsed and is focusable when expanded", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			const oContainer = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchContainer");
+			const oToggle = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchToggle");
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+			// Retrieve the underlying <input> that receives keyboard focus.
+			const oInnerInput = oSearchField.getDomRef("F");
+
+			// Collapsed state: visibility:hidden must be applied via CSS so the browser
+			// removes the element from the tab order. The computed style is the authoritative
+			// source — checking the CSS class alone would not catch a broken stylesheet.
+			assert.strictEqual(
+				window.getComputedStyle(oInnerInput).visibility,
+				"hidden",
+				"the search field input is visibility:hidden when collapsed"
+			);
+
+			// Expanded state: the CSS class switches visibility to 'visible'.
+			oToggle.firePress();
+			assert.ok(oContainer.hasStyleClass("sapUiRtaVersionsSearchExpanded"), "the container is now expanded");
+			assert.strictEqual(
+				window.getComputedStyle(oInnerInput).visibility,
+				"visible",
+				"the search field input is visibility:visible when expanded"
+			);
+		});
+
+		QUnit.test("searching filters the version list by title", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+
+			oSearchField.setValue(VERSION_TITLE);
+			oSearchField.fireLiveChange({ newValue: VERSION_TITLE });
+			await nextUIUpdate();
+
+			const aItems = oVersionList.getItems();
+			assert.strictEqual(aItems.length, 1, "only the matching version is shown");
+			assert.strictEqual(aItems[0].getCells()[0].getText(), VERSION_TITLE, "the matching version title is shown");
+		});
+
+		QUnit.test("searching filters the version list by user (activatedBy)", async function(assert) {
+			this.oToolbar.getModel("versions").setProperty("/versions", [{
+				version: "1",
+				title: "First",
+				type: Version.Type.Active,
+				isPublished: false,
+				activatedBy: "alice"
+			}, {
+				version: "2",
+				title: "Second",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedBy: "bob"
+			}]);
+			await this.oToolbar.showManageVersions();
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+
+			oSearchField.fireSearch({ query: "alice" });
+			await nextUIUpdate();
+
+			const aItems = oVersionList.getItems();
+			assert.strictEqual(aItems.length, 1, "only the version activated by the searched user is shown");
+			assert.strictEqual(aItems[0].getCells()[3].getText(), "alice", "the matching user is shown");
+		});
+
+		QUnit.test("searching filters the version list by a partial title", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+
+			// a substring taken from the middle of the title must still match
+			oSearchField.fireSearch({ query: "special_chars" });
+			await nextUIUpdate();
+
+			const aItems = oVersionList.getItems();
+			assert.strictEqual(aItems.length, 1, "only the version whose title contains the substring is shown");
+			assert.strictEqual(aItems[0].getCells()[0].getText(), VERSION_TITLE, "the matching version title is shown");
+		});
+
+		QUnit.test("searching filters the version list by a partial user (activatedBy)", async function(assert) {
+			this.oToolbar.getModel("versions").setProperty("/versions", [{
+				version: "1",
+				title: "First",
+				type: Version.Type.Active,
+				isPublished: false,
+				activatedBy: "alice"
+			}, {
+				version: "2",
+				title: "Second",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedBy: "bob"
+			}]);
+			await this.oToolbar.showManageVersions();
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+
+			// "lic" is a substring of "alice" but not of "bob"
+			oSearchField.fireSearch({ query: "lic" });
+			await nextUIUpdate();
+
+			const aItems = oVersionList.getItems();
+			assert.strictEqual(aItems.length, 1, "only the version whose user contains the substring is shown");
+			assert.strictEqual(aItems[0].getCells()[3].getText(), "alice", "the matching user is shown");
+		});
+
+		QUnit.test("searching is case-insensitive across title, user", async function(assert) {
+			this.oToolbar.getModel("versions").setProperty("/versions", [{
+				version: "1",
+				title: "MixedCaseTitle",
+				type: Version.Type.Active,
+				isPublished: false,
+				activatedBy: "Alice"
+			}, {
+				version: "2",
+				title: "Second",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedBy: "bob"
+			}]);
+			await this.oToolbar.showManageVersions();
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+
+			// a partial title typed in a different case must still match
+			oSearchField.fireSearch({ query: "mixedcase" });
+			await nextUIUpdate();
+			assert.strictEqual(oVersionList.getItems().length, 1, "a lower-case query matches a mixed-case title");
+
+			// a partial user typed in a different case must still match
+			oSearchField.fireSearch({ query: "ALI" });
+			await nextUIUpdate();
+			assert.strictEqual(oVersionList.getItems().length, 1, "an upper-case query matches a mixed-case user");
+		});
+
+		QUnit.test("clearing the search restores the full version list", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+			const iInitialCount = oVersionList.getItems().length;
+
+			oSearchField.fireLiveChange({ newValue: VERSION_TITLE });
+			await nextUIUpdate();
+			assert.ok(oVersionList.getItems().length < iInitialCount, "the list is filtered");
+
+			oSearchField.fireLiveChange({ newValue: "" });
+			await nextUIUpdate();
+			assert.strictEqual(oVersionList.getItems().length, iInitialCount, "the full list is restored when the query is empty");
+		});
+
+		QUnit.test("a search event without a query or newValue parameter is treated as an empty query", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+			const iInitialCount = oVersionList.getItems().length;
+
+			// first filter the list so we can observe the fallback clearing it again
+			oSearchField.fireSearch({ query: VERSION_TITLE });
+			await nextUIUpdate();
+			assert.ok(oVersionList.getItems().length < iInitialCount, "the list is filtered");
+
+			// an event carrying neither query nor newValue must fall back to an empty query
+			oSearchField.fireSearch({});
+			await nextUIUpdate();
+			assert.strictEqual(oVersionList.getItems().length, iInitialCount, "the full list is restored for a parameterless event");
+		});
+
+		QUnit.test("searching does not fail when the versions model has no versions", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			this.oToolbar.getModel("versions").setProperty("/versions", null);
+			await nextUIUpdate();
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+			const oSearchField = this.oToolbar.getControl("manageVersionsDialog--manageVersionsSearchField");
+
+			oSearchField.fireSearch({ query: "anything" });
+			await nextUIUpdate();
+
+			assert.strictEqual(oVersionList.getItems().length, 0, "no versions are shown and no error is thrown");
+		});
+
+		QUnit.test("clicking the date sort button sorts the version list ascending on first click", async function(assert) {
+			this.oToolbar.getModel("versions").setProperty("/versions", [{
+				version: "1",
+				title: "Oldest",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedAt: "2022-01-01 10:00:00.000Z"
+			}, {
+				version: "2",
+				title: "Newest",
+				type: Version.Type.Active,
+				isPublished: false,
+				activatedAt: "2022-06-01 10:00:00.000Z"
+			}, {
+				version: "3",
+				title: "Middle",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedAt: "2022-03-01 10:00:00.000Z"
+			}]);
+			await this.oToolbar.showManageVersions();
+			const oSortButton = this.oToolbar.getControl("manageVersionsDialog--versionListDateSortButton");
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+
+			assert.strictEqual(oSortButton.getIcon(), "sap-icon://sort-descending",
+				"the sort button defaults to the descending icon, matching the natural order");
+
+			oSortButton.firePress();
+			await nextUIUpdate();
+
+			const aTitles = oVersionList.getItems().map((oItem) => oItem.getCells()[0].getText());
+			assert.deepEqual(aTitles, ["Oldest", "Middle", "Newest"], "versions are sorted ascending by date");
+			assert.strictEqual(oSortButton.getIcon(), "sap-icon://sort-ascending", "the sort button shows the ascending icon");
+		});
+
+		QUnit.test("clicking the date sort button a second time sorts descending", async function(assert) {
+			this.oToolbar.getModel("versions").setProperty("/versions", [{
+				version: "1",
+				title: "Oldest",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedAt: "2022-01-01 10:00:00.000Z"
+			}, {
+				version: "2",
+				title: "Newest",
+				type: Version.Type.Active,
+				isPublished: false,
+				activatedAt: "2022-06-01 10:00:00.000Z"
+			}, {
+				version: "3",
+				title: "Middle",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedAt: "2022-03-01 10:00:00.000Z"
+			}]);
+			await this.oToolbar.showManageVersions();
+			const oSortButton = this.oToolbar.getControl("manageVersionsDialog--versionListDateSortButton");
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+
+			oSortButton.firePress();
+			await nextUIUpdate();
+			oSortButton.firePress();
+			await nextUIUpdate();
+
+			const aTitles = oVersionList.getItems().map((oItem) => oItem.getCells()[0].getText());
+			assert.deepEqual(aTitles, ["Newest", "Middle", "Oldest"], "versions are sorted descending by date");
+			assert.strictEqual(oSortButton.getIcon(), "sap-icon://sort-descending", "the sort button shows the descending icon");
+		});
+
+		QUnit.test("the draft stays pinned as the newest entry regardless of sort direction", async function(assert) {
+			this.oToolbar.getModel("versions").setProperty("/versions", [{
+				version: "1",
+				title: "Oldest",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedAt: "2022-01-01 10:00:00.000Z"
+			}, {
+				version: Version.Number.Draft,
+				title: "Draft",
+				type: Version.Type.Draft,
+				isPublished: false
+			}, {
+				version: "2",
+				title: "Newest",
+				type: Version.Type.Active,
+				isPublished: false,
+				activatedAt: "2022-06-01 10:00:00.000Z"
+			}]);
+			await this.oToolbar.showManageVersions();
+			const oSortButton = this.oToolbar.getControl("manageVersionsDialog--versionListDateSortButton");
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+
+			// first click → ascending: draft (no date) sorts to the bottom as the newest entry
+			oSortButton.firePress();
+			await nextUIUpdate();
+			let aTitles = oVersionList.getItems().map((oItem) => oItem.getCells()[0].getText());
+			assert.deepEqual(aTitles, ["Oldest", "Newest", "Draft"],
+				"ascending: dated versions sort oldest-first and the draft is pinned to the bottom");
+
+			// second click → descending: draft sorts back to the top as the newest entry
+			oSortButton.firePress();
+			await nextUIUpdate();
+			aTitles = oVersionList.getItems().map((oItem) => oItem.getCells()[0].getText());
+			assert.deepEqual(aTitles, ["Draft", "Newest", "Oldest"],
+				"descending: the draft is pinned to the top and dated versions sort newest-first");
+		});
+
+		QUnit.test("date sort uses importedAt over activatedAt, matching the date column display", async function(assert) {
+			// version "1" has importedAt so it is displayed and sorted by that date even
+			// though activatedAt would give a different order
+			this.oToolbar.getModel("versions").setProperty("/versions", [{
+				version: "1",
+				title: "ImportedEarly",
+				type: Version.Type.Active,
+				isPublished: true,
+				activatedAt: "2022-12-31 10:00:00.000Z",
+				importedAt: "2022-01-01 10:00:00.000"
+			}, {
+				version: "2",
+				title: "ActivatedLater",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedAt: "2022-06-01 10:00:00.000Z"
+			}]);
+			await this.oToolbar.showManageVersions();
+			const oSortButton = this.oToolbar.getControl("manageVersionsDialog--versionListDateSortButton");
+			const oVersionList = this.oToolbar.getControl("manageVersionsDialog--versionList");
+
+			oSortButton.firePress();
+			await nextUIUpdate();
+
+			const aTitles = oVersionList.getItems().map((oItem) => oItem.getCells()[0].getText());
+			assert.deepEqual(aTitles, ["ImportedEarly", "ActivatedLater"],
+				"importedAt takes priority: the early-imported version sorts before the later-activated one");
+		});
+
+		QUnit.test("the date sort icon is reset when the dialog is closed", async function(assert) {
+			await this.oToolbar.showManageVersions();
+			const oDialog = this.oToolbar.getControl("manageVersionsDialog--manageVersionsDialog");
+			const oSortButton = this.oToolbar.getControl("manageVersionsDialog--versionListDateSortButton");
+
+			oSortButton.firePress();
+			await nextUIUpdate();
+			assert.strictEqual(oSortButton.getIcon(), "sap-icon://sort-ascending", "sort icon is ascending after pressing");
+
+			// afterClose fires asynchronously (after the close animation); await it directly
+			const oAfterClosePromise = new Promise((resolve) => { oDialog.attachEventOnce("afterClose", resolve); });
+			oDialog.close();
+			await oAfterClosePromise;
+			assert.strictEqual(oSortButton.getIcon(), "sap-icon://sort-descending", "sort icon is reset to descending after the dialog closes");
+		});
+
+		QUnit.test("closing the dialog restores the original version order in the model", async function(assert) {
+			const aOriginalVersions = [{
+				version: "1",
+				title: "Oldest",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedAt: "2022-01-01 10:00:00.000Z"
+			}, {
+				version: "2",
+				title: "Newest",
+				type: Version.Type.Active,
+				isPublished: false,
+				activatedAt: "2022-06-01 10:00:00.000Z"
+			}, {
+				version: "3",
+				title: "Middle",
+				type: Version.Type.Inactive,
+				isPublished: false,
+				activatedAt: "2022-03-01 10:00:00.000Z"
+			}];
+			this.oToolbar.getModel("versions").setProperty("/versions", aOriginalVersions);
+			await this.oToolbar.showManageVersions();
+			const oDialog = this.oToolbar.getControl("manageVersionsDialog--manageVersionsDialog");
+			const oSortButton = this.oToolbar.getControl("manageVersionsDialog--versionListDateSortButton");
+
+			// sort twice (ascending then descending) so the model is not in its original order
+			oSortButton.firePress();
+			await nextUIUpdate();
+			oSortButton.firePress();
+			await nextUIUpdate();
+
+			const oAfterClosePromise = new Promise((resolve) => { oDialog.attachEventOnce("afterClose", resolve); });
+			oDialog.close();
+			await oAfterClosePromise;
+
+			const aTitlesAfterClose = this.oToolbar.getModel("versions").getProperty("/versions").map((oVersion) => oVersion.title);
+			assert.deepEqual(aTitlesAfterClose, ["Oldest", "Newest", "Middle"],
+				"the model array is back in its original order after the dialog closes");
 		});
 
 		QUnit.test("when a version is selected the switchVersion event is fired", async function(assert) {
