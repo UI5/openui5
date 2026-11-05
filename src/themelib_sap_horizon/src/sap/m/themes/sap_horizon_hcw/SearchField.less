@@ -3,17 +3,17 @@
 /* Horizon High Contrast White theme  */
 /* ================================== */
 
-// ==========================================================================
 // Variables overriding
-// ==========================================================================
 
-@_sap_m_SearchField_Height: 2.75rem;
-@_sap_m_SearchField_ButtonSize: 2.25rem;
-@_sap_m_SearchField_ButtonFontSize: 1rem;
-@_sap_m_SearchField_Compact_FormPaddingLeft: 0.5rem;
-@_sap_m_SearchField_ResetIcon: '\e03e';
-@_sap_m_SearchField_PlaceholderFontStyle: normal;
-@_sap_m_SearchField_ActiveBackgroundStyle: var(--sapField_BackgroundStyle);
+.sapUI5Scope {
+	--_sap_m_SearchField_Height: 2.75rem;
+	--_sap_m_SearchField_ButtonSize: 2.25rem;
+	--_sap_m_SearchField_ButtonFontSize: 1rem;
+	--_sap_m_SearchField_Compact_FormPaddingLeft: 0.5rem;
+	--_sap_m_SearchField_ResetIcon: '\e03e';
+	--_sap_m_SearchField_PlaceholderFontStyle: normal;
+	--_sap_m_SearchField_ActiveBackgroundStyle: var(--sapField_BackgroundStyle);
+}
 
 .sapMSFF {
 	border-radius: var(--sapField_BorderCornerRadius);
@@ -26,7 +26,7 @@
 .sapMSFB {
 	border-radius: var(--sapField_BorderCornerRadius);
 	color: var(--sapButton_TextColor);
-	line-height: @_sap_m_SearchField_ButtonSize - @sapUiFieldBorderWidth * 2; /* center the icon vertically */
+	line-height: ~'calc(var(--_sap_m_SearchField_ButtonSize) - var(--sapField_BorderWidth) * 2)'; /* center the icon vertically */
 
 	&:first-of-type {
 		margin-left: 0.25rem;
