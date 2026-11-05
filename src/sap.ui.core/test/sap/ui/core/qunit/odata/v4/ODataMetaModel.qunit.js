@@ -1222,6 +1222,7 @@ sap.ui.define([
 
 		beforeEach : function () {
 			var oMetadataRequestor = {
+					getQuery : () => "?n=a",
 					read : function () { throw new Error(); }
 				},
 				sUrl = "/a/b/c/d/e/$metadata";
@@ -5117,17 +5118,23 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("getETags", function (assert) {
-		var sETag = 'W/"..."',
-			mETags,
+		var oRequestorMock,
 			that = this;
 
-		function codeUnderTest(sUrl, mScope0) {
+		function codeUnderTest(sUrl, mScope0, sQuery) {
+			const bAnnotations = sQuery === "n/a";
+
+			oRequestorMock.expects("getQuery").exactly(bAnnotations ? 0 : 1).returns(sQuery);
+
 			// code under test
-			assert.strictEqual(that.oMetaModel.validate(sUrl, mScope0), mScope0);
+			assert.strictEqual(that.oMetaModel.validate(sUrl, mScope0, bAnnotations), mScope0);
 
 			assert.notOk("$ETag" in mScope0);
 			assert.notOk("$LastModified" in mScope0);
 		}
+
+		this.oMetaModel.oRequestor.getQuery = mustBeMocked;
+		oRequestorMock = this.mock(this.oMetaModel.oRequestor);
 
 		// code under test (together with c'tor)
 		assert.deepEqual(this.oMetaModel.getETags(), {}, "initial value");
@@ -5135,29 +5142,27 @@ sap.ui.define([
 		codeUnderTest("/~/A", {
 			$Version : "4.0",
 			$LastModified : "Fri, 07 Apr 2017 11:21:50 GMT"
-		});
+		}, "");
 		codeUnderTest("/~/B", {
 			$Version : "4.0",
 			$LastModified : "Tue, 18 Apr 2017 14:40:29 GMT"
-		});
+		}, "n/a");
 		codeUnderTest("/~/C", {
 			$Version : "4.0"
-		});
+		}, "?query=C");
 		codeUnderTest("/~/D", {
 			$Version : "4.0",
-			$ETag : sETag
-		});
+			$ETag : 'W/"..."'
+		}, "?query=D");
 
 		// code under test
-		mETags = this.oMetaModel.getETags();
-
-		assert.deepEqual(mETags, {
+		assert.deepEqual(this.oMetaModel.getETags(), {
 			// no need to use UI5Date.getInstance as only the timestamp is relevant
 			"/~/A" : new Date(Date.UTC(2017, 3, 7, 11, 21, 50)),
 			// no need to use UI5Date.getInstance as only the timestamp is relevant
 			"/~/B" : new Date(Date.UTC(2017, 3, 18, 14, 40, 29)),
-			"/~/C" : null,
-			"/~/D" : sETag // wins over null!
+			"/~/C?query=C" : null,
+			"/~/D?query=D" : 'W/"..."' // wins over null!
 		});
 	});
 
@@ -5300,9 +5305,9 @@ sap.ui.define([
 			.withExactArgs(sinon.match.same(mScope0["B."]), sinon.match.object));
 		if (bAnnotationFiles) {
 			this.oMetaModelMock.expects("validate")
-				.withExactArgs("/URL/1", sinon.match.same(mAnnotationScope1));
+				.withExactArgs("/URL/1", sinon.match.same(mAnnotationScope1), true);
 			this.oMetaModelMock.expects("validate")
-				.withExactArgs("/URL/2", sinon.match.same(mAnnotationScope2));
+				.withExactArgs("/URL/2", sinon.match.same(mAnnotationScope2), true);
 			aMergeExpectations.push(this.oMetaModelMock.expects("_doMergeAnnotations")
 				.withExactArgs(sinon.match.same(mAnnotationScope1["foo."]), sinon.match.object,
 					true));
@@ -5358,9 +5363,9 @@ sap.ui.define([
 		this.oMetaModelMock.expects("validate")
 			.withExactArgs(this.oMetaModel.sUrl, mScope0);
 		this.oMetaModelMock.expects("validate")
-			.withExactArgs("n/a", mAnnotationScope1);
+			.withExactArgs("n/a", mAnnotationScope1, true);
 		this.oMetaModelMock.expects("validate")
-			.withExactArgs("/my/annotation.xml", mAnnotationScope2)
+			.withExactArgs("/my/annotation.xml", mAnnotationScope2, true)
 			.throws(oError);
 
 		assert.throws(function () {
@@ -5401,7 +5406,7 @@ sap.ui.define([
 		this.oMetaModelMock.expects("validate")
 			.withExactArgs(this.oMetaModel.sUrl, oMetadata);
 		this.oMetaModelMock.expects("validate")
-			.withExactArgs("n/a", oAnnotation);
+			.withExactArgs("n/a", oAnnotation, true);
 
 		oExpectedResult.$Annotations = oMetadata[sNamespace].$Annotations;
 		delete oExpectedResult[sNamespace].$Annotations;
@@ -5606,9 +5611,9 @@ sap.ui.define([
 		this.oMetaModelMock.expects("validate")
 			.withExactArgs(this.oMetaModel.sUrl, mScope0);
 		this.oMetaModelMock.expects("validate")
-			.withExactArgs("/URL/1", mAnnotationScope1);
+			.withExactArgs("/URL/1", mAnnotationScope1, true);
 		this.oMetaModelMock.expects("validate")
-			.withExactArgs("/URL/2", mAnnotationScope2);
+			.withExactArgs("/URL/2", mAnnotationScope2, true);
 		assert.deepEqual(this.oMetaModel.mSchema2MetadataUrl, {});
 
 		// code under test
@@ -5673,9 +5678,9 @@ sap.ui.define([
 		this.oMetaModelMock.expects("validate")
 			.withExactArgs(this.oMetaModel.sUrl, oMetadata);
 		this.oMetaModelMock.expects("validate")
-			.withExactArgs("n/a", oAnnotation1);
+			.withExactArgs("n/a", oAnnotation1, true);
 		this.oMetaModelMock.expects("validate")
-			.withExactArgs("/my/annotation.xml", oAnnotation2);
+			.withExactArgs("/my/annotation.xml", oAnnotation2, true);
 		this.mock(this.oMetaModel.oModel).expects("reportError")
 			.withExactArgs(sMessage, sODataMetaModel, sinon.match({
 				message : oError.message,

@@ -40,6 +40,18 @@ sap.ui.define([
 
 			return {
 				/**
+				 * Returns the current query string. See <code>mQueryParams</code> and the note
+				 * there!
+				 *
+				 * @returns {string}
+				 *   The current query string; it is empty if there are no options; it starts with
+				 *   "?" otherwise
+				 *
+				 * @see sap.ui.model.odata.v4.lib._Helper.buildQuery
+				 */
+				getQuery : () => sQuery,
+
+				/**
 				 * Reads a metadata document from the given URL, taking care of "Retry-After".
 				 *
 				 * @param {string} sUrl

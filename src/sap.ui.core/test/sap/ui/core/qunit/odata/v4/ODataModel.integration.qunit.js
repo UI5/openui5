@@ -66939,18 +66939,32 @@ make root = ${bMakeRoot}`;
 	// annotation file are not ignored. Check that a value list model does not ignore annotations
 	// from its metadata.
 	// JIRA: CPOUI5ODATAV4-1925
+	//
+	// Check that URL parameters are present in ODMM#getETags (SNOW: CS20260013443601)
 	QUnit.test("ignoreAnnotationsFromMetadata: value list model", function (assert) {
 		var oMetaModel,
 			oModel = this.createSpecialCasesModel({
-				annotationURI : "/special/cases/annotations.xml",
+				annotationURI : "/special/cases/annotations.xml?custom=option",
 				autoExpandSelect : true,
+				metadataUrlParams : {
+					"sap-context-token" : "n/a",
+					"sap-language" : "EN"
+				},
 				// code under test
 				ignoreAnnotationsFromMetadata : true
 			}, {
-				"/special/cases/annotations.xml"
-					: {source : "odata/v4/data/annotations_special_cases.xml"},
-				"/special/countryoforigin/$metadata"
-					: {source : "odata/v4/data/metadata_countryoforigin.xml"}
+				"/special/cases/$metadata?sap-context-token=n/a&sap-language=EN" : {
+					headers : {ETag : "foo"},
+					source : "odata/v4/data/metadata_special_cases.xml"
+				},
+				"/special/cases/annotations.xml?custom=option" : {
+					headers : {ETag : "bar"},
+					source : "odata/v4/data/annotations_special_cases.xml"
+				},
+				"/special/countryoforigin/$metadata?sap-language=EN" : {
+					headers : {ETag : "baz"},
+					source : "odata/v4/data/metadata_countryoforigin.xml"
+				}
 			}),
 			oValueListMapping = { // from metadata_countryoforigin.xml
 				CollectionPath : "I_AIVS_CountryCode",
@@ -66967,6 +66981,9 @@ make root = ${bMakeRoot}`;
 		return this.createView(assert, "", oModel).then(function () {
 			oMetaModel = oModel.getMetaModel();
 
+			// code under test
+			assert.deepEqual(oMetaModel.getETags(), {}, "no URL yet");
+
 			return oMetaModel.requestData();
 		}).then(function (mMetaData) {
 			assert.deepEqual(mMetaData.$Annotations, { // from annotations_special_cases.xml
@@ -66979,12 +66996,23 @@ make root = ${bMakeRoot}`;
 			delete mMetaData.$Annotations;
 			assert.notOk(JSON.stringify(mMetaData).includes("@"), "no inline annotations");
 
+			// code under test (SNOW: CS20260013443601)
+			assert.deepEqual(oMetaModel.getETags(), {
+				"/special/cases/$metadata?sap-language=EN" : "foo",
+				"/special/cases/annotations.xml?custom=option" : "bar"
+			}, "URL parameters present");
+
 			return oMetaModel.requestValueListInfo("/Artists/special.cases.Create/Countryoforigin");
 		}).then(function (mQualifier2ValueListType) {
 			var oValueListModel = mQualifier2ValueListType[""].$model;
 
 			delete mQualifier2ValueListType[""].$model;
 			assert.deepEqual(mQualifier2ValueListType, {"" : oValueListMapping});
+
+			// code under test (SNOW: CS20260013443601)
+			assert.deepEqual(oValueListModel.getMetaModel().getETags(), {
+				"/special/countryoforigin/$metadata?sap-language=EN" : "baz"
+			}, "URL parameters present");
 
 			return oValueListModel.getMetaModel().requestData();
 		}).then(function (mValueListMetaData) {
@@ -74946,12 +74974,14 @@ make root = ${bMakeRoot}`;
 	// Scenario: Create a model with metadataUrlParams. See that the main $metadata request contains
 	// sap-context-token, sap-language, and sap-client -> see this.createModel() below.
 	// Further requests for $metadata references must not use sap-context-token.
-	//
 	// JIRA: CPOUI5ODATAV4-279
+	//
+	// Check that URL parameters are present in ODMM#getETags (SNOW: CS20260013443601)
 	QUnit.test("CPOUI5ODATAV4-279", function (assert) {
-		var oModel;
-
-		oModel = this.createModel(sTeaBusi + "?sap-client=279", {
+		const sMetadataUrl = sTeaBusi
+			+ "$metadata?sap-client=279&sap-context-token=20200716120000&sap-language=EN";
+		const sMetadataProductUrl = sTeaBusiProduct + "$metadata?sap-client=279&sap-language=EN";
+		const oModel = this.createModel(sTeaBusi + "?sap-client=279", {
 			earlyRequests : true,
 			metadataUrlParams : {
 				"sap-context-token" : "20200716120000",
@@ -74959,17 +74989,27 @@ make root = ${bMakeRoot}`;
 			}
 		}, {
 			[`HEAD ${sTeaBusi}?sap-client=279`] : {},
-			[sTeaBusi + "$metadata?sap-client=279&sap-context-token=20200716120000&sap-language=EN"]
-				: {source : "odata/v4/data/metadata.xml"},
-			[sTeaBusiProduct + "$metadata?sap-client=279&sap-language=EN"]
-				: {source : "odata/v4/data/metadata_tea_busi_product.xml"}
+			[sMetadataUrl] : {
+				headers : {ETag : "foo"},
+				source : "odata/v4/data/metadata.xml"
+			},
+			[sMetadataProductUrl] : {
+				headers : {ETag : "bar"},
+				source : "odata/v4/data/metadata_tea_busi_product.xml"
+			}
 		});
+		const oMetaModel = oModel.getMetaModel();
 
-		return oModel.getMetaModel()
-			.requestObject("/Equipments/EQUIPMENT_2_PRODUCT/PRODUCT_2_CATEGORY/$Type")
+		return oMetaModel.requestObject("/Equipments/EQUIPMENT_2_PRODUCT/PRODUCT_2_CATEGORY/$Type")
 			.then(function (sName) {
 				assert.strictEqual(sName,
 					"com.sap.gateway.default.iwbep.tea_busi_product.v0001.Category");
+
+				// code under test (SNOW: CS20260013443601)
+				assert.deepEqual(oMetaModel.getETags(), {
+					[sMetadataUrl.replace("&sap-context-token=20200716120000&", "&")] : "foo",
+					[sMetadataProductUrl] : "bar"
+				}, "URL parameters present");
 			});
 	});
 
