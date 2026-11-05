@@ -782,6 +782,12 @@ function(
 				}
 			}
 
+			// Hide the keyboard/clock toggle button at high zoom — the picker already shows
+			// inputs directly at high zoom, so toggling makes no sense on a narrow viewport
+			if (this._oToggleViewButton) {
+				this._oToggleViewButton.setVisible(!bShowInputs);
+			}
+
 			// On a phone at high zoom, replace the Dialog's open animation with a synchronous
 			// version so that onAfterOpen (and the focus() call inside it) fires within the
 			// original user-gesture call stack.  Without this, the setTimeout in _openAnimation
@@ -920,6 +926,7 @@ function(
 					secondsStep: this.getSecondsStep(),
 					showCurrentTimeButton: this.getShowCurrentTimeButton()
 				});
+				this._oInputsPart.addStyleClass("sapMTPHasInlineActions");
 			}
 			return this._oInputsPart;
 		};

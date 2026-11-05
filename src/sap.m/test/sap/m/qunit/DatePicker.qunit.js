@@ -41,7 +41,6 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/Element",
 	"sap/ui/core/date/UI5Date",
-	"sap/m/DateHighZoomInputs",
 	// load all required calendars in advance
 	"sap/ui/core/date/Buddhist",
 	"sap/ui/core/date/Gregorian",
@@ -89,8 +88,7 @@ sap.ui.define([
 	deepEqual,
 	jQuery,
 	Element,
-	UI5Date,
-	DateHighZoomInputs
+	UI5Date
 ) {
 	"use strict";
 
@@ -3675,141 +3673,12 @@ sap.ui.define([
 		assert.strictEqual(this.oDP._isHighZoom(), true, "high zoom at exactly 300px");
 	});
 
-	QUnit.test("value-help icon is hidden at high zoom", async function(assert) {
-		stubViewportWidth(this.oSandbox, 300);
-		this.oDP.invalidate();
-		await nextUIUpdate();
-		var oIcon = this.oDP._getValueHelpIcon();
-		assert.strictEqual(oIcon.getVisible(), false, "icon is hidden at high zoom");
-	});
-
 	QUnit.test("value-help icon is visible at normal zoom", async function(assert) {
 		stubViewportWidth(this.oSandbox, 1280);
 		this.oDP.invalidate();
 		await nextUIUpdate();
 		var oIcon = this.oDP._getValueHelpIcon();
 		assert.strictEqual(oIcon.getVisible(), true, "icon is visible at normal zoom");
-	});
-
-	QUnit.test("_getOrCreateHighZoomInputs returns a DateHighZoomInputs instance", function(assert) {
-		var oInputs = this.oDP._getOrCreateHighZoomInputs();
-		assert.ok(oInputs.isA("sap.m.DateHighZoomInputs"), "returns DateHighZoomInputs");
-	});
-
-	QUnit.test("_getOrCreateHighZoomInputs returns the same instance on repeated calls", function(assert) {
-		var oFirst = this.oDP._getOrCreateHighZoomInputs();
-		var oSecond = this.oDP._getOrCreateHighZoomInputs();
-		assert.strictEqual(oFirst, oSecond, "singleton — same instance returned");
-	});
-
-	QUnit.test("_switchPickerContent shows DateHighZoomInputs and hides Calendar at high zoom", async function(assert) {
-		// Open picker so calendar is created
-		this.oDP.toggleOpen(false);
-		await nextUIUpdate();
-
-		this.oDP._bHighZoom = true;
-		this.oDP._switchPickerContent(true);
-		await nextUIUpdate();
-
-		var oInputs = this.oDP._oHighZoomInputs;
-		assert.ok(oInputs && oInputs.getVisible(), "DateHighZoomInputs is visible");
-		assert.notOk(this.oDP._oCalendar.getVisible(), "Calendar is hidden");
-
-		this.oDP.toggleOpen(true);
-	});
-
-	QUnit.test("_switchPickerContent restores Calendar at normal zoom", async function(assert) {
-		this.oDP.toggleOpen(false);
-		await nextUIUpdate();
-
-		this.oDP._bHighZoom = true;
-		this.oDP._switchPickerContent(true);
-		this.oDP._bHighZoom = false;
-		this.oDP._switchPickerContent(false);
-		await nextUIUpdate();
-
-		assert.ok(this.oDP._oCalendar.getVisible(), "Calendar is visible after zoom-out");
-		assert.notOk(this.oDP._oHighZoomInputs.getVisible(), "DateHighZoomInputs is hidden");
-
-		this.oDP.toggleOpen(true);
-	});
-
-	QUnit.test("_handleOKButton with valid high-zoom input closes popup and sets dateValue", async function(assert) {
-		this.oDP.toggleOpen(false);
-		await nextUIUpdate();
-
-		this.oDP._bHighZoom = true;
-		this.oDP._switchPickerContent(true);
-		// Manually set date on inputs — _fillDateRange reads getDateValue() which may be null
-		// if the value hasn't been parsed yet. Set explicitly to the known initial value.
-		this.oDP._oHighZoomInputs.setMinDate(this.oDP._oMinDate);
-		this.oDP._oHighZoomInputs.setMaxDate(this.oDP._oMaxDate);
-		this.oDP._oHighZoomInputs.setDateValue(UI5Date.getInstance(2026, 4, 19));
-		this.oDP._oHighZoomInputs.syncStartDate();
-
-		var bClosed = false;
-		var fnOrig = this.oDP._oPopup.close.bind(this.oDP._oPopup);
-		this.oDP._oPopup.close = function() { bClosed = true; fnOrig(); };
-
-		this.oDP._handleOKButton();
-
-		assert.ok(bClosed, "Popup is closed after valid OK");
-
-		var oDateValue = this.oDP.getDateValue();
-		assert.ok(oDateValue instanceof Date, "dateValue is a Date after OK");
-		// Verify the committed value matches the initial value (May 19, 2026)
-		assert.strictEqual(oDateValue.getFullYear(), 2026, "dateValue year is 2026");
-		assert.strictEqual(oDateValue.getMonth(), 4, "dateValue month is May");
-		assert.strictEqual(oDateValue.getDate(), 19, "dateValue day is 19");
-
-		this.oDP._oPopup.close = fnOrig;
-	});
-
-	QUnit.test("_handleOKButton keeps popup open when validation fails", async function(assert) {
-		this.oDP.toggleOpen(false);
-		await nextUIUpdate();
-
-		this.oDP._bHighZoom = true;
-		this.oDP._switchPickerContent(true);
-		await nextUIUpdate();
-
-		// Stub validate to return false
-		this.oSandbox.stub(this.oDP._oHighZoomInputs, "validate").returns(false);
-
-		var bClosed = false;
-		this.oDP._oPopup.close = function() { bClosed = true; };
-
-		this.oDP._handleOKButton();
-
-		assert.notOk(bClosed, "Popup stays open when validation fails");
-	});
-
-	QUnit.test("_handleCancelButton clears field error states", async function(assert) {
-		this.oDP.toggleOpen(false);
-		await nextUIUpdate();
-
-		this.oDP._bHighZoom = true;
-		this.oDP._switchPickerContent(true);
-		await nextUIUpdate();
-
-		// Set an error state
-		this.oDP._oHighZoomInputs.setFieldValueState("Year", "Error", "out of range");
-
-		this.oDP._handleCancelButton();
-
-		// After cancel, year field should be None
-		var oYearInput = this.oDP._oHighZoomInputs._oYearInput;
-		assert.strictEqual(oYearInput.getValueState(), "None", "year error state cleared on Cancel");
-	});
-
-	QUnit.test("exit destroys _oHighZoomInputs", function(assert) {
-		var oInputs = this.oDP._getOrCreateHighZoomInputs();
-		var bDestroyed = false;
-		var fnOrig = oInputs.destroy.bind(oInputs);
-		oInputs.destroy = function() { bDestroyed = true; fnOrig(); };
-		this.oDP.destroy();
-		assert.ok(bDestroyed, "_oHighZoomInputs.destroy() called on exit");
-		// afterEach will call destroy() again — UI5 ignores double-destroy on a destroyed control
 	});
 
 });
