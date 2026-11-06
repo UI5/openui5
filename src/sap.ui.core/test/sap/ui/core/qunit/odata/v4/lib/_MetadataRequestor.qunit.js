@@ -145,6 +145,9 @@ sap.ui.define([
 				/*bWithCredentials*/true, fnGetOrCreateRetryAfterPromise);
 
 			// code under test
+			assert.strictEqual(oMetadataRequestor.getQuery(), "?...");
+
+			// code under test
 			return oMetadataRequestor.read(sUrl).then(function (oResult) {
 				assert.strictEqual(oResult, oExpectedJson);
 
@@ -188,6 +191,9 @@ sap.ui.define([
 					return oRetryAfterPromise;
 				}),
 			sUrl = "/~/";
+
+		// code under test
+		assert.strictEqual(oMetadataRequestor.getQuery(), "");
 
 		const oJQueryMock = this.mock(jQuery);
 		oJQueryMock.expects("ajax").never();
@@ -261,6 +267,12 @@ sap.ui.define([
 			.returns(sQuery1);
 		oMetadataRequestor = _MetadataRequestor.create(mHeaders, "4.0", true, mQueryParams,
 			false, fnGetOrCreateRetryAfterPromise);
+
+		assert.strictEqual(
+			// code under test
+			oMetadataRequestor.getQuery(),
+			"?sap-client=279&sap-context-token=20200716120000&sap-language=en");
+
 		oJQueryMock.expects("ajax")
 			.withExactArgs(sAnnotationUrl, {
 				headers : sinon.match.same(mHeaders),

@@ -889,7 +889,7 @@ sap.ui.define([
 			var oElement,
 				sQualifiedName;
 
-			that.validate(that.aAnnotationURLs[i], mAnnotationScope);
+			that.validate(that.aAnnotationURLs[i], mAnnotationScope, true);
 			for (sQualifiedName in mAnnotationScope) {
 				if (sQualifiedName[0] !== "$") {
 					if (sQualifiedName in mScope) {
@@ -2478,15 +2478,15 @@ sap.ui.define([
 	/**
 	 * Returns a map of entity tags for each $metadata or annotation file loaded so far.
 	 *
-	 * @returns {Object<string,string|null>}
+	 * @returns {Object<string,Date|string|null>}
 	 *   A map which contains one entry for each $metadata or annotation file loaded so far: the key
-	 *   is the file's URL as a <code>string</code> and the value is the <code>string</code> value
-	 *   of the "ETag" response header for that file. Initially, the map is empty. If no "ETag"
-	 *   response header was sent for a file, the <code>Date</code> value of the "Last-Modified"
-	 *   response header is used instead. The value <code>null</code> is used in case no such header
-	 *   is sent at all. Note that this map may change due to load-on-demand of "cross-service
-	 *   references" (see parameter <code>supportReferences</code> of
-	 *   {@link sap.ui.model.odata.v4.ODataModel#constructor}).
+	 *   is the file's URL as a <code>string</code> (including all query options except
+	 *   "sap-context-token") and the value is the <code>string</code> value of the "ETag" response
+	 *   header for that file. Initially, the map is empty. If no "ETag" response header was sent
+	 *   for a file, the <code>Date</code> value of the "Last-Modified" response header is used
+	 *   instead. The value <code>null</code> is used in case no such header is sent at all. Note
+	 *   that this map may change due to load-on-demand of "cross-service references" (see parameter
+	 *   <code>supportReferences</code> of {@link sap.ui.model.odata.v4.ODataModel#constructor}).
 	 *
 	 * @public
 	 * @since 1.51.0
@@ -3774,6 +3774,8 @@ sap.ui.define([
 	 *   The same $metadata URL that _MetadataRequestor#read() takes
 	 * @param {object} mScope
 	 *   The $metadata "JSON"
+	 * @param {boolean} [bAnnotations]
+	 *   Whether the scope was read from an additional annotation file
 	 * @returns {object}
 	 *   <code>mScope</code> to allow "chaining"
 	 * @throws {Error}
@@ -3781,7 +3783,7 @@ sap.ui.define([
 	 *
 	 * @private
 	 */
-	ODataMetaModel.prototype.validate = function (sUrl, mScope) {
+	ODataMetaModel.prototype.validate = function (sUrl, mScope, bAnnotations) {
 		var oDate, oLastModified, sSchema, oReference, sReferenceURL, i;
 
 		if (!this.bSupportReferences) {
@@ -3810,6 +3812,9 @@ sap.ui.define([
 		// handle & remove Date, ETag and Last-Modified headers
 		// no need to use UI5Date.getInstance as only the timestamp is relevant
 		oLastModified = mScope.$LastModified ? new Date(mScope.$LastModified) : null;
+		if (!bAnnotations) { // add query options
+			sUrl += this.oRequestor.getQuery(); // Note: NO "sap-context-token"
+		}
 		this.mETags[sUrl] = mScope.$ETag ? mScope.$ETag : oLastModified;
 		// no need to use UI5Date.getInstance as only the timestamp is relevant
 		oDate = mScope.$Date ? new Date(mScope.$Date) : new Date();
