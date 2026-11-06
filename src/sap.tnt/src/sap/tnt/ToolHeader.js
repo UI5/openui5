@@ -169,14 +169,6 @@ sap.ui.define([
 				contentWidth: Device.system.phone ? "100%" : "auto"
 			}).addStyleClass("sapTntToolHeaderPopover sapContrast sapContrastPlus");
 
-			if (Device.system.phone) {
-				// This will trigger when the toolbar is in the header/footer, because the position is known in advance (strictly top/bottom)
-				oPopover.attachBeforeOpen(this._shiftPopupShadow, this);
-
-				// This will trigger when the toolbar is not in the header/footer, when the actual calculation is ready (see the overridden _calcPlacement)
-				oPopover.attachAfterOpen(this._shiftPopupShadow, this);
-			}
-
 			// This will set the toggle button to "off"
 			oPopover.attachAfterClose(this._popOverClosedHandler, this);
 

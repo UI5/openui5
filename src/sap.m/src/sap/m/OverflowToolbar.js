@@ -1156,10 +1156,6 @@ sap.ui.define([
 				this._atPositions = ["end bottom", "end center", "end top", "begin center"];
 			};
 
-			if (Device.system.phone) {
-				oPopover.attachBeforeOpen(this._shiftPopupShadow, this);
-			}
-
 			// This will set the toggle button to "off"
 			oPopover.attachAfterClose(this._popOverClosedHandler, this);
 
@@ -1167,25 +1163,6 @@ sap.ui.define([
 		}
 
 		return this.getAggregation("_popover");
-	};
-
-	/**
-	 * On mobile, remove the shadow from the top/bottom, depending on how the popover was opened
-	 * If the popup is placed on the bottom, remove the top shadow
-	 * If the popup is placed on the top, remove the bottom shadow
-	 * @private
-	 */
-	OverflowToolbar.prototype._shiftPopupShadow = function () {
-		var oPopover = this._getPopover(),
-			sPos = oPopover.getCurrentPosition();
-
-		if (sPos === PlacementType.Bottom) {
-			oPopover.addStyleClass("sapMOTAPopoverNoShadowTop");
-			oPopover.removeStyleClass("sapMOTAPopoverNoShadowBottom");
-		} else if (sPos === PlacementType.Top) {
-			oPopover.addStyleClass("sapMOTAPopoverNoShadowBottom");
-			oPopover.removeStyleClass("sapMOTAPopoverNoShadowTop");
-		}
 	};
 
 	/**
