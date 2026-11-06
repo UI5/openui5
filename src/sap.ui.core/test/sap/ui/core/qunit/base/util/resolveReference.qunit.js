@@ -437,6 +437,7 @@ sap.ui.define([
 	 * @deprecated
 	 */
 	QUnit.test("jQuery.sap.includeScript should not be resolved", function(assert) {
+		assert.ok(jQuery.sap.includeScript, "jQuery.sap.includeScript is defined");
 		assert.strictEqual(resolveReference("jQuery.sap.includeScript"), undefined,
 			"jQuery.sap.includeScript should not be resolved");
 
