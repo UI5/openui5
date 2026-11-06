@@ -5,21 +5,21 @@
 
 .sapUiPanel {
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 	border: none;
 }
 
 .sapUiPanelHdr {
-	color: darken(@sapUiTextTitle, 6.5);
-	background-color: fade(darken(@sapUiContentForegroundColor, 10), 80);
+	color: ~'hsl(from var(--sapTitleColor) h s calc(l - 6.5))';
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l - 10) / 0.8)';
 	min-height: 27px;
 	border: none;
-	border-bottom: 2px solid darken(@sapUiContentForegroundBorderColor, 11.6);
+	border-bottom: 2px solid ~'hsl(from var(--sapContent_ForegroundBorderColor) h s calc(l - 11.6))';
 }
 
 .sapUiPanelHdrEmph {
-	background-color: fade(darken(@sapUiContentForegroundColor, 10), 80);
-	border-bottom: 2px solid darken(@sapUiContentForegroundBorderColor, 11.6);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l - 10) / 0.8)';
+	border-bottom: 2px solid ~'hsl(from var(--sapContent_ForegroundBorderColor) h s calc(l - 11.6))';
 }
 
 .sapUiPanelTitle {
@@ -60,7 +60,7 @@
 }
 
 .sapUiPanelAreaDesignFill > .sapUiPanelCont {
-	background-color: fade(darken(@sapUiContentForegroundColor, 10), 80);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l - 10) / 0.8)';
 }
 
 .sapUiPanelHeightSet > .sapUiPanelCont {

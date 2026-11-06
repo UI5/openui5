@@ -3,10 +3,12 @@
 /* Quartz High Contrast White theme      */
 /* ===================================== */
 
-@_sap_ui_commons_Panel_BorderRadius: 3px;
+.sapUI5Scope {
+	--_sap_ui_commons_Panel_BorderRadius: 3px;
+}
 
 .sapUiPanel {
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 }
 
 .sapUiPanelHdr {

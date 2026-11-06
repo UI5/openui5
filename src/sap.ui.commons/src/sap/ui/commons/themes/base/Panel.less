@@ -3,7 +3,9 @@
 /* base theme                            */
 /* ===================================== */
 
-@_sap_ui_commons_Panel_BorderRadius: 0;
+.sapUI5Scope {
+	--_sap_ui_commons_Panel_BorderRadius: 0;
+}
 
 .sapUiPanel {
 	display: inline-block;
@@ -11,7 +13,7 @@
 	vertical-align: top;
 	box-sizing: border-box;
 	border: 1px solid @sapUiMediumBorder;
-	border-radius: @_sap_ui_commons_Panel_BorderRadius @_sap_ui_commons_Panel_BorderRadius 0 0;
+	border-radius: var(--_sap_ui_commons_Panel_BorderRadius) var(--_sap_ui_commons_Panel_BorderRadius) 0 0;
 }
 
 .sapUiPanel:focus {
@@ -20,16 +22,16 @@
 
 .sapUiPanel.sapUiPanelColl,
 .sapUiPanelColl > .sapUiPanelHdr {
-	border-radius: @_sap_ui_commons_Panel_BorderRadius;
+	border-radius: var(--_sap_ui_commons_Panel_BorderRadius);
 }
 
 .sapUiPanelHdr {
-	border-radius: @_sap_ui_commons_Panel_BorderRadius @_sap_ui_commons_Panel_BorderRadius 0 0;
+	border-radius: var(--_sap_ui_commons_Panel_BorderRadius) var(--_sap_ui_commons_Panel_BorderRadius) 0 0;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	box-sizing: border-box;
-	background-color: @sapUiExtraLightBG;
+	background-color: var(--sapBackgroundColor);
 	white-space: nowrap;
 	width: 100%; /* the minimum width is set through JS calculations */
 	vertical-align: top;
@@ -107,9 +109,7 @@
 
 /* Panel content */
 .sapUiPanelCont {
-	border-top-style: solid;
-	border-top-width: 1px;
-	border-top-color: @sapUiMediumBorder;
+	border-top: 1px solid @sapUiMediumBorder;
 	display: block;
 	overflow: auto;
 	box-sizing: border-box;
@@ -132,7 +132,7 @@
 }
 
 .sapUiPanelAreaDesignFill > .sapUiPanelCont {
-	background-color: @sapUiExtraLightBG;
+	background-color: var(--sapBackgroundColor);
 }
 
 .sapUiPanelAreaDesignPlain > .sapUiPanelCont {
