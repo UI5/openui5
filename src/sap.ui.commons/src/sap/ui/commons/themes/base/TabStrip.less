@@ -6,7 +6,7 @@
 .sapUiTabStrip {
 	border: solid 1px @sapUiMediumBorder;
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiFontSize;
+	font-size: var(--sapFontSize);
 	box-sizing: border-box;
 	position: relative;
 }
@@ -20,7 +20,7 @@
 .sapUiTabBarCnt {
 	white-space: nowrap;
 	display: inline-block;
-	overflow:hidden;
+	overflow: hidden;
 	margin-top: 0;
 	padding-left: 0;
 	outline: none;
@@ -32,7 +32,7 @@
 	position: relative;
 	display: inline-block;
 	vertical-align: top;
-	white-space:nowrap;
+	white-space: nowrap;
 }
 
 .sapUiTabL {
@@ -48,7 +48,7 @@
 }
 
 .sapUiTabClose {
-	vertical-align:top;
+	vertical-align: top;
 	border: none;
 	background-color: transparent;
 	cursor: pointer;
@@ -65,7 +65,6 @@ span.sapUiTabIco {
 }
 
 .sapUiTabBar .sapUiTabMenu {
-	display: inline-block;
 	float: right;
 	display: none; /* will be toggled by framework code */
 }
@@ -76,7 +75,7 @@ span.sapUiTabIco {
 	right: 0;
 }
 
-/* If height is defined it must be positioned absolute to fit the height*/
+/* If height is defined it must be positioned absolute to fit the height */
 .sapUiTabPanelHeight {
 	position: absolute;
 	bottom: 0;
