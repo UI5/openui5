@@ -40,6 +40,7 @@ sap.ui.define([
 	"sap/m/FormattedText",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/core/tooltip/TooltipEnablement",
 	// provides jQuery.fn.zIndex
 	"sap/ui/dom/jquery/zIndex"
 ], function(
@@ -82,7 +83,8 @@ sap.ui.define([
 	FilterOperator,
 	FormattedText,
 	jQuery,
-	nextUIUpdate
+	nextUIUpdate,
+	TooltipEnablement
 ) {
 	"use strict";
 
@@ -10330,5 +10332,48 @@ sap.ui.define([
 		// assert
 		assert.strictEqual(fnValueStateCloseSpy.callCount, 1, "Value state message is closed");
 		assert.notStrictEqual(document.activeElement, aLinks[0].getDomRef(), "Focus is not on the link in the value state message popup");
+	});
+
+	QUnit.module("Enhanced Tooltip", {
+		beforeEach: async function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oInput = new Input("inp-enhanced-tooltip", {
+				tooltip: "Enter employee ID",
+				showClearIcon: true,
+				showValueHelp: true,
+				description: "EUR",
+				value: "007"
+			});
+			this.oInput.placeAt("content");
+			await nextUIUpdate(this.clock);
+		},
+		afterEach: async function() {
+			this.oInput.destroy();
+			await nextUIUpdate(this.clock);
+		}
+	});
+
+	QUnit.test("TooltipEnablement instances are created for input, icons, and description", function(assert) {
+		assert.ok(this.oInput._oEnhancedTooltip instanceof TooltipEnablement,
+			"_oEnhancedTooltip created on InputBase for the main tooltip");
+		assert.ok(this.oInput._oClearIconTooltip instanceof TooltipEnablement,
+			"_oClearIconTooltip created for the clear icon");
+		assert.ok(this.oInput._oValueHelpIconTooltip instanceof TooltipEnablement,
+			"_oValueHelpIconTooltip created for the value help icon");
+		assert.ok(this.oInput._oDescriptionTooltip instanceof TooltipEnablement,
+			"_oDescriptionTooltip created for the description");
+	});
+
+	QUnit.test("invisible tooltip spans are rendered in the DOM with correct texts", function(assert) {
+		const oMainSpan  = document.getElementById(this.oInput._oEnhancedTooltip.getInvisibleTooltipId());
+
+		assert.ok(oMainSpan, "invisible span for main tooltip is in the DOM");
+		assert.strictEqual(oMainSpan.textContent, "Enter employee ID",
+			"main tooltip span text matches the tooltip property");
+	});
+
+	QUnit.test("native title attribute is suppressed on the root element", function(assert) {
+		assert.strictEqual(this.oInput.getDomRef().getAttribute("title"), null,
+			"native title is absent — the enhanced tooltip owns the presentation");
 	});
 });
