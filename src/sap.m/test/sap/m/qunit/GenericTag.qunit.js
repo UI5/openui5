@@ -100,6 +100,31 @@ sap.ui.define([
 		assert.ok(oSpy.calledWith("_valueChanged"), "When changing a property of the 'value' aggregation, '_valueChanged' is fired");
 	});
 
+	QUnit.test("GenericTag - setValue(null) clears the aggregation without throwing", function (assert) {
+		//arrange
+		const oPreviousValue = this.oGenericTag.getValue();
+		const oDetachSpy = this.spy(oPreviousValue, "detachEvent");
+		const oFireSpy = this.spy(this.oGenericTag, "fireEvent");
+
+		//act
+		this.oGenericTag.setValue(null);
+
+		//assert
+		assert.strictEqual(this.oGenericTag.getValue(), null, "The 'value' aggregation is cleared");
+		assert.ok(oDetachSpy.calledWith("_change", this.oGenericTag._fireValueChanged, this.oGenericTag),
+			"The '_change' listener is detached from the previous value");
+		assert.ok(oFireSpy.calledWith("_valueChanged"), "'_valueChanged' is still fired when clearing the value");
+	});
+
+	QUnit.test("GenericTag - setValue(null) when no value is set does not throw", function (assert) {
+		//arrange
+		this.oGenericTag.setValue(null);
+
+		//act / assert
+		this.oGenericTag.setValue(null);
+		assert.strictEqual(this.oGenericTag.getValue(), null, "The 'value' aggregation stays cleared");
+	});
+
 	QUnit.module("GenericTag - setStatus", {
 		beforeEach: function() {
 			this.oGenericTag = new GenericTag({

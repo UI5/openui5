@@ -147,11 +147,14 @@ sap.ui.define([
 	GenericTag.prototype.setValue = function(oValue) {
 		var oPreviousValue = this.getValue();
 		if (oPreviousValue) {
-			oValue.detachEvent("_change", this._fireValueChanged, this);
+			oPreviousValue.detachEvent("_change", this._fireValueChanged, this);
 		}
 
 		this.setAggregation("value", oValue);
-		oValue.attachEvent("_change", this._fireValueChanged, this);
+
+		if (oValue) {
+			oValue.attachEvent("_change", this._fireValueChanged, this);
+		}
 
 		this._fireValueChanged();
 
