@@ -2229,6 +2229,16 @@ sap.ui.define([
 				mQueryOptions.$search = this.oAggregation.search;
 			}
 			delete mQueryOptions.$select;
+			// Note: creation w/ groupLevels happens on root level, so oFirstLevel knows the
+			// relevant exclusive filter for created leaves
+			const sExclusiveFilter = !this.oAggregation.hierarchyQualifier
+				? this.oFirstLevel.getExclusiveFilter()
+				: undefined;
+			if (sExclusiveFilter) {
+				mQueryOptions.$filter = mQueryOptions.$filter
+					? "(" + mQueryOptions.$filter + ") and " + sExclusiveFilter
+					: sExclusiveFilter;
+			}
 			sResourcePathWithQuery = this.sResourcePath + "/$count"
 				+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, false,
 					bSortSystemQueryOptions);
@@ -2236,6 +2246,9 @@ sap.ui.define([
 			return this.oRequestor.request("GET", sResourcePathWithQuery,
 					oGroupLock.getUnlockedCopy())
 				.then((iCount) => { // Note: iCount is already of type number here
+					if (!this.oAggregation.hierarchyQualifier) {
+						iCount += this.oFirstLevel.iActiveElements;
+					}
 					fnResolve(iCount);
 					_Helper.fireChange(this.mChangeListeners, "./$count", iCount);
 				})
@@ -2597,6 +2610,8 @@ sap.ui.define([
 			mQueryOptions.$search = this.oAggregation.search;
 		}
 
+		// Note: w/o groupLevels, oFirstLevel#requestCount applies the exclusive filter for created
+		// leaves on its own
 		return this.oFirstLevel.requestCount(oGroupLock, mQueryOptions);
 	};
 

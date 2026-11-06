@@ -2832,7 +2832,7 @@ sap.ui.define([
 		 * to ignore all changes, no matter which value.
 		 *
 		 * @param {string} sControlId - The control ID
-		 * @param {boolean} [bAll] - Whether to ignore *all* changes, not just nullishones
+		 * @param {boolean} [bAll] - Whether to ignore *all* changes, not just nullish ones
 		 * @returns {object} The test instance for chaining
 		 */
 		ignoreChanges : function (sControlId, bAll = false) {
@@ -30073,15 +30073,25 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// The $count is maintained on the client side: it is increased when a (non-inactive) entity is
 	// created, and decreased again if that creation is canceled. An inactive entity is not counted
-	// until it is activated; removing an inactive entity leaves the count unchanged.
+	// until it is activated; removing an inactive entity leaves the count unchanged. Deleting a
+	// kept-alive entity outside the collection requests the leaf count with an exclusive filter;
+	// here w/ visual grouping. The previous count is still available while the count request is
+	// pending.
 	// JIRA: CPOUI5ODATAV4-3711
-	QUnit.test("Data Aggregation: create with visual grouping", async function (assert) {
+[false, true].forEach(function (bWithFilter) {
+	const sTitle = "Data Aggregation: create with visual grouping; with filter = " + bWithFilter;
+
+	QUnit.test(sTitle, async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
+		const sFilter = bWithFilter
+			? "filters : {path : 'SalesNumber', operator : 'GE', value1 : 0},"
+			: "";
 		const sView = `
 <Text id="count" text="{$count}"/>
 <Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>
 <t:Table id="table" rows="{
 			path : '/BusinessPartners',
+			${sFilter}
 			parameters : {
 				$$aggregation : {
 					aggregate : {
@@ -30097,12 +30107,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	<Text text="{= %{@$ui5.node.isTotal} }"/>
 	<Text text="{= %{@$ui5.node.level} }"/>
 	<Text text="{Country}"/>
-	<Text text="{Id}"/>
+	<Text id="id" text="{Id}"/>
 	<Text text="{SalesNumber}"/>
 </t:Table>`;
 
-		this.expectRequest("BusinessPartners?"
-				+ "$apply=concat(groupby((Country,Id))/aggregate($count as UI5__leaves),"
+		this.expectRequest("BusinessPartners?$apply="
+				+ (bWithFilter ? "filter(SalesNumber ge 0)/" : "")
+				+ "concat(groupby((Country,Id))/aggregate($count as UI5__leaves),"
 				+ "aggregate(SalesNumber),groupby((Country),aggregate(SalesNumber))"
 				+ "/concat(aggregate($count as UI5__count),top(5)))", {
 				value : [
@@ -30114,7 +30125,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				]
 			})
 			.expectChange("count")
-			.expectChange("isOutdatedHeader");
+			.expectChange("isOutdatedHeader")
+			// expectChange for "id" is only used to ensure the right timing of re-rendering; table
+			// content is checked via checkTable
+			.expectChange("id", [null, null, null]);
 
 		await this.createView(assert, sView, oModel);
 
@@ -30146,16 +30160,19 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		this.expectChange("isOutdatedHeader", true)
 			.expectChange("count", "3")
+			.expectChange("id", ["3",,, null])
 			.expectRequest("#0 POST BusinessPartners", {
 				payload : {Id : 3}
 			}, {
 				Country : "A",
 				Id : 3, // Edm.Int16
 				SalesNumber : 5
-			})
-			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+			});
+		if (!bWithFilter) {
+			this.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
 				value : [{SalesNumber : 35}]
 			});
+		}
 
 		// code under test
 		const oCreatedContext0 = oListBinding.create({Id : 3}, /*bSkipRefresh*/true);
@@ -30174,9 +30191,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[, false, 1, "A", "3", "5"],
 			[true, true, 1, "A", "", "10"],
 			[true, true, 1, "B", "", "20"],
-			[false, true, 0, "", "", "35"]
+			[bWithFilter, true, 0, "", "", bWithFilter ? "30" : "35"]
 		]);
 		assert.strictEqual(oCreatedContext0.getPath(), "/BusinessPartners(3)", "check predicate");
+
+		this.expectChange("id", [, null,,, null]);
 
 		// code under test
 		const oCreatedContext1 = oListBinding.create({}, /*bSkipRefresh*/true, /*bAtEnd*/true,
@@ -30195,21 +30214,24 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[, false, 1, "", "", ""],
 			[true, true, 1, "A", "", "10"],
 			[true, true, 1, "B", "", "20"],
-			[false, true, 0, "", "", "35"]
+			[bWithFilter, true, 0, "", "", bWithFilter ? "30" : "35"]
 		]);
 		assertIndices(assert, oListBinding.getCurrentContexts(), [-2, -1, 0, 1, 2]);
 
 		this.expectChange("count", "4")
+			.expectChange("id", [, "4"])
 			.expectRequest("#0 POST BusinessPartners", {
 				payload : {Id : 4}
 			}, {
 				Country : "A",
 				Id : 4, // Edm.Int16
 				SalesNumber : 7
-			})
-			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+			});
+		if (!bWithFilter) {
+			this.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
 				value : [{SalesNumber : 42}]
 			});
+		}
 
 		await Promise.all([
 			// code under test
@@ -30229,13 +30251,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[, false, 1, "A", "4", "7"],
 			[true, true, 1, "A", "", "10"],
 			[true, true, 1, "B", "", "20"],
-			[false, true, 0, "", "", "42"]
+			[bWithFilter, true, 0, "", "", bWithFilter ? "30" : "42"]
 		]);
 		assert.strictEqual(oCreatedContext1.getPath(), "/BusinessPartners(4)", "check predicate");
 
 		const oGroupA = oListBinding.getCurrentContexts()[2];
 
-		this.expectRequest("BusinessPartners?$count=true&$filter=Country eq 'A'"
+		this.expectRequest("BusinessPartners?$count=true"
+				+ "&$filter=Country eq 'A'" + (bWithFilter ? " and (SalesNumber ge 0)" : "")
 				+ "&$select=Country,Id,SalesNumber&$skip=0&$top=5", {
 				"@odata.count" : "1",
 				value : [
@@ -30244,7 +30267,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					{Country : "A", Id : 1, SalesNumber : 8}
 					//TODO: return created entities
 				]
-			});
+			})
+			.expectChange("id", [,,, "1"]);
 
 		await Promise.all([
 			// code under test
@@ -30268,6 +30292,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		]);
 		assertIndices(assert, oListBinding.getCurrentContexts(), [-2, -1, 0, 1, 2]);
 
+		this.expectChange("id", null, 3);
+
 		// code under test
 		oGroupA.collapse();
 
@@ -30284,7 +30310,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[, false, 1, "A", "4", "7"],
 			[true, true, 1, "A", "", "10"],
 			[true, true, 1, "B", "", "20"],
-			[false, true, 0, "", "", "42"]
+			[bWithFilter, true, 0, "", "", bWithFilter ? "30" : "42"]
 		]);
 		assertIndices(assert, oListBinding.getCurrentContexts(), [-2, -1, 0, 1, 2]);
 
@@ -30310,14 +30336,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert, "delete inactive creation") // ensure $count was not changed
 		]);
 
+		this.expectChange("id", null, 2);
+
 		// code under test
 		const oCreatedContext2 = oListBinding.create({Country : "C"}, /*bSkipRefresh*/true,
 			/*bAtEnd*/true, /*bInactive*/true);
 
-		await Promise.all([
-			resolveLater(), // table update takes a moment
-			this.waitForChanges(assert, "create inactive at end of start #2")
-		]);
+		await this.waitForChanges(assert, "create inactive at end of start #2");
 
 		checkTable("after create inactive at end of start #2", assert, oTable, [
 			oCreatedContext0,
@@ -30334,7 +30359,35 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[true, true, 1, "B", "", "20"]
 		], 6);
 
-		this.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesNumber)"
+		this.expectRequest("BusinessPartners(98)?$select=Id", {Id : 98});
+
+		const oKeptContext = oListBinding.getKeepAliveContext("/BusinessPartners(98)");
+
+		await this.waitForChanges(assert, "kept-alive outside collection");
+
+		this.expectRequest("#0 DELETE BusinessPartners(98)")
+			.expectRequest("#0 BusinessPartners/$count?$filter="
+				+ (bWithFilter ? "(SalesNumber ge 0) and " : "")
+				+ "not (Id eq 3 or Id eq 4)", 2);
+		if (!bWithFilter) {
+			this.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+				value : [{SalesNumber : 42}]
+			});
+		}
+
+		// code under test
+		const oDeletePromise = oKeptContext.delete();
+
+		assert.strictEqual(oListBinding.getCount(), 4, "$count still shows old value");
+
+		await Promise.all([
+			oDeletePromise,
+			this.waitForChanges(assert, "delete kept-alive outside w/ exclusive filter")
+		]);
+
+		this.expectRequest("BusinessPartners?$apply="
+				+ (bWithFilter ? "filter(SalesNumber ge 0)/" : "")
+				+ "concat(aggregate(SalesNumber)"
 				+ ",groupby((Country,Id),aggregate(SalesNumber))"
 				+ "/concat(aggregate($count as UI5__count),top(4)))", {
 				value : [
@@ -30346,15 +30399,13 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					{Country : "A", Id : 4, SalesNumber : 7}
 				]
 			})
-			.expectChange("isOutdatedHeader", false);
+			.expectChange("isOutdatedHeader", false)
+			.expectChange("id", [null, "1", "2", "3", "4"]);
 
 		// code under test
 		oListBinding.setAggregation({...oListBinding.getAggregation(), groupLevels : []});
 
-		await Promise.all([
-			resolveLater(), // table update takes a moment
-			this.waitForChanges(assert, "disable visual grouping")
-		]);
+		await this.waitForChanges(assert, "disable visual grouping");
 
 		checkTable("after disable visual grouping", assert, oTable, [
 			oCreatedContext2,
@@ -30370,6 +30421,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[, false, 1, "A", "4", "7"]
 		], 6);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: sap.ui.table.Table with aggregation and visual grouping.
@@ -32294,6 +32346,9 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Update the outdated flags if an active entity is created or an inactive entity is activated.
 	// JIRA: CPOUI5ODATAV4-3392
+	//
+	// Deletion of kept-alive requests leaf count with exclusive filter, here w/o visual grouping
+	// JIRA: CPOUI5ODATAV4-3711
 [undefined, false, true].forEach((bInactive) => { // Note: false means "gets activated"
 	const sTitle = "Data Aggregation: filter w/o aggregation on leaves, bInactive=" + bInactive;
 	const bActivate = bInactive === false;
@@ -32810,6 +32865,27 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		oTable.setFirstVisibleRow(0); // Note: ChangeReason.Refresh does not reset 1st visible row!
 
 		await this.waitForChanges(assert, "scroll up again");
+
+		this.expectRequest("BusinessPartners(99)?$select=Id", {Id : 99});
+
+		const oKeptContext = oListBinding.getKeepAliveContext("/BusinessPartners(99)");
+
+		await this.waitForChanges(assert, "kept-alive outside collection");
+
+		this.expectRequest("#0 DELETE BusinessPartners(99)")
+			.expectRequest("#0 BusinessPartners?$count=true"
+				+ "&$filter=(Currency ne 'USD' and SalesAmount gt 0) and not ("
+				+ (bInactive ? "" : "Id eq 27 or ") + "Id eq 28)"
+				+ "&$search=covfefe&$top=0", {
+				"@odata.count" : "26",
+				value : []
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3711)
+			oKeptContext.delete(),
+			this.waitForChanges(assert, "delete kept-alive outside w/ exclusive filter")
+		]);
 
 		let sSideEffectsRefreshUrl = sUrl.replace("top(4)", "top(2)");
 		if (bActivate) {

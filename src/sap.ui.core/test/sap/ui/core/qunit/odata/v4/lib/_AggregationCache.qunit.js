@@ -2086,21 +2086,24 @@ sap.ui.define([
 	mExpectedQueryOptions : {
 		foo : "bar",
 		"sap-client" : "123"
-	}
+	},
+	sFilterWithExclusiveFilter : "~exclusiveFilter~"
 }, {
 	$filter : "Is_Manager",
 	mExpectedQueryOptions : {
 		$filter : "Is_Manager",
 		foo : "bar",
 		"sap-client" : "123"
-	}
+	},
+	sFilterWithExclusiveFilter : "(Is_Manager) and ~exclusiveFilter~"
 }, {
 	search : "covfefe",
 	mExpectedQueryOptions : {
 		$search : "covfefe",
 		foo : "bar",
 		"sap-client" : "123"
-	}
+	},
+	sFilterWithExclusiveFilter : "~exclusiveFilter~"
 }, {
 	$filter : "Is_Manager",
 	search : "covfefe",
@@ -2109,7 +2112,8 @@ sap.ui.define([
 		$search : "covfefe",
 		foo : "bar",
 		"sap-client" : "123"
-	}
+	},
+	sFilterWithExclusiveFilter : "(Is_Manager) and ~exclusiveFilter~"
 }, {
 	// NO $filter
 	$$filterBeforeAggregate : "Is_Manager",
@@ -2117,14 +2121,21 @@ sap.ui.define([
 		$filter : "Is_Manager",
 		foo : "bar",
 		"sap-client" : "123"
-	}
+	},
+	sFilterWithExclusiveFilter : "(Is_Manager) and ~exclusiveFilter~"
 }].forEach(function (oFixture, i) {
 	[false, true].forEach((bDataAggregation) => {
-		if (bDataAggregation && oFixture.$filter) {
-			return; // avoid "Unsupported system query option: $filter"
-		}
+		[false, true].forEach((bExclusiveFilter) => {
+	const sTitle = "readCount: #" + i + ", D.A.: " + bDataAggregation
+		+ ", exclusive filter: " + bExclusiveFilter;
+	if (bDataAggregation && oFixture.$filter) {
+		return; // avoid "Unsupported system query option: $filter"
+	}
+	if (bExclusiveFilter && !bDataAggregation) {
+		return; // w/o data aggregation there is no exclusive filter for created leaves
+	}
 
-	QUnit.test("readCount: #" + i + ", D.A.: " + bDataAggregation, function (assert) {
+	QUnit.test(sTitle, function (assert) {
 		var oAggregation = bDataAggregation ? {
 				aggregate : {},
 				group : {},
@@ -2138,6 +2149,7 @@ sap.ui.define([
 			oGroupLock = {
 				getUnlockedCopy : mustBeMocked
 			},
+			iExpectedCount = 42,
 			mQueryOptions = {
 				$apply : "A.P.P.L.E",
 				$count : true,
@@ -2163,8 +2175,16 @@ sap.ui.define([
 			$resolve : fnResolve,
 			$restore : mustBeMocked // must not be called
 		};
+		oCache.oFirstLevel.iActiveElements = "n/a"; // use iActiveElements at right point in time
+		this.mock(oCache.oFirstLevel).expects("getExclusiveFilter")
+			.exactly(bDataAggregation ? 1 : 0).withExactArgs()
+			.returns(bExclusiveFilter ? "~exclusiveFilter~" : undefined);
+		const mExpectedQueryOptions = {...oFixture.mExpectedQueryOptions};
+		if (bExclusiveFilter) {
+			mExpectedQueryOptions.$filter = oFixture.sFilterWithExclusiveFilter;
+		}
 		this.mock(this.oRequestor).expects("buildQueryString")
-			.withExactArgs("/~", oFixture.mExpectedQueryOptions, false, false, bDataAggregation)
+			.withExactArgs("/~", mExpectedQueryOptions, false, false, bDataAggregation)
 			.returns("?~query~");
 		this.mock(oGroupLock).expects("getUnlockedCopy").withExactArgs()
 			.returns("~oGroupLockCopy~");
@@ -2177,16 +2197,24 @@ sap.ui.define([
 		assert.notOk(fnResolve.called, "not yet");
 		assert.notOk("$resolve" in oCache.oCountPromise, "prevent 2nd GET");
 
+		if (bDataAggregation) {
+			// the number of active created elements may change between request and response; the
+			// value at response time must be used for the count
+			oCache.oFirstLevel.iActiveElements = 3;
+			iExpectedCount = 45; // server count + active created elements
+		}
+
 		this.mock(_Helper).expects("fireChange")
-			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "./$count", 42)
+			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "./$count", iExpectedCount)
 			.callsFake(() => {
 				assert.ok(fnResolve.calledOnce, "resolve called before");
 			});
 
 		return oResult.then(function () {
-			assert.strictEqual(fnResolve.args[0][0], 42);
+			assert.strictEqual(fnResolve.args[0][0], iExpectedCount);
 		});
 	});
+		});
 	});
 });
 
