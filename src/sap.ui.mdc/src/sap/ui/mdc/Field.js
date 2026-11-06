@@ -638,13 +638,14 @@ sap.ui.define([
 
 		// if value of composite binding was "initial" before and not lead to a condition in the new value, only the changed parts
 		// of the composite value must be updated. (Parsing in Operator and ConditionType sets it to null if no old value is known.)
+		// Do not change the value if nothing changed (called from initial creation of Condition - not from user change).
 		const oDataType = this.getContentFactory().getDataType(); // we just need the name or class, not FormatOptions or Constraints. (So OriginalDate/UnitType not needed here.)
 		const sDataType = oDataType ? oDataType.getMetadata().getName() : this.getDataType(); // as type must not exist now (but if set from Binding it normally exist)
 		const sBaseType = this.getTypeMap().getBaseType(sDataType); // is false for DateTimeWithTimeZone
 		const bIsComposite = oDataType?.isA("sap.ui.model.CompositeType"); // only if type set / internal content created. But no user input possible before. Needed to handle other CompositeTypes as DateTimeWithTimezone or Unit fields with only number part used
 		const bOldValueInitial = this.checkValueInitial(vOldValue);
 
-		if ((sBaseType === BaseType.Unit || bIsComposite) && Array.isArray(vValue) && Array.isArray(vOldValue)) {
+		if ((sBaseType === BaseType.Unit || bIsComposite) && Array.isArray(vValue) && Array.isArray(vOldValue) && !deepEqual(vValue, vOldValue)) {
 			const aResult = []; // don't modify original Array
 			for (let i = 0; i < vValue.length; i++) {
 				if (vValue[i] === null) {
