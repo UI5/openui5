@@ -45,30 +45,30 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.ui.core.TextDirection
-	var TextDirection = coreLibrary.TextDirection;
+	const TextDirection = coreLibrary.TextDirection;
 
 	// shortcut for sap.m.ButtonType
-	var ButtonType = library.ButtonType;
+	const ButtonType = library.ButtonType;
 
 	// shortcut for sap.m.ButtonAccessibilityType
-	var ButtonAccessibilityType = library.ButtonAccessibilityType;
+	const ButtonAccessibilityType = library.ButtonAccessibilityType;
 
 	// shortcut for sap.m.ButtonAccessibleRole
-	var ButtonAccessibleRole = library.ButtonAccessibleRole;
+	const ButtonAccessibleRole = library.ButtonAccessibleRole;
 
 	// shortcut for sap.m.BadgeState
-	var BadgeState = library.BadgeState;
+	const BadgeState = library.BadgeState;
 
 	// shortcut for sap.m.BadgeStyle
-	var BadgeStyle = library.BadgeStyle;
+	const BadgeStyle = library.BadgeStyle;
 
 	// shortcut for sap.ui.core.aria.HasPopup
-	var AriaHasPopup = coreLibrary.aria.HasPopup;
+	const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 	// constraints for the minimum and maximum Badge value
-	var BADGE_MIN_VALUE = 1,
-		BADGE_MAX_VALUE = 9999,
-		LONG_PRESS_DURATION = 500; // milliseconds for long press detection
+	const BADGE_MIN_VALUE = 1;
+	const BADGE_MAX_VALUE = 9999;
+	const LONG_PRESS_DURATION = 500; // milliseconds for long press detection
 
 	/**
 	 * Constructor for a new <code>Button</code>.
@@ -109,7 +109,7 @@ sap.ui.define([
 	 * @alias sap.m.Button
 	 * @see {@link fiori:https://experience.sap.com/fiori-design-web/button/ Button}
 	 */
-	var Button = Control.extend("sap.m.Button", /** @lends sap.m.Button.prototype */ {
+	const Button = Control.extend("sap.m.Button", /** @lends sap.m.Button.prototype */ {
 		metadata : {
 
 			interfaces : [
@@ -330,9 +330,9 @@ sap.ui.define([
 	//Formatter callback of the badge pre-set value, before it is visualized
 
 	Button.prototype.badgeValueFormatter = function(vValue) {
-		var iValue = parseInt(vValue),
-			oBadgeCustomData = this.getBadgeCustomData(),
-			bIsBadgeVisible = oBadgeCustomData.getVisible();
+		const iValue = parseInt(vValue);
+		const oBadgeCustomData = this.getBadgeCustomData();
+		const bIsBadgeVisible = oBadgeCustomData.getVisible();
 
 		if (isNaN(iValue)) {return false;}
 
@@ -342,8 +342,8 @@ sap.ui.define([
 		} else  {
 			!bIsBadgeVisible && oBadgeCustomData.setVisible(true);
 
-			if (iValue > this._badgeMaxValue && vValue.indexOf("+") === -1) {
-				vValue = this._badgeMaxValue < 1000 ? this._badgeMaxValue + "+" : "999+";
+			if (iValue > this._badgeMaxValue && !vValue.includes("+")) {
+				vValue = this._badgeMaxValue < 1000 ? `${this._badgeMaxValue}+` : "999+";
 			}
 		}
 
@@ -359,14 +359,14 @@ sap.ui.define([
 	 * @public
 	 */
 	Button.prototype.setBadgeMinValue = function(iMin) {
-		var iValue = this.getBadgeCustomData().getValue();
+		const iValue = this.getBadgeCustomData().getValue();
 
 		if (iMin && !isNaN(iMin) && iMin >= BADGE_MIN_VALUE && iMin != this._badgeMinValue && iMin <= this._badgeMaxValue) {
 			this._badgeMinValue = iMin;
 			this.badgeValueFormatter(iValue);
 			this.invalidate();
 		} else {
-			Log.warning("minValue is not valid (it is is less than minimum allowed badge value [" + BADGE_MIN_VALUE + "] or greater than maximum badge value [" + this._badgeMaxValue + "])", this);
+			Log.warning(`minValue is not valid (it is is less than minimum allowed badge value [${BADGE_MIN_VALUE}] or greater than maximum badge value [${this._badgeMaxValue}])`, this);
 		}
 		return this;
 	};
@@ -384,7 +384,7 @@ sap.ui.define([
 			this._badgeMaxValue = iMax;
 			this.invalidate();
 		} else {
-			Log.warning("maxValue is not valid (it is is greater than than maximum allowed badge value [" + BADGE_MAX_VALUE + "] or less than minimum badge value [" + this._badgeMinValue + "])", this);
+			Log.warning(`maxValue is not valid (it is is greater than than maximum allowed badge value [${BADGE_MAX_VALUE}] or less than minimum badge value [${this._badgeMinValue}])`, this);
 		}
 		return this;
 	};
@@ -417,14 +417,13 @@ sap.ui.define([
 	 * @private
 	 */
 	Button.prototype._updateBadgeInvisibleText = function(vValue) {
-		var oRb = Library.getResourceBundleFor("sap.m"),
-			sInvisibleTextValue,
-			iPlusPos;
+		const oRb = Library.getResourceBundleFor("sap.m");
+		let sInvisibleTextValue;
 
 		// set invisible text with badge value
 		vValue = vValue.toString().trim();
 
-		iPlusPos = vValue.indexOf("+");
+		const iPlusPos = vValue.indexOf("+");
 		if (iPlusPos !== -1) {
 			sInvisibleTextValue = oRb.getText("BUTTON_BADGE_MORE_THAN_ITEMS", [vValue.substr(0, iPlusPos)]);
 		} else {
@@ -446,7 +445,7 @@ sap.ui.define([
 	 */
 	Button.prototype._getBadgeInvisibleText = function() {
 		if (!this._oBadgeInvisibleText) {
-			this._oBadgeInvisibleText = new InvisibleText(this.getId() + "-badge").toStatic();
+			this._oBadgeInvisibleText = new InvisibleText(`${this.getId()}-badge`).toStatic();
 		}
 		return this._oBadgeInvisibleText;
 	};
@@ -522,7 +521,7 @@ sap.ui.define([
 	};
 
 	Button.prototype._updateAccessKey = function () {
-		var sText = this.getText();
+		const sText = this.getText();
 
 		if (sText) {
 			this.setProperty("accesskey", sText[0].toLowerCase());
@@ -600,9 +599,8 @@ sap.ui.define([
 	 * @private
 	 */
 	Button.prototype.ontouchend = function(oEvent) {
-		var sEndingTagId, bShouldSimulateTap,
-			bIsRightClick = oEvent.which === 3 || (oEvent.ctrlKey && oEvent.which === 1),
-			iTouchDuration = Date.now() - this._iTouchStartTimestamp;
+		const bIsRightClick = oEvent.which === 3 || (oEvent.ctrlKey && oEvent.which === 1);
+		const iTouchDuration = Date.now() - this._iTouchStartTimestamp;
 
 		this._buttonPressed = oEvent.originalEvent && oEvent.originalEvent.buttons & 1;
 
@@ -623,9 +621,9 @@ sap.ui.define([
 		}
 
 		// get the tag ID where the touch event ended
-		sEndingTagId = oEvent.target.id.replace(this.getId(), '');
+		const sEndingTagId = oEvent.target.id.replace(this.getId(), '');
 		// there are some cases when tap event won't come. Simulate it:
-		bShouldSimulateTap = this._buttonPressed === 0 && !bIsRightClick && (
+		const bShouldSimulateTap = this._buttonPressed === 0 && !bIsRightClick && (
 			(this._sTouchStartTargetId === "-BDI-content" && ['-content', '-inner', '-img'].includes(sEndingTagId)) ||
 			(this._sTouchStartTargetId === "-content" && ['-inner', '-img'].includes(sEndingTagId)) ||
 			(this._sTouchStartTargetId === '-img' && sEndingTagId !== '-img')
@@ -644,7 +642,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Button.prototype.ontouchcancel = function() {
-		var iTouchDuration = Date.now() - this._iTouchStartTimestamp;
+		const iTouchDuration = Date.now() - this._iTouchStartTimestamp;
 
 		this._buttonPressed = false;
 		this._sTouchStartTargetId = '';
@@ -693,9 +691,9 @@ sap.ui.define([
 		this.bFromTouchEnd = bFromTouchEnd;
 
 		if (this.bFromTouchEnd) {
-			setTimeout(function() {
+			setTimeout(() => {
 				delete this.bFromTouchEnd;
-			}.bind(this), 0);
+			}, 0);
 		}
 	};
 
@@ -910,8 +908,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Button.prototype._getImage = function(sImgId, sSrc, sActiveSrc, bIconDensityAware) {
-		var bIsIconURI = IconPool.isIconURI(sSrc),
-			bIconFirst;
+		const bIsIconURI = IconPool.isIconURI(sSrc);
 
 		// check if image control type and src match - destroy it, if they don't
 		if (this._image && this._image.isA("sap.m.Image") && bIsIconURI ||
@@ -921,7 +918,7 @@ sap.ui.define([
 		}
 
 		// update or create image control
-		bIconFirst = this.getIconFirst();
+		const bIconFirst = this.getIconFirst();
 
 		if (this._image) {
 			this._image.setSrc(sSrc);
@@ -961,7 +958,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Button.prototype._getInternalIconBtn = function(sImgId, sSrc) {
-		var oIcon = this._iconBtn;
+		let oIcon = this._iconBtn;
 
 		// update or create image control
 		if (oIcon) {
@@ -992,9 +989,9 @@ sap.ui.define([
 	 * @private
 	 */
 	Button.prototype._isUnstyled = function() {
-		var bUnstyled = false;
+		let bUnstyled = false;
 
-		if (this.getType()	=== ButtonType.Unstyled) {
+		if (this.getType() === ButtonType.Unstyled) {
 			bUnstyled = true;
 		}
 
@@ -1023,8 +1020,8 @@ sap.ui.define([
 
 	// A hook to be used by controls that extend sap.m.Button and want to display the tooltip in a different way
 	Button.prototype._getTooltip = function() {
-		var sTooltip,
-			oIconInfo;
+		let sTooltip;
+		let oIconInfo;
 
 		sTooltip = this.getTooltip_AsString();
 
@@ -1084,12 +1081,12 @@ sap.ui.define([
 	 * @protected
 	 */
 	Button.prototype.getAccessibilityInfo = function() {
-		var sDesc = this._getText() || this.getTooltip_AsString(),
-			sAccessibleRole = this.getAccessibleRole(),
-			sKeyShortcutsText = this.getDomRef()?.getAttribute("aria-keyshortcuts");
+		let sDesc = this._getText() || this.getTooltip_AsString();
+		const sAccessibleRole = this.getAccessibleRole();
+		const sKeyShortcutsText = this.getDomRef()?.getAttribute("aria-keyshortcuts");
 
 		if (!sDesc && this._getAppliedIcon()) {
-			var oIconInfo = IconPool.getIconInfo(this._getAppliedIcon());
+			const oIconInfo = IconPool.getIconInfo(this._getAppliedIcon());
 			if (oIconInfo) {
 				sDesc = oIconInfo.text || oIconInfo.name;
 			}
@@ -1110,7 +1107,7 @@ sap.ui.define([
 	* @private
 	*/
 	Button.prototype._setButtonFocus = function() {
-		setTimeout(function() { this.focus(); }.bind(this), 0);
+		setTimeout(() => this.focus(), 0);
 	};
 
 	/*
@@ -1120,11 +1117,11 @@ sap.ui.define([
 	* @private
 	*/
 	Button.prototype._determineSelfReferencePresence = function() {
-		var aAriaLabelledBy = this.getAriaLabelledBy(),
-			bAlreadyHasSelfReference = aAriaLabelledBy.indexOf(this.getId()) !== -1,
-			bHasReferencingLabels = LabelEnablement.getReferencingLabels(this).length > 0,
-			oParent = this.getParent(),
-			bAllowEnhancingByParent = !!(oParent && oParent.enhanceAccessibilityState);
+		const aAriaLabelledBy = this.getAriaLabelledBy();
+		const bAlreadyHasSelfReference = aAriaLabelledBy.includes(this.getId());
+		const bHasReferencingLabels = LabelEnablement.getReferencingLabels(this).length > 0;
+		const oParent = this.getParent();
+		const bAllowEnhancingByParent = !!(oParent && oParent.enhanceAccessibilityState);
 
 		return !bAlreadyHasSelfReference && this._getText() &&
 			(aAriaLabelledBy.length > 0 || bHasReferencingLabels || bAllowEnhancingByParent || this._isBadgeButton());
@@ -1137,13 +1134,13 @@ sap.ui.define([
 	 * @private
 	 */
 	Button.prototype._determineAccessibilityType = function () {
-		var bHasAriaLabelledBy = this.getAriaLabelledBy().length > 0,
-			bHasAriaDescribedBy = this.getAriaDescribedBy().length > 0,
-			bHasReferencingLabels = LabelEnablement.getReferencingLabels(this).length > 0,
-			bHasSemanticType = this.getType() !== ButtonType.Default,
-			bHasLabelling = bHasAriaLabelledBy || bHasReferencingLabels || this._determineSelfReferencePresence(),
-			bHasDescription = bHasAriaDescribedBy || bHasSemanticType || this._isBadgeButton(),
-			sAccType;
+		const bHasAriaLabelledBy = this.getAriaLabelledBy().length > 0;
+		const bHasAriaDescribedBy = this.getAriaDescribedBy().length > 0;
+		const bHasReferencingLabels = LabelEnablement.getReferencingLabels(this).length > 0;
+		const bHasSemanticType = this.getType() !== ButtonType.Default;
+		const bHasLabelling = bHasAriaLabelledBy || bHasReferencingLabels || this._determineSelfReferencePresence();
+		const bHasDescription = bHasAriaDescribedBy || bHasSemanticType || this._isBadgeButton();
+		let sAccType;
 
 		// Conditions are separated instead of grouped to improve readability afterwards.
 		if (!bHasLabelling && !bHasDescription) {
