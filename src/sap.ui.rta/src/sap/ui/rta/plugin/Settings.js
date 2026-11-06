@@ -128,14 +128,14 @@ sap.ui.define([
 			undefined,
 			sVariantManagementReference
 		);
-		const bRuntimeOnly = oSettingsAction.runtimeOnly;
+		const bRuntimeOnly = oSettingsAction.runtimeOnly || mChangeSpecificData.runtimeOnly;
 		if (oSettingsCommand && bRuntimeOnly) {
 			oSettingsCommand.setRuntimeOnly(bRuntimeOnly);
 		}
 		return oCompositeCommand.addCommand(oSettingsCommand);
 	};
 
-	Settings.prototype._handleManifestChangeCommand = async function(mChange, oElement, oCompositeCommand) {
+	Settings.prototype._handleManifestChangeCommand = async function(mChange, oElement, oCompositeCommand, bSuppressReload) {
 		const mChangeSpecificData = mChange.changeSpecificData;
 		const oComponent = mChange.appComponent;
 
@@ -150,11 +150,19 @@ sap.ui.define([
 				texts: mChangeSpecificData.content.texts
 			}
 		);
+		if (bSuppressReload) {
+			oManifestCommand.needsReload = false;
+		}
 		return oCompositeCommand.addCommand(oManifestCommand);
 	};
 
 	Settings.prototype._handleCompositeCommand = async function(aElementOverlays, oElement, aChanges, oSettingsAction) {
 		const oCompositeCommand = await this.getCommandFactory().getCommandFor(oElement, "composite");
+
+		// A manifest change paired with a runtime-only flex change does not require a reload,
+		// because the runtime change already makes the effect visible on screen.
+		const bSuppressReload = oSettingsAction.runtimeOnly
+			|| aChanges.some((mChange) => mChange.changeSpecificData.runtimeOnly);
 
 		const aPromises = aChanges.map((mChange) => {
 			const mChangeSpecificData = mChange.changeSpecificData;
@@ -163,7 +171,7 @@ sap.ui.define([
 				return () => this._handleFlexChangeCommand(mChange, aElementOverlays, oCompositeCommand, oSettingsAction);
 			// Manifest Change
 			} else if (mChangeSpecificData.appDescriptorChangeType) {
-				return () => this._handleManifestChangeCommand(mChange, oElement, oCompositeCommand);
+				return () => this._handleManifestChangeCommand(mChange, oElement, oCompositeCommand, bSuppressReload);
 			}
 			return undefined;
 		});

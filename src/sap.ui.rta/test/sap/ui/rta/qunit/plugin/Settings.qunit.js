@@ -698,6 +698,77 @@ sap.ui.define([
 			return this.oSettingsPlugin.handler([oButtonOverlay], { menuItem: oMenuItem[0], contextElement: this.oButton }, {});
 		});
 
+		QUnit.test("when the handle settings function is called with runtimeOnly action and manifest change, needsReload is set to false on the manifest command", async function(assert) {
+			const mManifestChange = {
+				appComponent: oMockedAppComponent,
+				changeSpecificData: {
+					appDescriptorChangeType: "appDescriptorChangeType",
+					content: {
+						parameters: { param1: "param1" },
+						texts: {}
+					}
+				}
+			};
+
+			const oButtonOverlay = createOverlayWithSettingsAction(this.oButton, {
+				isEnabled: true,
+				runtimeOnly: true,
+				handler() {
+					return Promise.resolve([mManifestChange]);
+				}
+			});
+
+			const oCommandPromise = new Promise((resolve) => {
+				this.oSettingsPlugin.attachEventOnce("elementModified", (oEvent) => resolve(oEvent.getParameter("command")));
+			});
+			const oMenuItem = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
+			await this.oSettingsPlugin.handler([oButtonOverlay], { menuItem: oMenuItem[0], contextElement: this.oButton });
+			const oCompositeCommand = await oCommandPromise;
+			const oManifestCommand = oCompositeCommand.getCommands()[0];
+			assert.ok(oManifestCommand instanceof ManifestCommand, "composite contains a ManifestCommand");
+			assert.strictEqual(oManifestCommand.needsReload, false, "needsReload is set to false on the manifest command");
+		});
+
+		QUnit.test("when the handler returns a manifest change paired with a runtimeOnly flex change, needsReload is set to false on the manifest command", async function(assert) {
+			const mManifestChange = {
+				appComponent: oMockedAppComponent,
+				changeSpecificData: {
+					appDescriptorChangeType: "appDescriptorChangeType",
+					content: {
+						parameters: { param1: "param1" },
+						texts: {}
+					}
+				}
+			};
+			const mRuntimeFlexChange = {
+				selectorElement: this.oButton,
+				changeSpecificData: {
+					runtimeOnly: true,
+					changeType: "changeSettings",
+					content: "testchange"
+				}
+			};
+
+			const oButtonOverlay = createOverlayWithSettingsAction(this.oButton, {
+				isEnabled: true,
+				handler() {
+					return Promise.resolve([mManifestChange, mRuntimeFlexChange]);
+				}
+			});
+
+			const oCommandPromise = new Promise((resolve) => {
+				this.oSettingsPlugin.attachEventOnce("elementModified", (oEvent) => resolve(oEvent.getParameter("command")));
+			});
+			const oMenuItem = await this.oSettingsPlugin.getMenuItems([oButtonOverlay]);
+			await this.oSettingsPlugin.handler([oButtonOverlay], { menuItem: oMenuItem[0], contextElement: this.oButton });
+			const oCompositeCommand = await oCommandPromise;
+			const oManifestCommand = oCompositeCommand.getCommands()[0];
+			const oFlexCommand = oCompositeCommand.getCommands()[1];
+			assert.ok(oManifestCommand instanceof ManifestCommand, "composite contains a ManifestCommand");
+			assert.strictEqual(oManifestCommand.needsReload, false, "needsReload is set to false on the manifest command");
+			assert.strictEqual(oFlexCommand.getRuntimeOnly(), true, "the flex command has runtimeOnly set");
+		});
+
 		QUnit.test("when retrieving the context menu item for single 'settings' action", async function(assert) {
 			const oButtonOverlay = createOverlayWithSettingsAction(this.oButton, {
 				handler() {}
