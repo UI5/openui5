@@ -5,19 +5,7 @@
 	xmlns="sap.m">
 	<l:VerticalLayout class="sapUiContentPadding" width="100%">
 		<Button
-			text="Default landmarks"
-			width="260px"
-			press=".onDefaultPress"
-			class="sapUiSmallMarginBottom" />
-		<Button
-			text="Embedded Page (Content suppressed)"
-			width="260px"
-			press=".onEmbeddedPagePress"
-			class="sapUiSmallMarginBottom" />
-		<Button
-			text="Small dialog (no regions)"
-			width="260px"
-			press=".onNoRegionsPress"
-			class="sapUiSmallMarginBottom" />
+			text="Open Dialog with embedded Page"
+			press=".onOpenPress" />
 	</l:VerticalLayout>
 </mvc:View>
