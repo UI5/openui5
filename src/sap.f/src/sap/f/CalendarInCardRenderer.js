@@ -15,7 +15,7 @@ sap.ui.define([
 		 * CalendarInCard renderer.
 		 * @namespace
 		 */
-		var CalendarInCardRenderer = Renderer.extend(CalendarRenderer);
+		const CalendarInCardRenderer = Renderer.extend(CalendarRenderer);
 		CalendarInCardRenderer.apiVersion = 2;
 		/**
 		 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -27,12 +27,12 @@ sap.ui.define([
 
 			// oCal._iMode = 0; // it's rendered always as DayPicker
 
-			var sId = oCal.getId(),
-				sTooltip = oCal.getTooltip_AsString(),
-				aMonths = oCal.getAggregation("month"),
-				sWidth = oCal.getWidth(),
-				rb = Library.getResourceBundleFor("sap.f"),
-				mAccProps = {labelledby: {value: "", append: false}};
+			const sId = oCal.getId();
+			const sTooltip = oCal.getTooltip_AsString();
+			const aMonths = oCal.getAggregation("month");
+			const sWidth = oCal.getWidth();
+			const rb = Library.getResourceBundleFor("sap.f");
+			const mAccProps = {labelledby: {value: "", append: false}};
 
 			oRm.openStart("div", oCal);
 			oRm.class("sapUiCal");
@@ -57,10 +57,10 @@ sap.ui.define([
 
 			oRm.openEnd(); // div element
 
-			var oHeader = oCal.getAggregation("header");
+			const oHeader = oCal.getAggregation("header");
 			oRm.renderControl(oHeader);
 
-			oRm.openStart("div", sId + "-content");
+			oRm.openStart("div", `${sId}-content`);
 			oRm.class("sapUiCalContent");
 			oRm.openEnd();
 			switch (oCal.getProperty("_currentPicker")) {
@@ -83,7 +83,7 @@ sap.ui.define([
 
 			//when used in a DatePicker, in mobile there is no cancel button
 			if (!oCal._bSkipCancelButtonRendering) {
-				oRm.openStart("button", sId + "-cancel");
+				oRm.openStart("button", `${sId}-cancel`);
 				oRm.class("sapUiCalCancel");
 				oRm.attr("tabindex", "-1");
 				oRm.openEnd();

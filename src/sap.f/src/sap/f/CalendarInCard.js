@@ -50,7 +50,7 @@ sap.ui.define([
 	 * @since 1.84.0
 	 * @alias sap.f.CalendarInCard
 	 */
-	var CalendarInCard = Calendar.extend("sap.f.CalendarInCard", /** @lends sap.f.CalendarInCard.prototype */ {
+	const CalendarInCard = Calendar.extend("sap.f.CalendarInCard", /** @lends sap.f.CalendarInCard.prototype */ {
 		metadata : {
 				library : "sap.f"
 			},
@@ -72,8 +72,8 @@ sap.ui.define([
 	};
 
 	CalendarInCard.prototype.onBeforeRendering = function() {
-		var aMonths = this.getAggregation("month"),
-			oFocusedDate = this._getFocusedDate().toLocalJSDate();
+		const aMonths = this.getAggregation("month");
+		const oFocusedDate = this._getFocusedDate().toLocalJSDate();
 
 		aMonths[0].displayDate(oFocusedDate);
 
@@ -107,24 +107,24 @@ sap.ui.define([
 	 * @override
 	 */
 	CalendarInCard.prototype._initializeHeader = function() {
-		var sNavToolbarId = this.getId() + "--Head",
-			oRB = Library.getResourceBundleFor("sap.f"),
-			oPrevBtn = new Button(sNavToolbarId + "-PrevBtn", {
+		const sNavToolbarId = `${this.getId()}--Head`;
+		const oRB = Library.getResourceBundleFor("sap.f");
+		const oPrevBtn = new Button(`${sNavToolbarId}-PrevBtn`, {
 				icon: IconPool.getIconURI('slim-arrow-left'),
 				tooltip: oRB.getText("CALENDAR_BTN_PREV"),
 				type: "Transparent",
-				press: function () {
+				press: () => {
 					this._handlePrevious();
-				}.bind(this)}),
-			oNextBtn = new Button({
+				}});
+		const oNextBtn = new Button({
 				icon: IconPool.getIconURI('slim-arrow-right'),
 				tooltip: oRB.getText("CALENDAR_BTN_NEXT"),
 				type: "Transparent",
-				press: function () {
+				press: () => {
 					this._handleNext();
-				}.bind(this)
-			}),
-			oHeader = new Toolbar(sNavToolbarId, {
+				}
+			});
+		const oHeader = new Toolbar(sNavToolbarId, {
 				ariaLabelledBy: InvisibleText.getStaticId("sap.f", "CALENDAR_NAVIGATION")
 			});
 
@@ -132,16 +132,16 @@ sap.ui.define([
 			text: oRB.getText("CALENDAR_TODAY"),
 			ariaLabelledBy: InvisibleText.getStaticId("sap.f", "CALENDAR_NAVIGATE_TO_TODAY"),
 			type: "Transparent",
-			press: function () {
+			press: () => {
 				this._handleTodayPress();
-			}.bind(this)});
+			}});
 
 		this._oPickerBtn = new Button({
 			type: "Transparent",
 			ariaLabelledBy: InvisibleText.getStaticId("sap.f", "CALENDAR_SELECT_RANGE"),
-			press: function () {
+			press: () => {
 				this._handlePickerButtonPress();
-			}.bind(this)
+			}
 		});
 
 		oHeader.addContent(oPrevBtn)
@@ -180,8 +180,8 @@ sap.ui.define([
 	 * @private
 	 */
 	CalendarInCard.prototype._handleTodayPress = function () {
-		var oDate = UI5Date.getInstance(),
-			oCalDate = CalendarDate.fromLocalJSDate(oDate);
+		const oDate = UI5Date.getInstance();
+		const oCalDate = CalendarDate.fromLocalJSDate(oDate);
 
 		this.getAggregation("month")[0].setDate(oDate);
 		this.getSelectedDates()[0].setStartDate(oDate);
@@ -215,21 +215,21 @@ sap.ui.define([
 	 * @private
 	 */
 	CalendarInCard.prototype._formatPickerText = function (oFocusedDate) {
-		var oDate = oFocusedDate ? oFocusedDate : this.getSelectedDates()[0].getStartDate(),
-			bRTL = Localization.getRTL(),
-			oDateFormat = DateFormat.getDateInstance({format: "yMMMM"}),
-			sBeginningResult = oDateFormat.format(oDate),
-			sResult,
-			sEndResult;
+		const oDate = oFocusedDate ? oFocusedDate : this.getSelectedDates()[0].getStartDate();
+		const bRTL = Localization.getRTL();
+		const oDateFormat = DateFormat.getDateInstance({format: "yMMMM"});
+		const sBeginningResult = oDateFormat.format(oDate);
+		let sResult;
+		let sEndResult;
 
 		if (!bRTL) {
 			sResult = sBeginningResult;
 			if (sEndResult) {
-				sResult += " - " + sEndResult;
+				sResult += ` - ${sEndResult}`;
 			}
 		} else {
 			if (sEndResult) {
-				sResult = sEndResult + " - " + sBeginningResult;
+				sResult = `${sEndResult} - ${sBeginningResult}`;
 			} else {
 				sResult = sBeginningResult;
 			}
@@ -244,11 +244,11 @@ sap.ui.define([
 	 * @private
 	 */
 	CalendarInCard.prototype._formatYearPickerText = function () {
-		var iCurrentYear = this._getYearPicker().getDate().getFullYear(),
-			iYearsShown = this._getYearPicker().getYears(),
-			iStartYear = iCurrentYear - Math.floor(iYearsShown / 2),
-			iEndYear = iCurrentYear + iYearsShown / 2 - 1;
-		return "" + iStartYear + " - " + iEndYear;
+		const iCurrentYear = this._getYearPicker().getDate().getFullYear();
+		const iYearsShown = this._getYearPicker().getYears();
+		const iStartYear = iCurrentYear - Math.floor(iYearsShown / 2);
+		const iEndYear = iCurrentYear + iYearsShown / 2 - 1;
+		return `${iStartYear} - ${iEndYear}`;
 	};
 
 	/**
@@ -269,8 +269,8 @@ sap.ui.define([
 	 * @override
 	 */
 	CalendarInCard.prototype._showMonthPicker = function (bSkipFocus) {
-		var oDate = this._getFocusedDate(),
-			oMonthPicker = this._getMonthPicker();
+		const oDate = this._getFocusedDate();
+		const oMonthPicker = this._getMonthPicker();
 
 		this.setProperty("_currentPicker", "monthPicker");
 
@@ -296,8 +296,8 @@ sap.ui.define([
 	 * @override
 	 */
 	CalendarInCard.prototype._showYearPicker = function () {
-		var oDate = this._getFocusedDate(),
-			oYearPicker = this._getYearPicker();
+		const oDate = this._getFocusedDate();
+		const oYearPicker = this._getYearPicker();
 
 		this.setProperty("_currentPicker", "yearPicker");
 
@@ -350,11 +350,11 @@ sap.ui.define([
 	 * @override
 	 */
 	CalendarInCard.prototype._selectYearRange = function() {
-		var oYearRangePicker = this.getAggregation("yearRangePicker"),
-			iRangeSize = oYearRangePicker.getRangeSize(),
-			sPrimaryCalendarType = this.getPrimaryCalendarType(),
-			oStartDate = CalendarDate.fromLocalJSDate(oYearRangePicker.getDate(), sPrimaryCalendarType),
-			oFocusedDate = this._getFocusedDate();
+		const oYearRangePicker = this.getAggregation("yearRangePicker");
+		const iRangeSize = oYearRangePicker.getRangeSize();
+		const sPrimaryCalendarType = this.getPrimaryCalendarType();
+		const oStartDate = CalendarDate.fromLocalJSDate(oYearRangePicker.getDate(), sPrimaryCalendarType);
+		const oFocusedDate = this._getFocusedDate();
 
 		oStartDate.setMonth(oFocusedDate.getMonth(), oFocusedDate.getDate());
 		oStartDate.setYear(oStartDate.getYear() + Math.floor(iRangeSize / 2));
@@ -398,7 +398,9 @@ sap.ui.define([
 	 * @override
 	 */
 	CalendarInCard.prototype._handleArrowNavigation = function(iBackwards) {
-		var oMonthPicker, oYearPicker, oYearRangePicker;
+		let oMonthPicker;
+		let oYearPicker;
+		let oYearRangePicker;
 
 		if (this._iMode === 3) {
 			oYearRangePicker = this._getYearRangePicker();
@@ -425,12 +427,12 @@ sap.ui.define([
 	 * @private
 	 */
 	CalendarInCard.prototype._dateMatchesVisibleRange = function() {
-		var oCalNewDate = CalendarDate.fromLocalJSDate(UI5Date.getInstance()),
-			oSelectedDate,
-			bIsSameDate,
-			oYearRangePicker,
-			oYearRangePickerDate,
-			oStartDate;
+		const oCalNewDate = CalendarDate.fromLocalJSDate(UI5Date.getInstance());
+		let oSelectedDate;
+		let bIsSameDate;
+		let oYearRangePicker;
+		let oYearRangePickerDate;
+		let oStartDate;
 
 		switch (this._iMode) {
 			case 0: // date picker
@@ -457,9 +459,7 @@ sap.ui.define([
 	 * @private
 	 */
 	CalendarInCard.prototype._updateTodayButtonState = function() {
-		if (this._oTodayBtn) {
-			this._oTodayBtn.setEnabled(!this._dateMatchesVisibleRange());
-		}
+		this._oTodayBtn?.setEnabled(!this._dateMatchesVisibleRange());
 	};
 
 	/**
