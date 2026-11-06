@@ -36,26 +36,26 @@ sap.ui.define([
 ) {
 	"use strict";
 
-	var TitleAlignment = mobileLibrary.TitleAlignment;
+	const TitleAlignment = mobileLibrary.TitleAlignment;
 
 	QUnit.module("rendering");
 
 	async function renderingTest (fnAssertions, clock) {
 
 		//Arrange systems under test
-		var bar = new Bar("myBar", {
+		const bar = new Bar("myBar", {
 			contentLeft: [ new Button('CancelBtn', {text: "Cancel"})],
 			contentMiddle: [ new Label("myLabel", {text: "my Bar"})],
 			contentRight: [ new Button('EditBtn', {text: "Edit"})]
 		}).placeAt("qunit-fixture");
 
-		var bar1 = new Bar("myBar1", {
+		const bar1 = new Bar("myBar1", {
 			contentLeft: [ new Image("myIcon", {src: "../images/SAPUI5.jpg"})],
 			contentMiddle: [ new Label("myLabel1", {text: "my Bar 1"})],
 			contentRight: [ new Button('EditBtn1', {text: "Edit"})]
 		}).placeAt("qunit-fixture");
 
-		var bar2 = new Bar("myBar2", {
+		const bar2 = new Bar("myBar2", {
 			contentLeft: [ new Image({src: "../images/SAPUI5.jpg"})],
 			contentMiddle: [ new Label({text: "my Bar 1"})],
 			contentRight: [ new Button({text: "Edit"})]
@@ -65,7 +65,7 @@ sap.ui.define([
 		await nextUIUpdate(clock);
 
 		//Assert
-		fnAssertions();
+		await fnAssertions();
 
 		//cleanup
 		bar.destroy();
@@ -76,7 +76,7 @@ sap.ui.define([
 
 	QUnit.test("Should render the bars", async function(assert) {
 
-		await renderingTest.call(this, function() {
+		await renderingTest.call(this, () => {
 
 			assert.ok(document.getElementById("myBar"), "Bar should be rendered");
 			assert.ok(document.getElementById("myBar1"), "Bar1 should be rendered");
@@ -88,7 +88,7 @@ sap.ui.define([
 	// This is more like visual test, but will leave it as it is for now.
 	QUnit.test("Should position the bars", async function(assert) {
 
-		await renderingTest.call(this, function() {
+		await renderingTest.call(this, () => {
 
 			assert.equal(Math.round(jQuery("#myBar1").position().top), Math.round(jQuery("#myBar").position().top + jQuery("#myBar").outerHeight()),
 					"Bar1 should be located below Bar");
@@ -99,7 +99,7 @@ sap.ui.define([
 
 	QUnit.test("content Element position", async function(assert) {
 
-		await renderingTest.call(this, function() {
+		await renderingTest.call(this, () => {
 
 			assert.ok(jQuery("#CancelBtn").parent().hasClass("sapMBarLeft"), "header button should have class sapMBarLeft");
 			assert.ok(jQuery("#myIcon").parent().hasClass("sapMBarLeft"), "header icon should have class sapMBarLeft");
@@ -114,19 +114,19 @@ sap.ui.define([
 
 	QUnit.test("Should set the design class to the containers", async function(assert) {
 		// Arrange
-		var sBarBaseContext = "sapMIBar-CTX";
+		const sBarBaseContext = "sapMIBar-CTX";
 
 		// System under Test
-		var oBar = new Bar().placeAt("qunit-fixture");
+		const oBar = new Bar().placeAt("qunit-fixture");
 
 		// Act
 		await nextUIUpdate(this.clock);
 
-		var sExpectedClass = BarRenderer.getContext(oBar);
+		const sExpectedClass = BarRenderer.getContext(oBar);
 
 		// Assert
-		assert.ok(oBar.$().hasClass(sExpectedClass), "the left button parent had the class " + sExpectedClass);
-		assert.ok(oBar.$().hasClass(sBarBaseContext), "the left button parent had the class " + sBarBaseContext);
+		assert.ok(oBar.$().hasClass(sExpectedClass), `the left button parent had the class ${sExpectedClass}`);
+		assert.ok(oBar.$().hasClass(sBarBaseContext), `the left button parent had the class ${sBarBaseContext}`);
 
 		//Cleanup
 		oBar.destroy();
@@ -135,12 +135,12 @@ sap.ui.define([
 
 	QUnit.test("Should get the correct contexts", async function(assert) {
 		// System under Test
-		var oBar = new Bar().placeAt("qunit-fixture");
+		const oBar = new Bar().placeAt("qunit-fixture");
 
 		// Act
 		await nextUIUpdate(this.clock);
 
-		var oExpectedContexts = oBar.getContext(oBar);
+		const oExpectedContexts = oBar.getContext(oBar);
 
 		// Assert
 		assert.equal(Object.keys(oExpectedContexts).length, 4, "There are four contexts");
@@ -156,24 +156,24 @@ sap.ui.define([
 
 	QUnit.test("tag property", async function(assert) {
 
-		await renderingTest.call(this, async function() {
+		await renderingTest.call(this, async () => {
 
 			assert.ok(jQuery("#myBar").is("div"), "bar should be rendered as div");
 			assert.ok(jQuery("#myBar1").is("div"), "bar1 should be rendered as div");
 
-			var bar = Element.getElementById("myBar");
+			const bar = Element.getElementById("myBar");
 			bar.setHTMLTag('Header');
 			bar.invalidate();
 			await nextUIUpdate(this.clock);
 			assert.ok(jQuery("#myBar").is("header"), "bar should be rendered as header");
 
-			var bar1 = Element.getElementById("myBar1");
+			const bar1 = Element.getElementById("myBar1");
 			bar1.setHTMLTag('Footer');
 			bar1.invalidate();
 			await nextUIUpdate(this.clock);
 			assert.ok(jQuery("#myBar1").is("footer"), "bar1 should be rendered as footer");
 
-			var bar2 = Element.getElementById("myBar2");
+			const bar2 = Element.getElementById("myBar2");
 			bar2.setHTMLTag('H1');
 			bar2.invalidate();
 			await nextUIUpdate(this.clock);
@@ -189,7 +189,7 @@ sap.ui.define([
 	 */
 	QUnit.test("Deprecated property 'enableFlexBox': should add and remove the flex box", async function(assert) {
 
-		var bar = new Bar("myBar2", {
+		const bar = new Bar("myBar2", {
 			enableFlexBox: true,
 			contentLeft: [ new Image({src: "../images/SAPUI5.jpg"})],
 			contentMiddle: [ new Label({text: "my Bar 1"})],
@@ -214,7 +214,7 @@ sap.ui.define([
 	 * @deprecated since version 1.18.6.
 	 */
 	QUnit.test("Should set the translucent class if on a touch device", async function(assert) {
-		var //System under Test
+		const //System under Test
 			sut = new Bar({
 				translucent : true
 			});
@@ -235,7 +235,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Should not register resize handlers if the bar is invisible", async function(assert) {
-		var //System under Test
+		const //System under Test
 				oBar = new Bar({
 					visible : true,
 					contentLeft : new Button()
@@ -244,7 +244,7 @@ sap.ui.define([
 		//Arrange + Act
 		oBar.placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
-		var fnSpy = this.spy(ResizeHandler, "register");
+		const fnSpy = this.spy(ResizeHandler, "register");
 
 		//Act
 		oBar.setVisible(false);
@@ -258,17 +258,17 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 	});
 
-	var iMargin = 4;
-	var iStartEndPadding = 4;
+	const iMargin = 4;
+	const iStartEndPadding = 4;
 
 	QUnit.test("Each first child should not have margins and each none first should have", async function(assert) {
 		// Arrange
-		var oFirstButton = new Button("first"),
-			oMiddleButton = new Button("middle"),
-			oLastButton = new Button("last");
+		const oFirstButton = new Button("first");
+		const oMiddleButton = new Button("middle");
+		const oLastButton = new Button("last");
 
 		// System under Test + Act
-		var oBar = new Bar({
+		const oBar = new Bar({
 			contentLeft : [oFirstButton],
 			contentRight : [
 				oMiddleButton,
@@ -283,11 +283,11 @@ sap.ui.define([
 		// Assert
 		function assertButton (oButton, oMargins) {
 			if (Localization.getRTL()) {
-				assert.strictEqual(oButton.$().css("margin-left"), oMargins.right + "px", oButton + " did have the correct right margin");
-				assert.strictEqual(oButton.$().css("margin-right"),  oMargins.left + "px", oButton + " did have the correct left margin");
+				assert.strictEqual(oButton.$().css("margin-left"), `${oMargins.right}px`, `${oButton} did have the correct right margin`);
+				assert.strictEqual(oButton.$().css("margin-right"),  `${oMargins.left}px`, `${oButton} did have the correct left margin`);
 			} else {
-				assert.strictEqual(oButton.$().css("margin-left"), oMargins.left + "px", oButton + " did have the correct left margin");
-				assert.strictEqual(oButton.$().css("margin-right"),  oMargins.right + "px", oButton + " did have the correct right margin");
+				assert.strictEqual(oButton.$().css("margin-left"), `${oMargins.left}px`, `${oButton} did have the correct left margin`);
+				assert.strictEqual(oButton.$().css("margin-right"),  `${oMargins.right}px`, `${oButton} did have the correct right margin`);
 			}
 		}
 
@@ -307,9 +307,9 @@ sap.ui.define([
 		});
 
 		if (Localization.getRTL()) {
-			assert.strictEqual(oBar.$("BarLeft").css("padding-right"), iStartEndPadding + 12 + "px", "Left bar does have a padding");
+			assert.strictEqual(oBar.$("BarLeft").css("padding-right"), `${iStartEndPadding + 12}px`, "Left bar does have a padding");
 		} else {
-			assert.strictEqual(oBar.$("BarLeft").css("padding-left"), iStartEndPadding + 12 + "px", "Left bar does have a padding");
+			assert.strictEqual(oBar.$("BarLeft").css("padding-left"), `${iStartEndPadding + 12}px`, "Left bar does have a padding");
 		}
 
 		// Cleanup
@@ -318,7 +318,7 @@ sap.ui.define([
 	});
 
 	function getBarContentStyles(sut) {
-		var oBarStyles = getJqueryObjectsForBar(sut);
+		const oBarStyles = getJqueryObjectsForBar(sut);
 
 		return {
 			left: oBarStyles.$left.attr("style") ? oBarStyles.$left.attr("style").replace(/[;|\s]/g, "") : "",
@@ -327,7 +327,7 @@ sap.ui.define([
 		};
 	}
 	function createSUTSingleAggregation(sAggregationName) {
-		var oSut;
+		let oSut;
 		switch (sAggregationName) {
 			case "contentLeft":
 				oSut = new Bar({contentLeft: [ new Button()]});
@@ -338,21 +338,21 @@ sap.ui.define([
 			case "contentRight":
 				oSut = new Bar({contentRight: [ new Button()]});
 				break;
-			default: "Invalid aggregation " + sAggregationName;
+			default: `Invalid aggregation ${sAggregationName}`;
 		}
 		return oSut;
 	}
 	QUnit.test("Single left aggregation is set with width 100%", async function(assert) {
 		//Sut
-		var sut = createSUTSingleAggregation("contentLeft"),
-				oBarWidths;
+		const sut = createSUTSingleAggregation("contentLeft");
+		let oBarWidths;
 
 		//Assert
 		function check (sMsgPrefix) {
 			oBarWidths = getBarContentStyles(sut);
-			assert.notEqual(oBarWidths.left.indexOf("width:100%"), -1, sMsgPrefix + " Left Content width must be set to 100%");
-			assert.equal(oBarWidths.mid.indexOf("width:100%"), -1 ,sMsgPrefix + " Middle Content width must not be set to 100%");
-			assert.equal(oBarWidths.right.indexOf("width:100%"), -1, sMsgPrefix + " Right Content width must not be set to 100%");
+			assert.ok(oBarWidths.left.includes("width:100%"), `${sMsgPrefix} Left Content width must be set to 100%`);
+			assert.notOk(oBarWidths.mid.includes("width:100%"), `${sMsgPrefix} Middle Content width must not be set to 100%`);
+			assert.notOk(oBarWidths.right.includes("width:100%"), `${sMsgPrefix} Right Content width must not be set to 100%`);
 		}
 
 		//Arrange
@@ -374,15 +374,15 @@ sap.ui.define([
 
 	QUnit.test("Single middle aggregation is set with width 100%", async function(assert) {
 		//Sut
-		var sut = createSUTSingleAggregation("contentMiddle"),
-				oBarWidths;
+		const sut = createSUTSingleAggregation("contentMiddle");
+		let oBarWidths;
 
 		//Assert
 		function check (sMsgPrefix) {
 			oBarWidths = getBarContentStyles(sut);
-			assert.equal(oBarWidths.left.indexOf("width:100%"), -1, sMsgPrefix + " Left Content width must not be set to 100%");
-			assert.equal(oBarWidths.right.indexOf("width:100%"), -1, sMsgPrefix + " Right Content width must not be set to 100%");
-			assert.notEqual(oBarWidths.mid.indexOf("width:100%"), -1, sMsgPrefix + " Middle Content width must be set to 100%");
+			assert.notOk(oBarWidths.left.includes("width:100%"), `${sMsgPrefix} Left Content width must not be set to 100%`);
+			assert.notOk(oBarWidths.right.includes("width:100%"), `${sMsgPrefix} Right Content width must not be set to 100%`);
+			assert.ok(oBarWidths.mid.includes("width:100%"), `${sMsgPrefix} Middle Content width must be set to 100%`);
 		}
 
 		//Arrange
@@ -404,15 +404,15 @@ sap.ui.define([
 
 	QUnit.test("Single right aggregation is set with width 100%", async function(assert) {
 		//Sut
-		var sut = createSUTSingleAggregation("contentRight"),
-				oBarWidths;
+		const sut = createSUTSingleAggregation("contentRight");
+		let oBarWidths;
 
 		//Assert
 		function check (sMsgPrefix) {
 			oBarWidths = getBarContentStyles(sut);
-			assert.equal(oBarWidths.left.indexOf("width:100%"), -1, sMsgPrefix + " Left Content width must not be set to 100%");
-			assert.equal(oBarWidths.mid.indexOf("width:100%"), -1, sMsgPrefix + " Middle Content width must not be set to 100%");
-			assert.notEqual(oBarWidths.right.indexOf("width:100%"), -1, sMsgPrefix + " Right Content width must be set to 100%");
+			assert.notOk(oBarWidths.left.includes("width:100%"), `${sMsgPrefix} Left Content width must not be set to 100%`);
+			assert.notOk(oBarWidths.mid.includes("width:100%"), `${sMsgPrefix} Middle Content width must not be set to 100%`);
+			assert.ok(oBarWidths.right.includes("width:100%"), `${sMsgPrefix} Right Content width must be set to 100%`);
 		}
 
 		//Arrange
@@ -435,8 +435,8 @@ sap.ui.define([
 	QUnit.test("ariaLabbeledBy", async function(assert) {
 
 	//Arrange
-	var oBar = new Bar(),
-	oInvisibleText = new InvisibleText({text: "invisible text"});
+	const oBar = new Bar();
+	const oInvisibleText = new InvisibleText({text: "invisible text"});
 
 	oBar.addAriaLabelledBy(oInvisibleText.toStatic());
 
@@ -457,67 +457,69 @@ sap.ui.define([
 	QUnit.module("positioning");
 
 	function getJqueryObjectsForBar (oBar) {
-		var sBarId = oBar.getId();
+		const sBarId = oBar.getId();
 
 		return {
-			$left : jQuery("#" + sBarId + "-BarLeft"),
-			$mid : jQuery("#" + sBarId + "-BarPH"),
-			$right : jQuery("#" + sBarId + "-BarRight")
+			$left : jQuery(`#${sBarId}-BarLeft`),
+			$mid : jQuery(`#${sBarId}-BarPH`),
+			$right : jQuery(`#${sBarId}-BarRight`)
 		};
 	}
 
 	function elementHasNoWidth(assert, $element, sElementName) {
-		var style = $element.attr("style");
+		const style = $element.attr("style");
 
 		if (style) {
 
-			assert.strictEqual(style.indexOf("width"), -1, sElementName + " has no inline width set style was " + style);
+			assert.notOk(style.includes("width"), `${sElementName} has no inline width set style was ${style}`);
 
 		} else {
 
-			assert.ok(true, sElementName + " has no inline style");
+			assert.ok(true, `${sElementName} has no inline style`);
 
 		}
 	}
 
 	function elementHasNoLeftOrRight(assert, $element, sElementName) {
-		var stlye = $element.attr("style");
+		const stlye = $element.attr("style");
 
 		if (stlye) {
 
-			assert.strictEqual(stlye.indexOf("right"), -1, sElementName + " has no inline right set style was " + stlye);
-			assert.strictEqual(stlye.indexOf("left"), -1, sElementName + " has no inline left set style was " + stlye);
+			assert.notOk(stlye.includes("right"), `${sElementName} has no inline right set style was ${stlye}`);
+			assert.notOk(stlye.includes("left"), `${sElementName} has no inline left set style was ${stlye}`);
 
 		} else {
 
-			assert.ok(true, sElementName + " has no inline style");
+			assert.ok(true, `${sElementName} has no inline style`);
 
 		}
 	}
 
 	async function createAndPlaceSUT(iLeftBarouterWidth, iRightBarouterWidth, iMidBarouterWidth, clock) {
-		var leftButton, rightButton, midButton;
+		let leftButton;
+		let rightButton;
+		let midButton;
 
 		if (iLeftBarouterWidth !== undefined) {
 			leftButton = new Button({
-				width : iLeftBarouterWidth + "px"
+				width : `${iLeftBarouterWidth}px`
 			});
 		}
 
 		if (iRightBarouterWidth !== undefined) {
 			rightButton = new Button({
-				width : iRightBarouterWidth + "px"
+				width : `${iRightBarouterWidth}px`
 			});
 		}
 
 		if (iMidBarouterWidth !== undefined) {
 			midButton = new Button({
-				width : iMidBarouterWidth + "px"
+				width : `${iMidBarouterWidth}px`
 			});
 		}
 
 		//System under Test
-		var sut = new Bar({
+		const sut = new Bar({
 			contentLeft : leftButton,
 			contentMiddle : midButton,
 			contentRight : rightButton
@@ -532,23 +534,19 @@ sap.ui.define([
 
 	function testAlsoForRTL(sName, fnTest) {
 		QUnit.test(sName, async function (assert) {
-			var config = oCore.getConfiguration();
+			const config = oCore.getConfiguration();
 
 			//turn on rtl for this test
-			this.stub(config, "getRTL").callsFake(function() {
-				return false;
-			});
+			this.stub(config, "getRTL").callsFake(() => false);
 
 			await fnTest.call(this, assert, config.getRTL());
 		});
 
-		QUnit.test(sName + " RTL", async function (assert) {
-			var config = oCore.getConfiguration();
+		QUnit.test(`${sName} RTL`, async function (assert) {
+			const config = oCore.getConfiguration();
 
 			//turn on rtl for this test
-			this.stub(config, "getRTL").callsFake(function() {
-				return true;
-			});
+			this.stub(config, "getRTL").callsFake(() => true);
 
 			await fnTest.call(this, assert, config.getRTL());
 		});
@@ -557,10 +555,10 @@ sap.ui.define([
 	testAlsoForRTL("Should position the mid content centered, left content left and right content right, if nothing overlaps", async function(assert, bRtl) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(100, 100, 100, this.clock);
+		const sut = await createAndPlaceSUT(100, 100, 100, this.clock);
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
-		var iExtraPadding = 16;
+		const oBarInternals = getJqueryObjectsForBar(sut);
+		const iExtraPadding = 16;
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), 100 + iStartEndPadding + iExtraPadding, "left outerWidth is correct");
 		elementHasNoWidth(assert, oBarInternals.$left, "left Bar");
@@ -583,11 +581,11 @@ sap.ui.define([
 	testAlsoForRTL("Should hide the mid content, and shorten leftContent if right content overlaps the leftContent", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(100, 450, 100, this.clock);
-		var iExtraPadding = 16;
+		const sut = await createAndPlaceSUT(100, 450, 100, this.clock);
+		const iExtraPadding = 16;
 
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		const oBarInternals = getJqueryObjectsForBar(sut);
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), 50 - iStartEndPadding - iExtraPadding, "left outerWidth is correct");
 		elementHasNoLeftOrRight(assert, oBarInternals.$left, "left Bar");
@@ -607,10 +605,10 @@ sap.ui.define([
 	testAlsoForRTL("Should hide the mid content, and shorten leftContent if left content overlaps the RightContent", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(450, 100, 100, this.clock);
-		var iExtraPadding = 16;
+		const sut = await createAndPlaceSUT(450, 100, 100, this.clock);
+		const iExtraPadding = 16;
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		const oBarInternals = getJqueryObjectsForBar(sut);
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), 400 - iStartEndPadding - iExtraPadding, "left outerWidth is correct");
 		elementHasNoLeftOrRight(assert, oBarInternals.$left, "left Bar");
@@ -630,11 +628,11 @@ sap.ui.define([
 	testAlsoForRTL("Should push the Middle content to the space between left and right if the left content overlaps the centered mid content", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(225, 100, 100, this.clock);
-		var iExtraPadding = 16;
+		const sut = await createAndPlaceSUT(225, 100, 100, this.clock);
+		const iExtraPadding = 16;
 
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		const oBarInternals = getJqueryObjectsForBar(sut);
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), 225 + iStartEndPadding + iExtraPadding, "left outerWidth is correct");
 
@@ -652,12 +650,12 @@ sap.ui.define([
 	 * @deprecated since version 1.16, replaced by <code>contentMiddle</code> aggregation.
 	 */
 	QUnit.test("Should push the mid to the center of the remaining space, if the right content overlaps it", async function(assert) {
-		var bRtl = Localization.getRTL(),
-			sLeftOrRight = bRtl ? "right" : "left";
-		var iExtraPadding = 16;
+		const bRtl = Localization.getRTL();
+		const sLeftOrRight = bRtl ? "right" : "left";
+		const iExtraPadding = 16;
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(undefined, 225, 100, this.clock);
+		const sut = await createAndPlaceSUT(undefined, 225, 100, this.clock);
 
 		//Act
 		jQuery("#qunit-fixture").width("500px");
@@ -665,12 +663,12 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		let oBarInternals = getJqueryObjectsForBar(sut);
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), 0, "left outerWidth is correct");
 
 		assert.strictEqual(oBarInternals.$mid.outerWidth(), 500 - 225 - iExtraPadding - iStartEndPadding, "mid outerWidth is the remaining space");
-		assert.strictEqual(parseInt(oBarInternals.$mid.css(sLeftOrRight)), iStartEndPadding * 0 , "mid was positioned at the " + sLeftOrRight + " edge");
+		assert.strictEqual(parseInt(oBarInternals.$mid.css(sLeftOrRight)), iStartEndPadding * 0 , `mid was positioned at the ${sLeftOrRight} edge`);
 
 		assert.strictEqual(oBarInternals.$right.outerWidth(), 225 + iExtraPadding + iStartEndPadding, "right outerWidth is correct");
 
@@ -684,7 +682,7 @@ sap.ui.define([
 		assert.strictEqual(oBarInternals.$left.outerWidth(), iExtraPadding + iStartEndPadding, "left outerWidth is correct (flexbox)");
 
 		assert.strictEqual(oBarInternals.$mid.outerWidth(), 500 - 225 - (iExtraPadding * 2) - iStartEndPadding * 2, "mid outerWidth is the remaining space (flexbox)");
-		assert.strictEqual(parseInt(oBarInternals.$mid.css(sLeftOrRight)), iStartEndPadding + iExtraPadding, "mid was positioned at the " + sLeftOrRight + " edge (flexbox)");
+		assert.strictEqual(parseInt(oBarInternals.$mid.css(sLeftOrRight)), iStartEndPadding + iExtraPadding, `mid was positioned at the ${sLeftOrRight} edge (flexbox)`);
 
 		assert.strictEqual(oBarInternals.$right.outerWidth(), 225 + iExtraPadding + iStartEndPadding, "right outerWidth is correct (flexbox)");
 
@@ -697,11 +695,11 @@ sap.ui.define([
 	testAlsoForRTL("Should hide left and mid content, if the right content is bigger than the bar", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(100, 600, 100, this.clock);
-		var iExtraPadding = 16;
+		const sut = await createAndPlaceSUT(100, 600, 100, this.clock);
+		const iExtraPadding = 16;
 
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		const oBarInternals = getJqueryObjectsForBar(sut);
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), iExtraPadding + iStartEndPadding, "left outerWidth is correct");
 
@@ -718,7 +716,7 @@ sap.ui.define([
 	testAlsoForRTL("Should hide mid content, if the left content is bigger than the bar", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(600, undefined, 100, this.clock);
+		const sut = await createAndPlaceSUT(600, undefined, 100, this.clock);
 
 		//Act
 		jQuery("#qunit-fixture").width("500px");
@@ -726,7 +724,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		const oBarInternals = getJqueryObjectsForBar(sut);
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), 500, "left width is correct");
 
@@ -746,8 +744,8 @@ sap.ui.define([
 	testAlsoForRTL("Should make the mid content smaller, if there is a left and right content", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(100, 100, 500, this.clock);
-		var iExtraPadding = 16;
+		const sut = await createAndPlaceSUT(100, 100, 500, this.clock);
+		const iExtraPadding = 16;
 
 		//Act
 		jQuery("#qunit-fixture").width("500px");
@@ -755,7 +753,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		let oBarInternals = getJqueryObjectsForBar(sut);
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), 100 + iExtraPadding + iStartEndPadding, "left outerWidth is correct");
 
@@ -785,8 +783,8 @@ sap.ui.define([
 	QUnit.test("Should push the mid content, right content that overlaps", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(undefined, 225, 100, this.clock);
-		var iExtraPadding = 16;
+		const sut = await createAndPlaceSUT(undefined, 225, 100, this.clock);
+		const iExtraPadding = 16;
 
 		//Act
 		jQuery("#qunit-fixture").width("500px");
@@ -794,7 +792,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		const oBarInternals = getJqueryObjectsForBar(sut);
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), 0, "left outerWidth is correct");
 
@@ -811,7 +809,7 @@ sap.ui.define([
 	testAlsoForRTL("Should give the right content the whole space if its the only content", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(undefined, 100, undefined, this.clock);
+		const sut = await createAndPlaceSUT(undefined, 100, undefined, this.clock);
 
 		//Act
 		jQuery("#qunit-fixture").width("500px");
@@ -819,7 +817,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		const oBarInternals = getJqueryObjectsForBar(sut);
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), 0, "left outerWidth is correct");
 		elementHasNoLeftOrRight(assert, oBarInternals.$left, "left Bar");
@@ -842,7 +840,7 @@ sap.ui.define([
 	QUnit.test("leftContent should not overlap the rightContent", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(300, 450, 0, this.clock);
+		const sut = await createAndPlaceSUT(300, 450, 0, this.clock);
 
 		//Act
 		jQuery("#qunit-fixture").width("750px");
@@ -850,7 +848,7 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		const oBarInternals = getJqueryObjectsForBar(sut);
 
 		if (Localization.getRTL()) {
 			assert.strictEqual(oBarInternals.$right.outerWidth(), Math.round(oBarInternals.$left.position().left), "left content starts where right content ends");
@@ -870,10 +868,10 @@ sap.ui.define([
 	QUnit.test("Should attach to the resize handlers", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(225, 225, 100, this.clock);
-		var iExtraPadding = 16;
+		const sut = await createAndPlaceSUT(225, 225, 100, this.clock);
+		const iExtraPadding = 16;
 
-		var oHandleResizeSpy = this.spy(Bar.prototype, "_handleResize");
+		const oHandleResizeSpy = this.spy(Bar.prototype, "_handleResize");
 
 		//Act
 		jQuery("#qunit-fixture").width("500px");
@@ -883,13 +881,13 @@ sap.ui.define([
 		assert.strictEqual(oHandleResizeSpy.callCount, 1, "resize was called once");
 
 		//Assert
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		let oBarInternals = getJqueryObjectsForBar(sut);
 
 		assert.strictEqual(oBarInternals.$left.outerWidth(), 225 + iExtraPadding + iStartEndPadding, "left outerWidth is correct");
 		elementHasNoLeftOrRight(assert, oBarInternals.$left, "left Bar");
 
 		assert.strictEqual(oBarInternals.$mid.outerWidth(), 50 - (iExtraPadding * 2) - iStartEndPadding * 2, "mid outerWidth was taking the remaining space");
-		assert.strictEqual(oBarInternals.$mid.css("left"), 225 + iExtraPadding + iStartEndPadding + "px", "mid was positioned at the left edge");
+		assert.strictEqual(oBarInternals.$mid.css("left"), `${225 + iExtraPadding + iStartEndPadding}px`, "mid was positioned at the left edge");
 
 		assert.strictEqual(oBarInternals.$right.outerWidth(), 225 + iExtraPadding + iStartEndPadding, "right outerWidth is correct");
 		elementHasNoLeftOrRight(assert, oBarInternals.$right, "right Bar");
@@ -920,9 +918,9 @@ sap.ui.define([
 	QUnit.test("Should not attach resizeHandlers if the bar has no content", async function(assert) {
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = new Bar();
+		const sut = new Bar();
 
-		var oHandleResizeSpy = this.spy(Bar.prototype, "_handleResize");
+		const oHandleResizeSpy = this.spy(Bar.prototype, "_handleResize");
 
 		jQuery("#qunit-fixture").width("500px");
 		sut.placeAt("qunit-fixture");
@@ -955,16 +953,16 @@ sap.ui.define([
 
 	QUnit.test("Should attach and detach resize listeners to the content", async function(assert) {
 
-		var oHandleResizeSpy = this.spy(Bar.prototype, "_handleResize");
+		const oHandleResizeSpy = this.spy(Bar.prototype, "_handleResize");
 
 		//Arrange + System under Test + Act
 		//left | right | mid
-		var sut = await createAndPlaceSUT(100, 100, 100, this.clock);
+		const sut = await createAndPlaceSUT(100, 100, 100, this.clock);
 
 		assert.strictEqual(oHandleResizeSpy.callCount, 1, "resize was called");
 
 
-		var oBarInternals = getJqueryObjectsForBar(sut);
+		const oBarInternals = getJqueryObjectsForBar(sut);
 
 		//left
 		oBarInternals.$left.width(105);
@@ -1039,29 +1037,27 @@ sap.ui.define([
 
 	QUnit.test("setTitleAlignment test", async function (assert) {
 
-		var oBar = new Bar({
+		const oBar = new Bar({
 				contentMiddle: new Title({
 					text: "Header"
 				})
-			}),
-			sAlignmentClass = "sapMBarTitleAlign",
-			sInitialAlignment,
-			sAlignment;
+			});
+		const sAlignmentClass = "sapMBarTitleAlign";
 
 		oBar.placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
-		sInitialAlignment = oBar.getTitleAlignment();
+		const sInitialAlignment = oBar.getTitleAlignment();
 
 		// initial titleAlignment test (when titleAlignment is None)
-		assert.ok(oBar.hasStyleClass(sAlignmentClass + sInitialAlignment),
-					"The default titleAlignment is '" + sInitialAlignment + "', so there is class '" + sAlignmentClass + sInitialAlignment + "' applied to the Bar");
+		assert.ok(oBar.hasStyleClass(`${sAlignmentClass}${sInitialAlignment}`),
+					`The default titleAlignment is '${sInitialAlignment}', so there is class '${sAlignmentClass}${sInitialAlignment}' applied to the Bar`);
 
 		// check if all types of alignment lead to apply the proper CSS class
-		for (sAlignment in TitleAlignment) {
+		for (const sAlignment in TitleAlignment) {
 			oBar.setTitleAlignment(sAlignment);
 			await nextUIUpdate(this.clock);
-			assert.ok(oBar.hasStyleClass(sAlignmentClass + sAlignment),
-						"titleAlignment is set to '" + sAlignment + "', there is class '" + sAlignmentClass + sAlignment + "' applied to the Bar");
+			assert.ok(oBar.hasStyleClass(`${sAlignmentClass}${sAlignment}`),
+						`titleAlignment is set to '${sAlignment}', there is class '${sAlignmentClass}${sAlignment}' applied to the Bar`);
 		}
 
 		// cleanup

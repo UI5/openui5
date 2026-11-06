@@ -12,7 +12,7 @@ sap.ui.define(['./BarInPageEnabler', "sap/base/i18n/Localization", 'sap/ui/Devic
 	 * Bar renderer.
 	 * @namespace
 	 */
-	var BarRenderer = {
+	const BarRenderer = {
 		apiVersion: 2
 	};
 
@@ -74,7 +74,7 @@ sap.ui.define(['./BarInPageEnabler', "sap/base/i18n/Localization", 'sap/ui/Devic
 	 */
 	BarRenderer.renderBarContent = function(oRM, oControl) {
 		//left content area
-		oRM.openStart("div", oControl.getId() + "-BarLeft");
+		oRM.openStart("div", `${oControl.getId()}-BarLeft`);
 		oRM.class("sapMBarLeft");
 		oRM.class("sapMBarContainer");
 		writeWidthIfContentOccupiesWholeArea("left", oRM, oControl);
@@ -85,28 +85,28 @@ sap.ui.define(['./BarInPageEnabler', "sap/base/i18n/Localization", 'sap/ui/Devic
 		oRM.close("div");
 
 		//middle content area
-		oRM.openStart("div", oControl.getId() + "-BarMiddle");
+		oRM.openStart("div", `${oControl.getId()}-BarMiddle`);
 		oRM.class("sapMBarMiddle");
 		oRM.openEnd();
 
-		var bFlexBox = false;
+		let bFlexBox = false;
 		/**
 		 * @deprecated As of version 1.16
 		 */
 		if (oControl.getEnableFlexBox()) {
 			bFlexBox = true;
 			oControl._oflexBox = oControl._oflexBox
-				|| new HBox(oControl.getId() + "-BarPH", {
+				|| new HBox(`${oControl.getId()}-BarPH`, {
 					alignItems: "Center"
 				}).addStyleClass("sapMBarPH").setParent(oControl, null, true);
-			var bContentLeft = !!oControl.getContentLeft().length,
-				bContentMiddle = !!oControl.getContentMiddle().length,
-				bContentRight = !!oControl.getContentRight().length;
+			const bContentLeft = !!oControl.getContentLeft().length;
+			const bContentMiddle = !!oControl.getContentMiddle().length;
+			const bContentRight = !!oControl.getContentRight().length;
 			if (bContentMiddle && !bContentLeft && !bContentRight) {
 				oControl._oflexBox.addStyleClass("sapMBarFlexBoxWidth100");
 
 			}
-			oControl.getContentMiddle().forEach(function(oMidContent) {
+			oControl.getContentMiddle().forEach((oMidContent) => {
 				oControl._oflexBox.addItem(oMidContent);
 			});
 
@@ -114,7 +114,7 @@ sap.ui.define(['./BarInPageEnabler', "sap/base/i18n/Localization", 'sap/ui/Devic
 		}
 
 		if (!bFlexBox) {
-			oRM.openStart("div", oControl.getId() + "-BarPH");
+			oRM.openStart("div", `${oControl.getId()}-BarPH`);
 			oRM.class("sapMBarPH");
 			oRM.class("sapMBarContainer");
 			writeWidthIfContentOccupiesWholeArea("middle", oRM, oControl);
@@ -127,7 +127,7 @@ sap.ui.define(['./BarInPageEnabler', "sap/base/i18n/Localization", 'sap/ui/Devic
 		oRM.close("div");
 
 		//right content area
-		oRM.openStart("div", oControl.getId() + "-BarRight");
+		oRM.openStart("div", `${oControl.getId()}-BarRight`);
 		oRM.class("sapMBarRight");
 		oRM.class("sapMBarContainer");
 		if (Localization.getRTL()) {
@@ -148,7 +148,7 @@ sap.ui.define(['./BarInPageEnabler', "sap/base/i18n/Localization", 'sap/ui/Devic
 	 * @param {sap.m.Bar} oBar An object representation of the control that should be rendered
 	 */
 	BarRenderer.renderAllControls = function (aControls, oRM, oBar) {
-		aControls.forEach(function (oControl) {
+		aControls.forEach((oControl) => {
 			BarInPageEnabler.addChildClassTo(oControl, oBar);
 
 			oRM.renderControl(oControl);
@@ -169,8 +169,8 @@ sap.ui.define(['./BarInPageEnabler', "sap/base/i18n/Localization", 'sap/ui/Devic
 	 * @returns {string} The context class
 	 */
 	BarRenderer.getContext = function(oControl) {
-		var sDesign = oControl.getDesign(),
-			mContexts = BarRenderer._mContexts;
+		const sDesign = oControl.getDesign();
+		const mContexts = BarRenderer._mContexts;
 
 		return mContexts[sDesign] || mContexts.Default;
 	};
@@ -183,9 +183,9 @@ sap.ui.define(['./BarInPageEnabler', "sap/base/i18n/Localization", 'sap/ui/Devic
 	 * @private
 	 */
 	function writeWidthIfContentOccupiesWholeArea(sArea, oRm, oControl) {
-		var bContentLeft = !!oControl.getContentLeft().length,
-			bContentMiddle = !!oControl.getContentMiddle().length,
-			bContentRight = !!oControl.getContentRight().length;
+		const bContentLeft = !!oControl.getContentLeft().length;
+		const bContentMiddle = !!oControl.getContentMiddle().length;
+		const bContentRight = !!oControl.getContentRight().length;
 		switch (sArea.toLowerCase()) {
 			case "left":
 				if (bContentLeft && !bContentMiddle && !bContentRight) {

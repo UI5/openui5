@@ -19,12 +19,12 @@ sap.ui.define([
 
 
 	// shortcut for sap.m.BarDesign
-	var BarDesign = library.BarDesign;
+	const BarDesign = library.BarDesign;
 
 	// shortcut for sap.m.TitleAlignment
-	var TitleAlignment = library.TitleAlignment;
+	const TitleAlignment = library.TitleAlignment;
 
-	var MIN_INTERACTIVE_CONTROLS = 2;
+	const MIN_INTERACTIVE_CONTROLS = 2;
 
 	/**
 	 * Constructor for a new <code>Bar</code>.
@@ -63,7 +63,7 @@ sap.ui.define([
 	 * @public
 	 * @alias sap.m.Bar
 	 */
-	var Bar = Control.extend("sap.m.Bar", /** @lends sap.m.Bar.prototype */ {
+	const Bar = Control.extend("sap.m.Bar", /** @lends sap.m.Bar.prototype */ {
 		metadata : {
 
 			interfaces : [
@@ -139,17 +139,17 @@ sap.ui.define([
 	});
 
 	Bar.prototype.onBeforeRendering = function() {
-		var sCurrentAlignment = this.getTitleAlignment(),
-			sAlignment;
+		const sCurrentAlignment = this.getTitleAlignment();
+		let sAlignment;
 
 		this._removeAllListeners();
 
 		// title alignment
 		for (sAlignment in TitleAlignment) {
 			if (sAlignment !== sCurrentAlignment) {
-				this.removeStyleClass("sapMBarTitleAlign" + sAlignment);
+				this.removeStyleClass(`sapMBarTitleAlign${sAlignment}`);
 			} else {
-				this.addStyleClass("sapMBarTitleAlign" + sAlignment);
+				this.addStyleClass(`sapMBarTitleAlign${sAlignment}`);
 			}
 		}
 	};
@@ -197,12 +197,8 @@ sap.ui.define([
 	 * @private
 	 */
 	Bar.prototype._removeAllListeners = function() {
-		var that = this;
-
-		Bar._aResizeHandlers.forEach(function(sItem) {
-
-			that._removeListenerFailsave(sItem);
-
+		Bar._aResizeHandlers.forEach((sItem) => {
+			this._removeListenerFailsave(sItem);
 		});
 	};
 
@@ -229,9 +225,9 @@ sap.ui.define([
 	Bar.prototype._handleResize = function() {
 		this._removeAllListeners();
 
-		var bContentLeft = !!this.getContentLeft().length,
-			bContentMiddle = !!this.getContentMiddle().length,
-			bContentRight = !!this.getContentRight().length;
+		const bContentLeft = !!this.getContentLeft().length;
+		let bContentMiddle = !!this.getContentMiddle().length;
+		const bContentRight = !!this.getContentRight().length;
 
 		/**
 		 * @deprecated As of version 1.16
@@ -307,13 +303,13 @@ sap.ui.define([
 			return;
 		}
 
-		var iBarWidth = this.$().outerWidth(true);
+		const iBarWidth = this.$().outerWidth(true);
 		// reset to default
 		this._$RightBar.css({ width : "" });
 		this._$LeftBar.css({ width : "" });
 		this._$MidBarPlaceHolder.css({ position : "", width : "", visibility: "hidden"});
 
-		var iRightBarWidth = this._$RightBar.outerWidth(true);
+		const iRightBarWidth = this._$RightBar.outerWidth(true);
 		//right bar is bigger than the bar - only show the right bar
 		if (iRightBarWidth > iBarWidth) {
 
@@ -325,11 +321,11 @@ sap.ui.define([
 				this._$MidBarPlaceHolder.css({ width : "0px" });
 			}
 
-			this._$RightBar.css({ width : iBarWidth + "px"});
+			this._$RightBar.css({ width : `${iBarWidth}px`});
 			return;
 
 		}
-		var iLeftBarWidth = this._getBarContainerWidth(this._$LeftBar);
+		let iLeftBarWidth = this._getBarContainerWidth(this._$LeftBar);
 
 		// handle the case when left and right content are wider than the bar itself
 		if (iBarWidth < (iLeftBarWidth + iRightBarWidth)) {
@@ -341,7 +337,7 @@ sap.ui.define([
 			// using .css("width",...) sets the width of the element including the borders
 			// and using only .width sets the width without the borders
 			// in our case we have style box-sizing: border-box, so we need the borders
-			this._$LeftBar.css({ width : iLeftBarWidth + "px" });
+			this._$LeftBar.css({ width : `${iLeftBarWidth}px` });
 
 			this._$MidBarPlaceHolder.css({ width : "0px" });
 			return;
@@ -363,32 +359,32 @@ sap.ui.define([
 	 * @private
 	 */
 	Bar.prototype._getMidBarCss = function(iRightBarWidth, iBarWidth, iLeftBarWidth) {
-		var iMidBarPlaceholderWidth = this._$MidBarPlaceHolder.outerWidth(true),
-			bRtl = Localization.getRTL(),
-			oMidBarCss = { visibility : "" };
+		let iMidBarPlaceholderWidth = this._$MidBarPlaceHolder.outerWidth(true);
+		const bRtl = Localization.getRTL();
+		const oMidBarCss = { visibility : "" };
 
 		/**
 		 * @deprecated As of version 1.16
 		 */
 		if (this.getEnableFlexBox()) {
-			var sLeftOrRight = bRtl ? "right" : "left";
+			const sLeftOrRight = bRtl ? "right" : "left";
 
 			iMidBarPlaceholderWidth = iBarWidth - iLeftBarWidth - iRightBarWidth - parseInt(this._$MidBarPlaceHolder.css('margin-left')) - parseInt(this._$MidBarPlaceHolder.css('margin-right'));
 
 			oMidBarCss.position = "absolute";
-			oMidBarCss.width = iMidBarPlaceholderWidth + "px";
+			oMidBarCss.width = `${iMidBarPlaceholderWidth}px`;
 			oMidBarCss[sLeftOrRight] = iLeftBarWidth;
 
 			//calculation for flex is done
 			return oMidBarCss;
 		}
 
-		var iSpaceBetweenLeftAndRight = iBarWidth - iLeftBarWidth - iRightBarWidth,
-			iMidBarStartingPoint = (iBarWidth / 2) - (iMidBarPlaceholderWidth / 2),
-			bLeftContentIsOverlapping = iLeftBarWidth > iMidBarStartingPoint,
-			iMidBarEndPoint = (iBarWidth / 2) + (iMidBarPlaceholderWidth / 2),
-			bRightContentIsOverlapping = (iBarWidth - iRightBarWidth) < iMidBarEndPoint,
-			sTitleAlignment = this.getTitleAlignment();
+		const iSpaceBetweenLeftAndRight = iBarWidth - iLeftBarWidth - iRightBarWidth;
+		const iMidBarStartingPoint = (iBarWidth / 2) - (iMidBarPlaceholderWidth / 2);
+		const bLeftContentIsOverlapping = iLeftBarWidth > iMidBarStartingPoint;
+		const iMidBarEndPoint = (iBarWidth / 2) + (iMidBarPlaceholderWidth / 2);
+		const bRightContentIsOverlapping = (iBarWidth - iRightBarWidth) < iMidBarEndPoint;
+		const sTitleAlignment = this.getTitleAlignment();
 
 		if ((sTitleAlignment !== TitleAlignment.None && sTitleAlignment !== TitleAlignment.Center) ||
 			(iSpaceBetweenLeftAndRight > 0 && (bLeftContentIsOverlapping || bRightContentIsOverlapping))) {
@@ -398,7 +394,7 @@ sap.ui.define([
 			oMidBarCss.position = "absolute";
 
 			//Use the remaining space
-			oMidBarCss.width = iSpaceBetweenLeftAndRight + "px";
+			oMidBarCss.width = `${iSpaceBetweenLeftAndRight}px`;
 
 			oMidBarCss.left = bRtl ? iRightBarWidth : iLeftBarWidth;
 		}
@@ -414,9 +410,9 @@ sap.ui.define([
 	 * @private
 	 */
 	Bar.prototype._getBarContainerWidth = function($Container) {
-		var iContainerWidth = 0,
-			aContainerChildren = $Container.children(),
-			iContainerChildrenTotalWidth = 0;
+		let iContainerWidth = 0;
+		const aContainerChildren = $Container.children();
+		let iContainerChildrenTotalWidth = 0;
 
 		// Chrome browser has a problem in providing the correct div size when image inside does not have width explicitly set
 		for (let i = 0; i < aContainerChildren.length; i++) {
@@ -450,7 +446,7 @@ sap.ui.define([
 	 * @protected
 	 * @alias sap.m.BarInAnyContentEnabler
 	 */
-	var BarInAnyContentEnabler = BarInPageEnabler.extend("sap.m.BarInAnyContentEnabler", /** @lends sap.m.BarInAnyContentEnabler.prototype */ {});
+	const BarInAnyContentEnabler = BarInPageEnabler.extend("sap.m.BarInAnyContentEnabler", /** @lends sap.m.BarInAnyContentEnabler.prototype */ {});
 
 	BarInAnyContentEnabler.mContexts = {
 		dialogFooter : {
@@ -465,9 +461,9 @@ sap.ui.define([
 	 * @returns {sap.m.BarContexts} with all available contexts
 	 */
 	BarInAnyContentEnabler.prototype.getContext = function() {
-		var oParentContexts = BarInPageEnabler.prototype.getContext.call();
+		const oParentContexts = BarInPageEnabler.prototype.getContext.call();
 
-		for (var key in BarInAnyContentEnabler.mContexts) {
+		for (const key in BarInAnyContentEnabler.mContexts) {
 			oParentContexts[key] = BarInAnyContentEnabler.mContexts[key];
 		}
 
@@ -565,8 +561,8 @@ sap.ui.define([
 	Bar.prototype._getRootAccessibilityRole = BarInAnyContentEnabler.prototype._getRootAccessibilityRole;
 
 	Bar.prototype._getAccessibilityRole = function () {
-		var sRootAccessibilityRole = this._getRootAccessibilityRole(),
-			sRole = sRootAccessibilityRole;
+		const sRootAccessibilityRole = this._getRootAccessibilityRole();
+		let sRole = sRootAccessibilityRole;
 		if (this._getBarInteractiveControlsCount() < MIN_INTERACTIVE_CONTROLS && sRootAccessibilityRole === "toolbar") {
 			sRole = "";
 		}
@@ -600,7 +596,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Bar.prototype._getBarInteractiveControlsCount = function () {
-		var count = 0;
+		let count = 0;
 		count += this.getContentLeft().filter(this._isInteractiveControl).length;
 		count += this.getContentRight().filter(this._isInteractiveControl).length;
 		count += this.getContentMiddle().filter(this._isInteractiveControl).length;
