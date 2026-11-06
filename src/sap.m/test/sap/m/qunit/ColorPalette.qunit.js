@@ -33,19 +33,19 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.ui.core.CSSColor
-	var CSSColor = coreLibrary.CSSColor;
+	const CSSColor = coreLibrary.CSSColor;
 
 
-	var ItemNavigationHomeEnd = ColorPalette.prototype._ItemNavigation;
+	const ItemNavigationHomeEnd = ColorPalette.prototype._ItemNavigation;
 
-	var DEFAULT_COLORS = ["gold", "darkorange", "indianred", "darkmagenta", "cornflowerblue", "deepskyblue", "darkcyan",
+	const DEFAULT_COLORS = ["gold", "darkorange", "indianred", "darkmagenta", "cornflowerblue", "deepskyblue", "darkcyan",
 		"olivedrab", "darkslategray", "azure", "white", "lightgray", "darkgray", "dimgray", "black"];
 
 	QUnit.module("Internal API", function() {
 
 		QUnit.test("init", function (assert) {
 			//Act
-			var oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			// Assert
 			assert.strictEqual(oCP._bShowDefaultColorButton, false, "should lead to default value of _bShowDefaultColorButton");
@@ -59,18 +59,14 @@ sap.ui.define([
 
 		QUnit.test("exit", function (assert) {
 			//Prepare
-			var oCP = new ColorPalette(),
-				oSpyMoreColorsDialogDestroy,
-				oSpyItemNavDestroy,
-				oSpyRemoveDelegate,
-				oItemNavigation = new ColorPalette.prototype._ItemNavigation();
-
+			const oCP = new ColorPalette();
+			const oItemNavigation = new ColorPalette.prototype._ItemNavigation();
 			oCP._oMoreColorsDialog = new Dialog();
 			oCP._oPaletteColorItemNavigation = oItemNavigation;
 
-			oSpyMoreColorsDialogDestroy = this.spy(oCP._oMoreColorsDialog, "destroy");
-			oSpyItemNavDestroy = this.spy(oCP._oPaletteColorItemNavigation, "destroy");
-			oSpyRemoveDelegate = this.spy(oCP, "removeDelegate");
+			const oSpyMoreColorsDialogDestroy = this.spy(oCP._oMoreColorsDialog, "destroy");
+			const oSpyItemNavDestroy = this.spy(oCP._oPaletteColorItemNavigation, "destroy");
+			const oSpyRemoveDelegate = this.spy(oCP, "removeDelegate");
 
 			// Act
 			oCP.destroy();
@@ -95,7 +91,7 @@ sap.ui.define([
 
 		QUnit.test("ItemNavigation after rendering", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			oCP.placeAt("qunit-fixture");
 			// Act
@@ -112,7 +108,7 @@ sap.ui.define([
 
 		QUnit.test("_bShowDefaultColorButton - default value", function (assert) {
 			// Act
-			var oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			// Assert
 			assert.equal(oCP._getShowDefaultColorButton(), false, "..should be initially <false>");
@@ -125,14 +121,14 @@ sap.ui.define([
 
 		QUnit.test("_setShowDefaultColorButton with invalid type", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				sInvalidType = "invalid type of string";
+			const oCP = new ColorPalette();
+			const sInvalidType = "invalid type of string";
 
 			// Act
-			assert.throws(function () {
+			assert.throws(() => {
 
 					oCP._setShowDefaultColorButton(sInvalidType);
-				}, Error("Cannot set internal property 'showDefaultColorButton' - invalid value: " + sInvalidType),
+				}, Error(`Cannot set internal property 'showDefaultColorButton' - invalid value: ${sInvalidType}`),
 				"..should throw a certain exception");
 
 			// Cleanup
@@ -142,11 +138,10 @@ sap.ui.define([
 
 		QUnit.test("_setShowDefaultColorButton, _getShowDefaultColorButton", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				oResult;
+			const oCP = new ColorPalette();
 
 			// Act
-			oResult = oCP._setShowDefaultColorButton(true);
+			const oResult = oCP._setShowDefaultColorButton(true);
 
 			// Assert
 			assert.equal(oCP._getShowDefaultColorButton(), true, "..should be <true> after setter with <true> is called");
@@ -168,7 +163,7 @@ sap.ui.define([
 
 		QUnit.test("_bShowMoreColorsButton - default value", function (assert) {
 			// Act
-			var oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			// Assert
 			assert.equal(oCP._getShowMoreColorsButton(), false, "..should be initially <false>");
@@ -180,14 +175,14 @@ sap.ui.define([
 
 		QUnit.test("_setShowMoreColorsButton with invalid type", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				sInvalidType = "invalid type of string";
+			const oCP = new ColorPalette();
+			const sInvalidType = "invalid type of string";
 
 			// Act
-			assert.throws(function () {
+			assert.throws(() => {
 
 					oCP._setShowMoreColorsButton(sInvalidType);
-				}, Error("Cannot set internal property 'showMoreColorsButton' - invalid value: " + sInvalidType),
+				}, Error(`Cannot set internal property 'showMoreColorsButton' - invalid value: ${sInvalidType}`),
 				"..should throw a certain exception");
 
 			// Cleanup
@@ -197,11 +192,10 @@ sap.ui.define([
 
 		QUnit.test("_setShowMoreColorsButton, _getShowMoreColorsButton", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				oResult;
+			const oCP = new ColorPalette();
 
 			// Act
-			oResult = oCP._setShowMoreColorsButton(true);
+			const oResult = oCP._setShowMoreColorsButton(true);
 
 			// Assert
 			assert.equal(oCP._getShowMoreColorsButton(), true, "..should be <true> after setter with <true> is called");
@@ -222,11 +216,11 @@ sap.ui.define([
 
 		QUnit.test("_setDefaultColor - invalid value", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				spyCSSColorIsValid = this.spy(CSSColor, "isValid");
+			const oCP = new ColorPalette();
+			const spyCSSColorIsValid = this.spy(CSSColor, "isValid");
 
 			// Act & Assert
-			assert.throws(function () {
+			assert.throws(() => {
 					oCP._setDefaultColor("mycolor");
 				}, Error("Cannot set internal property '_defaultColor' - invalid value: mycolor"),
 				"..should throw a certain exception");
@@ -241,7 +235,7 @@ sap.ui.define([
 
 		QUnit.test("_setDefaultColor - valid value", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			// Pre-assert
 			assert.notOk(oCP._oDefaultColor, ".. defaultColor initially should not be defined");
@@ -256,7 +250,7 @@ sap.ui.define([
 
 		QUnit.test("_getDefaultColor", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			oCP._oDefaultColor = "orange";
 
@@ -269,9 +263,9 @@ sap.ui.define([
 
 		QUnit.test("_setDisplayMode calls ColorPicker.prototype.setDisplayMode", function (assert) {
 			// Prepare
-			var oColorPalette = new ColorPalette(),
-				oColorPicker = oColorPalette._getColorPicker(),
-				oSpyColorPickerSetDisplayMode = this.spy(oColorPicker, "setDisplayMode");
+			const oColorPalette = new ColorPalette();
+			const oColorPicker = oColorPalette._getColorPicker();
+			const oSpyColorPickerSetDisplayMode = this.spy(oColorPicker, "setDisplayMode");
 
 			// Act
 			oColorPalette._setDisplayMode(ColorPickerDisplayMode.Simplified);
@@ -287,10 +281,10 @@ sap.ui.define([
 
 		QUnit.test("_setDisplayMode - invalid value", function (assert) {
 			// Prepare
-			var oColorPalette = new ColorPalette();
+			const oColorPalette = new ColorPalette();
 
 			// Act & Assert
-			assert.throws(function () {
+			assert.throws(() => {
 					oColorPalette._setDisplayMode("myDisplayMode");
 				},
 				Error("\"myDisplayMode\" is of type string, expected sap.ui.unified.ColorPickerDisplayMode for property \"displayMode\" of Element sap.ui.unified.ColorPicker#__picker1"),
@@ -303,7 +297,7 @@ sap.ui.define([
 
 		QUnit.test("_setDisplayMode - valid value", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			// Pre-assert
 			assert.ok(oCP._oDisplayMode, ColorPickerDisplayMode.Default, "displayMode initially have its default value");
@@ -318,7 +312,7 @@ sap.ui.define([
 
 		QUnit.test("_getDisplayMode", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			oCP._oDisplayMode = ColorPickerDisplayMode.Simplified;
 
@@ -331,11 +325,11 @@ sap.ui.define([
 
 		QUnit.test("setColorPickerSelectedColor - invalid value", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				spyCSSColorIsValid = this.spy(CSSColor, "isValid");
+			const oCP = new ColorPalette();
+			const spyCSSColorIsValid = this.spy(CSSColor, "isValid");
 
 			// Act & Assert
-			assert.throws(function () {
+			assert.throws(() => {
 					oCP.setColorPickerSelectedColor("mycolor");
 				}, Error("Cannot set the selected color - invalid value: mycolor"),
 				"Throws the right exception");
@@ -349,7 +343,7 @@ sap.ui.define([
 
 		QUnit.test("setColorPickerSelectedColor - valid value", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			// Act & Assert
 			assert.deepEqual(oCP.setColorPickerSelectedColor("red"), oCP, "Setter return this");
@@ -364,12 +358,10 @@ sap.ui.define([
 
 		QUnit.test("_openColorPicker", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				oSpyBeforeOpen = this.spy(),
-				oSpyOpenDialog = this.spy(),
-				oStubOpenDialog = this.stub(oCP, "_ensureMoreColorsDialog", function () {
-					return {open: oSpyOpenDialog};
-				});
+			const oCP = new ColorPalette();
+			const oSpyBeforeOpen = this.spy();
+			const oSpyOpenDialog = this.spy();
+			const oStubOpenDialog = this.stub(oCP, "_ensureMoreColorsDialog", () => ({open: oSpyOpenDialog}));
 
 			oCP.attachEvent("_beforeOpenColorPicker", oSpyBeforeOpen);
 
@@ -387,22 +379,18 @@ sap.ui.define([
 
 		QUnit.test("_ensureMoreColorsDialog creates dialog only once", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				oStubDialog = {
-					fakeProp: "1", destroy: function () {
-					}
-				},
-				oResult,
-				oDialogFirstTimeCreation,
-				oStubCreateMoreColors = this.stub(oCP, "_createMoreColorsDialog", function () {
-					return oStubDialog;
-				});
+			const oCP = new ColorPalette();
+			const oStubDialog = {
+				fakeProp: "1", destroy: function () {
+				}
+			};
+			const oStubCreateMoreColors = this.stub(oCP, "_createMoreColorsDialog", () => oStubDialog);
 
 			// Pre-Assert
 			assert.notOk(oCP._oMoreColorsDialog, "..initially no dialog is created");
 
 			// Act
-			oResult = oCP._ensureMoreColorsDialog();
+			const oResult = oCP._ensureMoreColorsDialog();
 
 			// Assert
 			assert.ok(oCP._oMoreColorsDialog, "..first time ensuring the dialog leads to an object creation");
@@ -410,7 +398,7 @@ sap.ui.define([
 				"createMoreColorsDialog creates");
 			assert.deepEqual(oCP._oMoreColorsDialog, oResult, "..and the same instance if being returned");
 
-			oDialogFirstTimeCreation = oCP._oMoreColorsDialog;
+			const oDialogFirstTimeCreation = oCP._oMoreColorsDialog;
 
 			// Act
 			oCP._ensureMoreColorsDialog();
@@ -426,13 +414,12 @@ sap.ui.define([
 
 		QUnit.test("_createMoreColorsDialog for Desktop", function (assert) {
 			// Prepare
-			var oDialog,
-				oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			this.stub(Device.system, "phone", false);
 
 			// Act
-			oDialog = oCP._createMoreColorsDialog();
+			const oDialog = oCP._createMoreColorsDialog();
 
 			// Assert
 			assert.ok(oDialog, "..returns an object");
@@ -448,13 +435,12 @@ sap.ui.define([
 
 		QUnit.test("_createMoreColorsDialog for phone", function (assert) {
 			// Prepare
-			var oDialog,
-				oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			this.stub(Device.system, "phone", true);
 
 			// Act
-			oDialog = oCP._createMoreColorsDialog();
+			const oDialog = oCP._createMoreColorsDialog();
 
 			// Assert
 			assert.ok(oDialog, "..returns an object");
@@ -471,13 +457,12 @@ sap.ui.define([
 
 		QUnit.test("_focusFirstElement when 'Default Color' button is available", async function (assert) {
 			// Prepare
-			var oCP = new ColorPalette({}),
-				oSpyFocusDefaultButton;
+			const oCP = new ColorPalette({});
 
 			oCP._setShowDefaultColorButton(true);
 			oCP.placeAt("qunit-fixture");
 			await nextUIUpdate();
-			oSpyFocusDefaultButton = this.spy(oCP._getDefaultColorButton().getDomRef(), "focus");
+			const oSpyFocusDefaultButton = this.spy(oCP._getDefaultColorButton().getDomRef(), "focus");
 
 			// Act
 			oCP._focusFirstElement();
@@ -492,13 +477,12 @@ sap.ui.define([
 
 		QUnit.test("_focusFirstElement when 'Default Color' button is not available", async function (assert) {
 			// Prepare
-			var oCP = new ColorPalette({}),
-				oSpyFocusFirstSwatch;
+			const oCP = new ColorPalette({});
 
 			oCP._setShowDefaultColorButton(false);
 			oCP.placeAt("qunit-fixture");
 			await nextUIUpdate();
-			oSpyFocusFirstSwatch = this.spy(oCP._getAllPaletteColorSwatches()[0], "focus");
+			const oSpyFocusFirstSwatch = this.spy(oCP._getAllPaletteColorSwatches()[0], "focus");
 
 			// Act
 			oCP._focusFirstElement();
@@ -513,9 +497,9 @@ sap.ui.define([
 
 		QUnit.test("_fireColorSelect", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				oSpyFireColorSelect = this.spy(oCP, "fireColorSelect"),
-				oOriginalEvent = jQuery.Event();
+			const oCP = new ColorPalette();
+			const oSpyFireColorSelect = this.spy(oCP, "fireColorSelect");
+			const oOriginalEvent = jQuery.Event();
 
 			// Act
 			oCP._fireColorSelect("red", true, oOriginalEvent);
@@ -553,10 +537,10 @@ sap.ui.define([
 
 		QUnit.test("ColorPalette.prototype.onsaphome for 'Default Color' or 'More Colors..' button", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				oEvent = new jQuery.Event(),
-				oSpyEvtPreventDefault = this.spy(oEvent, "preventDefault"),
-				oSpyEvtStopImmediatePropagation = this.spy(oEvent, "stopImmediatePropagation");
+			const oCP = new ColorPalette();
+			const oEvent = new jQuery.Event();
+			const oSpyEvtPreventDefault = this.spy(oEvent, "preventDefault");
+			const oSpyEvtStopImmediatePropagation = this.spy(oEvent, "stopImmediatePropagation");
 
 			this.stub(ColorPalette.prototype, "_getElementInfo").returns({
 				bIsDefaultColorButton: false,
@@ -575,10 +559,10 @@ sap.ui.define([
 		QUnit.test("ColorPalette.prototype.onsaphome when event does not occur on 'Default Color' nor 'More Colors..' button",
 			function (assert) {
 				// Prepare
-				var oCP = new ColorPalette(),
-					oEvent = new jQuery.Event(),
-					oSpyEvtPreventDefault = this.spy(oEvent, "preventDefault"),
-					oSpyEvtStopImmediatePropagation = this.spy(oEvent, "stopImmediatePropagation");
+				const oCP = new ColorPalette();
+				const oEvent = new jQuery.Event();
+				const oSpyEvtPreventDefault = this.spy(oEvent, "preventDefault");
+				const oSpyEvtStopImmediatePropagation = this.spy(oEvent, "stopImmediatePropagation");
 
 				this.stub(ColorPalette.prototype, "_getElementInfo").returns({
 					bIsDefaultColorButton: false,
@@ -596,8 +580,8 @@ sap.ui.define([
 
 		QUnit.module("Keyboard color select", function (hooks) {
 			hooks.beforeEach(function () {
-				var sSelectedColor = "red",
-					oTarget = document.createElement("DIV");
+				const sSelectedColor = "red";
+				const oTarget = document.createElement("DIV");
 				oTarget.classList.add("sapMColorPaletteSquare");
 				oTarget.setAttribute("data-sap-ui-color", sSelectedColor);
 				oTarget.classList.add("sapMColorPaletteContent");
@@ -610,7 +594,7 @@ sap.ui.define([
 
 			QUnit.test("'space' key should select color on key up", function (assert) {
 				// Prepare
-				var fnFireColorSelectSpy = this.spy(ColorPalette.prototype, "_fireColorSelect");
+				const fnFireColorSelectSpy = this.spy(ColorPalette.prototype, "_fireColorSelect");
 
 				// Act
 				this.oCP.onkeyup({
@@ -630,7 +614,7 @@ sap.ui.define([
 
 			QUnit.test("'enter' key should select color on key down", function (assert) {
 				// Prepare
-				var fnFireColorSelectSpy = this.spy(ColorPalette.prototype, "_fireColorSelect");
+				const fnFireColorSelectSpy = this.spy(ColorPalette.prototype, "_fireColorSelect");
 
 				// Act
 				this.oCP.onsapenter({
@@ -649,7 +633,7 @@ sap.ui.define([
 
 		QUnit.module("Tab key - selection behaviour depending on context", function (hooks) {
 			hooks.beforeEach(function () {
-				var oTarget = document.createElement("DIV");
+				const oTarget = document.createElement("DIV");
 				oTarget.classList.add("sapMColorPaletteSquare");
 				oTarget.setAttribute("data-sap-ui-color", "red");
 				oTarget.setAttribute("data-sap-ui-region", "main-colors-palette");
@@ -664,7 +648,7 @@ sap.ui.define([
 			QUnit.test("Tab from a swatch should NOT fire colorSelect when palette is embedded (not in popover)", function (assert) {
 				// Arrange
 				this.oCP = new ColorPalette();
-				var oOntapStub = this.stub(ColorPalette.prototype, "ontap");
+				const oOntapStub = this.stub(ColorPalette.prototype, "ontap");
 				this.stub(this.oCP, "_getElementInfo").returns({
 					bIsDefaultColorButton: false,
 					bIsMoreColorsButton: false,
@@ -683,9 +667,9 @@ sap.ui.define([
 
 			QUnit.test("Tab from a swatch should fire colorSelect when palette is inside a ColorPalettePopover", function (assert) {
 				// Arrange
-				var oCPP = new ColorPalettePopover();
+				const oCPP = new ColorPalettePopover();
 				this.oCP = oCPP._getPalette();
-				var oOntapStub = this.stub(ColorPalette.prototype, "ontap");
+				const oOntapStub = this.stub(ColorPalette.prototype, "ontap");
 				this.stub(this.oCP, "_getElementInfo").returns({
 					bIsDefaultColorButton: false,
 					bIsMoreColorsButton: false,
@@ -707,9 +691,9 @@ sap.ui.define([
 
 		QUnit.test("ColorPalette.prototype.onsapspace should prevent default", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				oEvent = new jQuery.Event(),
-				oSpyEvtPreventDefault = this.spy(oEvent, "preventDefault");
+			const oCP = new ColorPalette();
+			const oEvent = new jQuery.Event();
+			const oSpyEvtPreventDefault = this.spy(oEvent, "preventDefault");
 
 			// Act
 			oCP.onsapspace(oEvent);
@@ -741,11 +725,12 @@ sap.ui.define([
 				// Forward Navigation
 				QUnit.test("Forward Navigation outside swatch container when only more colors is available", function (assert) {
 					// Prepare
-					var oCP = new ColorPalette(), //without any buttons
-						oSpyFocus = this.spy(),
-						aMockSwatches = new Array(oCP.getColors().length),
-						oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionForward),
-						oMockMoreColorsButton = {focus: oSpyFocus};
+					const oCP = new ColorPalette();
+					const //without any buttons
+						oSpyFocus = this.spy();
+					const aMockSwatches = new Array(oCP.getColors().length);
+					const oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionForward);
+					const oMockMoreColorsButton = {focus: oSpyFocus};
 
 					this.stub(oCP, "_getAllPaletteColorSwatches").returns(aMockSwatches);
 					this.stub(oCP, "_getShowMoreColorsButton").returns(true);
@@ -760,11 +745,12 @@ sap.ui.define([
 
 				QUnit.test("Forward Navigation outside swatch container when only default color button is available", function (assert) {
 					// Prepare
-					var oCP = new ColorPalette(), //without any buttons
-						oSpyFocus = this.spy(),
-						aMockSwatches = new Array(oCP.getColors().length),
-						oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionForward),
-						oMockDefaulColorButton = {focus: oSpyFocus};
+					const oCP = new ColorPalette();
+					const //without any buttons
+						oSpyFocus = this.spy();
+					const aMockSwatches = new Array(oCP.getColors().length);
+					const oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionForward);
+					const oMockDefaulColorButton = {focus: oSpyFocus};
 
 					this.stub(oCP, "_getAllPaletteColorSwatches").returns(aMockSwatches);
 					this.stub(oCP, "_getShowMoreColorsButton").returns(false);
@@ -781,12 +767,11 @@ sap.ui.define([
 				QUnit.test("Forward Navigation with 'sapend' outside swatch container when only default color button is available",
 					function (assert) {
 						// Prepare
-						var oCP = new ColorPalette(), //without any buttons
-							oSpyFocus = this.spy(),
-							aMockSwatches = new Array(oCP.getColors().length),
-							oMockEvent = this.mockEhancedKeybEvent("sapend", ItemNavigationHomeEnd.BorderReachedDirectionForward),
-							oMockDefaultColorButton = {focus: oSpyFocus},
-							vResult;
+						const oCP = new ColorPalette(); //without any buttons
+						const oSpyFocus = this.spy();
+						const aMockSwatches = new Array(oCP.getColors().length);
+						const oMockEvent = this.mockEhancedKeybEvent("sapend", ItemNavigationHomeEnd.BorderReachedDirectionForward);
+						const oMockDefaultColorButton = {focus: oSpyFocus};
 
 						this.stub(oCP, "_getAllPaletteColorSwatches").returns(aMockSwatches);
 						this.stub(oCP, "_getShowMoreColorsButton").returns(false);
@@ -795,7 +780,7 @@ sap.ui.define([
 						this.stub(oCP,  "_getDefaultColorButton").returns(oMockDefaultColorButton);
 
 						// Act
-						vResult = oCP._onSwatchContainerBorderReached(oMockEvent);
+						const vResult = oCP._onSwatchContainerBorderReached(oMockEvent);
 						// Assert
 						assert.equal(oSpyFocus.callCount, 0, "..should not focus any element");
 						assert.equal(vResult, null, "..should return null");
@@ -804,11 +789,12 @@ sap.ui.define([
 				QUnit.test("Forward Navigation outside swatch container when both more colors and default color buttons are unavailable",
 					function (assert) {
 						// Prepare
-						var oCP = new ColorPalette(), //without any buttons
-							oSpyFocus = this.spy(),
-							oMockFirstSwatch = {focus: oSpyFocus},
-							aMockSwatches = new Array(oCP.getColors().length),
-							oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionForward);
+						const oCP = new ColorPalette();
+						const //without any buttons
+							oSpyFocus = this.spy();
+						const oMockFirstSwatch = {focus: oSpyFocus};
+						const aMockSwatches = new Array(oCP.getColors().length);
+						const oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionForward);
 
 						aMockSwatches[0] = oMockFirstSwatch;
 						this.stub(oCP, "_getAllPaletteColorSwatches").returns(aMockSwatches);
@@ -823,11 +809,12 @@ sap.ui.define([
 				// Backward Navigation
 				QUnit.test("Backward Navigation outside swatch container when only more colors is available", function (assert) {
 					// Prepare
-					var oCP = new ColorPalette(), //without any buttons
-						oSpyFocus = this.spy(),
-						aMockSwatches = new Array(oCP.getColors().length),
-						oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionBackward),
-						oMockMoreColorsButton = {focus: oSpyFocus};
+					const oCP = new ColorPalette();
+					const //without any buttons
+						oSpyFocus = this.spy();
+					const aMockSwatches = new Array(oCP.getColors().length);
+					const oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionBackward);
+					const oMockMoreColorsButton = {focus: oSpyFocus};
 
 					this.stub(oCP, "_getAllPaletteColorSwatches").returns(aMockSwatches);
 					this.stub(oCP, "_getShowMoreColorsButton").returns(true);
@@ -842,11 +829,12 @@ sap.ui.define([
 
 				QUnit.test("Backward Navigation outside swatch container when only default color button is available", function (assert) {
 					// Prepare
-					var oCP = new ColorPalette(), //without any buttons
-						oSpyFocus = this.spy(),
-						aMockSwatches = new Array(oCP.getColors().length),
-						oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionBackward),
-						oMockDefaulColorButton = {focus: oSpyFocus};
+					const oCP = new ColorPalette();
+					const //without any buttons
+						oSpyFocus = this.spy();
+					const aMockSwatches = new Array(oCP.getColors().length);
+					const oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionBackward);
+					const oMockDefaulColorButton = {focus: oSpyFocus};
 
 					this.stub(oCP, "_getAllPaletteColorSwatches").returns(aMockSwatches);
 					this.stub(oCP, "_getShowMoreColorsButton").returns(false);
@@ -862,12 +850,11 @@ sap.ui.define([
 				QUnit.test("Backward Navigation with 'saphome' outside swatch container when only more colors button is available",
 					function (assert) {
 						// Prepare
-						var oCP = new ColorPalette(), //without any buttons
-							oSpyFocus = this.spy(),
-							aMockSwatches = new Array(oCP.getColors().length),
-							oMockEvent = this.mockEhancedKeybEvent("sapend", ItemNavigationHomeEnd.BorderReachedDirectionBackward),
-							oMockMoreColorsButton = {focus: oSpyFocus},
-							vResult;
+						const oCP = new ColorPalette(); //without any buttons
+						const oSpyFocus = this.spy();
+						const aMockSwatches = new Array(oCP.getColors().length);
+						const oMockEvent = this.mockEhancedKeybEvent("sapend", ItemNavigationHomeEnd.BorderReachedDirectionBackward);
+						const oMockMoreColorsButton = {focus: oSpyFocus};
 
 						this.stub(oCP, "_getAllPaletteColorSwatches").returns(aMockSwatches);
 						this.stub(oCP, "_getShowDefaultColorButton").returns(false);
@@ -875,7 +862,7 @@ sap.ui.define([
 						this.stub(oCP,  "_getMoreColorsButton").returns(oMockMoreColorsButton);
 
 						// Act
-						vResult = oCP._onSwatchContainerBorderReached(oMockEvent);
+						const vResult = oCP._onSwatchContainerBorderReached(oMockEvent);
 						// Assert
 						assert.equal(oSpyFocus.callCount, 0, "..should not focus any element");
 						assert.equal(vResult, null, "..should return null");
@@ -884,12 +871,13 @@ sap.ui.define([
 				QUnit.test("Backward Navigation outside swatch container when both more colors and default color buttons are unavailable",
 					function (assert) {
 						// Prepare
-						var oCP = new ColorPalette(), //without any buttons
-							oSpyFocus = this.spy(),
-							oMockLastSwatch = {focus: oSpyFocus},
-							aMockSwatches = new Array(oCP.getColors().length),
-							oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionBackward),
-							iMockIndexOfTheLastItemInLastRow = aMockSwatches.length - 1;
+						const oCP = new ColorPalette();
+						const //without any buttons
+							oSpyFocus = this.spy();
+						const oMockLastSwatch = {focus: oSpyFocus};
+						const aMockSwatches = new Array(oCP.getColors().length);
+						const oMockEvent = this.mockEhancedKeybEvent("", ItemNavigationHomeEnd.BorderReachedDirectionBackward);
+						const iMockIndexOfTheLastItemInLastRow = aMockSwatches.length - 1;
 
 						oCP._ensureItemNavigation();
 						aMockSwatches[iMockIndexOfTheLastItemInLastRow] = oMockLastSwatch;
@@ -908,37 +896,37 @@ sap.ui.define([
 		QUnit.module("Internal ItemNavigation", function() {
 			QUnit.test("alt/meta key + right/left or + home/end is not handled", function (assert) {
 				// Prepare
-				var oColorPalette = new ColorPalette();
+				const oColorPalette = new ColorPalette();
 
 				// Act
 				oColorPalette._ensureItemNavigation();
 
 				// Assert
-				var oModifiers = oColorPalette._oPaletteColorItemNavigation.getDisabledModifiers();
+				const oModifiers = oColorPalette._oPaletteColorItemNavigation.getDisabledModifiers();
 				assert.ok(oModifiers["sapnext"], "sapnext has disabled modifiers");
 				assert.ok(oModifiers["sapprevious"], "sapprevious has disabled modifiers");
 				assert.ok(oModifiers["saphome"], "saphome has disabled modifiers");
 				assert.ok(oModifiers["sapend"], "sapend has disabled modifiers");
-				assert.ok(oModifiers["sapnext"].indexOf("alt") !== -1, "right is not handled when alt is pressed");
-				assert.ok(oModifiers["sapnext"].indexOf("meta") !== -1, "right is not handled when meta key is pressed");
-				assert.ok(oModifiers["sapprevious"].indexOf("alt") !== -1, "left is not handled when alt is pressed");
-				assert.ok(oModifiers["sapprevious"].indexOf("meta") !== -1, "left is not handled when meta key is pressed");
-				assert.ok(oModifiers["saphome"].indexOf("alt") !== -1, "home is not handled when alt is pressed");
-				assert.ok(oModifiers["saphome"].indexOf("meta") !== -1, "home is not handled when meta key is pressed");
-				assert.ok(oModifiers["sapend"].indexOf("meta") !== -1, "end is not handled when meta key is pressed");
+				assert.ok(oModifiers["sapnext"].includes("alt"), "right is not handled when alt is pressed");
+				assert.ok(oModifiers["sapnext"].includes("meta"), "right is not handled when meta key is pressed");
+				assert.ok(oModifiers["sapprevious"].includes("alt"), "left is not handled when alt is pressed");
+				assert.ok(oModifiers["sapprevious"].includes("meta"), "left is not handled when meta key is pressed");
+				assert.ok(oModifiers["saphome"].includes("alt"), "home is not handled when alt is pressed");
+				assert.ok(oModifiers["saphome"].includes("meta"), "home is not handled when meta key is pressed");
+				assert.ok(oModifiers["sapend"].includes("meta"), "end is not handled when meta key is pressed");
 
-				var oModifiersRecentColors = oColorPalette._oRecentColorItemNavigation.getDisabledModifiers();
+				const oModifiersRecentColors = oColorPalette._oRecentColorItemNavigation.getDisabledModifiers();
 				assert.ok(oModifiersRecentColors["sapnext"], "sapnext has disabled modifiers");
 				assert.ok(oModifiersRecentColors["sapprevious"], "sapprevious has disabled modifiers");
 				assert.ok(oModifiersRecentColors["saphome"], "saphome has disabled modifiers");
 				assert.ok(oModifiersRecentColors["sapend"], "sapend has disabled modifiers");
-				assert.ok(oModifiersRecentColors["sapnext"].indexOf("alt") !== -1, "right is not handled when alt is pressed");
-				assert.ok(oModifiersRecentColors["sapnext"].indexOf("meta") !== -1, "right is not handled when meta key is pressed");
-				assert.ok(oModifiersRecentColors["sapprevious"].indexOf("alt") !== -1, "left is not handled when alt is pressed");
-				assert.ok(oModifiersRecentColors["sapprevious"].indexOf("meta") !== -1, "left is not handled when meta key is pressed");
-				assert.ok(oModifiersRecentColors["saphome"].indexOf("alt") !== -1, "home is not handled when alt is pressed");
-				assert.ok(oModifiersRecentColors["saphome"].indexOf("meta") !== -1, "home is not handled when meta key is pressed");
-				assert.ok(oModifiersRecentColors["sapend"].indexOf("meta") !== -1, "end is not handled when meta key is pressed");
+				assert.ok(oModifiersRecentColors["sapnext"].includes("alt"), "right is not handled when alt is pressed");
+				assert.ok(oModifiersRecentColors["sapnext"].includes("meta"), "right is not handled when meta key is pressed");
+				assert.ok(oModifiersRecentColors["sapprevious"].includes("alt"), "left is not handled when alt is pressed");
+				assert.ok(oModifiersRecentColors["sapprevious"].includes("meta"), "left is not handled when meta key is pressed");
+				assert.ok(oModifiersRecentColors["saphome"].includes("alt"), "home is not handled when alt is pressed");
+				assert.ok(oModifiersRecentColors["saphome"].includes("meta"), "home is not handled when meta key is pressed");
+				assert.ok(oModifiersRecentColors["sapend"].includes("meta"), "end is not handled when meta key is pressed");
 
 				// Cleanup
 				oColorPalette.destroy();
@@ -948,14 +936,13 @@ sap.ui.define([
 		QUnit.module("Internal ItemNavigationHomeEnd", function() {
 			QUnit.test("ItemNavigationHomeEnd._getIndexOfTheFirstItemInLastRow", function (assert) {
 				// Prepare
-				var oColorPalette = new ColorPalette(),
-					oItemNavigation,
-					oStubGetItemDomRefs,
-					that = this;
+				const oColorPalette = new ColorPalette();
+				const that = this;
+				let oStubGetItemDomRefs;
 
 				oColorPalette._ensureItemNavigation();
 
-				oItemNavigation = oColorPalette._oPaletteColorItemNavigation;
+				const oItemNavigation = oColorPalette._oPaletteColorItemNavigation;
 
 				function callSut(iItemCount, iExpectedResult) {
 					if (oStubGetItemDomRefs) {
@@ -963,7 +950,7 @@ sap.ui.define([
 					}
 					oStubGetItemDomRefs = that.stub(oItemNavigation, "getItemDomRefs").returns(new Array(iItemCount));
 					assert.equal(oItemNavigation._getIndexOfTheFirstItemInLastRow(iItemCount), iExpectedResult,
-						"_getIndexOfTheFirstItemInLastRow(" + iItemCount + ")");
+						`_getIndexOfTheFirstItemInLastRow(${iItemCount})`);
 				}
 
 				// Act & Assert
@@ -985,16 +972,15 @@ sap.ui.define([
 				" on the 1st item",
 				function (assert) {
 					// Prepare
-					var oCP = new ColorPalette(),
-						oSpyFireEvent,
-						oSpyPreventDefault = this.spy();
+					const oCP = new ColorPalette();
+					const oSpyPreventDefault = this.spy();
 
-					this.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function () {});
+					this.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", () => {});
 					oCP._ensureItemNavigation();
 					oCP._oPaletteColorItemNavigation.oDomRef = document.getElementsByClassName("sapUiBody")[0];
-					var oMockEvent = {keyCode: KeyCodes.ARROW_UP, preventDefault: oSpyPreventDefault, target: oCP._oPaletteColorItemNavigation.getRootDomRef()};
+					const oMockEvent = {keyCode: KeyCodes.ARROW_UP, preventDefault: oSpyPreventDefault, target: oCP._oPaletteColorItemNavigation.getRootDomRef()};
 
-					oSpyFireEvent = this.spy(oCP._oPaletteColorItemNavigation, "fireEvent");
+					const oSpyFireEvent = this.spy(oCP._oPaletteColorItemNavigation, "fireEvent");
 					this.stub(oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(0);
 					this.stub(oCP._oPaletteColorItemNavigation, "getItemDomRefs").returns(new Array(oCP.getColors().length));
 
@@ -1013,13 +999,13 @@ sap.ui.define([
 				" on the 1st item",
 				function (assert) {
 					// Prepare
-					var oCP = new ColorPalette(),
-						oSpyParentOnSapPrevious = this.spy(ItemNavigation.prototype, "onsapprevious");
+					const oCP = new ColorPalette();
+					const oSpyParentOnSapPrevious = this.spy(ItemNavigation.prototype, "onsapprevious");
 
-					this.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function () {});
+					this.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", () => {});
 					oCP._ensureItemNavigation();
 					oCP._oPaletteColorItemNavigation.oDomRef = document.getElementsByClassName("sapUiBody")[0];
-					var oMockEvent = {keyCode: KeyCodes.ARROW_LEFT, target: oCP._oPaletteColorItemNavigation.getRootDomRef()};
+					const oMockEvent = {keyCode: KeyCodes.ARROW_LEFT, target: oCP._oPaletteColorItemNavigation.getRootDomRef()};
 
 					this.stub(oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(0);
 					this.stub(oCP._oPaletteColorItemNavigation, "getItemDomRefs").returns(new Array(oCP.getColors().length));
@@ -1038,16 +1024,15 @@ sap.ui.define([
 			QUnit.test(".onsapnext fires event BorderReached only if [down] is pressed on the last item in the last column",
 				function (assert) {
 					// Prepare
-					var oCP = new ColorPalette(),
-						oSpyFireEvent,
-						oSpyPreventDefault = this.spy();
+					const oCP = new ColorPalette();
+					const oSpyPreventDefault = this.spy();
 
-					this.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function () {});
+					this.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", () => {});
 					oCP._ensureItemNavigation();
 					oCP._oPaletteColorItemNavigation.oDomRef = document.getElementsByClassName("sapUiBody")[0];
-					var oMockEvent = {keyCode: KeyCodes.ARROW_DOWN, preventDefault: oSpyPreventDefault, target: oCP._oPaletteColorItemNavigation.getRootDomRef()};
+					const oMockEvent = {keyCode: KeyCodes.ARROW_DOWN, preventDefault: oSpyPreventDefault, target: oCP._oPaletteColorItemNavigation.getRootDomRef()};
 
-					oSpyFireEvent = this.spy(oCP._oPaletteColorItemNavigation, "fireEvent");
+					const oSpyFireEvent = this.spy(oCP._oPaletteColorItemNavigation, "fireEvent");
 					this.stub(oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(0);
 					this.stub(oCP._oPaletteColorItemNavigation, "getItemDomRefs").returns(new Array(oCP.getColors().length));
 					this.stub(oCP._oPaletteColorItemNavigation, "_getItemInfo").returns({
@@ -1069,13 +1054,13 @@ sap.ui.define([
 				" on the 1st item",
 				function (assert) {
 					// Prepare
-					var oCP = new ColorPalette(),
-						oSpyParentOnSapNext = this.spy(ItemNavigation.prototype, "onsapnext");
+					const oCP = new ColorPalette();
+					const oSpyParentOnSapNext = this.spy(ItemNavigation.prototype, "onsapnext");
 
-					this.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function () {});
+					this.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", () => {});
 					oCP._ensureItemNavigation();
 					oCP._oPaletteColorItemNavigation.oDomRef = document.getElementsByClassName("sapUiBody")[0];
-					var oMockEvent = {keyCode: KeyCodes.ARROW_RIGHT, target: oCP._oPaletteColorItemNavigation.getRootDomRef()};
+					const oMockEvent = {keyCode: KeyCodes.ARROW_RIGHT, target: oCP._oPaletteColorItemNavigation.getRootDomRef()};
 
 					this.stub(oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(0);
 					this.stub(oCP._oPaletteColorItemNavigation, "getItemDomRefs").returns(new Array(oCP.getColors().length));
@@ -1092,16 +1077,16 @@ sap.ui.define([
 			QUnit.test(".onsapnext with [down] key moves the focus to the next row and same column, unless item is missing",
 				function (assert) {
 					// Prepare
-					var oCP = new ColorPalette(),
-						oSpyFocus = this.spy(),
-						oSpyPreventDefault = this.spy(),
-						aMockItems = new Array(12),
-						oMockLastItem = {focus: oSpyFocus};
+					const oCP = new ColorPalette();
+					const oSpyFocus = this.spy();
+					const oSpyPreventDefault = this.spy();
+					const aMockItems = new Array(12);
+					const oMockLastItem = {focus: oSpyFocus};
 
-					this.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function () {});
+					this.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", () => {});
 					oCP._ensureItemNavigation();
 					oCP._oPaletteColorItemNavigation.oDomRef = document.getElementsByClassName("sapUiBody")[0];
-					var oMockEvent = {keyCode: KeyCodes.ARROW_DOWN, preventDefault: oSpyPreventDefault, target: oCP._oPaletteColorItemNavigation.getRootDomRef()};
+					const oMockEvent = {keyCode: KeyCodes.ARROW_DOWN, preventDefault: oSpyPreventDefault, target: oCP._oPaletteColorItemNavigation.getRootDomRef()};
 
 					this.stub(oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(8);
 					aMockItems[11] = oMockLastItem;
@@ -1129,7 +1114,7 @@ sap.ui.define([
 			QUnit.module("oItemNavigation.fireEvent", {
 				beforeEach: function() {
 					this.oCP = new ColorPalette();
-					this.oStubSetDomRef = sinon.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function() {});
+					this.oStubSetDomRef = sinon.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", () => {});
 
 					this.oCP._ensureItemNavigation();
 					this.oStubGetItemDomRefs = sinon.stub(this.oCP._oPaletteColorItemNavigation, "getItemDomRefs").returns(new Array(this.oCP.getColors().length));
@@ -1142,8 +1127,8 @@ sap.ui.define([
 				QUnit.test("Enriches the event parameters in case of the Border Reached Event with first item index",
 					function (assert) {
 						// Prepare
-						var oEvent = {type: "sapprevious"},
-							oSpyFireEventsHandler = this.stub(ItemNavigation.prototype, "fireEvent");
+						const oEvent = {type: "sapprevious"};
+						const oSpyFireEventsHandler = this.stub(ItemNavigation.prototype, "fireEvent");
 
 						this.stub(this.oCP._oPaletteColorItemNavigation, "_getItemInfo").returns({
 							bIsFirstItem: true,
@@ -1177,8 +1162,8 @@ sap.ui.define([
 				QUnit.test("Enriches the event parameters in case of the Border Reached Event with last item index",
 					function (assert) {
 						// Prepare
-						var oEvent = {type: "sapnext"},
-							oSpyFireEventsHandler = this.stub(ItemNavigation.prototype, "fireEvent");
+						const oEvent = {type: "sapnext"};
+						const oSpyFireEventsHandler = this.stub(ItemNavigation.prototype, "fireEvent");
 
 						this.stub(this.oCP._oPaletteColorItemNavigation, "_getItemInfo").returns({
 							bIsFirstItem: false,
@@ -1211,8 +1196,8 @@ sap.ui.define([
 
 				QUnit.test("Does not modify the event parameters in case of event is not Border Reached", function(assert) {
 					// Prepare
-					var oEventParams = {x: 1, y: 2},
-						oSpyFireEventsHandler = this.stub(ItemNavigation.prototype, "fireEvent");
+					const oEventParams = {x: 1, y: 2};
+					const oSpyFireEventsHandler = this.stub(ItemNavigation.prototype, "fireEvent");
 
 					// Act
 					this.oCP._oPaletteColorItemNavigation.fireEvent("MyEvent", oEventParams);
@@ -1230,7 +1215,7 @@ sap.ui.define([
 				beforeEach: function() {
 					this.oCP = new ColorPalette();
 					this.oEvent = jQuery.Event("saphome");
-					this.oStubSetDomRef = sinon.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function() {});
+					this.oStubSetDomRef = sinon.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", () => {});
 
 					this.oCP._ensureItemNavigation();
 					this.oCP.setProperty("_isInPopover", true);
@@ -1247,7 +1232,7 @@ sap.ui.define([
 			}, function() {
 				QUnit.test("ItemNavigationHomeEnd.onsaphome when HOME is pressed outside items (swatch) container)",
 					function(assert) {
-						var oSpyGetItemInfo = this.spy(this.oCP._oPaletteColorItemNavigation, "_getItemInfo");
+						const oSpyGetItemInfo = this.spy(this.oCP._oPaletteColorItemNavigation, "_getItemInfo");
 						this.oEvent.target = undefined;
 						// Act
 						this.oCP._oPaletteColorItemNavigation.onsaphome(this.oEvent);
@@ -1258,7 +1243,7 @@ sap.ui.define([
 				QUnit.test("ItemNavigationHomeEnd.onsaphome when HOME is pressed on a item that is not first nor last" +
 					" in the row", function (assert) {
 					// Prepare
-					var oStubOnSaphomeParent = this.stub(ItemNavigation.prototype, "onsaphome", function() {});
+					const oStubOnSaphomeParent = this.stub(ItemNavigation.prototype, "onsaphome", () => {});
 
 					this.stub(this.oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(1);
 					this.stub(this.oCP._oPaletteColorItemNavigation, "_getItemInfo").returns({
@@ -1279,8 +1264,8 @@ sap.ui.define([
 				QUnit.test("ItemNavigationHomeEnd.onsaphome when HOME is pressed on a item that is first in the row",
 					function (assert) {
 						// Prepare
-						var oStubOnSaphomeParent = this.stub(ItemNavigation.prototype, "onsaphome", function() {}),
-							oStubFirstItemFocusFunction = this.stub();
+						const oStubOnSaphomeParent = this.stub(ItemNavigation.prototype, "onsaphome", () => {});
+						const oStubFirstItemFocusFunction = this.stub();
 
 							this.stub(this.oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(5);
 							this.oCP._oPaletteColorItemNavigation.getItemDomRefs()[0] = {
@@ -1305,8 +1290,8 @@ sap.ui.define([
 				QUnit.test("ItemNavigationHomeEnd.onsaphome when HOME is pressed on first item in the whole container",
 					function (assert) {
 						// Prepare
-						var oStubOnSaphomeParent = this.stub(ItemNavigation.prototype, "onsaphome", function() {}),
-							oStubFireEventOnInstance = this.stub(this.oCP._oPaletteColorItemNavigation, "fireEvent", function() {});
+						const oStubOnSaphomeParent = this.stub(ItemNavigation.prototype, "onsaphome", () => {});
+						const oStubFireEventOnInstance = this.stub(this.oCP._oPaletteColorItemNavigation, "fireEvent", () => {});
 
 						this.stub(this.oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(0); //on first item
 						this.stub(this.oCP._oPaletteColorItemNavigation, "_getItemInfo").returns({
@@ -1336,7 +1321,7 @@ sap.ui.define([
 				beforeEach: function() {
 					this.oCP = new ColorPalette();
 					this.oEvent = jQuery.Event("sapend");
-					this.oStubSetDomRef = sinon.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function() {});
+					this.oStubSetDomRef = sinon.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", () => {});
 
 					this.oCP._ensureItemNavigation();
 					this.oCP.setProperty("_isInPopover", true);
@@ -1353,7 +1338,7 @@ sap.ui.define([
 
 				QUnit.test("ItemNavigationHomeEnd.onsapend when END is pressed outside items (swatch) container)",
 					function(assert) {
-						var oSpyGetItemInfo = this.spy(this.oCP._oPaletteColorItemNavigation, "_getItemInfo");
+						const oSpyGetItemInfo = this.spy(this.oCP._oPaletteColorItemNavigation, "_getItemInfo");
 						this.oEvent.target = undefined;
 						// Act
 						this.oCP._oPaletteColorItemNavigation.onsapend(this.oEvent);
@@ -1365,7 +1350,7 @@ sap.ui.define([
 				QUnit.test("ItemNavigationHomeEnd.onsapend when END is pressed on a item that is not first nor last" +
 					" in the row", function (assert) {
 					// Prepare
-					var oStubOnSapendParent = this.stub(ItemNavigation.prototype, "onsapend", function() {});
+					const oStubOnSapendParent = this.stub(ItemNavigation.prototype, "onsapend", () => {});
 
 					this.stub(this.oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(1);
 					this.stub(this.oCP._oPaletteColorItemNavigation, "_getItemInfo").returns({
@@ -1386,8 +1371,8 @@ sap.ui.define([
 				QUnit.test("ItemNavigationHomeEnd.onsapend when END is pressed on a item that is last in the row",
 					function (assert) {
 						// Prepare
-						var oStubOnSapendParent = this.stub(ItemNavigation.prototype, "onsapend", function() {}),
-							oStubLastItemFocusFunction = this.stub();
+						const oStubOnSapendParent = this.stub(ItemNavigation.prototype, "onsapend", () => {});
+						const oStubLastItemFocusFunction = this.stub();
 
 						this.stub(this.oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(9);
 						this.oCP._oPaletteColorItemNavigation.getItemDomRefs()[this.oCP.getColors().length - 1] = {
@@ -1413,8 +1398,8 @@ sap.ui.define([
 				QUnit.test("ItemNavigationHomeEnd.onsapend when END is pressed on last item in the whole container",
 					function (assert) {
 						// Prepare
-						var oStubOnSapendParent = this.stub(ItemNavigation.prototype, "onsapend", function() {}),
-							oStubFireEventOnInstance = this.stub(this.oCP._oPaletteColorItemNavigation, "fireEvent", function() {});
+						const oStubOnSapendParent = this.stub(ItemNavigation.prototype, "onsapend", () => {});
+						const oStubFireEventOnInstance = this.stub(this.oCP._oPaletteColorItemNavigation, "fireEvent", () => {});
 
 						this.stub(this.oCP._oPaletteColorItemNavigation, "getFocusedIndex").returns(this.oCP.getColors().length - 1); //on last item
 						this.stub(this.oCP._oPaletteColorItemNavigation, "_getItemInfo").returns({
@@ -1444,7 +1429,7 @@ sap.ui.define([
 			QUnit.module("._getItemInfo", {
 				beforeEach: function() {
 					this.oCP = new ColorPalette();
-					this.oStubSetDomRef = sinon.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", function() {});
+					this.oStubSetDomRef = sinon.stub(ColorPalette.prototype._ItemNavigation.prototype, "setItemDomRefs", () => {});
 
 					this.oCP._ensureItemNavigation();
 				},
@@ -1453,20 +1438,19 @@ sap.ui.define([
 				},
 				callGetItemInfo: function(iIndex, itemsCount, oExpected, sMsg, assert) {
 					// Prepare
-					var aItemDomRefs = new Array(itemsCount),
-						oResult;
+					const aItemDomRefs = new Array(itemsCount);
 
 					this.stub(this.oCP._oPaletteColorItemNavigation, "getItemDomRefs").returns(aItemDomRefs);
 
 					// Act
-					oResult = this.oCP._oPaletteColorItemNavigation._getItemInfo(iIndex);
+					const oResult = this.oCP._oPaletteColorItemNavigation._getItemInfo(iIndex);
 
 					// Assert
 					assert.deepEqual(oResult, oExpected, sMsg);
 				}
 			}, function() {
 				QUnit.test("first column in first row: _getItemInfo(0), items=15", function (assert) {
-					var oExpected = {
+					const oExpected = {
 						bIsFirstItem: true,
 						bIsLastItem: false,
 						bIsInTheLastColumn: false,
@@ -1479,7 +1463,7 @@ sap.ui.define([
 				});
 
 				QUnit.test("last column in last row: _getItemInfo(14), items=15", function (assert) {
-					var oExpected = {
+					const oExpected = {
 						bIsFirstItem: false,
 						bIsLastItem: true,
 						bIsInTheLastColumn: true,
@@ -1493,7 +1477,7 @@ sap.ui.define([
 				});
 
 				QUnit.test("first column in second row: _getItemInfo(5), items=15", function (assert) {
-					var oExpected = {
+					const oExpected = {
 						bIsFirstItem: false,
 						bIsLastItem: false,
 						bIsInTheLastColumn: false,
@@ -1507,7 +1491,7 @@ sap.ui.define([
 				});
 
 				QUnit.test("last column in second row: _getItemInfo(9), items=15", function (assert) {
-					var oExpected = {
+					const oExpected = {
 						bIsFirstItem: false,
 						bIsLastItem: false,
 						bIsInTheLastColumn: true,
@@ -1522,7 +1506,7 @@ sap.ui.define([
 
 				QUnit.test("second column on the first row where no next item in the same column: _getItemInfo(3), items=6",
 					function (assert) {
-						var oExpected = {
+						const oExpected = {
 							bIsFirstItem: false,
 							bIsLastItem: false,
 							bIsInTheLastColumn: false,
@@ -1539,7 +1523,7 @@ sap.ui.define([
 			QUnit.module("InternalAPI - ColorHelper", function() {
 				QUnit.test("getNamedColor", function (assert) {
 					// Prepare
-					var oCPHelper = ColorPalette.prototype._ColorsHelper;
+					const oCPHelper = ColorPalette.prototype._ColorsHelper;
 
 					// Act
 					assert.equal(oCPHelper.getNamedColor("#Ffb200"), "gold", "..finds the right named color for given hex");
@@ -1566,7 +1550,7 @@ sap.ui.define([
 	QUnit.module("Public API", function() {
 		QUnit.test("Property <colors> - default value", function (assert) {
 			// Act
-			var oCP = new ColorPalette();
+			const oCP = new ColorPalette();
 
 			// Assert
 			assert.deepEqual(oCP.getColors(), DEFAULT_COLORS, "..should be as expected");
@@ -1576,9 +1560,9 @@ sap.ui.define([
 
 		QUnit.test("Property <colors> - setColor with allowed amount of colors", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				aColors = ["green", "#fff000"],
-				oSpySetProperty = this.spy(oCP, "setProperty");
+			const oCP = new ColorPalette();
+			const aColors = ["green", "#fff000"];
+			const oSpySetProperty = this.spy(oCP, "setProperty");
 
 			// Act
 			oCP.setColors(aColors);
@@ -1593,13 +1577,13 @@ sap.ui.define([
 
 		QUnit.test("Property <colors> - setColor with invalid color", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				aColors = ["greenn", "#fff000#"],
-				oSpySetProperty = this.spy(oCP, "setProperty"),
-				oSpyValidateProperty = this.spy(oCP, "validateProperty");
+			const oCP = new ColorPalette();
+			const aColors = ["greenn", "#fff000#"];
+			const oSpySetProperty = this.spy(oCP, "setProperty");
+			const oSpyValidateProperty = this.spy(oCP, "validateProperty");
 
 			// Act
-			assert.throws(function () {
+			assert.throws(() => {
 					oCP.setColors(aColors);
 				}, '..should throw an exception with expected message'
 			);
@@ -1613,12 +1597,12 @@ sap.ui.define([
 
 		QUnit.test("Property <colors> - setColor with valid colors, but less than allowed", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				aColors = DEFAULT_COLORS.slice().concat(["#FFFAAA"]),
-				oSpySetProperty = this.spy(oCP, "setProperty");
+			const oCP = new ColorPalette();
+			const aColors = DEFAULT_COLORS.slice().concat(["#FFFAAA"]);
+			const oSpySetProperty = this.spy(oCP, "setProperty");
 
 			// Act
-			assert.throws(function () {
+			assert.throws(() => {
 					oCP.setColors(aColors);
 				},
 				Error("Cannot set property 'colors' - array must has minimum 2 and maximum 15 elements"),
@@ -1632,12 +1616,12 @@ sap.ui.define([
 
 		QUnit.test("Property <colors> - setColor with valid colors, but more than allowed", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				aColors = ["green"],
-				oSpySetProperty = this.spy(oCP, "setProperty");
+			const oCP = new ColorPalette();
+			const aColors = ["green"];
+			const oSpySetProperty = this.spy(oCP, "setProperty");
 
 			// Act
-			assert.throws(function () {
+			assert.throws(() => {
 					oCP.setColors(aColors);
 				},
 				Error("Cannot set property 'colors' - array must has minimum 2 and maximum 15 elements"),
@@ -1652,10 +1636,10 @@ sap.ui.define([
 
 		QUnit.test("Property <setSelectedColor> - selectedColor will be set to any color given", function (assert) {
 			// Prepare
-			var oCP = new ColorPalette(),
-				aColors = ["white", "#87de7a"],
-				sSelectedColor = "rgb(224, 121, 200)",
-				oSpySetProperty = this.spy(oCP, "setProperty");
+			const oCP = new ColorPalette();
+			const aColors = ["white", "#87de7a"];
+			const sSelectedColor = "rgb(224, 121, 200)";
+			const oSpySetProperty = this.spy(oCP, "setProperty");
 
 			oCP.setColors(aColors);
 
@@ -1676,19 +1660,17 @@ sap.ui.define([
 		// The ARIA tests are the only ones, that checks something at the DOM. DOM rendering is supposed to be tested via OPA.
 		QUnit.test("ARIA attributes and tooltips are rendered", async function (assert) {
 			// Prepare
-			var oCP = new ColorPalette({
+			const oCP = new ColorPalette({
 					colors: [
 						"black",
 						"#ffffff",
 						"#a811ff"
 					]/*black, white, non-named*/
-				}),
-				oBundle = Library.getResourceBundleFor("sap.m"),
-				sBlack = oBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR_BLACK"),
-				sWhite = oBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR_WHITE"),
-				$SwatchContainer,
-				$aSwatches,
-				sCPSwatchContainerTitle = oBundle.getText("COLOR_PALETTE_SWATCH_CONTAINER_TITLE", [3]);
+				});
+			const oBundle = Library.getResourceBundleFor("sap.m");
+			const sBlack = oBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR_BLACK");
+			const sWhite = oBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR_WHITE");
+			const sCPSwatchContainerTitle = oBundle.getText("COLOR_PALETTE_SWATCH_CONTAINER_TITLE", [3]);
 
 			// Act
 			oCP.placeAt("qunit-fixture");
@@ -1696,12 +1678,12 @@ sap.ui.define([
 
 			// Assert
 			// swatch container
-			$SwatchContainer = oCP.$().find(".sapMColorPaletteContent");
+			const $SwatchContainer = oCP.$().find(".sapMColorPaletteContent");
 			assert.equal($SwatchContainer.attr("role"), "region", "Swatch Container: role");
 			assert.equal($SwatchContainer.attr("aria-label"), sCPSwatchContainerTitle, "Swatch Container: aria-label");
 
 			// swatches
-			$aSwatches = oCP._getAllPaletteColorSwatches();
+			const $aSwatches = oCP._getAllPaletteColorSwatches();
 
 			assert.equal($aSwatches[0].getAttribute("role"), "button", "Swatch 1 role");
 			assert.equal($aSwatches[0].getAttribute("aria-label"), oBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR", [1, sBlack]),
@@ -1732,10 +1714,10 @@ sap.ui.define([
 	QUnit.module("ColorPalettePopover", function() {
 		QUnit.module("API", function() {
 			QUnit.test("exit", function (assert) {
-				var oCPP = new ColorPalettePopover(),
-					oSpyPopoverRemoveDelegate = this.spy(),
-					oSpyPopoverDestroy = this.spy(),
-					onAfterRenderingDelegate = {};
+				const oCPP = new ColorPalettePopover();
+				const oSpyPopoverRemoveDelegate = this.spy();
+				const oSpyPopoverDestroy = this.spy();
+				const onAfterRenderingDelegate = {};
 
 				oCPP._oPopover = {
 					removeDelegate: oSpyPopoverRemoveDelegate,
@@ -1760,13 +1742,11 @@ sap.ui.define([
 
 			QUnit.test("openBy", function (assert) {
 				// Prepare
-				var oOpener = new Button(),
-					oCPP = new ColorPalettePopover(),
-					oRPopover = new ResponsivePopover(),
-					oStubEnsurePopover = this.stub(oCPP, "_ensurePopover", function () {
-						return oRPopover;
-					}),
-					oSpyResponsivePopoverOpenBy = this.spy(ResponsivePopover.prototype, "openBy");
+				const oOpener = new Button();
+				const oCPP = new ColorPalettePopover();
+				const oRPopover = new ResponsivePopover();
+				const oStubEnsurePopover = this.stub(oCPP, "_ensurePopover", () => oRPopover);
+				const oSpyResponsivePopoverOpenBy = this.spy(ResponsivePopover.prototype, "openBy");
 
 				// Act
 				oCPP.openBy(oOpener);
@@ -1785,13 +1765,11 @@ sap.ui.define([
 
 			QUnit.test("getDomRef", function (assert) {
 				// Prepare
-				var oOpener = new Button(),
-					oCPP = new ColorPalettePopover(),
-					oRPopover = new ResponsivePopover(),
-					oStubEnsurePopover = this.stub(oCPP, "_ensurePopover", function () {
-						return oRPopover;
-					}),
-					oSpyResponsivePopoverGetDomRef = this.spy(ResponsivePopover.prototype, "getDomRef");
+				const oOpener = new Button();
+				const oCPP = new ColorPalettePopover();
+				const oRPopover = new ResponsivePopover();
+				const oStubEnsurePopover = this.stub(oCPP, "_ensurePopover", () => oRPopover);
+				const oSpyResponsivePopoverGetDomRef = this.spy(ResponsivePopover.prototype, "getDomRef");
 
 				// Act
 				oCPP.getDomRef();
@@ -1809,13 +1787,11 @@ sap.ui.define([
 
 			QUnit.test("close", function (assert) {
 				// Prepare
-				var oOpener = new Button(),
-					oCPP = new ColorPalettePopover(),
-					oRPopover = new ResponsivePopover(),
-					oStubEnsurePopover = this.stub(oCPP, "_ensurePopover", function () {
-						return oRPopover;
-					}),
-					oSpyResponsivePopoveClose = this.spy(ResponsivePopover.prototype, "close");
+				const oOpener = new Button();
+				const oCPP = new ColorPalettePopover();
+				const oRPopover = new ResponsivePopover();
+				const oStubEnsurePopover = this.stub(oCPP, "_ensurePopover", () => oRPopover);
+				const oSpyResponsivePopoveClose = this.spy(ResponsivePopover.prototype, "close");
 
 				// Act
 				oCPP.close();
@@ -1834,11 +1810,11 @@ sap.ui.define([
 
 			QUnit.test("Property <colors>", function (assert) {
 				// Prepare
-				var oCP = new ColorPalette(),
-					oCPP = new ColorPalettePopover(),
-					oStub_getPalette = this.stub(oCPP, "_getPalette").returns(oCP),
-					oSpyCPSetColor = this.spy(ColorPalette.prototype.setColors, "call"),
-					oSpyCPSetProperty = this.spy(ColorPalette.prototype, "setProperty");
+				const oCP = new ColorPalette();
+				const oCPP = new ColorPalettePopover();
+				const oStub_getPalette = this.stub(oCPP, "_getPalette").returns(oCP);
+				const oSpyCPSetColor = this.spy(ColorPalette.prototype.setColors, "call");
+				const oSpyCPSetProperty = this.spy(ColorPalette.prototype, "setProperty");
 
 				// Act
 				oCPP.setColors(["red", "green"]);
@@ -1858,11 +1834,11 @@ sap.ui.define([
 
 			QUnit.test("Property <showDefaultColorButton>", function (assert) {
 				// Prepare
-				var oCP = new ColorPalette(),
-					oCPP = new ColorPalettePopover(),
-					oStub_getPalette = this.stub(oCPP, "_getPalette").returns(oCP),
-					oSpyCP_setShowDefaultColorButton = this.spy(ColorPalette.prototype._setShowDefaultColorButton, "call"),
-					oSpyCPP_setShowDefaultColorButton = this.spy(Control.prototype.setProperty, "apply");
+				const oCP = new ColorPalette();
+				const oCPP = new ColorPalettePopover();
+				const oStub_getPalette = this.stub(oCPP, "_getPalette").returns(oCP);
+				const oSpyCP_setShowDefaultColorButton = this.spy(ColorPalette.prototype._setShowDefaultColorButton, "call");
+				const oSpyCPP_setShowDefaultColorButton = this.spy(Control.prototype.setProperty, "apply");
 
 				// Act
 				oCPP.setShowDefaultColorButton(true);
@@ -1887,11 +1863,11 @@ sap.ui.define([
 
 			QUnit.test("Property <showMoreColorsButton>", function (assert) {
 				// Prepare
-				var oCP = new ColorPalette(),
-					oCPP = new ColorPalettePopover(),
-					oStub_getPalette = this.stub(oCPP, "_getPalette").returns(oCP),
-					oSpyCP_setShowMoreColorsButton = this.spy(ColorPalette.prototype._setShowMoreColorsButton, "call"),
-					oSpyCPP_setShowMoreColorsButton = this.spy(Control.prototype.setProperty, "apply");
+				const oCP = new ColorPalette();
+				const oCPP = new ColorPalettePopover();
+				const oStub_getPalette = this.stub(oCPP, "_getPalette").returns(oCP);
+				const oSpyCP_setShowMoreColorsButton = this.spy(ColorPalette.prototype._setShowMoreColorsButton, "call");
+				const oSpyCPP_setShowMoreColorsButton = this.spy(Control.prototype.setProperty, "apply");
 
 				// Act
 				oCPP.setShowMoreColorsButton(true);
@@ -1916,10 +1892,10 @@ sap.ui.define([
 
 			QUnit.test("setColorPickerSelectedColor is called in ColorPalette", function (assert) {
 				// Prepare
-				var oCP = new ColorPalette(),
-					oCPP = new ColorPalettePopover(),
-					oStub_getPalette = this.stub(oCPP, "_getPalette").returns(oCP),
-					oSpyCP_setColorPickerSelectedColor = this.spy(oCP, "setColorPickerSelectedColor");
+				const oCP = new ColorPalette();
+				const oCPP = new ColorPalettePopover();
+				const oStub_getPalette = this.stub(oCPP, "_getPalette").returns(oCP);
+				const oSpyCP_setColorPickerSelectedColor = this.spy(oCP, "setColorPickerSelectedColor");
 
 				// Act
 				oCPP.setColorPickerSelectedColor("green");
@@ -1938,12 +1914,12 @@ sap.ui.define([
 
 			QUnit.test("colorSelect event ", function (assert) {
 				// Prepare
-				var oCPP = new ColorPalettePopover(),
-					/* custom spies as the event cannot be kept after it is being thrown (the framework returns it back to the pool)*/
-					oSpyColorSelectParams = {},
-					aColorSelectCalls = [];
+				const oCPP = new ColorPalettePopover();
+				// custom spies as the event cannot be kept after it is being thrown (the framework returns it back to the pool)
+				let oSpyColorSelectParams = {};
+				const aColorSelectCalls = [];
 
-				oCPP.attachEvent("colorSelect", function (oEvent) {
+				oCPP.attachEvent("colorSelect", (oEvent) => {
 					aColorSelectCalls.push("");
 					oSpyColorSelectParams = oEvent.getParameters();
 				});
@@ -1977,22 +1953,20 @@ sap.ui.define([
 
 			QUnit.test("liveChange event", function (assert) {
 				// Prepare
-				var oColorPalettePopover = new ColorPalettePopover({
+				const oColorPalettePopover = new ColorPalettePopover({
 						displayMode: ColorPickerDisplayMode.Large
-					}),
-					aTestCasesRed = [128, 192, 255, 0],
-					iTestCasesLength = aTestCasesRed.length,
-					iCase,
-					oColorPalette,
-					oColorPicker;
+					});
+				const aTestCasesRed = [128, 192, 255, 0];
+				const iTestCasesLength = aTestCasesRed.length;
+				let iCase;
 
 				// initialize the ColorPickerPopover and its internal ColorPalette without opening it
 				oColorPalettePopover._ensurePopover();
-				oColorPalette = oColorPalettePopover._getPalette();
+				const oColorPalette = oColorPalettePopover._getPalette();
 				oColorPalette._ensureMoreColorsDialog();
 
 				// prepare internal ColorPicker
-				oColorPicker = oColorPalette._oMoreColorsDialog._oColorPicker;
+				const oColorPicker = oColorPalette._oMoreColorsDialog._oColorPicker;
 				oColorPicker._createLayout();
 				oColorPicker.$CPBox = oColorPicker.oCPBox.$();
 
@@ -2003,11 +1977,11 @@ sap.ui.define([
 				assert.expect(iTestCasesLength * 2); // this is needed to make sure the change event handler is called otherwise we won't know.
 
 				// attach liveChange handler
-				oColorPalettePopover.attachLiveChange(function (oEvent) {
-					var sColorString = oEvent.getParameter("colorString");
+				oColorPalettePopover.attachLiveChange((oEvent) => {
+					const sColorString = oEvent.getParameter("colorString");
 					// assert
 					assert.ok(true, "liveChange event is called");
-					assert.equal(sColorString, "rgb(" + aTestCasesRed[iCase] + ",0,0)", "colorString parameter is correct: " + sColorString);
+					assert.equal(sColorString, `rgb(${aTestCasesRed[iCase]},0,0)`, `colorString parameter is correct: ${sColorString}`);
 				});
 
 				// act - simulate change of the RED color input value and call the field change handler
@@ -2022,10 +1996,10 @@ sap.ui.define([
 
 			QUnit.test("Property displayMode", function (assert) {
 				// Prepare
-				var oCP = new ColorPalette(),
-					oCPP = new ColorPalettePopover(),
-					oStubGetPalette = this.stub(oCPP, "_getPalette").returns(oCP),
-					oSpyCPsetDisplayMode = this.spy(ColorPalette.prototype._setDisplayMode, "call");
+				const oCP = new ColorPalette();
+				const oCPP = new ColorPalettePopover();
+				const oStubGetPalette = this.stub(oCPP, "_getPalette").returns(oCP);
+				const oSpyCPsetDisplayMode = this.spy(ColorPalette.prototype._setDisplayMode, "call");
 
 				// Act
 				oCPP.setDisplayMode(ColorPickerDisplayMode.Simplified);
@@ -2048,9 +2022,9 @@ sap.ui.define([
 		QUnit.module("ColorPalettePopover - Private API functions", function() {
 			QUnit.test("_ensurePopover", function (assert) {
 				// Prepare
-				var oCPP = new ColorPalettePopover(),
-					oFakePopover = {destroy: this.stub(), getDomRef: this.stub(), removeDelegate: this.stub()},
-					oStubCreatePopover = this.stub(oCPP, "_createPopover").returns(oFakePopover);
+				const oCPP = new ColorPalettePopover();
+				const oFakePopover = {destroy: this.stub(), getDomRef: this.stub(), removeDelegate: this.stub()};
+				const oStubCreatePopover = this.stub(oCPP, "_createPopover").returns(oFakePopover);
 
 				oCPP._oPopover = null;
 
@@ -2077,8 +2051,8 @@ sap.ui.define([
 
 			QUnit.test("Popover is closed when ColorPalette is about to open the ColorPicker", function (assert) {
 				// Prepare
-				var oCPP = new ColorPalettePopover(),
-					oSpyPopoverClose = this.spy(oCPP._oPopover, "close");
+				const oCPP = new ColorPalettePopover();
+				const oSpyPopoverClose = this.spy(oCPP._oPopover, "close");
 
 				// Act
 				oCPP._getPalette().fireEvent("_beforeOpenColorPicker");
@@ -2094,8 +2068,8 @@ sap.ui.define([
 
 			QUnit.test("Popover is closed when end-user chooses a color from ColorPalette ", function (assert) {
 				// Prepare
-				var oCPP = new ColorPalettePopover(),
-					oSpyPopoverClose = this.spy(oCPP._oPopover, "close");
+				const oCPP = new ColorPalettePopover();
+				const oSpyPopoverClose = this.spy(oCPP._oPopover, "close");
 
 				// Act
 				oCPP._getPalette().fireEvent("colorSelect");
@@ -2110,10 +2084,10 @@ sap.ui.define([
 
 			QUnit.test("_handleNextOrPreviousUponPaletteClose - ColorPalette closed with TAB", function (assert) {
 				// Prepare
-				var oCPP = new ColorPalettePopover(),
-					oTabEvent = jQuery.Event("saptabnext"),
-					oSpyPreventDefault = this.spy(oTabEvent, "preventDefault"),
-					oSpyStopPropagation = this.spy(oTabEvent, "stopPropagation");
+				const oCPP = new ColorPalettePopover();
+				const oTabEvent = jQuery.Event("saptabnext");
+				const oSpyPreventDefault = this.spy(oTabEvent, "preventDefault");
+				const oSpyStopPropagation = this.spy(oTabEvent, "stopPropagation");
 
 				// Act
 				oCPP._getPalette()._fireColorSelect("white", false, oTabEvent); // [TAB] on the "white" swatch
@@ -2130,10 +2104,10 @@ sap.ui.define([
 
 			QUnit.test("_handleNextOrPreviousUponPaletteClose - ColorPalette closed with SHIFT+TAB", function (assert) {
 				// Prepare
-				var oCPP = new ColorPalettePopover(),
-					oShiftTabEvent = jQuery.Event("saptabprevious"),
-					oSpyPreventDefault = this.spy(oShiftTabEvent, "preventDefault"),
-					oSpyStopPropagation = this.spy(oShiftTabEvent, "stopPropagation");
+				const oCPP = new ColorPalettePopover();
+				const oShiftTabEvent = jQuery.Event("saptabprevious");
+				const oSpyPreventDefault = this.spy(oShiftTabEvent, "preventDefault");
+				const oSpyStopPropagation = this.spy(oShiftTabEvent, "stopPropagation");
 
 				// Act
 				oCPP._getPalette()._fireColorSelect("white", false, oShiftTabEvent); // [SHIFT+TAB] on the "white" swatch
@@ -2153,8 +2127,8 @@ sap.ui.define([
 			// The ARIA tests are the only ones, that checks something at the DOM. DOM rendering is supposed to be tested via OPA.
 			QUnit.test("Popover has certain aria attributes", async function (assert) {
 				// Prepare
-				var oCPP = new ColorPalettePopover(),
-					oOpener = new Button();
+				const oCPP = new ColorPalettePopover();
+				const oOpener = new Button();
 
 				oOpener.placeAt("qunit-fixture");
 				await nextUIUpdate();
@@ -2174,7 +2148,7 @@ sap.ui.define([
 		QUnit.module("ColorPalette Recent Colors", function() {
 			QUnit.test("When color is selected it is pushed to recent colors array", function (assert) {
 				// Prepare
-				var oCP = new ColorPalette();
+				const oCP = new ColorPalette();
 
 				assert.strictEqual(oCP.getSelectedColor(), "", "There should be no selected color initially");
 
@@ -2191,8 +2165,8 @@ sap.ui.define([
 
 			QUnit.test("When color is selected and it's already in the array it goes to first place", function (assert) {
 				// Prepare
-				var oCP = new ColorPalette(),
-					aTestArray = ["blue", "pink", "red"];
+				const oCP = new ColorPalette();
+				const aTestArray = ["blue", "pink", "red"];
 
 				assert.strictEqual(oCP.getSelectedColor(), "", "There should be no selected color initially");
 
@@ -2212,8 +2186,8 @@ sap.ui.define([
 
 			QUnit.test("When color is selected and there are already 5 colors in the array it goes to first place and the last one is popped", function (assert) {
 				// Prepare
-				var oCP = new ColorPalette(),
-					aTestArray = ["black", "green", "purple","pink","blue"];
+				const oCP = new ColorPalette();
+				const aTestArray = ["black", "green", "purple","pink","blue"];
 
 				assert.strictEqual(oCP.getSelectedColor(), "", "There should be no selected color initially");
 
@@ -2238,11 +2212,11 @@ sap.ui.define([
 			QUnit.test("ColorPalette.prototype.onsaphome for 'Default Color' or 'More Colors..' button", function (assert) {
 
 				// Prepare
-				var oCPP = new ColorPalettePopover(),
-					oCP = oCPP._getPalette(),
-					oEvent = new jQuery.Event(),
-					oSpyEvtPreventDefault = this.spy(oEvent, "preventDefault"),
-					oSpyEvtStopImmediatePropagation = this.spy(oEvent, "stopImmediatePropagation");
+				const oCPP = new ColorPalettePopover();
+				const oCP = oCPP._getPalette();
+				const oEvent = new jQuery.Event();
+				const oSpyEvtPreventDefault = this.spy(oEvent, "preventDefault");
+				const oSpyEvtStopImmediatePropagation = this.spy(oEvent, "stopImmediatePropagation");
 
 				this.stub(ColorPalette.prototype, "_getElementInfo").returns({
 					bIsDefaultColorButton: false,
@@ -2269,32 +2243,31 @@ sap.ui.define([
 
 		QUnit.test("Selected color value is set to the internal color picker too", function (assert) {
 			// Prepare
-			var aTestColors = [
+			const aTestColors = [
 					{ color: "red", expected: { r: 255, g: 0, b: 0, a: 1 } },
 					{ color: "#ffffff", expected: { r: 255, g: 255, b: 255, a: 1 } },
 					{ color: "rgb(10, 20, 30)", expected: {r: 10, g: 20, b: 30, a: 1} },
 					{ color: "rgba(40, 50, 60, 0.5)", expected: {r: 40, g: 50, b: 60, a: 0.5} },
 					{ color: "hsl(120, 100%, 50%)", expected: {r: 0, g: 255, b: 0, a: 1} },
 					{ color: "hsla(60, 60%, 30%, 0.75)", expected: {r: 122, g: 122, b: 31, a: 0.75} }
-				],
-				oColorPalette = new ColorPalette({
-				}).placeAt("qunit-fixture"),
-				oColorPicker;
+				];
+			const oColorPalette = new ColorPalette({
+				}).placeAt("qunit-fixture");
 
 			// Prepare
-			oColorPicker = oColorPalette._getColorPicker();
+			const oColorPicker = oColorPalette._getColorPicker();
 			oColorPicker._createLayout();
 			oColorPicker._updateControlVisualState();
 
 			// Act
-			for (var i = 0; i < aTestColors.length; i++) {
+			for (let i = 0; i < aTestColors.length; i++) {
 				oColorPalette.setSelectedColor(aTestColors[i].color);
 				oColorPalette.setColorPickerSelectedColor(oColorPalette.getSelectedColor());
 				oColorPicker._updateColorString();
-				assert.equal(oColorPicker.Color.r, aTestColors[i].expected.r, "R color component is set properly for color " + aTestColors[i].color);
-				assert.equal(oColorPicker.Color.g, aTestColors[i].expected.g, "G color component is set properly for color " + aTestColors[i].color);
-				assert.equal(oColorPicker.Color.b, aTestColors[i].expected.b, "B color component is set properly for color " + aTestColors[i].color);
-				assert.equal(oColorPicker.Color.a, aTestColors[i].expected.a, "Alpha component is set properly for color " + aTestColors[i].color);
+				assert.equal(oColorPicker.Color.r, aTestColors[i].expected.r, `R color component is set properly for color ${aTestColors[i].color}`);
+				assert.equal(oColorPicker.Color.g, aTestColors[i].expected.g, `G color component is set properly for color ${aTestColors[i].color}`);
+				assert.equal(oColorPicker.Color.b, aTestColors[i].expected.b, `B color component is set properly for color ${aTestColors[i].color}`);
+				assert.equal(oColorPicker.Color.a, aTestColors[i].expected.a, `Alpha component is set properly for color ${aTestColors[i].color}`);
 			}
 
 			// Cleanup

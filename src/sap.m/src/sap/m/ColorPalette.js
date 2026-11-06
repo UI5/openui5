@@ -41,33 +41,33 @@ sap.ui.define([
 		"use strict";
 
 		// shortcut to CSSColor of the core library
-		var CSSColor = coreLibrary.CSSColor;
+		const CSSColor = coreLibrary.CSSColor;
 
 		// shortcut to ColorPickerMode
-		var ColorPickerMode = unifiedLibrary.ColorPickerMode;
+		const ColorPickerMode = unifiedLibrary.ColorPickerMode;
 
 		// shortcut to the ButtonType enumeration
-		var ButtonType = library.ButtonType;
+		const ButtonType = library.ButtonType;
 
 		// reference to the boolean data type in the core
-		var BooleanType = DataType.getType("boolean");
+		const BooleanType = DataType.getType("boolean");
 
 		// The name of the class, corresponding to a single color item
-		var CSS_CLASS_SWATCH = "sapMColorPaletteSquare";
+		const CSS_CLASS_SWATCH = "sapMColorPaletteSquare";
 
-		var CSS_CLASS_REGION = "sapMColorPaletteContent";
+		const CSS_CLASS_REGION = "sapMColorPaletteContent";
 
 		// Defines the exact count of swatches per row
-		var SWATCHES_PER_ROW = 5;
+		const SWATCHES_PER_ROW = 5;
 
 		// Min amount of swatches when app.developer sets colors
-		var MIN_COLORS = 2;
+		const MIN_COLORS = 2;
 
 		// Max amount of swatches when app.developer sets colors
-		var MAX_COLORS = 15;
+		const MAX_COLORS = 15;
 
 		// get resource translation bundle;
-		var oLibraryResourceBundle = Library.getResourceBundleFor("sap.m");
+		const oLibraryResourceBundle = Library.getResourceBundleFor("sap.m");
 
 		/**
 		 * Constructor for a new <code>ColorPalette</code>.
@@ -113,7 +113,7 @@ sap.ui.define([
 		 * @since 1.54
 		 * @alias sap.m.ColorPalette
 		 */
-		var ColorPalette = Control.extend("sap.m.ColorPalette", /** @lends sap.m.ColorPalette.prototype */ {
+		const ColorPalette = Control.extend("sap.m.ColorPalette", /** @lends sap.m.ColorPalette.prototype */ {
 			metadata: {
 				library: "sap.m",
 				properties: {
@@ -313,7 +313,7 @@ sap.ui.define([
 		 * @returns {this} Reference to <code>this</code> for method chaining
 		 */
 		ColorPalette.prototype._setDisplayMode = function (oDisplayMode) {
-			var oColorPicker = this._getColorPicker();
+			const oColorPicker = this._getColorPicker();
 			oColorPicker.setDisplayMode(oDisplayMode);
 			this._oDisplayMode = oDisplayMode;
 
@@ -330,21 +330,17 @@ sap.ui.define([
 		};
 
 		ColorPalette.prototype.ontap = function (oEvent) {
-			var oTarget = oEvent.target,
-				sColor,
-				oSwatch,
-				oRegion,
-				sRegion;
+			const oTarget = oEvent.target;
 
-			oSwatch = oTarget.closest("." + CSS_CLASS_SWATCH);
-			oRegion = oTarget.closest("." + CSS_CLASS_REGION);
+			const oSwatch = oTarget.closest(`.${CSS_CLASS_SWATCH}`);
+			const oRegion = oTarget.closest(`.${CSS_CLASS_REGION}`);
 
 			if (!(oSwatch && oRegion)) {
 				return;
 			}
 
-			sColor = oSwatch.getAttribute("data-sap-ui-color");
-			sRegion = oRegion.getAttribute("data-sap-ui-region");
+			const sColor = oSwatch.getAttribute("data-sap-ui-color");
+			const sRegion = oRegion.getAttribute("data-sap-ui-region");
 			this._bMainRegionSelection = sRegion === "main-colors-palette";
 
 			this._fireColorSelect(sColor, false, oEvent);
@@ -355,7 +351,7 @@ sap.ui.define([
 				return;
 			}
 
-			var oElementInfo = this._getElementInfo(oEvent.target);
+			const oElementInfo = this._getElementInfo(oEvent.target);
 
 			if (oElementInfo.bIsMoreColorsButton) {
 				this.fireEvent("_colorNotSelected", {_originalEvent: oEvent});
@@ -389,7 +385,7 @@ sap.ui.define([
 		};
 
 		ColorPalette.prototype.pushToRecentColors = function (sColor) {
-			var iIndexOfColor = this._recentColors.indexOf(sColor);
+			const iIndexOfColor = this._recentColors.indexOf(sColor);
 
 			if (!sColor) {
 				return;
@@ -414,13 +410,13 @@ sap.ui.define([
 		 */
 		ColorPalette.prototype.setColorPickerSelectedColor = function (sColor) {
 			if (!CSSColor.isValid(sColor)) {
-				throw new Error("Cannot set the selected color - invalid value: " + sColor);
+				throw new Error(`Cannot set the selected color - invalid value: ${sColor}`);
 			}
 
 			const oColorPicker = this._getColorPicker();
 			oColorPicker.setColorString(sColor);
 			sColor = sColor.toLowerCase();
-			if (sColor.indexOf("rgba") === -1 && sColor.indexOf("hsla") === -1) {
+			if (!sColor.includes("rgba") && !sColor.includes("hsla")) {
 				oColorPicker._updateAlphaValue(1);
 			}
 
@@ -429,15 +425,15 @@ sap.ui.define([
 
 		// Private methods -------------------------------------------------------------------------------------------
 		ColorPalette.prototype._createDefaultColorButton = function () {
-			return new Button(this.getId() + "-btnDefaultColor", {
+			return new Button(`${this.getId()}-btnDefaultColor`, {
 				width: "100%",
 				type: ButtonType.Transparent,
 				text: oLibraryResourceBundle.getText("COLOR_PALETTE_DEFAULT_COLOR"),
 				visible: this._getShowDefaultColorButton(),
-				press: function (oEvent) {
+				press: (oEvent) => {
 					this._bMainRegionSelection = false;
 					this._fireColorSelect(this._getDefaultColor(), true, oEvent);
-				}.bind(this)
+				}
 			}).addStyleClass("sapMColorPaletteDefaultColorBtn");
 		};
 
@@ -454,7 +450,7 @@ sap.ui.define([
 		 */
 		ColorPalette.prototype._setDefaultColor = function (color) {
 			if (!CSSColor.isValid(color)) {
-				throw new Error("Cannot set internal property '_defaultColor' - invalid value: " + color);
+				throw new Error(`Cannot set internal property '_defaultColor' - invalid value: ${color}`);
 			}
 			this._oDefaultColor = color;
 			return this;
@@ -467,7 +463,7 @@ sap.ui.define([
 
 		ColorPalette.prototype._setShowDefaultColorButton = function (bValue) {
 			if (!BooleanType.isValid(bValue)) {
-				throw new Error("Cannot set internal property 'showDefaultColorButton' - invalid value: " + bValue);
+				throw new Error(`Cannot set internal property 'showDefaultColorButton' - invalid value: ${bValue}`);
 			}
 			this._bShowDefaultColorButton = bValue;
 
@@ -488,7 +484,7 @@ sap.ui.define([
 
 		// More Colors...
 		ColorPalette.prototype._createMoreColorsButton = function () {
-			return new Button(this.getId() + "-btnMoreColors", {
+			return new Button(`${this.getId()}-btnMoreColors`, {
 				width: "100%",
 				type: ButtonType.Transparent,
 				text: oLibraryResourceBundle.getText("COLOR_PALETTE_MORE_COLORS"),
@@ -511,7 +507,7 @@ sap.ui.define([
 
 		ColorPalette.prototype._setShowRecentColorsSection = function (bValue) {
 			if (!BooleanType.isValid(bValue)) {
-				throw new Error("Cannot set internal property 'showRecentColorsSection' - invalid value: " + bValue);
+				throw new Error(`Cannot set internal property 'showRecentColorsSection' - invalid value: ${bValue}`);
 			}
 			this._bShowRecentColorsSection = bValue;
 
@@ -520,7 +516,7 @@ sap.ui.define([
 
 		ColorPalette.prototype._setShowMoreColorsButton = function (bValue) {
 			if (!BooleanType.isValid(bValue)) {
-				throw new Error("Cannot set internal property 'showMoreColorsButton' - invalid value: " + bValue);
+				throw new Error(`Cannot set internal property 'showMoreColorsButton' - invalid value: ${bValue}`);
 			}
 			this._bShowMoreColorsButton = bValue;
 
@@ -593,7 +589,7 @@ sap.ui.define([
 		 * @private
 		 */
 		ColorPalette.prototype._createMoreColorsDialog = function () {
-			var oDialog = new Dialog(this.getId() + "-moreColorsDialog", {
+			const oDialog = new Dialog(`${this.getId()}-moreColorsDialog`, {
 				stretch: !!Device.system.phone,
 				title: oLibraryResourceBundle.getText("COLOR_PALETTE_MORE_COLORS_TITLE")
 			}).addStyleClass("CPDialog");
@@ -602,28 +598,28 @@ sap.ui.define([
 			oDialog.addContent(oDialog._oColorPicker = new ColorPicker({
 				mode: ColorPickerMode.HSL,
 				displayMode: this._oDisplayMode,
-				liveChange: function (oEvent) {
+				liveChange: (oEvent) => {
 					this.fireLiveChange(oEvent.getParameters());
-				}.bind(this)
+				}
 			}));
 
 			// OK button
 			oDialog.setBeginButton(new Button({
 				text: oLibraryResourceBundle.getText("COLOR_PALETTE_MORE_COLORS_CONFIRM"),
 				type: ButtonType.Emphasized,
-				press: function (oEvent) {
+				press: (oEvent) => {
 					oDialog.close();
 					if (oDialog._oColorPicker.getColorString()) {
 						this._bMainRegionSelection = false;
 						this._fireColorSelect(oDialog._oColorPicker.getColorString(), false, oEvent);
 					}
-				}.bind(this)
+				}
 			}));
 
 			// Cancel button
 			oDialog.setEndButton(new Button({
 				text: oLibraryResourceBundle.getText("COLOR_PALETTE_MORE_COLORS_CANCEL"),
-				press: function () {
+				press: () => {
 					oDialog.close();
 				}
 			}));
@@ -637,7 +633,7 @@ sap.ui.define([
 		 * @private
 		 */
 		ColorPalette.prototype._focusFirstElement = function () {
-			var oFirstSwatchElement = this._getShowDefaultColorButton() ? this._getDefaultColorButton().getDomRef() : this._getAllPaletteColorSwatches()[0];
+			const oFirstSwatchElement = this._getShowDefaultColorButton() ? this._getDefaultColorButton().getDomRef() : this._getAllPaletteColorSwatches()[0];
 
 			oFirstSwatchElement.focus();
 		};
@@ -647,8 +643,8 @@ sap.ui.define([
 		 * @private
 		 */
 	   ColorPalette.prototype._focusSelectedElement = function () {
-			var oSelectedElement,
-				oFirstRecentSwatch = this._getAllRecentColorSwatches()[0];
+			let oSelectedElement;
+			const oFirstRecentSwatch = this._getAllRecentColorSwatches()[0];
 
 			if (!this.getSelectedColor() || this._bDefaultColorSelected) {
 				this._focusFirstElement();
@@ -683,8 +679,8 @@ sap.ui.define([
 		 * @private
 		 */
 		ColorPalette.prototype._ensureItemNavigation = function () {
-			var aPaletteColorsDomRefs = [],
-				aRecentColorsDomRefs = [];
+			let aPaletteColorsDomRefs = [];
+			let aRecentColorsDomRefs = [];
 
 			if (!this._oPaletteColorItemNavigation) {
 				this._oPaletteColorItemNavigation = new ItemNavigationHomeEnd(this);
@@ -758,10 +754,10 @@ sap.ui.define([
 		 * @private
 		 */
 		ColorPalette.prototype._onSwatchContainerBorderReached = function(oEvent) {
-			var vNextElement,
-				aSwatches,
-				bHomeOrEnd = ["saphome","sapend"].indexOf(oEvent.getParameter("event").type) > -1,
-				bIsRecentColorSwatch = this._getAllRecentColorSwatches()[0] ? this._getElementInfo(oEvent.mParameters.event.target).bIsRecentColorSwatch : false;
+			let vNextElement;
+			let aSwatches;
+			const bHomeOrEnd = ["saphome","sapend"].includes(oEvent.getParameter("event").type);
+			const bIsRecentColorSwatch = this._getAllRecentColorSwatches()[0] ? this._getElementInfo(oEvent.mParameters.event.target).bIsRecentColorSwatch : false;
 
 			if (oEvent.getParameter(ItemNavigationHomeEnd.BorderReachedDirection) === ItemNavigationHomeEnd.BorderReachedDirectionForward) {
 				if (this._getShowMoreColorsButton() && !bIsRecentColorSwatch) {
@@ -806,8 +802,8 @@ sap.ui.define([
 		 * @param {jQuery.Event} oEvent the keyboard event
 		 */
 		ColorPalette.prototype.onsapnext = function (oEvent) {
-			var vNextElement,
-				oElementInfo = this._getElementInfo(oEvent.target);
+			let vNextElement;
+			const oElementInfo = this._getElementInfo(oEvent.target);
 
 			if (!(oElementInfo.bIsDefaultColorButton || oElementInfo.bIsMoreColorsButton)) {
 				return;
@@ -840,9 +836,9 @@ sap.ui.define([
 		 * @param {jQuery.Event} oEvent the keyboard event
 		 */
 		ColorPalette.prototype.onsapprevious = function (oEvent) {
-			var vNextElement,
-				oFocusInfo = this._getElementInfo(oEvent.target),
-				aAllSwatches;
+			let vNextElement;
+			const oFocusInfo = this._getElementInfo(oEvent.target);
+			let aAllSwatches;
 
 			if (!(oFocusInfo.bIsDefaultColorButton || oFocusInfo.bIsMoreColorsButton || oEvent.target === this._getAllRecentColorSwatches()[0])) {
 				return;
@@ -886,7 +882,7 @@ sap.ui.define([
 			}
 
 			// Home and End keys on ColorPalette buttons should do nothing. If event occurs on the swatch, see ItemNavigationHomeEnd).
-			var oElementInfo = this._getElementInfo(oEvent.target);
+			const oElementInfo = this._getElementInfo(oEvent.target);
 
 			if (!oElementInfo.bIsMoreColorsButton) {
 				return;
@@ -915,7 +911,7 @@ sap.ui.define([
 				return;
 			}
 
-			var oElementInfo = this._getElementInfo(oEvent.target);
+			const oElementInfo = this._getElementInfo(oEvent.target);
 
 			if (!oElementInfo.bIsDefaultColorButton) {
 				return;
@@ -937,7 +933,7 @@ sap.ui.define([
 		 * @private
 		 */
 		ColorPalette.prototype._getAllPaletteColorSwatches = function () {
-			return this.$().find("." + CSS_CLASS_SWATCH).get().slice(0, this.getColors().length);
+			return this.$().find(`.${CSS_CLASS_SWATCH}`).get().slice(0, this.getColors().length);
 		};
 
 		/**
@@ -946,7 +942,7 @@ sap.ui.define([
 		 * @private
 		 */
 		ColorPalette.prototype._getAllRecentColorSwatches = function () {
-			return this.$().find("." + CSS_CLASS_SWATCH).get().slice(this.getColors().length);
+			return this.$().find(`.${CSS_CLASS_SWATCH}`).get().slice(this.getColors().length);
 		};
 
 		/**
@@ -957,12 +953,12 @@ sap.ui.define([
 		 * @private
 		 */
 		ColorPalette.prototype._getElementInfo = function (oElement) {
-			var bIsDefaultColorButton = this._getShowDefaultColorButton() && containsOrEquals(oElement,
-					this._getDefaultColorButton().getDomRef()),
-				bIsMoreColorsButton = !bIsDefaultColorButton && this._getShowMoreColorsButton() && containsOrEquals(oElement,
-					this._getMoreColorsButton().getDomRef()),
-				bIsRecentColorSwatch = this._getAllRecentColorSwatches().indexOf(oElement) > -1,
-				bIsASwatch = this._getAllPaletteColorSwatches().indexOf(oElement) > -1;
+			const bIsDefaultColorButton = this._getShowDefaultColorButton() && containsOrEquals(oElement,
+					this._getDefaultColorButton().getDomRef());
+			const bIsMoreColorsButton = !bIsDefaultColorButton && this._getShowMoreColorsButton() && containsOrEquals(oElement,
+					this._getMoreColorsButton().getDomRef());
+			const bIsRecentColorSwatch = this._getAllRecentColorSwatches().includes(oElement);
+			const bIsASwatch = this._getAllPaletteColorSwatches().includes(oElement);
 
 			return {
 				bIsDefaultColorButton: bIsDefaultColorButton,
@@ -1000,18 +996,18 @@ sap.ui.define([
 		 *
 		 *  @private
 		 */
-		var ItemNavigationHomeEnd = ItemNavigation.extend("sap.m.ItemNavigationHomeEnd", {
+		const ItemNavigationHomeEnd = ItemNavigation.extend("sap.m.ItemNavigationHomeEnd", {
 			constructor: function () {
 				ItemNavigation.apply(this, arguments);
 				this.setHomeEndColumnMode(true);
 
 				// overrides fireEvent in order to enhance it with the parameter 'direction'
 				this.fireEvent = function(sName, oEventParams) {
-					var sDirection;
+					let sDirection;
 
 					if (sName === ItemNavigation.Events.BorderReached) {
 						sDirection = ItemNavigationHomeEnd.BorderReachedDirectionBackward;
-						if (["sapnext", "sapend"].indexOf(oEventParams.event.type) > -1) { // last item
+						if (["sapnext", "sapend"].includes(oEventParams.event.type)) { // last item
 							sDirection = ItemNavigationHomeEnd.BorderReachedDirectionForward;
 						}
 						oEventParams[ItemNavigationHomeEnd.BorderReachedDirection] = sDirection;
@@ -1040,8 +1036,8 @@ sap.ui.define([
 		 * @param {jQuery.Event} oEvent the keyboard event
 		 */
 		ItemNavigationHomeEnd.prototype.onsapprevious = function (oEvent) {
-			var bIsOnItem = containsOrEquals(this.getRootDomRef(), oEvent.target),
-				bArrowUpOnFirstItem = oEvent.keyCode === KeyCodes.ARROW_UP && this.getFocusedIndex() === 0;
+			const bIsOnItem = containsOrEquals(this.getRootDomRef(), oEvent.target);
+			const bArrowUpOnFirstItem = oEvent.keyCode === KeyCodes.ARROW_UP && this.getFocusedIndex() === 0;
 
 			if (!bIsOnItem) {
 				return;
@@ -1070,10 +1066,8 @@ sap.ui.define([
 		 * @param {jQuery.Event} oEvent the keyboard event
 		 */
 		ItemNavigationHomeEnd.prototype.onsapnext = function (oEvent) {
-			var bIsOnItem = containsOrEquals(this.getRootDomRef(), oEvent.target),
-				aItemDomRefs,
-				iCurrentIndex,
-				oItemInfo;
+			const bIsOnItem = containsOrEquals(this.getRootDomRef(), oEvent.target);
+			let aItemDomRefs;
 
 			if (!bIsOnItem) {
 				return;
@@ -1084,8 +1078,8 @@ sap.ui.define([
 				return;
 			}
 
-			iCurrentIndex = this.getFocusedIndex();
-			oItemInfo = this._getItemInfo(iCurrentIndex);
+			const iCurrentIndex = this.getFocusedIndex();
+			const oItemInfo = this._getItemInfo(iCurrentIndex);
 
 			if (oItemInfo.bIsLastItem && oItemInfo.bIsInTheLastColumn) {
 				oEvent.preventDefault(); //browser's scrolling should be prevented
@@ -1112,15 +1106,14 @@ sap.ui.define([
 		};
 
 		ItemNavigationHomeEnd.prototype.onsaphome = function(oEvent) {
-			var bIsOnItem = containsOrEquals(this.getRootDomRef(), oEvent.target),
-				bInlineUsage = !this._isColorPaletteInPopover(),
-				oItemInfo;
+			const bIsOnItem = containsOrEquals(this.getRootDomRef(), oEvent.target);
+			const bInlineUsage = !this._isColorPaletteInPopover();
 
 			if (!bIsOnItem || bInlineUsage) {
 				return;
 			}
 
-			oItemInfo = this._getItemInfo(this.getFocusedIndex());
+			const oItemInfo = this._getItemInfo(this.getFocusedIndex());
 
 			if (!oItemInfo.bIsInTheFirstColumn) {
 				// delegate to the parent, which should move the focus to the first item in the row
@@ -1141,15 +1134,14 @@ sap.ui.define([
 		};
 
 		ItemNavigationHomeEnd.prototype.onsapend = function(oEvent) {
-			var bIsOnItem = containsOrEquals(this.getRootDomRef(), oEvent.target),
-				bInlineUsage = !this._isColorPaletteInPopover(),
-				oItemInfo;
+			const bIsOnItem = containsOrEquals(this.getRootDomRef(), oEvent.target);
+			const bInlineUsage = !this._isColorPaletteInPopover();
 
 			if (!bIsOnItem || bInlineUsage) {
 				return;
 			}
 
-			oItemInfo = this._getItemInfo(this.getFocusedIndex());
+			const oItemInfo = this._getItemInfo(this.getFocusedIndex());
 
 			if (!(oItemInfo.bIsLastItem || oItemInfo.bIsInTheLastColumn)) {
 				// delegate to the parent, which should move the focus to the last item in the row
@@ -1176,17 +1168,15 @@ sap.ui.define([
 		 * @private
 		 */
 		ItemNavigationHomeEnd.prototype._getItemInfo = function(iIndex) {
-			var iItemsCount = this.getItemDomRefs().length,
-				bItemIsLast = iIndex === (iItemsCount - 1),
-				iLastVisibleColumn = iItemsCount  > this.getColumns() ? this.getColumns() : iItemsCount,
-				bItemIsInTheFirstColumn = iIndex % this.getColumns() === 0,
-				bItemIsInTheLastColumn = (iIndex + 1) % iLastVisibleColumn === 0,
-				iCurrentRow = Math.floor(iIndex / this.getColumns()) + 1, //1 based
-				bNextRowExists,
-				bItemSameColumnNextRowExists;
+			const iItemsCount = this.getItemDomRefs().length;
+			const bItemIsLast = iIndex === (iItemsCount - 1);
+			const iLastVisibleColumn = iItemsCount  > this.getColumns() ? this.getColumns() : iItemsCount;
+			const bItemIsInTheFirstColumn = iIndex % this.getColumns() === 0;
+			const bItemIsInTheLastColumn = (iIndex + 1) % iLastVisibleColumn === 0;
+			const iCurrentRow = Math.floor(iIndex / this.getColumns()) + 1; //1 based
 
-			bNextRowExists = iCurrentRow * this.getColumns() < iItemsCount;
-			bItemSameColumnNextRowExists = bNextRowExists && (iIndex + this.getColumns()) < iItemsCount;
+			const bNextRowExists = iCurrentRow * this.getColumns() < iItemsCount;
+			const bItemSameColumnNextRowExists = bNextRowExists && (iIndex + this.getColumns()) < iItemsCount;
 
 			return {
 				bIsFirstItem: iIndex === 0,
@@ -1270,14 +1260,14 @@ sap.ui.define([
 			 * @returns {string|undefined} The named color, if such can really correspond to the input color, or <code>undefined</code> otherwise.
 			 */
 			getNamedColor: function (sColor) {
-				var sHexColor = "";
+				let sHexColor = "";
 
-				if (!sColor || sColor.toLowerCase().indexOf("hsl") !== -1) {
+				if (!sColor || sColor.toLowerCase().includes("hsl")) {
 					return undefined;
 				}
 
 				// named color
-				if (sColor.indexOf("#") === -1) {
+				if (!sColor.includes("#")) {
 					return this.NAME_COLORS_TO_RGB_MAP[sColor.toLowerCase()] ? sColor.toLowerCase() : undefined;
 				}
 
