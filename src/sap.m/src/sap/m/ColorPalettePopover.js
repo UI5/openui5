@@ -25,7 +25,7 @@ sap.ui.define([
 		"use strict";
 
 		// shortcut for PlacementType
-		var PlacementType = library.PlacementType;
+		const PlacementType = library.PlacementType;
 
 		/**
 		 * Constructor for a new <code>ColorPalettePopover</code>.
@@ -43,7 +43,7 @@ sap.ui.define([
 		 * @since 1.54
 		 * @alias sap.m.ColorPalettePopover
 		 */
-		var ColorPalettePopover = Control.extend("sap.m.ColorPalettePopover", /** @lends sap.m.ColorPalettePopover.prototype */ {
+		const ColorPalettePopover = Control.extend("sap.m.ColorPalettePopover", /** @lends sap.m.ColorPalettePopover.prototype */ {
 			metadata: {
 				library: "sap.m",
 				publicMethods: ["openBy", "close"],
@@ -187,14 +187,14 @@ sap.ui.define([
 		});
 
 		// get resource translation bundle;
-		var oLibraryResourceBundle = Library.getResourceBundleFor("sap.m");
+		const oLibraryResourceBundle = Library.getResourceBundleFor("sap.m");
 
 		/**
 		 * Keeps reference to all API properties and/or methods that are about to be forwarded to either a
 		 * <code>ColorPalette</code> or <code>Popover</code>. The value contains the name of the method at the target
 		 * instance. If empty, then the key is used as target name.
 		 */
-		var FORWARDABLE = {
+		const FORWARDABLE = {
 			COLOR_PALETTE_PROPS: {
 				colors: "setColors",
 				selectedColor: "setSelectedColor",
@@ -293,11 +293,9 @@ sap.ui.define([
 		 * @private
 		 */
 		ColorPalettePopover.prototype._createPopover = function () {
-			var oPopover,
-				oColorPalette = this._createColorPalette(),
-				oDelegate;
+			const oColorPalette = this._createColorPalette();
 
-			oPopover = new ResponsivePopover(this.getId() + "-colorPalettePopover", {
+			const oPopover = new ResponsivePopover(`${this.getId()}-colorPalettePopover`, {
 				showHeader: Device.system.phone,
 				placement: PlacementType.VerticalPreferredBottom,
 				showArrow: false,
@@ -312,25 +310,25 @@ sap.ui.define([
 			if (Device.system.phone) {
 				oPopover.setEndButton(new Button({
 					text: oLibraryResourceBundle.getText("COLOR_PALETTE_CANCEL"),
-					press: function () {
+					press: () => {
 						oPopover.close();
 					}
 				}));
 			}
 
 			// there should be only one popover at a time, so make sure we close the current when ColorPalette opens its own
-			oColorPalette.attachEvent("_beforeOpenColorPicker", function () {
+			oColorPalette.attachEvent("_beforeOpenColorPicker", () => {
 				oPopover.close();
 			});
 
 			// if the end-user navigated out of the palette without selecting a color
-			oColorPalette.attachEvent("_colorNotSelected", function (oEvent) {
+			oColorPalette.attachEvent("_colorNotSelected", (oEvent) => {
 				this._handleNextOrPreviousUponPaletteClose(oEvent);
 				oPopover.close();
-			}.bind(this));
+			});
 
 			// when color is selected in the ColorPalette, we close the popover, update the selected color, and notify the app developer
-			oColorPalette.attachEvent("colorSelect", function (oEvent) {
+			oColorPalette.attachEvent("colorSelect", (oEvent) => {
 				this._handleNextOrPreviousUponPaletteClose(oEvent);
 				oPopover.close();
 				const sColor = oEvent.getParameter("value");
@@ -339,15 +337,15 @@ sap.ui.define([
 					"value": sColor,
 					"defaultAction": oEvent.getParameter("defaultAction")
 				});
-			}.bind(this));
+			});
 
 
 			// aria requirements for the popover implemented as delegate
-			oDelegate = {
-				onAfterRendering: function () {
-					var $Popover = this.$(); //this is bound to the popover, see below
+			const oDelegate = {
+				onAfterRendering: () => {
+					const $Popover = oPopover.$();
 					$Popover.attr("aria-modal", "true");
-					$Popover.attr("aria-label", this.getTitle());
+					$Popover.attr("aria-label", oPopover.getTitle());
 				}
 			};
 
@@ -365,10 +363,10 @@ sap.ui.define([
 		 * @private
 		 */
 		ColorPalettePopover.prototype._createColorPalette = function () {
-			var oColorPalette = new ColorPalette(this.getId() + "-palette", {
-				liveChange: function (oEvent) {
+			const oColorPalette = new ColorPalette(`${this.getId()}-palette`, {
+				liveChange: (oEvent) => {
 					this.fireLiveChange(oEvent.getParameters());
-				}.bind(this)
+				}
 			});
 
 			oColorPalette._setShowDefaultColorButton(this.getShowDefaultColorButton());
@@ -389,7 +387,7 @@ sap.ui.define([
 		 * @private
 		 */
 		ColorPalettePopover.prototype._handleNextOrPreviousUponPaletteClose = function (oEvent) {
-			var oOriginalEvent = oEvent.getParameter("_originalEvent");
+			const oOriginalEvent = oEvent.getParameter("_originalEvent");
 
 			if (!oOriginalEvent) {
 				return;
@@ -403,10 +401,8 @@ sap.ui.define([
 
 		//proxy properties to the ColorPalette's content
 		ColorPalettePopover.prototype.setProperty = function (sPropertyName, oValue, bSuppressInvalidate) {
-			var sTargetMethodName;
-
 			if (FORWARDABLE.COLOR_PALETTE_PROPS[sPropertyName] !== undefined) {
-				sTargetMethodName = FORWARDABLE.COLOR_PALETTE_PROPS[sPropertyName] || sPropertyName;
+				const sTargetMethodName = FORWARDABLE.COLOR_PALETTE_PROPS[sPropertyName] || sPropertyName;
 				ColorPalette.prototype[sTargetMethodName].call(this._getPalette(), oValue);
 			}
 
@@ -414,14 +410,14 @@ sap.ui.define([
 		};
 
 		//proxy methods to the popover's content
-		Object.keys(FORWARDABLE.POPOVER_METHODS).forEach(function (sSourceName) {
-			var sTargetMethodName = FORWARDABLE.COLOR_PALETTE_PROPS[sSourceName] || sSourceName;
+		Object.keys(FORWARDABLE.POPOVER_METHODS).forEach((sSourceName) => {
+			const sTargetMethodName = FORWARDABLE.COLOR_PALETTE_PROPS[sSourceName] || sSourceName;
 
 			ColorPalettePopover.prototype[sSourceName] = function () {
 				if (this._bPopoverDestroying) {
 					return null;
 				}
-				var oPopover = this._ensurePopover();
+				const oPopover = this._ensurePopover();
 				return oPopover[sTargetMethodName].apply(oPopover, arguments);
 			};
 		});
