@@ -159,6 +159,17 @@ sap.ui.define([
 			assert.notOk(this.oDom.classList.contains(HIGHLIGHT_CLASS), "then it is removed after the latest duration");
 		});
 
+		QUnit.test("when an overlay is highlighted without a duration", function(assert) {
+			AIVisualization.highlightOverlay("ctrl1");
+			assert.ok(this.oDom.classList.contains(HIGHLIGHT_CLASS), "then the highlight class is added");
+
+			this.oClock.tick(5999);
+			assert.ok(this.oDom.classList.contains(HIGHLIGHT_CLASS), "then it is still present just before the default duration");
+
+			this.oClock.tick(1);
+			assert.notOk(this.oDom.classList.contains(HIGHLIGHT_CLASS), "then it is removed after the default 6000ms duration");
+		});
+
 		QUnit.test("when highlightOverlay is called without a control id", function(assert) {
 			AIVisualization.highlightOverlay();
 			assert.ok(OverlayRegistry.getOverlay.notCalled, "then no overlay is looked up and it is a no-op");

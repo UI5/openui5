@@ -188,7 +188,7 @@ sap.ui.define([
 		 * model is currently looking at.
 		 *
 		 * @param {string} sControlId Control id whose overlay should pulse.
-		 * @param {int} [iDurationMs=2200] How long the pulse stays on.
+		 * @param {int} [iDurationMs=6000] How long the pulse stays on.
 		 */
 		highlightOverlay(sControlId, iDurationMs) {
 			if (!sControlId) {
@@ -209,7 +209,7 @@ sap.ui.define([
 			const iTimer = setTimeout(() => {
 				oDom.classList.remove(HIGHLIGHT_CLASS);
 				oHighlightTimers.delete(oDom);
-			}, iDurationMs || 2200);
+			}, iDurationMs || 6000);
 			oHighlightTimers.set(oDom, iTimer);
 		}
 	};

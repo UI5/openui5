@@ -9,16 +9,19 @@
  * #sapUiRtaAIVisualizationBlocker element / toggles the highlight class and
  * writes the caption into the data-status attribute; all styling lives here.
  *
- * Brand-fidelity literals are kept in the base theme so the Horizon look does
- * not silently shift. The sap_hcb variant overrides only the color variables
- * with high-contrast-safe theme params.
+ * The primary blue reuses the global @sapUiAssistantColor1 theme param (an
+ * exact match for the Joule brand blue in Horizon/Fiori 3, and a
+ * high-contrast-safe foreground in the HC themes). The remaining accent
+ * literals are kept in the base theme so the Horizon look does not silently
+ * shift. The sap_hcb variant overrides only the color variables with
+ * high-contrast-safe theme params.
  */
 
 /* stylelint-disable selector-id-pattern -- #sapUiRtaAIVisualizationBlocker is a UI5-convention camelCase DOM id set from JS */
-@_sap_ui_rta_AIVisualization_ColorBlue: #5582ff;
-@_sap_ui_rta_AIVisualization_ColorPurple: #aa6eff;
+@_sap_ui_rta_AIVisualization_ColorBlue: @sapUiAssistantColor1; // Joule Brand (#5d36ff); HC themes map to a high-contrast-safe foreground
+@_sap_ui_rta_AIVisualization_ColorPurple: #a10dc2; // verified with guideline color Joule Accent 1 (close to @sapUiAssistantColor2 #a100c2 but intentionally not identical)
 @_sap_ui_rta_AIVisualization_ColorPink: #ff6ec7;
-@_sap_ui_rta_AIVisualization_InnerGlow: fade(#5582ff, 35%);
+@_sap_ui_rta_AIVisualization_InnerGlow: fade(#7458FF, 35%); // verified with guideline color Joule Accent 2
 @_sap_ui_rta_AIVisualization_PillShadow: fade(#000000, 30%);
 @_sap_ui_rta_AIVisualization_PillTextColor: #ffffff;
 
