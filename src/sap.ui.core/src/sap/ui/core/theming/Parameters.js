@@ -78,6 +78,25 @@ sap.ui.define([
 		return sUrl;
 	}
 
+	/**
+	 * Checks whether the given parameter value contains a relative CSS URL.
+	 *
+	 * @param {string} sValue the parameter value
+	 * @returns {boolean} whether the value contains a relative CSS URL
+	 */
+	function hasRelativeCssUrl(sValue) {
+		const aMatch = rCssUrl.exec(sValue);
+		if (!aMatch) {
+			return false;
+		}
+		try {
+			return !new _URL(aMatch[1]).isAbsolute();
+		} catch (e) {
+			// not a valid URL: keep the value as is
+			return false;
+		}
+	}
+
 	function mergeParameters(mNewParameters, sThemeBaseUrl) {
 		// normalize parameter maps
 		// for legacy reasons themes may provide nested objects:
@@ -324,8 +343,23 @@ sap.ui.define([
 					//       However: empty values for our theming parameters are most likely not valid, so the simple empty check should be enough.
 					//       Still, without an existence check we cannot cache empty results as momentarily non-existent parameter might come async through another library.
 					if (sCustomPropValue.trim() !== "") {
-						mCustomPropertiesParameters[sCustomPropName] = sCustomPropValue;
-						return mCustomPropertiesParameters[sCustomPropName];
+						if (!hasRelativeCssUrl(sCustomPropValue)) {
+							mCustomPropertiesParameters[sCustomPropName] = sCustomPropValue;
+							return sCustomPropValue;
+						}
+						// The computed value of a CSS custom property contains relative URLs as declared, but not the
+						// location of the stylesheet declaring it. Resolving such a URL against the document or any
+						// other stylesheet would point to the wrong location, so the URL is taken from the library
+						// parameters, which are resolved against the theme folder of the declaring library.
+						processLibraries(parseParameters);
+						const sResolvedValue = mParameters[sParameterName];
+						if (sResolvedValue !== undefined) {
+							mCustomPropertiesParameters[sCustomPropName] = sResolvedValue;
+							return sResolvedValue;
+						}
+						// No library parameter available: return the value as declared (not cached, as the
+						// library parameters might still become available, e.g. via another library)
+						return sCustomPropValue;
 					}
 				}
 			} else {

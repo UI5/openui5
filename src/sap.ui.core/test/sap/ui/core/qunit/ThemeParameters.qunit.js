@@ -476,6 +476,62 @@ sap.ui.define([
 		}
 	});
 
+	/**
+	 * Retrieves the given parameter(s) via the async API and resolves with the result.
+	 *
+	 * @param {object} mOptions the options passed to <code>Parameters.get</code> (without callback)
+	 * @returns {Promise<string|Object<string,string>|undefined>} the parameter value(s)
+	 */
+	function getParametersAsync(mOptions) {
+		return new Promise((resolve) => {
+			const vValue = Parameters.get(Object.assign({}, mOptions, {
+				callback: resolve
+			}));
+			if (vValue !== undefined) {
+				resolve(vValue);
+			}
+		});
+	}
+
+	QUnit.test("Relative URLs in CSS custom properties are resolved against the declaring library", async function(assert) {
+		await Library.load({name: "testlibs.themeParameters.lib19"});
+
+		const sLibThemeUrl = new URL(sap.ui.require.toUrl("testlibs/themeParameters/lib19/themes/sap_horizon_hcb/"), document.baseURI).toString();
+		const sExpectedUrl = new URL("../../img/logo.png", sLibThemeUrl).toString();
+
+		assert.strictEqual(await getParametersAsync({name: "sapUiTstCssVarRelUrl"}), `url('${sExpectedUrl}')`,
+			"Relative URL is resolved against the theme folder of the library that declares the parameter");
+		assert.strictEqual(
+			window.getComputedStyle(document.body).getPropertyValue("--sapUiTstCssVarRelUrl").trim(),
+			"url(../../img/logo.png)",
+			"The browser itself returns the CSS custom property with the unresolved relative URL");
+		assert.strictEqual(await getParametersAsync({name: "sapUiTstCssVarRelUrl", _restrictedParseUrls: true}), sExpectedUrl,
+			"Parsed URL is absolute and points to the theme folder of the library that declares the parameter");
+		assert.strictEqual(await getParametersAsync({name: "sapUiTstCssVarRelUrl"}), `url('${sExpectedUrl}')`,
+			"Subsequent calls return the same resolved URL");
+	});
+
+	QUnit.test("Absolute URLs in CSS custom properties are returned unchanged", async function(assert) {
+		await Library.load({name: "testlibs.themeParameters.lib19"});
+
+		assert.strictEqual(await getParametersAsync({name: "sapUiTstCssVarAbsUrl", _restrictedParseUrls: true}), "https://example.com/logo.png",
+			"Absolute URL is returned as is");
+	});
+
+	QUnit.test("Relative URL in CSS custom property without parameter metadata falls back to the CSS custom property value", async function(assert) {
+		await Library.load({name: "testlibs.themeParameters.lib19"});
+
+		assert.strictEqual(await getParametersAsync({name: "sapUiTstCssVarRelUrlOnly"}), "url(../../img/only.png)",
+			"Value of the CSS custom property is returned when the parameter is not part of the library parameters");
+	});
+
+	QUnit.test("Invalid URL in CSS custom property is returned unchanged", async function(assert) {
+		await Library.load({name: "testlibs.themeParameters.lib19"});
+
+		assert.strictEqual(await getParametersAsync({name: "sapUiTstCssVarInvalidUrl"}), "url(http://[)",
+			"Value of the CSS custom property is returned without an error");
+	});
+
 	QUnit.test("After Theme Change: CSS custom property value is updated", async function(assert) {
 		const done = assert.async();
 
