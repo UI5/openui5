@@ -262,7 +262,7 @@ sap.ui.define([
 		 *   <code>sSAPLanguage</code> is given and can't be interpreted as SAP language code.
 		 * @return {this} <code>this</code> to allow method chaining
 		 *
-		 * @see http://scn.sap.com/docs/DOC-14377
+		 * @see {@link https://me.sap.com/notes/73606 SAP Note 73606}
 		 * @function
 		 * @public
 		 * @deprecated As of Version 1.119. Please use {@link module:sap/base/i18n/Localization.setLanguage Localization.setLanguage} instead.
