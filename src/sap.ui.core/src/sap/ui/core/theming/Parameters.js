@@ -43,6 +43,7 @@ sap.ui.define([
 	const parsedLibraries = new Set();
 	const aCallbackRegistry = [];
 	const rCssUrl = /url[\s]*\('?"?([^\'")]*)'?"?\)/;
+	const rSingleCssUrl = /^\s*url\s*\('?"?([^'")]*)'?"?\)\s*$/;
 
 	/** @deprecated */
 	const sBootstrapOrigin = new URL(sap.ui.require.toUrl(""), document.baseURI).origin;
@@ -79,13 +80,16 @@ sap.ui.define([
 	}
 
 	/**
-	 * Checks whether the given parameter value contains a relative CSS URL.
+	 * Checks whether the given parameter value consists of a single relative CSS URL.
+	 *
+	 * Values with further content besides the URL (e.g. <code>url(img.png) no-repeat</code>) are not considered,
+	 * as the resolved library parameter would only contain the URL.
 	 *
 	 * @param {string} sValue the parameter value
-	 * @returns {boolean} whether the value contains a relative CSS URL
+	 * @returns {boolean} whether the value is a relative CSS URL
 	 */
-	function hasRelativeCssUrl(sValue) {
-		const aMatch = rCssUrl.exec(sValue);
+	function isRelativeCssUrl(sValue) {
+		const aMatch = rSingleCssUrl.exec(sValue);
 		if (!aMatch) {
 			return false;
 		}
@@ -343,7 +347,7 @@ sap.ui.define([
 					//       However: empty values for our theming parameters are most likely not valid, so the simple empty check should be enough.
 					//       Still, without an existence check we cannot cache empty results as momentarily non-existent parameter might come async through another library.
 					if (sCustomPropValue.trim() !== "") {
-						if (!hasRelativeCssUrl(sCustomPropValue)) {
+						if (!isRelativeCssUrl(sCustomPropValue)) {
 							mCustomPropertiesParameters[sCustomPropName] = sCustomPropValue;
 							return sCustomPropValue;
 						}
