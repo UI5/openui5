@@ -564,7 +564,8 @@ sap.ui.define([
 			const resolveWithParameter = function () {
 				Theming.detachApplied(resolveWithParameter);
 				const vParams = this.get({ // Don't pass callback again
-					name: vName.name
+					name: vName.name,
+					_restrictedParseUrls: bParseUrls
 				});
 
 				if (!vParams || (typeof vParams === "object" && (Object.keys(vParams).length !== aNames.length))) {

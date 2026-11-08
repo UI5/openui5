@@ -421,6 +421,26 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.test("Parsed URLs are passed to the callback when parameters are not yet available", async function(assert) {
+		await Library.load({name: "testlibs.themeParameters.lib20"});
+		const sThemeFolderUrl = new URL(sap.ui.require.toUrl("testlibs/themeParameters/lib20/themes/sap_horizon_hcb/"), document.baseURI);
+
+		// When: the parameter is requested before the library CSS has been applied
+		let vSyncResult;
+		const vCallbackResult = await new Promise((resolve) => {
+			vSyncResult = Parameters.get({
+				name: "sapUiTstCallbackRelUrl",
+				_restrictedParseUrls: true,
+				callback: resolve
+			});
+		});
+
+		// Then: the callback receives the parsed URL, as the synchronous result would
+		assert.strictEqual(vSyncResult, undefined, "Precondition: parameter is not available synchronously");
+		assert.strictEqual(vCallbackResult, new URL("img/callback.png", sThemeFolderUrl).toString(),
+			"Callback receives the parsed URL");
+	});
+
 	QUnit.module("Parameters.get - CSS Custom Properties");
 
 	QUnit.test("Resolves CSS custom property via async API", async function(assert) {
