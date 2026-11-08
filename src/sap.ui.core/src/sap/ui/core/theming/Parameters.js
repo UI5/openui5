@@ -82,15 +82,16 @@ sap.ui.define([
 	/**
 	 * Checks whether the given parameter value consists of a single relative CSS URL.
 	 *
-	 * Values with further content besides the URL (e.g. <code>url(img.png) no-repeat</code>) are not considered,
-	 * as the resolved library parameter would only contain the URL.
+	 * Values with further content besides the URL (e.g. <code>url(img.png) no-repeat</code>) and empty URLs are
+	 * not considered, as the resolved library parameter would only contain the URL or point to the theme folder.
 	 *
 	 * @param {string} sValue the parameter value
 	 * @returns {boolean} whether the value is a relative CSS URL
 	 */
 	function isRelativeCssUrl(sValue) {
 		const aMatch = rSingleCssUrl.exec(sValue);
-		if (!aMatch) {
+		if (!aMatch?.[1]) {
+			// no URL or an empty URL (e.g. "url()"), which must not be resolved to the theme folder
 			return false;
 		}
 		try {

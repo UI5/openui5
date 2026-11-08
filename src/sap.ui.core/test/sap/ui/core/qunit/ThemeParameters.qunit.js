@@ -626,6 +626,13 @@ sap.ui.define([
 			"Value is not reduced to the URL");
 	});
 
+	QUnit.test("Empty URL in CSS custom property is returned unchanged", async function(assert) {
+		await Library.load({name: "testlibs.themeParameters.lib19"});
+
+		assert.strictEqual(await getParametersAsync({name: "sapUiTstCssVarEmptyUrl"}), "url()",
+			"Empty URL is not resolved to the theme folder");
+	});
+
 	QUnit.test("Invalid URL in CSS custom property is returned unchanged", async function(assert) {
 		await Library.load({name: "testlibs.themeParameters.lib19"});
 
