@@ -1,5 +1,6 @@
 /* global QUnit */
 sap.ui.define([
+	"sap/ui/core/Lib",
 	"sap/ui/fl/initial/_internal/StorageUtils",
 	"sap/ui/test/opaQunit",
 	"sap/ui/test/Opa5",
@@ -8,6 +9,7 @@ sap.ui.define([
 	"./pages/toolbar/RuntimeAuthoring",
 	"test-resources/sap/ui/fl/testutils/opa/TestLibrary"
 ], (
+	Lib,
 	StorageUtils,
 	opaTest,
 	Opa5,
@@ -81,9 +83,13 @@ sap.ui.define([
 	const sContainedVMControlId = "RTAReloadContainer---rtaReload--variantManagementOrdersTable";
 	const sNewContainedVariantName = "New Contained VM Variant";
 
-	const sRoleSpecificReloadReason = "Role-specific views are available for this app. The app is reloading with these views.";
-	const sWillReloadWithoutDraftChangesReloadReason = "The app will now reload without the draft changes.";
-	const sDraftChangesAvailableReloadReason = "Draft changes are available for this app. The app is reloading with these changes.";
+	const oResourceBundle = Lib.getResourceBundleFor("sap.ui.rta");
+	function getSingleReasonMessage(sReasonKey) {
+		return oResourceBundle.getText("MSG_RELOAD_SINGLE_REASON", [oResourceBundle.getText(sReasonKey)]);
+	}
+	const sRoleSpecificReloadReason = getSingleReasonMessage("MSG_RELOAD_REASON_START_RESTRICTED_CONTEXT");
+	const sWillReloadWithoutDraftChangesReloadReason = getSingleReasonMessage("MSG_RELOAD_REASON_EXIT_DRAFT");
+	const sDraftChangesAvailableReloadReason = getSingleReasonMessage("MSG_RELOAD_REASON_START_DRAFT");
 
 	const oArrangements = new Opa5({
 		iStartMyApp(oFlexDataResponses, bClearStorages = false) {
