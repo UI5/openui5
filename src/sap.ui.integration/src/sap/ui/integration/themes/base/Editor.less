@@ -1,3 +1,7 @@
+/* ================================================== */
+/* CSS for control sap.ui.integration.editor/Editor  */
+/* Base theme                                        */
+/* ================================================== */
 
 .sapUiIntegrationEditor {
 	padding: 1rem 1rem 1rem 0.5rem;
@@ -84,11 +88,11 @@
 }
 
 .sapUiIntegrationEditor .sapUiIntegrationEditorForm:hover::-webkit-scrollbar-thumb {
-	background-color: var(--sapUiChartScrollbarBorderColor, rgba(148, 148, 148, 0.4))!important;
+	background-color: @sapUiChartScrollbarBorderColor !important;
 }
 
 .sapUiIntegrationEditor.sapUiIntegrationEditorDark .sapUiIntegrationEditorForm:hover::-webkit-scrollbar-thumb {
-	background-color: var(--sapUiChartScrollbarBorderColor, rgba(222, 222, 222, 0.2))!important;
+	background-color: @sapUiChartScrollbarBorderColor !important;
 }
 
 .sapUiIntegrationEditor .sapUiIntegrationEditorItem {
@@ -151,7 +155,7 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 }
 
 .sapUiIntegrationEditor .sapUiIntegrationEditorSettingsButton .sapMBtnIcon {
-	color: var(--sapUiContentLabelColor, #c0c0c0);
+	color: var(--sapContent_LabelColor, #c0c0c0);
 	margin-top: -1px;
 }
 
@@ -166,7 +170,7 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
     margin-left: -10px;
     margin-top: 0.4rem;
     font-size: 10px;
-    background-color:var(--sapUiButtonHoverBackground,#f5f5f5);
+    background-color: var(--sapButton_Hover_Background, #f5f5f5);
     clip-path: circle(5px at 5px 12px);
 }
 .sapUiIntegrationEditor .sapUiIntegrationEditorSettingsButton.dynamicvalue .sapMBtnIcon{
@@ -383,7 +387,7 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 }
 
 .sapUiIntegrationFieldSettings .headertitle {
-	border-bottom: 1px solid var(--sapUiTileSeparatorColor,#e5e5e5);
+	border-bottom: 1px solid var(--sapTile_SeparatorColor, #e5e5e5);
 }
 .sapUiIntegrationFieldSettings .headertitle > DIV {
 	width:100%;
@@ -391,8 +395,8 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 }
 
 .sapUiIntegrationFieldSettings .currentval {
-	border-top: 1px solid var(--sapUiTileSeparatorColor,#e5e5e5);
-	background-color: var(--sapUiBaseBG,#f5f5f5);
+	border-top: 1px solid var(--sapTile_SeparatorColor, #e5e5e5);
+	background-color: var(--sapBackgroundColor, #f5f5f5);
 	height: 5rem;
 	transition: opacity 0.1s;
 	position: absolute;
@@ -425,7 +429,7 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 }
 
 .sapUiIntegrationFieldSettings .pavTblCellText {
-	color: var(--sapMLabelColor, #6a6d70);
+	color: var(--sapContent_LabelColor, #6a6d70);
 	font-size: 0.8rem !important;
 }
 
@@ -514,12 +518,12 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 }
 
 .sapUiIntegrationIconSelectList li[aria-posinset='2'].sapMSelectListItem {
-	border-bottom: 1px solid var(--sapTile_SeparatorColor,#e5e5e5);
+	border-bottom: 1px solid var(--sapTile_SeparatorColor, #e5e5e5);
 	margin-bottom: 0.5rem;
 }
 
 .sapUiIntegrationIconSelectList li .sapUiIcon {
-	color: var(--sapUiContentLabelColor, #333);
+	color: var(--sapContent_LabelColor, #333);
 }
 
 .sapUiIntegrationIconSelectList li[aria-posinset='2'].sapMSelectListItem,
@@ -536,8 +540,8 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 }
 
 .sapUiIntegrationIconSelectList li[aria-posinset].sapMSelectListItemBaseSelected {
-	background-color: var(--sapUiListSelectionBackgroundColor, #e5f0fa);
-	border: 0.0625rem solid var(--sapUiHighlight, #0854a0);
+	background-color: var(--sapList_SelectionBackgroundColor, #e5f0fa);
+	border: 0.0625rem solid var(--sapHighlightColor, #0854a0);
 	border-radius: 3px;
 }
 
@@ -630,17 +634,17 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 
 .sapUiIntegrationEditor .sapUiIntegrationEditorMessageIcon.error::before {
 	content:"\e0b1" !important;
-	color: var(--sapUiNegativeText, darkred);
+	color: var(--sapNegativeTextColor, darkred);
 }
 .sapUiIntegrationEditor .sapUiIntegrationEditorMessageIcon.warning::before {
 	content:"\e201";
-	color: var(--sapUiCriticalText, darkorange);
+	color: var(--sapCriticalTextColor, darkorange);
 }
 .sapUiIntegrationEditor .sapUiIntegrationEditorMessageIcon.success::before {
 	content:"\e203";
 	opacity: 0;
 	transition: opacity 1.4s ease-out;
-	color: var(--sapUiPositiveText, green);
+	color: var(--sapPositiveTextColor, green);
 }
 .sapUiIntegrationEditor .sapUiIntegrationEditorMessageIcon {
 	margin: 0.10rem 0.5rem;
@@ -703,7 +707,7 @@ html[data-sap-ui-browser^="cr"] .sapUiIntegrationEditor .sapMInputBaseInner::sel
 }
 
 .sapUiIntegrationEditor .warningBTNImage .sapMBtnIcon  {
-	color: var(--sapUiCriticalText, darkorange) !important;
+	color: var(--sapCriticalTextColor, darkorange) !important;
 	font-size: 12px !important;
 }
 
