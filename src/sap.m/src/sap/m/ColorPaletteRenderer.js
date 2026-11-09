@@ -10,13 +10,13 @@ sap.ui.define(['sap/ui/Device', "sap/ui/core/Lib"],
 		 * ColorPalette renderer.
 		 * @namespace
 		 */
-		var ColorPaletteRenderer = {
+		const ColorPaletteRenderer = {
 			apiVersion: 2
 		};
 
 
 		// reference to the message bundle
-		var oLibraryResourceBundle = Library.getResourceBundleFor("sap.m");
+		const oLibraryResourceBundle = Library.getResourceBundleFor("sap.m");
 
 		/**
 		 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -68,13 +68,12 @@ sap.ui.define(['sap/ui/Device', "sap/ui/core/Lib"],
 		 * @param {sap.m.ColorPalette} oColorPalette A palette instance
 		 */
 		ColorPaletteRenderer.renderSwatches = function (oRm, oColorPalette) {
-			var sColors = oColorPalette.getColors(),
-				sSelectedColor = oColorPalette.getSelectedColor(),
-				bInMainRegion = oColorPalette._isSelectedInMainRegion(),
-				iSelectedColorIndex = sColors.indexOf(sSelectedColor),
-				bIsSelected;
+			const sColors = oColorPalette.getColors();
+			const sSelectedColor = oColorPalette.getSelectedColor();
+			const bInMainRegion = oColorPalette._isSelectedInMainRegion();
+			const iSelectedColorIndex = sColors.indexOf(sSelectedColor);
 
-			oRm.openStart("div", oColorPalette.getId() + "-swatchCont-paletteColor");
+			oRm.openStart("div", `${oColorPalette.getId()}-swatchCont-paletteColor`);
 			oRm.class("sapMColorPaletteContent");
 			oRm.attr("data-sap-ui-region", "main-colors-palette");
 			oRm.accessibilityState(oColorPalette, {
@@ -83,10 +82,10 @@ sap.ui.define(['sap/ui/Device', "sap/ui/core/Lib"],
 			});
 			oRm.openEnd();
 
-			sColors.forEach(function (sColor, iIndex) {
-				bIsSelected = bInMainRegion && iSelectedColorIndex === iIndex && sColor === sSelectedColor;
+			sColors.forEach((sColor, iIndex) => {
+				const bIsSelected = bInMainRegion && iSelectedColorIndex === iIndex && sColor === sSelectedColor;
 				this.renderSquare(oRm, oColorPalette, sColor, iIndex, false, bIsSelected);
-			}, this);
+			});
 
 			oRm.close("div"); //close palette squares container
 		};
@@ -101,9 +100,9 @@ sap.ui.define(['sap/ui/Device', "sap/ui/core/Lib"],
 		 * @param {boolean} bIsSelected is currently selected
 		 */
 		ColorPaletteRenderer.renderSquare = function (oRm, oColorPalette, sColor, iIndex, bIsRecentColor, bIsSelected) {
-			var sNamedColor = oColorPalette._ColorsHelper.getNamedColor(sColor),
-				sCustomOrPredefinedColor = (sNamedColor === undefined) ? oLibraryResourceBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR_CUSTOM") : oLibraryResourceBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR_" + sNamedColor.toUpperCase()),
-				sColorNameAria = bIsRecentColor ? oLibraryResourceBundle.getText("COLOR_PALETTE_RECENT_COLOR", [iIndex + 1, sCustomOrPredefinedColor]) : oLibraryResourceBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR", [iIndex + 1, sCustomOrPredefinedColor]);
+			const sNamedColor = oColorPalette._ColorsHelper.getNamedColor(sColor);
+			const sCustomOrPredefinedColor = (sNamedColor === undefined) ? oLibraryResourceBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR_CUSTOM") : oLibraryResourceBundle.getText(`COLOR_PALETTE_PREDEFINED_COLOR_${sNamedColor.toUpperCase()}`);
+			const sColorNameAria = bIsRecentColor ? oLibraryResourceBundle.getText("COLOR_PALETTE_RECENT_COLOR", [iIndex + 1, sCustomOrPredefinedColor]) : oLibraryResourceBundle.getText("COLOR_PALETTE_PREDEFINED_COLOR", [iIndex + 1, sCustomOrPredefinedColor]);
 
 			oRm.openStart("div");
 			oRm.class("sapMColorPaletteSquare");
@@ -162,28 +161,22 @@ sap.ui.define(['sap/ui/Device', "sap/ui/core/Lib"],
 		 * @param {sap.ui.core.RenderManager} oRm the RenderManager that can be used for writing to the render output buffer
 		 */
 		ColorPaletteRenderer.renderRecentColorsSection = function (oRm, oColorPalette) {
-			var sColor,
-				aRecentColors = oColorPalette._getRecentColors(),
-				iCountOfBoxes = 5,
-				sContainer = oLibraryResourceBundle.getText("COLOR_PALETTE_SWATCH_RECENT_COLOR_CONTAINER_TITLE", [aRecentColors.length]),
-				bInRecentColorsRegion = oColorPalette._isSelectedInRecentColors(),
-				sSelectedColor = oColorPalette.getSelectedColor(),
-				bIsSelected;
+			const aRecentColors = oColorPalette._getRecentColors();
+			const iCountOfBoxes = 5;
+			const sContainer = oLibraryResourceBundle.getText("COLOR_PALETTE_SWATCH_RECENT_COLOR_CONTAINER_TITLE", [aRecentColors.length]);
+			const bInRecentColorsRegion = oColorPalette._isSelectedInRecentColors();
+			const sSelectedColor = oColorPalette.getSelectedColor();
 
-			oRm.openStart("div", oColorPalette.getId() + "-swatchCont-recentColors");
+			oRm.openStart("div", `${oColorPalette.getId()}-swatchCont-recentColors`);
 			oRm.class("sapMColorPaletteContent");
 			oRm.attr("data-sap-ui-region", "recent-colors-palette");
 			oRm.attr("role","region");
 			oRm.attr("aria-label",sContainer); // Change with translation variable
 			oRm.openEnd();
 			// Use render square function
-			for (var i = 0; i < iCountOfBoxes; i++) {
-				if (aRecentColors[i]) {
-					sColor = aRecentColors[i];
-				} else {
-					sColor = "";
-				}
-				bIsSelected = bInRecentColorsRegion && i == 0 && sSelectedColor && (sColor === sSelectedColor);
+			for (let i = 0; i < iCountOfBoxes; i++) {
+				const sColor = aRecentColors[i] || "";
+				const bIsSelected = bInRecentColorsRegion && i == 0 && sSelectedColor && (sColor === sSelectedColor);
 				this.renderSquare(oRm, oColorPalette, sColor, i, true, bIsSelected);
 			}
 			oRm.close("div");
