@@ -350,7 +350,11 @@ sap.ui.define([
 			aIds.push(this.getId() + "-dataTimestamp");
 		}
 
-		if (this.getIconSrc() || this.getIconInitials() || this.getIconState() !== ValueState.None) {
+		// Only a state/status icon is part of the header accessible name. A
+		// regular icon stays reachable by the virtual cursor but is kept out
+		// of the card name so the generic "Avatar" is not part of the link's
+		// announcement.
+		if (this.getIconState() !== ValueState.None) {
 			aIds.push(this._getAvatar().getId());
 		}
 

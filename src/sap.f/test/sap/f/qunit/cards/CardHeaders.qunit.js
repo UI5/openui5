@@ -246,6 +246,142 @@ sap.ui.define([
 		oNumericHeader.destroy();
 	});
 
+	function isAvatarInLabel(oHeader) {
+		return (oHeader.$("focusable").attr("aria-labelledby") || "").indexOf(oHeader._getAvatar().getId()) > -1;
+	}
+
+	QUnit.test("Icon-only avatar is excluded from the card's accessible name", async function (assert) {
+		// Arrange
+		const oHeader = new CardHeader({
+			title: "Title",
+			iconSrc: "sap-icon://accept"
+		});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(isAvatarInLabel(oHeader), "The icon is not part of the card's accessible name, so 'Avatar' is not part of the link announcement");
+
+		// Clean up
+		oHeader.destroy();
+	});
+
+	QUnit.test("Initials avatar is excluded from the card's accessible name but keeps its initials", async function (assert) {
+		// Arrange
+		const oHeader = new CardHeader({
+			title: "Title",
+			iconInitials: "JD"
+		});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(isAvatarInLabel(oHeader), "The initials avatar is not part of the card's accessible name");
+		assert.strictEqual(oHeader._getAvatar().getInitials(), "JD", "The avatar keeps its initials so they are still announced when reached by the virtual cursor");
+
+		// Clean up
+		oHeader.destroy();
+	});
+
+	QUnit.test("Labelled avatar is excluded from the card's accessible name", async function (assert) {
+		// Arrange
+		const oHeader = new CardHeader({
+			title: "Title",
+			iconSrc: "sap-icon://accept",
+			iconAlt: "Approved"
+		});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(isAvatarInLabel(oHeader), "The labelled icon is not part of the card's accessible name");
+		assert.strictEqual(oHeader._getAvatar().getTooltip(), "Approved", "The author label is used as the avatar's accessible name");
+
+		// Clean up
+		oHeader.destroy();
+	});
+
+	QUnit.test("State icon remains part of the card's accessible name", async function (assert) {
+		// Arrange
+		const oHeader = new CardHeader({
+			title: "Title",
+			iconState: ValueState.Error
+		});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.ok(isAvatarInLabel(oHeader), "A state icon stays part of the header accessible name");
+
+		// Clean up
+		oHeader.destroy();
+	});
+
+	QUnit.test("NumericHeader: icon-only avatar is excluded from the card's accessible name", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({
+			title: "Title",
+			iconSrc: "sap-icon://accept"
+		});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(isAvatarInLabel(oHeader), "The icon is not part of the card's accessible name");
+
+		// Clean up
+		oHeader.destroy();
+	});
+
+	QUnit.test("NumericHeader: initials avatar is excluded from the card's accessible name but keeps its initials", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({
+			title: "Title",
+			iconInitials: "JD"
+		});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(isAvatarInLabel(oHeader), "The initials avatar is not part of the card's accessible name");
+		assert.strictEqual(oHeader._getAvatar().getInitials(), "JD", "The avatar keeps its initials");
+
+		// Clean up
+		oHeader.destroy();
+	});
+
+	QUnit.test("NumericHeader: labelled avatar is excluded from the card's accessible name", async function (assert) {
+		// Arrange
+		const oHeader = new CardNumericHeader({
+			title: "Title",
+			iconSrc: "sap-icon://accept",
+			iconAlt: "Approved"
+		});
+
+		// Act
+		oHeader.placeAt(DOM_RENDER_LOCATION);
+		await nextUIUpdate();
+
+		// Assert
+		assert.notOk(isAvatarInLabel(oHeader), "The labelled icon is not part of the card's accessible name");
+		assert.strictEqual(oHeader._getAvatar().getTooltip(), "Approved", "The author label is used as the avatar's accessible name");
+
+		// Clean up
+		oHeader.destroy();
+	});
+
 	QUnit.test("Header and NumericHeader titleMaxLines", async function (assert) {
 		// Arrange
 		const oHeader = new CardHeader({
