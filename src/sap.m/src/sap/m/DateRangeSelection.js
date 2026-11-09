@@ -219,10 +219,6 @@ sap.ui.define([
 		renderer: DateRangeSelectionRenderer
 	});
 
-	var HYPHEN = String.fromCharCode(45),
-		ENDASH = String.fromCharCode(8211),
-		EMDASH = String.fromCharCode(8212);
-
 	/* eslint-disable no-lonely-if */
 
 	DateRangeSelection.prototype.init = function(){
@@ -265,10 +261,10 @@ sap.ui.define([
 			return;
 		}
 
-		var oFormatter = _getFormatter.call(this);
-		var sDelimiter = _getDelimiter.call(this);
-		var sAllowedCharacters = oFormatter.sAllowedCharacters + sDelimiter + " ";
-		var sChar = String.fromCharCode(oEvent.charCode);
+		const oFormatter = this._getFormatter();
+		const sDelimiter = this._getDelimiter();
+		const sAllowedCharacters = oFormatter.sAllowedCharacters + sDelimiter + " ";
+		const sChar = String.fromCharCode(oEvent.charCode);
 
 		if (sChar && oFormatter.sAllowedCharacters && sAllowedCharacters.indexOf(sChar) < 0) {
 			oEvent.preventDefault();
@@ -305,12 +301,12 @@ sap.ui.define([
 				}
 
 				if (this._checkStyle(sPlaceholder)) {
-					oFormatOptions = Object.assign({ interval: true, singleIntervalValue: true, intervalDelimiter: _getDelimiter.call(this) }, _getFormatter.call(this).oFormatOptions);
+					oFormatOptions = Object.assign({ interval: true, singleIntervalValue: true, intervalDelimiter: this._getDelimiter() }, this._getFormatter().oFormatOptions);
 					return  this._getDateFormatPlaceholderText(oFormatOptions);
 				}
 			}
 
-			var sDelimiter = _getDelimiter.call(this);
+			var sDelimiter = this._getDelimiter();
 			if (sDelimiter && sDelimiter !== "") {
 				sPlaceholder = sPlaceholder + " " + sDelimiter + " " + sPlaceholder;
 			}
@@ -436,11 +432,13 @@ sap.ui.define([
 	 * @private
 	 */
 	DateRangeSelection.prototype._normalizeDateValue = function(vBindingDate) {
+		let aParsed = null;
 		switch (typeof vBindingDate) {
 			case "number":
 				return UI5Date.getInstance(vBindingDate);
 			case "string":
-				return _getFormatter.call(this).parse(vBindingDate);
+				aParsed = this._getFormatter().parse(vBindingDate);
+				return Array.isArray(aParsed) ? aParsed[0] : aParsed;
 			default:
 				return vBindingDate;
 		}
@@ -459,7 +457,9 @@ sap.ui.define([
 	/**
 	 * Getter for property <code>valueFormat</code>.
 	 *
-	 * <b>Note:</b> Property <code>valueFormat</code> is not supported in the <code>sap.m.DateRangeSelection</code> control.
+	 * <b>Note:</b> Property <code>valueFormat</code> is not used for display purposes in the
+	 * <code>sap.m.DateRangeSelection</code> control. It is used for parsing the model-bound
+	 * value, for example when the control is used with MDC's DateContent.
 	 *
 	 * @returns {string} the value of property valueFormat
 	 * @public
@@ -470,7 +470,9 @@ sap.ui.define([
 	/**
 	 * Setter for property <code>valueFormat</code>.
 	 *
-	 * <b>Note:</b> Property <code>valueFormat</code> is not supported in the <code>sap.m.DateRangeSelection</code> control.
+	 * <b>Note:</b> Property <code>valueFormat</code> is not used for display purposes in the
+	 * <code>sap.m.DateRangeSelection</code> control. It is used for parsing the model-bound
+	 * value, for example when the control is used with MDC's DateContent.
 	 *
 	 * @param {string} sValueFormat New value for property valueFormat
 	 * @returns {this} Reference to <code>this</code> for method chaining
@@ -481,8 +483,6 @@ sap.ui.define([
 		// if valueFormat changes the value must be parsed again
 
 		this.setProperty("valueFormat", sValueFormat, true); // no rerendering
-
-		Log.warning("Property valueFormat is not supported in sap.m.DateRangeSelection control.", this);
 
 		return this;
 
@@ -712,10 +712,7 @@ sap.ui.define([
 	//Support of two date range version added into original DatePicker's version
 	DateRangeSelection.prototype._parseValue = function(sValue) {
 
-		var oFormat;
-		var aDates = [];
-		var oDate1, oDate2;
-		var oBinding = this.getBinding("value");
+		const oBinding = this.getBinding("value");
 
 		if (oBinding && oBinding.getType() && oBinding.getType().isA("sap.ui.model.type.DateInterval")) {
 			//The InputBase has it's own mechanism for handling parser exception that
@@ -724,6 +721,7 @@ sap.ui.define([
 			//was done in onChange function after parsing the value (in Binding case).
 			//When an invalid value is entered, it was causing an unhandled console error
 			//in DateRangeSelection control.
+			let aDates;
 			try {
 				aDates = oBinding.getType().parseValue(sValue, "string");
 			} catch (e) {
@@ -743,86 +741,35 @@ sap.ui.define([
 			return aDates;
 		}
 
-		//If we have version of control with delimiter, then sValue should consist of two dates delimited with delimiter,
-		//hence we have to split the value to these dates
-		var sDelimiter = _getDelimiter.call(this);
-		if (sDelimiter && sValue) {
-			sValue = sValue.trim();
-			sValue = _trim(sValue, [sDelimiter, " "]);
-
-			aDates = this._splitValueByDelimiter(sValue, sDelimiter);
-
-			if (aDates.length === 2) {
-				// if delimiter only appears once in value (not part of date pattern) remove " " to be more flexible for input
-				if (aDates[0].slice(aDates[0].length - 1,aDates[0].length) == " ") {
-					aDates[0] = aDates[0].slice(0, aDates[0].length - 1);
-				}
-				if (aDates[1].slice(0,1) == " ") {
-					aDates[1] = aDates[1].slice(1);
-				}
-			} else {
-				const aDateInterval = sValue.split(" " + sDelimiter + " ");// Delimiter appears more than once -> try with separators
-
-				if ( (aDateInterval.length  === 1 || aDateInterval.length  % 2 === 0) && aDates.length % 2 === 0) {
-					const sFirstDate = aDates.slice(0, aDates.length / 2).join(sDelimiter);
-					const sSecondDate = aDates.slice(aDates.length / 2).join(sDelimiter);
-					aDates = [sFirstDate, sSecondDate];
-				} else {
-					aDates = aDateInterval;
-				}
-
-			}
-
-			if (sValue.indexOf(sDelimiter) === -1) {
-				// no delimiter found -> maybe only " " is used
-				var aDates2 = sValue.split(" ");
-				if (aDates2.length === 2) {
-					aDates = aDates2;
-				}
-			}
+		if (!sValue) {
+			return [undefined, undefined];
 		}
 
-		if (sValue && aDates.length <= 2) {
+		const sDelimiter = this._getDelimiter();
+		let oDate1, oDate2;
 
-			oFormat = _getFormatter.call(this);
+		sValue = sValue.trim();
+		if (sValue.endsWith(sDelimiter)) {
+			sValue = sValue.slice(0, -sDelimiter.length).trim();
+		}
+		if (sValue.startsWith(sDelimiter)) {
+			sValue = sValue.slice(sDelimiter.length).trim();
+		}
 
-			//Convert to date object(s)
-			if ((!sDelimiter || sDelimiter === "") || aDates.length === 1) {
-				oDate1 = oFormat.parse(sValue);
-			} else if (aDates.length === 2) {
-				oDate1 = oFormat.parse(aDates[0]);
-				oDate2 = oFormat.parse(aDates[1]);
-				if (!oDate1 || !oDate2) {
-					// at least one date can not be parsed -> whole value is incorrect
-					oDate1 = undefined;
-					oDate2 = undefined;
-				}
+		const oFmt = this._getFormatter();
+		let aParsed = oFmt.parse(sValue);
+		if (!Array.isArray(aParsed) || aParsed[0] === null) {
+			const oValueFmt = this._getValueFormatter();
+			if (oValueFmt) {
+				aParsed = oValueFmt.parse(sValue);
 			}
+		}
+		if (Array.isArray(aParsed) && aParsed[0] !== null) {
+			oDate1 = aParsed[0];
+			oDate2 = aParsed[1];
 		}
 
 		return [oDate1, oDate2];
-
-	};
-
-	// Handles the splitting of the value into parts logic regarding a valid delimiter
-	DateRangeSelection.prototype._splitValueByDelimiter = function (sValue, sDelimiter) {
-		var aDelimiters = [HYPHEN, ENDASH, EMDASH],
-			i;
-
-		if (sDelimiter) { // if there is a passed delimiter - use it
-			if (aDelimiters.indexOf(sDelimiter) === -1) { // if the passed delimiter is not a variety of a dash - split by it
-				return sValue.split(sDelimiter);
-			}
-		}
-
-		for (i = 0; i < aDelimiters.length; i++) {
-			if (sValue.indexOf(aDelimiters[i]) > 0) { // there is no delimiter passed - split by dash
-				return sValue.split(aDelimiters[i]);
-			}
-		}
-
-		// only one date value is used
-		return sValue ? sValue.split(" ") : [];
 
 	};
 
@@ -830,8 +777,7 @@ sap.ui.define([
 	DateRangeSelection.prototype._formatValue = function(oDateValue, oSecondDateValue) {
 
 		var sValue = "",
-			sDelimiter = _getDelimiter.call(this),
-			oFormat = _getFormatter.call(this),
+			oFormat = this._getFormatter(),
 			oBinding,
 			oBindingType,
 			oDate1, oDate2;
@@ -859,20 +805,16 @@ sap.ui.define([
 						}
 					}
 
-					if (oBindingType.oInputFormat && typeof oDate1 === "object") {
-						oDate1 = oFormat.format(oDate1);
+					if (oBindingType.oInputFormat && oDate1 && typeof oDate1 === "object") {
+						oDate1 = oFormat.format([oDate1, null]);
 					}
-					if (oBindingType.oInputFormat && typeof oDate2 === "object") {
-						oDate2 = oFormat.format(oDate2);
+					if (oBindingType.oInputFormat && oDate2 && typeof oDate2 === "object") {
+						oDate2 = oFormat.format([oDate2, null]);
 					}
 					sValue = oBinding.getType().formatValue([oDate1, oDate2], "string");
 				}
 			} else {
-				if (sDelimiter && sDelimiter !== "" && oDate2) {
-					sValue = oFormat.format(oDate1) + " " + sDelimiter + " " + oFormat.format(oDate2);
-				} else {
-					sValue = oFormat.format(oDate1);
-				}
+				sValue = oFormat.format([oDate1, oDate2 || null]);
 			}
 		}
 
@@ -1261,14 +1203,18 @@ sap.ui.define([
 			return;
 		}
 
-		var oFormatOptions = { interval: true, singleIntervalValue: true, intervalDelimiter: _getDelimiter.call(this) };
-		oFormatOptions = this.getBinding("value")
-			? Object.assign(oFormatOptions, this.getBinding("value").getType().oFormatOptions)
-			: Object.assign(oFormatOptions, _getFormatter.call(this).oFormatOptions);
-
-		var oFormat = DateFormat.getDateInstance(oFormatOptions);
-
-		sValue = oFormat.format([oFirstOldDate, oSecondOldDate]);
+		var oFormat;
+		if (this.getBinding("value")) {
+			var oFormatOptions = Object.assign(
+				{ interval: true, singleIntervalValue: true, intervalDelimiter: this._getDelimiter() },
+				this.getBinding("value").getType().oFormatOptions
+			);
+			oFormat = DateFormat.getDateInstance(oFormatOptions);
+			sValue = oFormat.format([oFirstOldDate, oSecondOldDate]);
+		} else {
+			oFormat = this._getFormatter();
+			sValue = oFormat.format([oFirstOldDate, oSecondOldDate || null]);
+		}
 		iCurPos = this._$input.cursorPos();
 
 		iFirstDateValueLen = oFirstOldDate ? oFormat.format([oFirstOldDate, null]).length : 0;
@@ -1357,17 +1303,17 @@ sap.ui.define([
 		return oUTCDate;
 	}
 
-	function _getDelimiter() {
+	DateRangeSelection.prototype._getDelimiter = function() {
 
-		var sDelimiter = this.getDelimiter();
+		let sDelimiter = this.getDelimiter();
 
 		if (!sDelimiter) {
 			if (!this._sLocaleDelimiter) {
-				var oLocale = new Locale(Formatting.getLanguageTag());
-				var oLocaleData = LocaleData.getInstance(oLocale);
-				var sPattern = oLocaleData.getIntervalPattern();
-				var iIndex1 = sPattern.indexOf("{0}") + 3;
-				var iIndex2 = sPattern.indexOf("{1}");
+				const oLocale = new Locale(Formatting.getLanguageTag());
+				const oLocaleData = LocaleData.getInstance(oLocale);
+				const sPattern = oLocaleData.getIntervalPattern();
+				const iIndex1 = sPattern.indexOf("{0}") + 3;
+				const iIndex2 = sPattern.indexOf("{1}");
 				sDelimiter = sPattern.slice(iIndex1, iIndex2);
 				if (sDelimiter.length > 1) {
 					if (sDelimiter.slice(0,1) == " ") {
@@ -1385,75 +1331,66 @@ sap.ui.define([
 
 		return sDelimiter;
 
-	}
+	};
 
-	function _getFormatter() {
+	DateRangeSelection.prototype._getIntervalFormatter = function(bDisplay, sPattern, sCalendarType) {
 
-		var sPattern = ( this.getDisplayFormat() || "medium" );
-		var oFormat;
-		var sCalendarType = this.getDisplayFormatType();
+		const oFormatOptions = this._checkStyle(sPattern)
+			? { style: sPattern }
+			: { pattern: sPattern };
 
-		if (sPattern == this._sUsedDisplayPattern && sCalendarType == this._sUsedDisplayCalendarType) {
-			oFormat = this._oDisplayFormat;
-		} else {
-			if (this._checkStyle(sPattern)) {
-				oFormat = DateFormat.getInstance({style: sPattern, strictParsing: true, calendarType: sCalendarType});
-			} else {
-				oFormat = DateFormat.getInstance({pattern: sPattern, strictParsing: true, calendarType: sCalendarType});
-			}
-			this._sUsedDisplayPattern = sPattern;
-			this._sUsedDisplayCalendarType = sCalendarType;
-			this._oDisplayFormat = oFormat;
+		if (bDisplay) {
+			oFormatOptions.strictParsing = true;
+			oFormatOptions.calendarType = sCalendarType;
 		}
 
-		return oFormat;
+		oFormatOptions.interval = true;
+		oFormatOptions.singleIntervalValue = true;
+		oFormatOptions.intervalDelimiter = " " + this._getDelimiter() + " ";
 
-	}
+		return DateFormat.getDateInstance(oFormatOptions);
 
-	function _endsWith(sValue, sEndStr) {
-		return sValue && sEndStr && sValue.lastIndexOf(sEndStr) === sValue.length - sEndStr.length;
-	}
+	};
 
-	function _startsWith(sValue, sStartStr) {
-		return sValue && sStartStr && sValue.indexOf(sStartStr) === 0;
-	}
+	DateRangeSelection.prototype._getFormatter = function() {
 
-	/**
-	 * Trims all occurrences of the given string values from both ends of the specified string.
-	 * @param {string} sValue The value to be trimmed
-	 * @param {string[]} aParams All values to be removed
-	 * @returns {string} The trimmed value
-	 * @private
-	 */
-	function _trim(sValue, aParams) {
-		var i = 0,
-			aTrims = aParams;
+		const sPattern = ( this.getDisplayFormat() || "medium" );
+		const sCalendarType = this.getDisplayFormatType();
+		const sDelimiter = this._getDelimiter();
 
-		if (!aTrims) {
-			aTrims = [" "];
+		if (sPattern == this._sUsedDisplayPattern && sCalendarType == this._sUsedDisplayCalendarType && sDelimiter == this._sUsedDisplayDelimiter) {
+			return this._oDisplayFormat;
 		}
 
-		while (i < aTrims.length) {
-			if (_endsWith(sValue, aTrims[i])) {
-				sValue = sValue.substring(0, sValue.length - aTrims[i].length);
-				i = 0;
-				continue;
-			}
-			i++;
+		this._oDisplayFormat = this._getIntervalFormatter(true, sPattern, sCalendarType);
+		this._sUsedDisplayPattern = sPattern;
+		this._sUsedDisplayCalendarType = sCalendarType;
+		this._sUsedDisplayDelimiter = sDelimiter;
+
+		return this._oDisplayFormat;
+
+	};
+
+	DateRangeSelection.prototype._getValueFormatter = function() {
+
+		const sPattern = this.getValueFormat();
+		const sDelimiter = this._getDelimiter();
+
+		if (!sPattern) {
+			return null;
 		}
 
-		i = 0;
-		while (i < aTrims.length) {
-			if (_startsWith(sValue, aTrims[i])) {
-				sValue = sValue.substring(aTrims[i].length);
-				i = 0;
-				continue;
-			}
-			i++;
+		if (sPattern === this._sUsedValuePattern && sDelimiter === this._sUsedValueDelimiter) {
+			return this._oValueFormat;
 		}
 
-		return sValue;
-	}
+		this._oValueFormat = this._getIntervalFormatter(false, sPattern);
+		this._sUsedValuePattern = sPattern;
+		this._sUsedValueDelimiter = sDelimiter;
+
+		return this._oValueFormat;
+
+	};
 
 	//	to overwrite JS doc
 
