@@ -258,5 +258,60 @@
         "text": " GroupPanel, SortPanel: improve for small screens"
       }
     ]
+  },
+  "1.151.2": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "da971d1fa45a472fafac8990519f388f6371d4e6",
+        "type": "FIX",
+        "text": " sap.m.MaskInput: cut event does not clear value when editable/enabled is false"
+      },
+      {
+        "id": "88c03b61822ab1b6336c2ae183765d599907d43e",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange: correct calculation of calendarWeekNumbering for Calendar control"
+      },
+      {
+        "id": "6a093e8d602a4558988f612c71d9c52837e99673",
+        "type": "FIX",
+        "text": " VariantManagement: duplicate ID error after lazy loading"
+      },
+      {
+        "id": "40da437d2e85066e5b6619ac4f2aa9841db27b7e",
+        "type": "FIX",
+        "text": " sap.m.IconTabFilter: fix invalid role=\"separator\" inside role=\"tab\""
+      },
+      {
+        "id": "e27929ec810186c6f4f7d8858f8452f801b32092",
+        "type": "FIX",
+        "text": " We've now fixed the visual clipping of the remove button in the ScopeActions scope on the sap_horizon and sap_horizon_dark themes in the slide tile control"
+      },
+      {
+        "id": "7d8889a470cc9b1fc0adbee6de579d7110dd7c24",
+        "type": "FIX",
+        "text": " We've now fixed the displacement of action buttons when they are incorrectly placed inside the content wrapper in generic tile"
+      },
+      {
+        "id": "2c646883d5c9ae551c6f3d3b04f5b8d5f6b5996c",
+        "type": "FIX",
+        "text": " We've now fixed the overflow clipping and border-radius issues in generic tile and action tile controls"
+      },
+      {
+        "id": "52a1037d3019c1d95024f00aceedaabfcfd5f173",
+        "type": "FIX",
+        "text": " m.ListItemAction: use direct shortcut definitions"
+      },
+      {
+        "id": "31de327dfbd47e598bef23c3b9e5e531e679e7e4",
+        "type": "FIX",
+        "text": " sap.m.p13n.FilterController: Editing existing filter condition fails"
+      },
+      {
+        "id": "db563b1c6be7eff3e5ac3cf6251af172f8e9a583",
+        "type": "FIX",
+        "text": " sap.m.ScrollPosition: fix intermittent QUnit test failures after navigation and re-render"
+      }
+    ]
   }
 }

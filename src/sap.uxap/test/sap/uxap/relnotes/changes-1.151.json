@@ -13,5 +13,15 @@
         "text": " sap.f.DynamicPageTitle: refresh accessible name on title text changes"
       }
     ]
+  },
+  "1.151.2": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "f26def137933eff7aae2e2b8d5406b051b8c741b",
+        "type": "FIX",
+        "text": " sap.uxap.ObjectPageLayout: no re-scroll when subSection in view"
+      }
+    ]
   }
 }

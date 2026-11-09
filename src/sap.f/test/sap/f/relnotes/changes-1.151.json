@@ -53,5 +53,15 @@
         "text": " sap.f: Search - use correct background-color parameter on hover"
       }
     ]
+  },
+  "1.151.2": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "ec35d198bd4acad03db95b559089f33fe25918bc",
+        "type": "FIX",
+        "text": " sap.f.GridContainer: Sentinel divs now have aria-hidden=\"true\""
+      }
+    ]
   }
 }
