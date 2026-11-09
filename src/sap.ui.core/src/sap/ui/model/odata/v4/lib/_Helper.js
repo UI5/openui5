@@ -1695,6 +1695,40 @@ sap.ui.define([
 		 */
 		getKeyPredicate : function (oInstance, sMetaPath, mTypeForMetaPath, aKeyProperties,
 				bKeepSingleProperty) {
+			aKeyProperties = _Helper.getKeyPredicateParts(oInstance, sMetaPath, mTypeForMetaPath,
+				aKeyProperties, bKeepSingleProperty);
+
+			return aKeyProperties && "(" + aKeyProperties.join(",") + ")";
+		},
+
+		/**
+		 * Returns the key predicate parts (see "4.3.1 Canonical URL") for the given entity using
+		 * the given metadata.
+		 *
+		 * @param {object} oInstance
+		 *   Entity instance runtime data
+		 * @param {string} sMetaPath
+		 *   The absolute meta path of the given instance
+		 * @param {object} mTypeForMetaPath
+		 *   Maps meta paths to the corresponding entity or complex types
+		 * @param {Array<(string|object)>} [aKeyProperties]
+		 *   A list of key properties, either as a string or an object with one property (its name
+		 *   is the alias in the key predicate, its value is the path in the instance); if not
+		 *   given, the entity's key is used
+		 * @param {boolean} [bKeepSingleProperty]
+		 *   If true, the property name is not omitted if there is only one property
+		 *   (like "(ID='42')")
+		 * @returns {string[]|undefined}
+		 *   The key predicate parts with proper URL encoding, e.g.
+		 *   ["Sector='A%2FB%26C'", "ID='42'"] or ["'42'"], or <code>undefined</code>, if at least
+		 *   one key property is undefined
+		 * @throws {Error}
+		 *   In case the entity type has no key properties according to metadata
+		 *
+		 * @public
+		 */
+		getKeyPredicateParts : function (oInstance, sMetaPath, mTypeForMetaPath, aKeyProperties,
+				bKeepSingleProperty) {
 			var mKey2Value = _Helper.getKeyProperties(oInstance, sMetaPath, mTypeForMetaPath,
 					aKeyProperties, true);
 
@@ -1709,7 +1743,7 @@ sap.ui.define([
 					: vValue;
 			});
 
-			return "(" + aKeyProperties.join(",") + ")";
+			return aKeyProperties;
 		},
 
 		/**

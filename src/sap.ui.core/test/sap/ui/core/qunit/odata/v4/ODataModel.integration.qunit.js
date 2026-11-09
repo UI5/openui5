@@ -61,7 +61,7 @@ sap.ui.define([
 		rCountUrl = /\/\$count(?:\?|$)/, // URL for ".../$count?..."
 		sDefaultLanguage = Localization.getLanguage(),
 		oDONT_CARE = {}, // a response which does not matter
-		rDuplicatePredicate = /,\$duplicate=[-\w]+\)/g,
+		rDuplicatePredicate = /,\$duplicate=[-\w]+(?=[,)])/g,
 		fnFireEvent = EventProvider.prototype.fireEvent,
 		oINTENTIONALLY_FAILED = Object.freeze({ // see createErrorInsideBatch
 			code : "CODE",
@@ -714,7 +714,7 @@ sap.ui.define([
 	 */
 	function normalizeUID(sText) {
 		return sText.replace(rTransientPredicate, "($uid=...)")
-			.replace(rDuplicatePredicate, ",$duplicate=...)");
+			.replace(rDuplicatePredicate, ",$duplicate=...");
 	}
 
 	/**
@@ -32989,7 +32989,16 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// annotation is also set on subtotals restored from the cache (collapse/expand) as well as on
 	// subtotals read later by scrolling. A refresh resets all outdated flags.
 	// JIRA: CPOUI5ODATAV4-3502
-	QUnit.test("Data Aggregation: isOutdated with visual grouping", async function (assert) {
+	//
+	// Deleting a leaf only marks its ancestors and their copies as outdated. Unrelated subtotals
+	// remain unchanged, including those restored from the cache or read later.
+	// Multiple deletions accumulate the affected ancestors. If a kept-alive entity's grouping
+	// values are unavailable, deletion falls back to marking all subtotals as outdated.
+	// JIRA: CPOUI5ODATAV4-3737
+[false, true].forEach((bDelete) => {
+	const sTitle = "Data Aggregation: isOutdated with visual grouping, delete: " + bDelete;
+
+	QUnit.test(sTitle, async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
 <Text id="isOutdatedHeader" text="{= %{@$ui5.context.isOutdated} }"/>
@@ -33045,11 +33054,11 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/BusinessPartners(Country='C')",
 			"/BusinessPartners(Country='D')"
 		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
-			[, true, 0, "", "", "", "150"],
-			[, true, 1, "A", "", "", "10"],
-			[, true, 1, "B", "", "", "20"],
-			[, true, 1, "C", "", "", "30"],
-			[, true, 1, "D", "", "", "40"]
+			[undefined, true, 0, "", "", "", "150"],
+			[undefined, true, 1, "A", "", "", "10"],
+			[undefined, true, 1, "B", "", "", "20"],
+			[undefined, true, 1, "C", "", "", "30"],
+			[undefined, true, 1, "D", "", "", "40"]
 		], 6);
 		const [, oContextA, oContextB] = oListBinding.getCurrentContexts();
 
@@ -33087,17 +33096,21 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		this.expectRequest("BusinessPartners?$count=true"
 				+ "&$filter=Country eq 'B' and Region eq 'b'"
 				+ "&$select=Country,Id,Region,SalesNumber&$skip=0&$top=5", {
-				"@odata.count" : "1",
-				value : [{Country : "B", Id : 2, Region : "b", SalesNumber : 20}]
+				"@odata.count" : "2",
+				value : [
+					{Country : "B", Id : 2, Region : "b", SalesNumber : 10},
+					// comes into view only if BusinessPartners(2) is deleted
+					{Country : "B", Id : 3, Region : "b", SalesNumber : 10}
+				]
 			});
 
 		await Promise.all([
 			// code under test
 			oListBinding.getCurrentContexts()[3].expand(),
-			this.waitForChanges(assert, "expand 'B/b' down to the leaf")
+			this.waitForChanges(assert, "expand 'B/b' down to the leaves")
 		]);
 
-		checkTable("after expand 'B/b' down to the leaf", assert, oTable, [
+		checkTable("after expand 'B/b' down to the leaves", assert, oTable, [
 			"/BusinessPartners()",
 			oContextA,
 			oContextB,
@@ -33107,51 +33120,58 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/BusinessPartners(Country='C')",
 			"/BusinessPartners(Country='D')"
 		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
-			[, true, 0, "", "", "", "150"],
-			[, true, 1, "A", "", "", "10"],
-			[, true, 1, "B", "", "", "20"],
-			[, true, 2, "B", "b", "", "20"],
-			[, false, 3, "B", "b", "2", "20"]
-		], 10);
-		const oLeafContext = oListBinding.getCurrentContexts()[4];
+			[undefined, true, 0, "", "", "", "150"],
+			[undefined, true, 1, "A", "", "", "10"],
+			[undefined, true, 1, "B", "", "", "20"],
+			[undefined, true, 2, "B", "b", "", "20"],
+			[undefined, false, 3, "B", "b", "2", "10"]
+		], 11);
+		const oBusinessPartner2 = oListBinding.getCurrentContexts()[4];
 
-		this.expectChange("isOutdatedHeader", true)
-			.expectRequest("#0 PATCH BusinessPartners(2)", {
-				payload : {SalesNumber : 25}
-			}, {Id : 2, SalesNumber : 25})
-			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
-				value : [{SalesNumber : 155}]
-			});
+		this.expectChange("isOutdatedHeader", true);
+		if (bDelete) {
+			this.expectRequest("#0 DELETE BusinessPartners(2)");
+		} else {
+			this.expectRequest("#0 PATCH BusinessPartners(2)", {
+					payload : {SalesNumber : 25}
+				}, {Id : 2, SalesNumber : 25});
+		}
+		this.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+			value : [{SalesNumber : bDelete ? 140 : 155}]
+		});
 
 		await Promise.all([
-			// code under test
-			oLeafContext.setProperty("SalesNumber", 25),
-			this.waitForChanges(assert, "edit the leaf's SalesNumber -> outdated subtotals;"
+			bDelete
+				// code under test (JIRA: CPOUI5ODATAV4-3737)
+				? oBusinessPartner2.delete()
+				// code under test (JIRA: CPOUI5ODATAV4-3502)
+				: oBusinessPartner2.setProperty("SalesNumber", 25),
+			this.waitForChanges(assert, "modify the leaf -> outdated subtotals;"
 				+ " leaves and the grand total are not outdated")
 		]);
 
-		checkTable("after edit the leaf's SalesNumber", assert, oTable, [
+		checkTable("after modifying the leaf", assert, oTable, [
 			"/BusinessPartners()",
 			oContextA,
 			oContextB,
 			"/BusinessPartners(Country='B',Region='b')",
-			oLeafContext,
+			bDelete ? "/BusinessPartners(3)" : oBusinessPartner2,
 			"/BusinessPartners(Country='B',$isTotal=true)",
 			"/BusinessPartners(Country='C')",
 			"/BusinessPartners(Country='D')"
 		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
-			[false, true, 0, "", "", "", "155"],
-			[true, true, 1, "A", "", "", "10"],
+			[false, true, 0, "", "", "", bDelete ? "140" : "155"],
+			[bDelete ? undefined : true, true, 1, "A", "", "", "10"],
 			[true, true, 1, "B", "", "", "20"],
 			[true, true, 2, "B", "b", "", "20"],
-			[, false, 3, "B", "b", "2", "25"]
-		], 10);
+			[undefined, false, 3, "B", "b", bDelete ? "3" : "2", bDelete ? "10" : "25"]
+		], bDelete ? 10 : 11);
+		const oLeafContext = bDelete ? oListBinding.getCurrentContexts()[4] : oBusinessPartner2;
 
 		await Promise.all([
 			// code under test
 			oContextA.expand(),
-			this.waitForChanges(assert,
-				"expand 'A' again - restored (cached) subtotals are outdated too")
+			this.waitForChanges(assert, "expand 'A' again - check restored (cached) subtotals")
 		]);
 
 		checkTable("after expand 'A' again", assert, oTable, [
@@ -33166,21 +33186,22 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/BusinessPartners(Country='C')",
 			"/BusinessPartners(Country='D')"
 		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
-			[false, true, 0, "", "", "", "155"],
-			[true, true, 1, "A", "", "", "10"],
-			[true, true, 2, "A", "a", "", "10"],
-			[true, true, 1, "", "", "", "10"],
+			[false, true, 0, "", "", "", bDelete ? "140" : "155"],
+			[bDelete ? undefined : true, true, 1, "A", "", "", "10"],
+			[bDelete ? undefined : true, true, 2, "A", "a", "", "10"],
+			[bDelete ? undefined : true, true, 1, "", "", "", "10"],
 			[true, true, 1, "B", "", "", "20"]
-		], 12);
-		assert.deepEqual(oListBinding.getCurrentContexts()[2].getObject(), {
+		], (bDelete ? 10 : 11) + 2);
+		assert.deepEqual(oContextB.getObject(), {
 			"@$ui5.context.isOutdated" : true, // has to be contained in the node's object
-			"@$ui5.node.isExpanded" : false,
+			"@$ui5.node.groupLevelCount" : 1,
+			"@$ui5.node.isExpanded" : true,
 			"@$ui5.node.isTotal" : true,
-			"@$ui5.node.level" : 2,
-			Country : "A",
+			"@$ui5.node.level" : 1,
+			Country : "B",
 			"Id@$ui5.noData" : true,
-			Region : "a",
-			SalesNumber : 10
+			"Region@$ui5.noData" : true,
+			SalesNumber : 20
 		});
 
 		this.expectRequest("BusinessPartners?"
@@ -33192,7 +33213,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		// code under test
 		oTable.setFirstVisibleRow(oListBinding.getLength());
 
-		await this.waitForChanges(assert, "scroll to end - newly read subtotals are outdated too");
+		await this.waitForChanges(assert, "scroll to end - check newly read subtotals");
 
 		checkTable("after scroll to end", assert, oTable, [
 			"/BusinessPartners()",
@@ -33210,10 +33231,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
 			[true, true, 2, "", "", "", "20"],
 			[true, true, 1, "", "", "", "20"],
-			[true, true, 1, "C", "", "", "30"],
-			[true, true, 1, "D", "", "", "40"],
-			[true, true, 1, "E", "", "", "50"]
-		], 12);
+			[bDelete ? undefined : true, true, 1, "C", "", "", "30"],
+			[bDelete ? undefined : true, true, 1, "D", "", "", "40"],
+			[bDelete ? undefined : true, true, 1, "E", "", "", "50"]
+		], (bDelete ? 10 : 11) + 2);
 		const oContextC = oListBinding.getCurrentContexts()[2];
 
 		this.expectRequest("BusinessPartners?$apply=filter(Country eq 'C')"
@@ -33226,8 +33247,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await Promise.all([
 			// code under test
 			oContextC.expand(),
-			this.waitForChanges(assert,
-				"expand 'C' - new subtotals, read by expand, are outdated too")
+			this.waitForChanges(assert, "expand 'C' - check new subtotals read by expand")
 		]);
 
 		checkTable("after expand 'C'", assert, oTable, [
@@ -33248,32 +33268,106 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
 			[true, true, 2, "", "", "", "20"],
 			[true, true, 1, "", "", "", "20"],
+			[bDelete ? undefined : true, true, 1, "C", "", "", "30"],
+			[bDelete ? undefined : true, true, 2, "C", "c", "", "30"],
+			[bDelete ? undefined : true, true, 1, "", "", "", "30"]
+		], (bDelete ? 10 : 11) + 4);
+
+		this.expectRequest("BusinessPartners?$count=true"
+				+ "&$filter=Country eq 'C' and Region eq 'c'"
+				+ "&$select=Country,Id,Region,SalesNumber&$skip=0&$top=5", {
+				"@odata.count" : "2",
+				value : [
+					{Country : "C", Id : 4, Region : "c", SalesNumber : 10},
+					{Country : "C", Id : 5, Region : "c", SalesNumber : 20}
+				]
+			});
+
+		await Promise.all([
+			// code under test
+			oListBinding.getCurrentContexts()[3].expand(),
+			this.waitForChanges(assert, "expand 'C/c' down to the leaves")
+		]);
+
+		this.expectRequest("#0 DELETE BusinessPartners(4)")
+			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+				value : [{SalesNumber : 130}]
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3737)
+			oListBinding.getCurrentContexts()[4].delete(),
+			this.waitForChanges(assert, "delete another leaf in a different branch")
+		]);
+
+		checkTable("after deleting leaves in 'B/b' and 'C/c'", assert, oTable, [
+			"/BusinessPartners()",
+			oContextA,
+			"/BusinessPartners(Country='A',Region='a')",
+			"/BusinessPartners(Country='A',$isTotal=true)",
+			oContextB,
+			"/BusinessPartners(Country='B',Region='b')",
+			oLeafContext,
+			"/BusinessPartners(Country='B',Region='b',$isTotal=true)",
+			"/BusinessPartners(Country='B',$isTotal=true)",
+			oContextC,
+			"/BusinessPartners(Country='C',Region='c')",
+			"/BusinessPartners(5)",
+			"/BusinessPartners(Country='C',$isTotal=true)",
+			"/BusinessPartners(Country='D')",
+			"/BusinessPartners(Country='E')"
+		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
+			[true, true, 2, "", "", "", "20"],
+			[true, true, 1, "", "", "", "20"],
 			[true, true, 1, "C", "", "", "30"],
 			[true, true, 2, "C", "c", "", "30"],
-			[true, true, 1, "", "", "", "30"]
-		], 14);
+			[undefined, false, 3, "C", "c", "5", "20"]
+		], (bDelete ? 12 : 13) + 4);
+		assert.deepEqual(
+			oListBinding._getAllExistingContexts().reduce((mOutdated, oContext) => {
+				mOutdated[getNormalizedPath(oContext)] = oContext.isOutdated();
+				return mOutdated;
+			}, {}),
+			{
+				"/BusinessPartners()" : false,
+				"/BusinessPartners(Country='A')" : bDelete ? undefined : true,
+				"/BusinessPartners(Country='A',Region='a')" : bDelete ? undefined : true,
+				"/BusinessPartners(Country='A',$isTotal=true)" : bDelete ? undefined : true,
+				"/BusinessPartners(Country='B')" : true,
+				"/BusinessPartners(Country='B',Region='b')" : true,
+				[bDelete ? "/BusinessPartners(3)" : "/BusinessPartners(2)"] : undefined,
+				"/BusinessPartners(Country='B',Region='b',$isTotal=true)" : true,
+				"/BusinessPartners(Country='B',$isTotal=true)" : true,
+				"/BusinessPartners(Country='C')" : true,
+				"/BusinessPartners(Country='C',Region='c')" : true,
+				"/BusinessPartners(5)" : undefined,
+				"/BusinessPartners(Country='C',$isTotal=true)" : true,
+				"/BusinessPartners(Country='D')" : bDelete ? undefined : true,
+				"/BusinessPartners(Country='E')" : bDelete ? undefined : true
+			});
 
 		// code under test
 		oTable.setFirstVisibleRow(0);
 
 		await this.waitForChanges(assert, "scroll back to top");
 
-		// keep the leaf context alive to avoid new cache creation when refreshing the list
+		// keep a leaf context alive to avoid new cache creation when refreshing the list
 		oLeafContext.setKeepAlive(true);
 
 		this.expectRequest("BusinessPartners?$select=Country,Id,Region,SalesNumber"
-				+ "&$filter=Id eq 2", {
-				value : [{Country : "B", Id : 2, Region : "b", SalesNumber : 25}]
+				+ "&$filter=Id eq " + (bDelete ? 3 : 2), {
+				value : [{Country : "B", Id : bDelete ? 3 : 2, Region : "b",
+					SalesNumber : bDelete ? 10 : 25}]
 			})
 			.expectRequest("BusinessPartners?$apply=concat(aggregate(SalesNumber)"
 				+ ",groupby((Country),aggregate(SalesNumber))"
 				+ "/concat(aggregate($count as UI5__count),top(4)))", {
 				value : [
-					{SalesNumber : 155},
+					{SalesNumber : bDelete ? 130 : 155},
 					{UI5__count : "5", "UI5__count@odata.type" : "#Decimal"},
 					{Country : "A", SalesNumber : 10},
-					{Country : "B", SalesNumber : 25},
-					{Country : "C", SalesNumber : 30},
+					{Country : "B", SalesNumber : bDelete ? 10 : 35},
+					{Country : "C", SalesNumber : bDelete ? 20 : 30},
 					{Country : "D", SalesNumber : 40}
 				]
 			})
@@ -33293,13 +33387,57 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/BusinessPartners(Country='D')",
 			oLeafContext
 		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
-			[, true, 0, "", "", "", "155"],
-			[, true, 1, "A", "", "", "10"],
-			[, true, 1, "B", "", "", "25"],
-			[, true, 1, "C", "", "", "30"],
-			[, true, 1, "D", "", "", "40"]
+			[undefined, true, 0, "", "", "", bDelete ? "130" : "155"],
+			[undefined, true, 1, "A", "", "", "10"],
+			[undefined, true, 1, "B", "", "", bDelete ? "10" : "35"],
+			[undefined, true, 1, "C", "", "", bDelete ? "20" : "30"],
+			[undefined, true, 1, "D", "", "", "40"]
+		], 6);
+
+		this.expectRequest("BusinessPartners(6)?$select=Id", {
+				"@odata.etag" : "etag",
+				Id : 6
+			});
+
+		const oBusinessPartner6 = oListBinding.getKeepAliveContext("/BusinessPartners(6)");
+
+		await Promise.all([
+			oBusinessPartner6.requestProperty("Id"),
+			this.waitForChanges(assert,
+				"request Id and wait to get the etag needed to delete the entity")
+		]);
+
+		this.expectChange("isOutdatedHeader", true)
+			.expectRequest("#0 DELETE BusinessPartners(6)", {
+				headers : {"If-Match" : "etag"}
+			})
+			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+				value : [{SalesNumber : 120}]
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3737)
+			oBusinessPartner6.delete(undefined, /*bDoNotRequestCount*/true),
+			this.waitForChanges(assert,
+				"delete without known grouping values -> all subtotals outdated")
+		]);
+
+		checkTable("after deleting an entity without grouping values", assert, oTable, [
+			"/BusinessPartners()",
+			oContextA,
+			oContextB,
+			"/BusinessPartners(Country='C')",
+			"/BusinessPartners(Country='D')",
+			oLeafContext
+		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
+			[false, true, 0, "", "", "", "120"],
+			[true, true, 1, "A", "", "", "10"],
+			[true, true, 1, "B", "", "", bDelete ? "10" : "35"],
+			[true, true, 1, "C", "", "", bDelete ? "20" : "30"],
+			[true, true, 1, "D", "", "", "40"]
 		], 6);
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: Create at end is supported (JIRA: CPOUI5ODATAV4-3410)
@@ -34163,6 +34301,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// error. Expanding these nodes leads to the same request because of the same filter, and
 	// therefore the children of both groups are duplicates.
 	// SNOW: DINC0380951
+	//
+	// Deleting an entity with empty grouping values also marks ancestors with duplicate predicates
+	// as outdated.
+	// JIRA: CPOUI5ODATAV4-3737
 	QUnit.test("Data Aggregation: DINC0380951", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
@@ -34172,9 +34314,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				aggregate : {
 					SalesAmount : {subtotals : true}
 				},
-				groupLevels : ['Country', 'Region', 'Industry']
+				groupLevels : ['Country', 'Region', 'Industry', 'Id'],
+				subtotalsAtBottomOnly : false
 			}
-		}}" threshold="0" visibleRowCount="15">
+		}}" threshold="0" visibleRowCount="100"> <!-- show all entries in the table -->
 	<Text id="isExpanded" text="{= %{@$ui5.node.isExpanded} }"/>
 	<Text id="isTotal" text="{= %{@$ui5.node.isTotal} }"/>
 	<Text id="level" text="{= %{@$ui5.node.level} }"/>
@@ -34201,7 +34344,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		//     (Country=null,Region=null)
 
 		this.expectRequest("BusinessPartners?$apply=groupby((Country),aggregate(SalesAmount))"
-				+ "&$count=true&$skip=0&$top=15", {
+				+ "&$count=true&$skip=0&$top=100", {
 				"@odata.count" : "3",
 				value : [{
 					Country : "DE",
@@ -34233,7 +34376,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		this.expectRequest("BusinessPartners?"
 				+ "$apply=filter(Country eq 'DE')/groupby((Region),aggregate(SalesAmount))"
-				+ "&$count=true&$skip=0&$top=15", {
+				+ "&$count=true&$skip=0&$top=100", {
 				"@odata.count" : "1",
 				value : [{
 					Region : "BW",
@@ -34248,18 +34391,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		checkTable("expand (Country='DE')", assert, oTable, [
 			"/BusinessPartners(Country='DE')",
 			"/BusinessPartners(Country='DE',Region='BW')",
+			"/BusinessPartners(Country='DE',$isTotal=true)",
 			"/BusinessPartners(Country='')",
 			"/BusinessPartners(Country='',$duplicate=...)"
 		], [
 			[true, true, 1, "DE", "", "", "42"],
 			[false, true, 2, "DE", "BW", "", "41"],
+			[undefined, true, 1, "", "", "", "42"],
 			[false, true, 1, "", "", "", "11"],
 			[false, true, 1, "", "", "", "22"]
 		]);
 
 		const sCountryEmpty = "BusinessPartners?"
 			+ "$apply=filter(Country eq '')/groupby((Region),aggregate(SalesAmount))"
-			+ "&$count=true&$skip=0&$top=15";
+			+ "&$count=true&$skip=0&$top=100";
 		const oCountryEmpty = {
 			"@odata.count" : "4",
 			value : [{
@@ -34287,20 +34432,24 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		checkTable("expand (Country=initial)", assert, oTable, [
 			"/BusinessPartners(Country='DE')",
 			"/BusinessPartners(Country='DE',Region='BW')",
+			"/BusinessPartners(Country='DE',$isTotal=true)",
 			"/BusinessPartners(Country='')",
 			"/BusinessPartners(Country='',Region='')",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
+			"/BusinessPartners(Country='',$isTotal=true)",
 			"/BusinessPartners(Country='',$duplicate=...)"
 		], [
 			[true, true, 1, "DE", "", "", "42"],
 			[false, true, 2, "DE", "BW", "", "41"],
+			[undefined, true, 1, "", "", "", "42"],
 			[true, true, 1, "", "", "", "11"],
 			[false, true, 2, "", "", "", "4"],
 			[false, true, 2, "", "", "", "5"],
 			[false, true, 2, "", "", "", "6"],
 			[false, true, 2, "", "", "", "7"],
+			[undefined, true, 1, "", "", "", "11"],
 			[false, true, 1, "", "", "", "22"]
 		]);
 
@@ -34315,36 +34464,42 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		checkTable("expand (Country=null)", assert, oTable, [
 			"/BusinessPartners(Country='DE')",
 			"/BusinessPartners(Country='DE',Region='BW')",
+			"/BusinessPartners(Country='DE',$isTotal=true)",
 			"/BusinessPartners(Country='')",
 			"/BusinessPartners(Country='',Region='')",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
+			"/BusinessPartners(Country='',$isTotal=true)",
 			"/BusinessPartners(Country='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
-			"/BusinessPartners(Country='',Region='',$duplicate=...)"
+			"/BusinessPartners(Country='',Region='',$duplicate=...)",
+			"/BusinessPartners(Country='',$duplicate=...,$isTotal=true)"
 		], [
 			[true, true, 1, "DE", "", "", "42"],
 			[false, true, 2, "DE", "BW", "", "41"],
+			[undefined, true, 1, "", "", "", "42"],
 			[true, true, 1, "", "", "", "11"],
 			[false, true, 2, "", "", "", "4"],
 			[false, true, 2, "", "", "", "5"],
 			[false, true, 2, "", "", "", "6"],
 			[false, true, 2, "", "", "", "7"],
+			[undefined, true, 1, "", "", "", "11"],
 			[true, true, 1, "", "", "", "22"],
 			[false, true, 2, "", "", "", "4"],
 			[false, true, 2, "", "", "", "5"],
 			[false, true, 2, "", "", "", "6"],
-			[false, true, 2, "", "", "", "7"]
+			[false, true, 2, "", "", "", "7"],
+			[undefined, true, 1, "", "", "", "22"]
 		]);
-		const [,,, oCountry1_0, oCountry1_1, oCountry1_2] = oBinding.getCurrentContexts();
+		const [,,,, oCountry1_0, oCountry1_1, oCountry1_2] = oBinding.getCurrentContexts();
 
 		const sCountryAndRegionEmpty = "BusinessPartners?"
 			+ "$apply=filter(Country eq '' and Region eq '')"
 			+ "/groupby((Industry),aggregate(SalesAmount))"
-			+ "&$count=true&$skip=0&$top=15";
+			+ "&$count=true&$skip=0&$top=100";
 		const oCountryAndRegionEmpty = {
 			"@odata.count" : "1",
 			value : [{
@@ -34361,31 +34516,39 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		checkTable("expand (Country=initial,Region=initial)", assert, oTable, [
 			"/BusinessPartners(Country='DE')",
 			"/BusinessPartners(Country='DE',Region='BW')",
+			"/BusinessPartners(Country='DE',$isTotal=true)",
 			"/BusinessPartners(Country='')",
 			"/BusinessPartners(Country='',Region='')",
 			"/BusinessPartners(Country='',Region='',Industry='foo')",
+			"/BusinessPartners(Country='',Region='',$isTotal=true)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
+			"/BusinessPartners(Country='',$isTotal=true)",
 			"/BusinessPartners(Country='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
-			"/BusinessPartners(Country='',Region='',$duplicate=...)"
+			"/BusinessPartners(Country='',Region='',$duplicate=...)",
+			"/BusinessPartners(Country='',$duplicate=...,$isTotal=true)"
 		], [
 			[true, true, 1, "DE", "", "", "42"],
 			[false, true, 2, "DE", "BW", "", "41"],
+			[undefined, true, 1, "", "", "", "42"],
 			[true, true, 1, "", "", "", "11"],
 			[true, true, 2, "", "", "", "4"],
-			[undefined, false, 3, "", "", "foo", "1"],
+			[false, true, 3, "", "", "foo", "1"],
+			[undefined, true, 2, "", "", "", "4"],
 			[false, true, 2, "", "", "", "5"],
 			[false, true, 2, "", "", "", "6"],
 			[false, true, 2, "", "", "", "7"],
+			[undefined, true, 1, "", "", "", "11"],
 			[true, true, 1, "", "", "", "22"],
 			[false, true, 2, "", "", "", "4"],
 			[false, true, 2, "", "", "", "5"],
 			[false, true, 2, "", "", "", "6"],
-			[false, true, 2, "", "", "", "7"]
+			[false, true, 2, "", "", "", "7"],
+			[undefined, true, 1, "", "", "", "22"]
 		]);
 
 		this.expectRequest(sCountryAndRegionEmpty, oCountryAndRegionEmpty);
@@ -34399,33 +34562,43 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		checkTable("expand (Country=initial,Region=null)", assert, oTable, [
 			"/BusinessPartners(Country='DE')",
 			"/BusinessPartners(Country='DE',Region='BW')",
+			"/BusinessPartners(Country='DE',$isTotal=true)",
 			"/BusinessPartners(Country='')",
 			"/BusinessPartners(Country='',Region='')",
 			"/BusinessPartners(Country='',Region='',Industry='foo')",
+			"/BusinessPartners(Country='',Region='',$isTotal=true)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',Industry='foo',$duplicate=...)",
+			"/BusinessPartners(Country='',Region='',$duplicate=...,$isTotal=true)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
+			"/BusinessPartners(Country='',$isTotal=true)",
 			"/BusinessPartners(Country='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
-			"/BusinessPartners(Country='',Region='',$duplicate=...)"
+			"/BusinessPartners(Country='',Region='',$duplicate=...)",
+			"/BusinessPartners(Country='',$duplicate=...,$isTotal=true)"
 		], [
 			[true, true, 1, "DE", "", "", "42"],
 			[false, true, 2, "DE", "BW", "", "41"],
+			[undefined, true, 1, "", "", "", "42"],
 			[true, true, 1, "", "", "", "11"],
 			[true, true, 2, "", "", "", "4"],
-			[undefined, false, 3, "", "", "foo", "1"],
+			[false, true, 3, "", "", "foo", "1"],
+			[undefined, true, 2, "", "", "", "4"],
 			[true, true, 2, "", "", "", "5"],
-			[undefined, false, 3, "", "", "foo", "1"],
+			[false, true, 3, "", "", "foo", "1"],
+			[undefined, true, 2, "", "", "", "5"],
 			[false, true, 2, "", "", "", "6"],
 			[false, true, 2, "", "", "", "7"],
+			[undefined, true, 1, "", "", "", "11"],
 			[true, true, 1, "", "", "", "22"],
 			[false, true, 2, "", "", "", "4"],
 			[false, true, 2, "", "", "", "5"],
 			[false, true, 2, "", "", "", "6"],
-			[false, true, 2, "", "", "", "7"]
+			[false, true, 2, "", "", "", "7"],
+			[undefined, true, 1, "", "", "", "22"]
 		]);
 
 		this.expectRequest(sCountryAndRegionEmpty, oCountryAndRegionEmpty);
@@ -34439,36 +34612,96 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		checkTable("expand (Country=null,Region=initial)", assert, oTable, [
 			"/BusinessPartners(Country='DE')",
 			"/BusinessPartners(Country='DE',Region='BW')",
+			"/BusinessPartners(Country='DE',$isTotal=true)",
 			"/BusinessPartners(Country='')",
 			"/BusinessPartners(Country='',Region='')",
 			"/BusinessPartners(Country='',Region='',Industry='foo')",
+			"/BusinessPartners(Country='',Region='',$isTotal=true)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',Industry='foo',$duplicate=...)",
+			"/BusinessPartners(Country='',Region='',$duplicate=...,$isTotal=true)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',Industry='foo',$duplicate=...)",
+			"/BusinessPartners(Country='',Region='',$duplicate=...,$isTotal=true)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
+			"/BusinessPartners(Country='',$isTotal=true)",
 			"/BusinessPartners(Country='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
 			"/BusinessPartners(Country='',Region='',$duplicate=...)",
-			"/BusinessPartners(Country='',Region='',$duplicate=...)"
+			"/BusinessPartners(Country='',Region='',$duplicate=...)",
+			"/BusinessPartners(Country='',$duplicate=...,$isTotal=true)"
 		], [
 			[true, true, 1, "DE", "", "", "42"],
 			[false, true, 2, "DE", "BW", "", "41"],
+			[undefined, true, 1, "", "", "", "42"],
 			[true, true, 1, "", "", "", "11"],
 			[true, true, 2, "", "", "", "4"],
-			[undefined, false, 3, "", "", "foo", "1"],
+			[false, true, 3, "", "", "foo", "1"],
+			[undefined, true, 2, "", "", "", "4"],
 			[true, true, 2, "", "", "", "5"],
-			[undefined, false, 3, "", "", "foo", "1"],
+			[false, true, 3, "", "", "foo", "1"],
+			[undefined, true, 2, "", "", "", "5"],
 			[true, true, 2, "", "", "", "6"],
-			[undefined, false, 3, "", "", "foo", "1"],
+			[false, true, 3, "", "", "foo", "1"],
+			[undefined, true, 2, "", "", "", "6"],
 			[false, true, 2, "", "", "", "7"],
+			[undefined, true, 1, "", "", "", "11"],
 			[true, true, 1, "", "", "", "22"],
 			[false, true, 2, "", "", "", "4"],
 			[false, true, 2, "", "", "", "5"],
 			[false, true, 2, "", "", "", "6"],
-			[false, true, 2, "", "", "", "7"]
+			[false, true, 2, "", "", "", "7"],
+			[undefined, true, 1, "", "", "", "22"]
 		]);
+
+		this.expectRequest("BusinessPartners(42)?$select=Country,Id,Industry,Region", {
+			Country : "",
+			Id : 42,
+			Industry : "foo",
+			Region : ""
+		});
+
+		const oKeptContext = oBinding.getKeepAliveContext("/BusinessPartners(42)");
+		await Promise.all([
+			oKeptContext.requestProperty(["Country", "Industry", "Region"]),
+			this.waitForChanges(assert, "read the kept-alive entity's grouping values")
+		]);
+
+		this.expectRequest("DELETE BusinessPartners(42)");
+
+		await Promise.all([
+			// code under test
+			oKeptContext.delete(undefined, /*bDoNotRequestCount*/true),
+			this.waitForChanges(assert, "delete an entity with duplicate ancestors")
+		]);
+
+		assert.deepEqual(
+			oBinding.getCurrentContexts().map(
+				(oContext) => normalizeUID(oContext.getPath()) + ": " + oContext.isOutdated()
+			), [
+				"/BusinessPartners(Country='DE'): undefined",
+				"/BusinessPartners(Country='DE',Region='BW'): undefined",
+				"/BusinessPartners(Country='DE',$isTotal=true): undefined",
+				"/BusinessPartners(Country=''): true",
+				"/BusinessPartners(Country='',Region=''): true",
+				"/BusinessPartners(Country='',Region='',Industry='foo'): true",
+				"/BusinessPartners(Country='',Region='',$isTotal=true): true",
+				"/BusinessPartners(Country='',Region='',$duplicate=...): true",
+				"/BusinessPartners(Country='',Region='',Industry='foo',$duplicate=...): true",
+				"/BusinessPartners(Country='',Region='',$duplicate=...,$isTotal=true): true",
+				"/BusinessPartners(Country='',Region='',$duplicate=...): true",
+				"/BusinessPartners(Country='',Region='',Industry='foo',$duplicate=...): true",
+				"/BusinessPartners(Country='',Region='',$duplicate=...,$isTotal=true): true",
+				"/BusinessPartners(Country='',Region='',$duplicate=...): true",
+				"/BusinessPartners(Country='',$isTotal=true): true",
+				"/BusinessPartners(Country='',$duplicate=...): true",
+				"/BusinessPartners(Country='',Region='',$duplicate=...): true",
+				"/BusinessPartners(Country='',Region='',$duplicate=...): true",
+				"/BusinessPartners(Country='',Region='',$duplicate=...): true",
+				"/BusinessPartners(Country='',Region='',$duplicate=...): true",
+				"/BusinessPartners(Country='',$duplicate=...,$isTotal=true): true"
+			], "All ancestors with empty grouping values, including duplicates, are outdated");
 	});
 
 	//*********************************************************************************************

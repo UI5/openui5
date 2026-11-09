@@ -1361,7 +1361,7 @@ sap.ui.define([
 
 		this.iDeletedContexts += 1;
 		const bSelected = oContext.isSelected();
-		that.setOutdated("delete");
+		that.setOutdated("delete", undefined, undefined, oContext);
 
 		return oContext.doDelete(oGroupLock, sEditUrl, sPath, oETagEntity, this,
 			function (iIndex, iOffset, bCountChanged) {
@@ -5483,8 +5483,9 @@ sap.ui.define([
 	 *       any filters; subtotals are set to outdated;
 	 *     <li> "delete": an entity is deleted via its context; a manual refresh might be necessary
 	 *       only if visual grouping is used; otherwise, the entity is directly removed from the
-	 *       list and no refresh is needed; the grand total is never set to outdated; subtotals are
-	 *       set to outdated;
+	 *       list and no refresh is needed; the grand total is never set to outdated; subtotals
+	 *       belonging to the deleted entity's ancestors are set to outdated if its grouping values
+	 *       are available, otherwise all subtotals are set to outdated;
 	 *     <li> "deleteViaPath": an entity was deleted via its path and no grand total is requested,
 	 *       so a manual refresh is needed; the grand total is set to outdated; subtotals are set to
 	 *       outdated;
@@ -5506,17 +5507,23 @@ sap.ui.define([
 	 * @param {boolean} [bNoRequest]
 	 *   Whether the properties given in <code>aPaths</code> are updated without sending a PATCH
 	 *   request to the server; if <code>true</code>, <code>aPaths</code> is mandatory
+	 * @param {sap.ui.model.odata.v4.Context} [oContext]
+	 *   The affected context; supported only for use case "delete"
 	 * @throws {Error}
 	 *   If <code>sUseCase</code> is unknown, <code>aPaths</code> are not supported by the given use
-	 *   case, or if <code>bNoRequest</code> is set and the header context gets outdated or the
-	 *   property with the given path contributes to the grand total
+	 *   case, <code>oContext</code> is given for another use case than "delete", or if
+	 *   <code>bNoRequest</code> is set and the header context gets outdated or the property with
+	 *   the given path contributes to the grand total
 	 *
 	 * @private
 	 */
-	ODataListBinding.prototype.setOutdated = function (sUseCase, aPaths, bNoRequest) {
+	ODataListBinding.prototype.setOutdated = function (sUseCase, aPaths, bNoRequest, oContext) {
 		if (_Helper.isDataAggregation(this.mParameters)) {
 			if (sUseCase && aPaths) {
 				throw new Error(`Use case '${sUseCase}' does not support paths`);
+			}
+			if (oContext && sUseCase !== "delete") {
+				throw new Error(`Use case '${sUseCase}' does not support a context`);
 			}
 			const oAggregation = this.mParameters.$$aggregation;
 			const bHasSearchOrCustomQueryOptions = this.mParameters.$search || oAggregation.search
@@ -5576,7 +5583,9 @@ sap.ui.define([
 			if (bHeaderContextOutdated) {
 				this.oHeaderContext.setOutdated(true);
 				if (bSubtotalsOutdated) {
-					this.oCache.setSubtotalsOutdated?.();
+					this.oCache.setSubtotalsOutdated?.(oContext
+						&& _Helper.getRelativePath(oContext.getPath(),
+							this.oHeaderContext.getPath()));
 				}
 			}
 		}

@@ -19,6 +19,8 @@ sap.ui.define([
 	"use strict";
 
 	const sClassName = "sap.ui.model.odata.v4.lib._AggregationCache";
+	const rPredicateEndsWithDuplicate = /,\$duplicate=[-\w]+\)$/;
+	const rPredicateEndsWithIsTotal = /,\$isTotal=true\)$/;
 
 	//*********************************************************************************************
 	// _AggregationCache
@@ -888,7 +890,11 @@ sap.ui.define([
 	 */
 	_AggregationCache.prototype.doReset = function (oAggregation, bHasGrandTotal, oFirstLevel) {
 		this.oAggregation = oAggregation;
-		this.bSubtotalsOutdated = undefined;
+		// whether all subtotals are set to outdated
+		this.bAllSubtotalsOutdated = undefined;
+		// a set of subtotal keys for which the corresponding subtotals are and will be set to
+		// outdated; copies and duplicates are not contained, they are handled separately
+		this.oOutdatedSubtotals = undefined;
 		// early call of _AggregationHelper.buildApply to determine $NodeProperty etc.
 		this.sToString = this.getDownloadUrl("");
 
@@ -2920,7 +2926,8 @@ sap.ui.define([
 			this.oBackup.oFirstLevel = this.oFirstLevel;
 			this.oBackup.oGrandTotalPromise = this.oGrandTotalPromise;
 			this.oBackup.mKeptElements = {};
-			this.oBackup.bSubtotalsOutdated = this.bSubtotalsOutdated;
+			this.oBackup.bAllSubtotalsOutdated = this.bAllSubtotalsOutdated;
+			this.oBackup.oOutdatedSubtotals = this.oOutdatedSubtotals;
 			this.oBackup.bUnifiedCache = this.bUnifiedCache;
 			this.bUnifiedCache = bUseMultiLevelExpand || this.bKeptFirstLevel
 				|| !!oAggregation.hierarchyQualifier;
@@ -2985,7 +2992,8 @@ sap.ui.define([
 				this.oFirstLevel.restore(bReally);
 			}
 			this.oGrandTotalPromise = this.oBackup.oGrandTotalPromise;
-			this.bSubtotalsOutdated = this.oBackup.bSubtotalsOutdated;
+			this.bAllSubtotalsOutdated = this.oBackup.bAllSubtotalsOutdated;
+			this.oOutdatedSubtotals = this.oBackup.oOutdatedSubtotals;
 			this.bUnifiedCache = this.oBackup.bUnifiedCache;
 			for (const sPredicate in this.oBackup.mKeptElements) {
 				const oKeptElement = this.aElements.$byPredicate[sPredicate];
@@ -3037,14 +3045,36 @@ sap.ui.define([
 	};
 
 	/**
-	 * Sets the outdated state of all available subtotals. All subtotals that are added afterwards,
-	 * e.g. by scrolling or expanding a group node, are considered outdated until {@link #doReset}
-	 * is called.
+	 * Sets the outdated state of all available subtotals, or only the ancestors of the entity for
+	 * the given path. The same applies to subtotals that become available afterwards, e.g. by
+	 * scrolling or expanding a group node, until {@link #doReset} is called.
+	 *
+	 * @param {string} [sPredicate]
+	 *   The predicate of the affected entity; all subtotals are marked as outdated if omitted or
+	 *   if a required grouping value is not available
 	 *
 	 * @public
 	 */
-	_AggregationCache.prototype.setSubtotalsOutdated = function () {
-		this.bSubtotalsOutdated = true;
+	_AggregationCache.prototype.setSubtotalsOutdated = function (sPredicate) {
+		if (!sPredicate) {
+			this.bAllSubtotalsOutdated = true;
+		} else if (!this.bAllSubtotalsOutdated && this.oAggregation.groupLevels.length) {
+			const oEntity = this.aElements.$byPredicate[sPredicate];
+			const aGroupProperties = _Helper.getKeyPredicateParts(oEntity, this.sMetaPath,
+				this.getTypes(), this.oAggregation.groupLevels, true);
+			if (aGroupProperties) {
+				this.oOutdatedSubtotals ??= new Set();
+				let sPrefix = "(";
+				for (const sGroupProperty of aGroupProperties) {
+					sPrefix += sGroupProperty;
+					this.oOutdatedSubtotals.add(sPrefix + ")");
+					sPrefix += ",";
+				}
+			} else {
+				// Fall back to global invalidation
+				this.bAllSubtotalsOutdated = true;
+			}
+		}
 		// #expand and #calculateKeyPredicate take care to set the outdated state of subtotals
 		// coming later into the view
 		this.aElements.forEach((oElement) => {
@@ -3174,19 +3204,31 @@ sap.ui.define([
 
 	/**
 	 * Updates the "@$ui5.context.isOutdated" annotation if the given element is a subtotal and all
-	 * subtotals have to be marked as outdated. All change listeners are informed.
+	 * subtotals have to be marked as outdated or the element is an ancestor of a deleted entity.
+	 * All change listeners are informed.
 	 *
 	 * @param {object} oElement - The element to be updated
 	 *
 	 * @private
 	 */
 	_AggregationCache.prototype.updateSubtotalsOutdatedAnnotation = function (oElement) {
-		if (this.bSubtotalsOutdated && oElement["@$ui5.node.isTotal"]
-				&& oElement["@$ui5.node.level"]) {
-			_Helper.updateAll(this.mChangeListeners,
-				_Helper.getPrivateAnnotation(oElement, "predicate"), oElement,
-				{"@$ui5.context.isOutdated" : true});
+		if (!this.bAllSubtotalsOutdated && !this.oOutdatedSubtotals
+				|| !oElement["@$ui5.node.isTotal"] || !oElement["@$ui5.node.level"]) {
+			return;
 		}
+
+		const sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate");
+		if (!this.bAllSubtotalsOutdated) {
+			// handle copies and duplicates in the same way as the non-duplicate subtotals;
+			// ",$isTotal=true" is always the last part of the predicate, so replace it first
+			const sSubtotalPredicate = sPredicate.replace(rPredicateEndsWithIsTotal, ")")
+				.replace(rPredicateEndsWithDuplicate, ")");
+			if (!this.oOutdatedSubtotals.has(sSubtotalPredicate)) {
+				return; // not affected
+			}
+		}
+		_Helper.updateAll(this.mChangeListeners, sPredicate, oElement,
+			{"@$ui5.context.isOutdated" : true});
 	};
 
 	/**

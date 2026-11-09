@@ -828,7 +828,8 @@ sap.ui.define([
 		});
 		oCache.oCountPromise = "~oOldCountPromise~";
 		oCache.oFirstLevel = bHasFirstLevel ? "~oOldFirstLevel~" : null;
-		oCache.bSubtotalsOutdated = "~bSubtotalsOutdated~";
+		oCache.bAllSubtotalsOutdated = "~bAllSubtotalsOutdated~";
+		oCache.oOutdatedSubtotals = "~oOutdatedSubtotals~";
 		this.mock(oCache).expects("getDownloadUrl").withExactArgs("").returns("~sDownloadUrl~");
 		this.mock(oCache).expects("createCountPromise").exactly(bCount && i === 1 ? 1 : 0)
 			.withExactArgs()
@@ -873,7 +874,8 @@ sap.ui.define([
 		oCache.doReset(oNewAggregation, bHasGrandTotal, "~oFirstLevel~");
 
 		assert.strictEqual(oCache.oAggregation, oNewAggregation);
-		assert.strictEqual(oCache.bSubtotalsOutdated, undefined);
+		assert.strictEqual(oCache.bAllSubtotalsOutdated, undefined);
+		assert.strictEqual(oCache.oOutdatedSubtotals, undefined);
 		assert.strictEqual(oCache.sToString, "~sDownloadUrl~");
 		assert.strictEqual(oCache.toString(), "~sDownloadUrl~"); // <-- code under test
 		assert.strictEqual(oCache.oFirstLevel,
@@ -5410,17 +5412,19 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("setSubtotalsOutdated", function (assert) {
+	QUnit.test("setSubtotalsOutdated: no predicate", function (assert) {
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {},
 			{groupLevels : ["foo"]});
 		// sparse array; avoid calling updateSubtotalsOutdatedAnnotation for empty slots
 		oCache.aElements = ["~oElement0~", "~oElement1~",,, "~oElement2~"];
-		oCache.bSubtotalsOutdated = "~bSubtotalsOutdated~";
+		oCache.bAllSubtotalsOutdated = "~bAllSubtotalsOutdated~";
+		oCache.oOutdatedSubtotals = "~oOutdatedSubtotals~";
+		this.mock(_Helper).expects("getKeyPredicateParts").never();
 		const oCacheMock = this.mock(oCache);
 		oCacheMock.expects("updateSubtotalsOutdatedAnnotation").withExactArgs("~oElement0~")
 			.callsFake(() => {
-				assert.strictEqual(oCache.bSubtotalsOutdated, true,
-					"bSubtotalsOutdated updated before calling updateSubtotalsOutdatedAnnotation");
+				assert.strictEqual(oCache.bAllSubtotalsOutdated, true,
+					"bAllSubtotalsOutdated updated before");
 			});
 		oCacheMock.expects("updateSubtotalsOutdatedAnnotation").withExactArgs("~oElement1~");
 		oCacheMock.expects("updateSubtotalsOutdatedAnnotation").withExactArgs("~oElement2~");
@@ -5428,37 +5432,187 @@ sap.ui.define([
 		// code under test
 		oCache.setSubtotalsOutdated();
 
-		assert.strictEqual(oCache.bSubtotalsOutdated, true);
+		assert.strictEqual(oCache.bAllSubtotalsOutdated, true);
+		assert.strictEqual(oCache.oOutdatedSubtotals, "~oOutdatedSubtotals~", "unchanged");
 	});
 
 	//*********************************************************************************************
-[undefined, true].forEach((bSubtotalsOutdated) => {
-	[undefined, false, true].forEach((bIsTotal) => {
-		[undefined, /*grand total*/0, 1, 42].forEach((iLevel) => {
-	const sTitle = "updateSubtotalsOutdatedAnnotation: bSubtotalsOutdated = " + bSubtotalsOutdated
-		+ ", is total = " + bIsTotal + ", level = " + iLevel;
-
-	QUnit.test(sTitle, function () {
+[{
+	sTitle : "all subtotals are already outdated",
+	bAllSubtotalsOutdated : true,
+	aGroupLevels : ["foo"],
+	oOutdatedSubtotals : "~oOutdatedSubtotals~",
+	bExpectedAllSubtotalsOutdated : true,
+	oExpectedOutdatedSubtotals : "~oOutdatedSubtotals~" // unchanged
+}, {
+	sTitle : "no group levels",
+	bAllSubtotalsOutdated : undefined,
+	aGroupLevels : [],
+	oOutdatedSubtotals : "~oOutdatedSubtotals~",
+	bExpectedAllSubtotalsOutdated : undefined, // unchanged
+	oExpectedOutdatedSubtotals : "~oOutdatedSubtotals~" // unchanged
+}, {
+	sTitle : "key predicate parts cannot be determined -> fall back to all subtotals outdated",
+	bAllSubtotalsOutdated : false,
+	aGroupLevels : ["foo"],
+	aGroupProperties : undefined,
+	oOutdatedSubtotals : "~oOutdatedSubtotals~",
+	bExpectedAllSubtotalsOutdated : true,
+	oExpectedOutdatedSubtotals : "~oOutdatedSubtotals~" // unchanged
+}, {
+	sTitle : "key predicate parts can be determined -> mark all subtotals to root outdated,"
+		+ " reuse existing outdated subtotals",
+	bAllSubtotalsOutdated : false,
+	aGroupLevels : ["Fo=o", "bar", "baz"],
+	aGroupProperties : ["Fo%3Do='Walter%22s%20Win''s'", "bar='X'", "baz=42"],
+	oOutdatedSubtotals : new Set(["already", "outdated"]),
+	bExpectedAllSubtotalsOutdated : false, // unchanged
+	oExpectedOutdatedSubtotals : new Set([
+		"already",
+		"outdated",
+		"(Fo%3Do='Walter%22s%20Win''s')", // no further encoding
+		"(Fo%3Do='Walter%22s%20Win''s',bar='X')",
+		"(Fo%3Do='Walter%22s%20Win''s',bar='X',baz=42)"
+	])
+}, {
+	sTitle : "key predicate parts can be determined -> mark all subtotals to root outdated,"
+		+ " create outdated subtotals set on demand",
+	bAllSubtotalsOutdated : false,
+	aGroupLevels : ["foo", "bar", "baz"],
+	aGroupProperties : ["foo=0", "bar=1", "baz=2"],
+	oOutdatedSubtotals : undefined,
+	bExpectedAllSubtotalsOutdated : false, // unchanged
+	oExpectedOutdatedSubtotals : new Set(["(foo=0)", "(foo=0,bar=1)", "(foo=0,bar=1,baz=2)"])
+}].forEach((oFixture) => {
+	QUnit.test("setSubtotalsOutdated: with predicate, " + oFixture.sTitle, function (assert) {
 		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {},
 			{groupLevels : ["foo"]});
-		oCache.bSubtotalsOutdated = bSubtotalsOutdated;
-		const iExpectedCallCount = bSubtotalsOutdated && bIsTotal && iLevel ? 1 : 0;
+		oCache.aElements = ["~oElement0~", "~oElement1~",,, "~oElement2~"];
+		oCache.aElements.$byPredicate = {"~predicate~" : "~oEntity~"};
+		oCache.oAggregation.groupLevels = oFixture.aGroupLevels;
+		oCache.bAllSubtotalsOutdated = oFixture.bAllSubtotalsOutdated;
+		oCache.oOutdatedSubtotals = oFixture.oOutdatedSubtotals;
+		const oCacheMock = this.mock(oCache);
+		oCacheMock.expects("getTypes").exactly("aGroupProperties" in oFixture ? 1 : 0)
+			.withExactArgs().returns("~mTypes~");
+		this.mock(_Helper).expects("getKeyPredicateParts")
+			.exactly("aGroupProperties" in oFixture ? 1 : 0)
+			.withExactArgs("~oEntity~", oCache.sMetaPath, "~mTypes~",
+				sinon.match.same(oFixture.aGroupLevels), true)
+			.returns(oFixture.aGroupProperties);
+		oCacheMock.expects("updateSubtotalsOutdatedAnnotation").withExactArgs("~oElement0~")
+			.callsFake(() => {
+				assert.strictEqual(oCache.bAllSubtotalsOutdated,
+					oFixture.bExpectedAllSubtotalsOutdated);
+				if (oFixture.oOutdatedSubtotals) {
+					assert.strictEqual(oCache.oOutdatedSubtotals, oFixture.oOutdatedSubtotals,
+						"still the same set");
+				}
+				assert.deepEqual(oCache.oOutdatedSubtotals, oFixture.oExpectedOutdatedSubtotals,
+					"Invalidation state updated before updating annotations");
+			});
+		oCacheMock.expects("updateSubtotalsOutdatedAnnotation").withExactArgs("~oElement1~");
+		oCacheMock.expects("updateSubtotalsOutdatedAnnotation").withExactArgs("~oElement2~");
+
+		// code under test
+		oCache.setSubtotalsOutdated("~predicate~");
+	});
+});
+
+	//*********************************************************************************************
+[{ // no subtotals are outdated
+	bAllSubtotalsOutdated : false,
+	oOutdatedSubtotals : undefined,
+	bIsTotal : true,
+	iLevel : 1
+}, { // there are outdated subtotals (oOutdatedSubtotals), but element is not a total
+	bAllSubtotalsOutdated : false,
+	oOutdatedSubtotals : new Set(),
+	bIsTotal : undefined,
+	iLevel : 1
+}, { // there are outdated subtotals (all subtotals outdated), but element is not a total
+	bAllSubtotalsOutdated : true,
+	oOutdatedSubtotals : undefined,
+	bIsTotal : false,
+	iLevel : 1
+}, { // there are outdated subtotals (oOutdatedSubtotals) and element is a total, but grand total
+	bAllSubtotalsOutdated : false,
+	oOutdatedSubtotals : new Set(),
+	bIsTotal : true,
+	iLevel : 0
+}].forEach((oFixture, i) => {
+	QUnit.test("updateSubtotalsOutdatedAnnotation: nothing to do #" + i, function () {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {},
+			{groupLevels : ["foo"]});
+		oCache.bAllSubtotalsOutdated = oFixture.bAllSubtotalsOutdated;
+		oCache.oOutdatedSubtotals = oFixture.oOutdatedSubtotals;
 		const oElement = {
-			...(bIsTotal !== undefined && {"@$ui5.node.isTotal" : bIsTotal}),
-			...(iLevel !== undefined && {"@$ui5.node.level" : iLevel})
+			...(oFixture.bIsTotal !== undefined && {"@$ui5.node.isTotal" : oFixture.bIsTotal}),
+			...(oFixture.iLevel !== undefined && {"@$ui5.node.level" : oFixture.iLevel})
 		};
-		this.mock(_Helper).expects("getPrivateAnnotation").exactly(iExpectedCallCount)
+		this.mock(_Helper).expects("getPrivateAnnotation").never();
+		this.mock(_Helper).expects("updateAll").never();
+
+		// code under test
+		oCache.updateSubtotalsOutdatedAnnotation(oElement);
+	});
+});
+
+	//*********************************************************************************************
+	QUnit.test("updateSubtotalsOutdatedAnnotation: all subtotals are outdated", function (assert) {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {},
+			{groupLevels : ["foo"]});
+		oCache.bAllSubtotalsOutdated = true;
+
+		assert.strictEqual(oCache.oOutdatedSubtotals, undefined, "oOutdatedSubtotals is not set");
+
+		// oElement has to be a subtotal that the outdated state is updated
+		const oElement = {
+			"@$ui5.node.isTotal" : true,
+			"@$ui5.node.level" : 1
+		};
+		this.mock(_Helper).expects("getPrivateAnnotation")
 			.withExactArgs(sinon.match.same(oElement), "predicate").returns("~sPredicate~");
-		this.mock(_Helper).expects("updateAll").exactly(iExpectedCallCount)
+		this.mock(_Helper).expects("updateAll")
 			.withExactArgs(sinon.match.same(oCache.mChangeListeners), "~sPredicate~",
 				sinon.match.same(oElement), {"@$ui5.context.isOutdated" : true});
 
 		// code under test
 		oCache.updateSubtotalsOutdatedAnnotation(oElement);
 	});
-		});
+
+	//*********************************************************************************************
+[
+	{sPredicate : "(foo=baz)", bOutdated : false},
+	{sPredicate : "(foo=bar)", bOutdated : true},
+	{sPredicate : "(foo=bar,$isTotal=true)", bOutdated : true},
+	{sPredicate : "(foo=',$isTotal=true')", bOutdated : false},
+	{sPredicate : "(foo=bar,$duplicate=1234-5678)", bOutdated : true},
+	{sPredicate : "(foo=',$duplicate=1234-5678')", bOutdated : false},
+	// $isTotal always comes last in the predicate
+	{sPredicate : "(foo=bar,$duplicate=1234-5678,$isTotal=true)", bOutdated : true}
+].forEach((oFixture, i) => {
+	QUnit.test("updateSubtotalsOutdatedAnnotation: some outdated subtotals, #" + i, function () {
+		const oCache = _AggregationCache.create(this.oRequestor, "Foo", "", {},
+			{groupLevels : ["foo"]});
+		oCache.bAllSubtotalsOutdated = false;
+		oCache.oOutdatedSubtotals = new Set(["(foo=bar)"]);
+		// oElement has to be a subtotal that the outdated state is updated
+		const oElement = {
+			"@$ui5.node.isTotal" : true,
+			"@$ui5.node.level" : 1
+		};
+		this.mock(_Helper).expects("getPrivateAnnotation")
+			.withExactArgs(sinon.match.same(oElement), "predicate").returns(oFixture.sPredicate);
+		this.mock(_Helper).expects("updateAll").exactly(oFixture.bOutdated ? 1 : 0)
+			.withExactArgs(sinon.match.same(oCache.mChangeListeners), oFixture.sPredicate,
+				sinon.match.same(oElement), {"@$ui5.context.isOutdated" : true});
+
+		// code under test
+		oCache.updateSubtotalsOutdatedAnnotation(oElement);
 	});
 });
+
 	//*********************************************************************************************
 [false, true].forEach((bUsedForGrandTotal) => {
 	const sTitle = "update: property used for grand total = " + bUsedForGrandTotal;
@@ -5843,7 +5997,8 @@ sap.ui.define([
 		oCache.bUnifiedCache = "~bUnifiedCache~";
 		oCache.bKeptFirstLevel = bKeptFirstLevel;
 		oCache.oGrandTotalPromise = "~oGrandTotalPromise~";
-		oCache.bSubtotalsOutdated = "~bSubtotalsOutdated~";
+		oCache.bAllSubtotalsOutdated = "~bAllSubtotalsOutdated~";
+		oCache.oOutdatedSubtotals = "~oOutdatedSubtotals~";
 		assert.strictEqual(oCache.aElements.$created, 0);
 		const oFirstLevelMock = this.mock(oCache.oFirstLevel);
 		oFirstLevelMock.expects("getCreated").exactly(bDataAggregation ? 1 : 0).withExactArgs()
@@ -5957,7 +6112,8 @@ sap.ui.define([
 				oCountPromise : "~oCountPromise~",
 				oFirstLevel : oExpectedBackupFirstLevel,
 				oGrandTotalPromise : "~oGrandTotalPromise~",
-				bSubtotalsOutdated : "~bSubtotalsOutdated~",
+				bAllSubtotalsOutdated : "~bAllSubtotalsOutdated~",
+				oOutdatedSubtotals : "~oOutdatedSubtotals~",
 				bUnifiedCache : "~bUnifiedCache~"
 			});
 			assert.strictEqual(oCache.oBackup.oFirstLevel, oExpectedBackupFirstLevel);
@@ -6063,13 +6219,15 @@ sap.ui.define([
 						foo : "n/a"
 					}
 				},
-				bSubtotalsOutdated : "~bSubtotalsOutdated~",
+				bAllSubtotalsOutdated : "~bAllSubtotalsOutdated~",
+				oOutdatedSubtotals : "~oOutdatedSubtotals~",
 				bUnifiedCache : "~bNewUnifiedCache~"
 			}
 			: null;
 		oCache.oCountPromise = "~oOldCountPromise~";
 		oCache.oGrandTotalPromise = "~oOldGrandTotalPromise~";
-		oCache.bSubtotalsOutdated = "~bOldSubtotalsOutdated~";
+		oCache.bAllSubtotalsOutdated = "~bOldAllSubtotalsOutdated~";
+		oCache.oOutdatedSubtotals = "~oOldOutdatedSubtotals~";
 		oResultingFirstLevelMock.expects("restore").on(oResultingFirstLevel)
 			.exactly(bCallRestore ? 1 : 0)
 			.withExactArgs(bReally);
@@ -6087,8 +6245,10 @@ sap.ui.define([
 		assert.strictEqual(oCache.oFirstLevel, oResultingFirstLevel);
 		assert.strictEqual(oCache.oGrandTotalPromise,
 			bReally ? "~oNewGrandTotalPromise~" : "~oOldGrandTotalPromise~");
-		assert.strictEqual(oCache.bSubtotalsOutdated,
-			bReally ? "~bSubtotalsOutdated~" : "~bOldSubtotalsOutdated~");
+		assert.strictEqual(oCache.bAllSubtotalsOutdated,
+			bReally ? "~bAllSubtotalsOutdated~" : "~bOldAllSubtotalsOutdated~");
+		assert.strictEqual(oCache.oOutdatedSubtotals,
+			bReally ? "~oOutdatedSubtotals~" : "~oOldOutdatedSubtotals~");
 		assert.strictEqual(oCache.bUnifiedCache,
 			bReally ? "~bNewUnifiedCache~" : "~bOldUnifiedCache~");
 		assert.deepEqual(oCache.aElements.$byPredicate, {
