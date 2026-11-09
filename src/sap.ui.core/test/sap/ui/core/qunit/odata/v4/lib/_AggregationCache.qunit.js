@@ -6669,8 +6669,15 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("keepOnlyGivenElements", function (assert) {
-		var oAggregation = {
+[false, true].forEach((bDataAggregation) => {
+	const sTitle = "keepOnlyGivenElements, data aggregation: " + bDataAggregation;
+
+	QUnit.test(sTitle, function (assert) {
+		var oAggregation = bDataAggregation ? {
+				aggregate : {},
+				group : {},
+				groupLevels : ["X", "Y", "leaf level"]
+			} : {
 				hierarchyQualifier : "X"
 			},
 			oAggregationHelperMock = this.mock(_AggregationHelper),
@@ -6682,19 +6689,32 @@ sap.ui.define([
 			aResult;
 
 		aElements.$byPredicate = {
-			"()" : {
-				"@$ui5._" : {predicate : "()"},
-				"@$ui5.node.isTotal" : true // must be ignored
-			},
 			"('A')" : oElementA,
 			"('B')" : {
-				"@$ui5._" : {predicate : "('B')"}
+				"@$ui5._" : {predicate : "('B')"},
+				"@$ui5.node.level" : 3 // edge case, not to be ignored
 			}, "('C')" : {
-				"@$ui5._" : {predicate : "('C')"}
+				"@$ui5._" : {predicate : "('C')"},
+				"@$ui5.node.level" : 1,
+				"@$ui5.context.isTransient" : false // created, not to be ignored
 			}, "($uid=1-23)" : {
 				"@$ui5._" : {transientPredicate : "($uid=1-23)"} // must be ignored
 			}, "($uid=4-56)" : oElementA
 		};
+		if (bDataAggregation) {
+			aElements.$byPredicate["()"] = {
+				"@$ui5._" : {predicate : "()"},
+				"@$ui5.node.level" : 0 // must be ignored
+			};
+			aElements.$byPredicate["(X='x')"] = {
+				"@$ui5._" : {predicate : "(X='x')"},
+				"@$ui5.node.level" : 1 // must be ignored
+			};
+			aElements.$byPredicate["(X='x',Y='y')"] = {
+				"@$ui5._" : {predicate : "(X='x',Y='y')"},
+				"@$ui5.node.level" : 2 // must be ignored
+			};
+		}
 
 		oCache.aElements.$byPredicate = aElements.$byPredicate;
 		oAggregationHelperMock.expects("markSplicedStale")
@@ -6711,6 +6731,7 @@ sap.ui.define([
 		assert.strictEqual(aResult[0], aElements.$byPredicate["('A')"]);
 		assert.strictEqual(aResult[1], aElements.$byPredicate["('C')"]);
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("move: PATCH failure", function (assert) {

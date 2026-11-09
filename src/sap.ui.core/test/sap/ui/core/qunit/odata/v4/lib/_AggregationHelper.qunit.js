@@ -2814,11 +2814,11 @@ sap.ui.define([
 		// code under test - not affected if no aggregation and no filter
 		assert.notOk(_AggregationHelper.isAffected(oAggregation, [], ["foo", "bar"]));
 
-		// code under test - wildcard should always affect
-		assert.ok(_AggregationHelper.isAffected(oAggregation, [], ["*"]));
+		// code under test - wildcard doesn't always affect
+		assert.notOk(_AggregationHelper.isAffected(oAggregation, [], ["*"]));
 
-		// code under test - empty string should always affect
-		assert.ok(_AggregationHelper.isAffected(oAggregation, [], [""]));
+		// code under test - empty string doesn't always affect
+		assert.notOk(_AggregationHelper.isAffected(oAggregation, [], [""]));
 
 		// code under test - filter-based affection still works
 		assert.ok(_AggregationHelper.isAffected(oAggregation, [
@@ -2838,19 +2838,65 @@ sap.ui.define([
 				aggregate : {
 					alias : {name : "measure1"},
 					"complexA/measure2" : {}, // be prepared for paths here!
-					measure3 : {unit : "unit"},
+					measure3 : {subtotals : true, unit : "unit"},
 					measure4 : {unit : "toParent/unit"}, // be prepared for paths here!
 					yetAnotherAlias : {name : "complexB/measure5"} // be prepared for paths here!
 				},
 				group : {
 					"complexG/group1" : {}, // be prepared for paths here!
 					group2 : {additionally : ["a", "b/c"]}
-				}
+				},
+				groupLevels : ["group2"] // used only by bGroupLevelsOnly
+			},
+			oAggregationOnly = { // Note: normalized by _AggregationHelper.buildApply before
+				aggregate : {
+					measure3 : {subtotals : true},
+					measure4 : {}
+				},
+				group : {},
+				groupLevels : [] // empty!
 			};
 
 		assert.notOk( // code under test
 			_AggregationHelper.isAffected(oAggregation, [],
 				["alias", "group", "measure", "yetAnotherAlias"]));
+
+		// bGroupLevelsOnly - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.isAffected(oAggregation, [], ["group2"], true),
+			true);
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.isAffected(oAggregation, [], ["complexG"], true),
+			false);
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.isAffected(oAggregation, [], ["measure3"], true),
+			true);
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.isAffected(oAggregation, [], ["measure4"], true),
+			false);
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.isAffected(oAggregationOnly, [], ["measure3"], true),
+			false);
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.isAffected(oAggregationOnly, [], ["measure4"], true),
+			false, "w/o groupLevels, missing subtotals must not matter");
+
+		assert.strictEqual(
+			// code under test
+			_AggregationHelper.isAffected(oAggregationOnly, [], ["*"], true),
+			false, "w/o groupLevels, they cannot be affected");
+		// end of bGroupLevelsOnly - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 		[
 			"", "*",
@@ -2870,6 +2916,16 @@ sap.ui.define([
 				_AggregationHelper.isAffected(oAggregation, [], ["foo", sSideEffectPath, "bar"]),
 				sSideEffectPath);
 		});
+
+		// code under test
+		assert.ok(_AggregationHelper.isAffected(oAggregation, [
+			new Filter("bar", FilterOperator.EQ, "baz")
+		], [""]));
+
+		// code under test
+		assert.ok(_AggregationHelper.isAffected(oAggregation, [
+			new Filter("bar", FilterOperator.EQ, "baz")
+		], ["*"]));
 
 		// code under test
 		assert.notOk(_AggregationHelper.isAffected(oAggregation, [
@@ -3047,35 +3103,18 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("isUsedForGroupLevels: no group levels", function (assert) {
-		this.mock(_AggregationHelper).expects("isAffected").never();
-
-		// code under test
-		assert.strictEqual(
-			_AggregationHelper.isUsedForGroupLevels("~aPaths~", {groupLevels : []}),
-			false);
-	});
-
-	//*********************************************************************************************
 	QUnit.test("isUsedForGroupLevels: with group levels", function (assert) {
 		const oAggregation = Object.freeze({
 			aggregate : "~not used~",
-			group : {
-				AnotherNotInGroupLevels : "n/a",
-				GroupLevel1 : "~details1~",
-				GroupLevel2 : "~details2~",
-				NotInGroupLevels : "~not used~"
-			},
-			groupLevels : ["GroupLevel1", "GroupLevel2"]
+			group : "~group~",
+			groupLevels : "~groupLevels~"
 		});
 		this.mock(_AggregationHelper).expects("isAffected")
 			.withExactArgs({
 				aggregate : {},
-				group : {
-					GroupLevel1 : "~details1~",
-					GroupLevel2 : "~details2~"
-				}
-			}, [], "~aPaths~")
+				group : "~group~",
+				groupLevels : "~groupLevels~"
+			}, [], "~aPaths~", /*bGroupLevelsOnly*/true)
 			.returns("~result~");
 
 		// code under test

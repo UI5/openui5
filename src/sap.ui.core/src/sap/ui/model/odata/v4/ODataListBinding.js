@@ -1892,7 +1892,8 @@ sap.ui.define([
 			}
 		).then((iCount) => {
 			if (iCount < 0) { // side-effects expand - do not refresh kept elements
-				return this.requestSideEffects(this.getGroupId(), [""], null, true);
+				return this.requestSideEffects(this.getGroupId(), [""], null,
+					/*bSkipKeptElements*/true);
 			}
 			if (iCount) {
 				this.insertGap(this.getModelIndex(oContext), iCount);
@@ -3878,7 +3879,8 @@ sap.ui.define([
 	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have changed
 	 *   due to an update or side effects of a previous update, see
-	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; if omitted, any filter counts
+	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; must not contain an empty path;
+	 *   if omitted, any filter counts
 	 * @returns {boolean}
 	 *   Whether this binding is filtered by any property affected by the given side-effects paths,
 	 *   or by any property if no paths are given
@@ -3949,7 +3951,8 @@ sap.ui.define([
 	 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have changed
 	 *   due to an update or side effects of a previous update, see
-	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; if omitted, any sorter counts
+	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; must not contain an empty path;
+	 *   if omitted, any sorter counts
 	 * @returns {boolean}
 	 *   Whether this binding is sorted by any property affected by the given side-effects paths, or
 	 *   by any property if no paths are given
@@ -4032,15 +4035,14 @@ sap.ui.define([
 		let iNewLength = 0;
 
 		/**
-		 * Keeps and requests created contexts and (grand) totals, destroys others.
+		 * Keeps and requests created contexts, destroys others.
 		 *
 		 * @param {number} iBase - A base index
 		 * @param {sap.ui.model.odata.v4.Context} oContext0 - A context, maybe created
 		 * @param {number} iIndex - A relative index
 		 */
 		function keepOrDestroy(iBase, oContext0, iIndex) {
-			if (oContext0.created() // e.g. Recursive Hierarchy maintenance
-					|| oContext0.getProperty("@$ui5.node.isTotal")) { // e.g. grand total
+			if (oContext0.created()) { // e.g. Recursive Hierarchy maintenance
 				aContexts.push(oContext0);
 				iNewLength = iBase + iIndex + 1;
 			} else {
@@ -4059,11 +4061,10 @@ sap.ui.define([
 		}
 
 		return aContexts.filter((oContext) => {
-			// cannot request side effects for transient contexts or (grand) totals
+			// cannot request side effects for transient contexts
 			// Note: do not use #isTransient because #created() may not be resolved yet,
 			// although already persisted (timing issue, see caller)
-			return !oContext.getProperty("@$ui5.context.isTransient")
-				&& !oContext.getProperty("@$ui5.node.isTotal");
+			return !oContext.getProperty("@$ui5.context.isTransient");
 		});
 	};
 
@@ -4898,6 +4899,7 @@ sap.ui.define([
 		var oModel = this.oModel,
 			aPredicates,
 			aPromises,
+			bRefresh = aPaths.includes(""),
 			bSingle = oContext && oContext !== this.oHeaderContext,
 			that = this;
 
@@ -4919,8 +4921,10 @@ sap.ui.define([
 
 		if (_Helper.isDataAggregation(this.mParameters)) {
 			if (!bSingle) {
-				if (this.mParameters.$$aggregation.groupLevels.length
-						|| this.oHeaderContext.isAggregated()) {
+				if (!bRefresh
+					&& (this.oHeaderContext.isAggregated()
+						|| _AggregationHelper.isAffected(this.mParameters.$$aggregation, [], aPaths,
+							/*bGroupLevelsOnly*/true))) {
 					return _AggregationHelper.isAffected(this.mParameters.$$aggregation,
 							this.aFilters.concat(this.aApplicationFilters), aPaths)
 						? this.refreshInternal("", sGroupId, false, true)
@@ -4946,7 +4950,7 @@ sap.ui.define([
 			});
 		}
 
-		if (!aPaths.includes("")) {
+		if (!bRefresh) {
 			aPredicates
 				= _Helper.getPredicates(bSingle ? [oContext] : this.keepOnlyVisibleContexts());
 			if (aPredicates) {
@@ -5518,7 +5522,7 @@ sap.ui.define([
 	 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have changed
 	 *   due to an update or side effects of a previous update, see
 	 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; must be given only if
-	 *   <code>sUseCase</code> is the empty string
+	 *   <code>sUseCase</code> is the empty string; must not contain an empty path
 	 * @param {boolean} [bNoRequest]
 	 *   Whether the properties given in <code>aPaths</code> are updated without sending a PATCH
 	 *   request to the server; if <code>true</code>, <code>aPaths</code> is mandatory
@@ -5526,10 +5530,11 @@ sap.ui.define([
 	 *   The affected context; supported only for use cases "delete" and
 	 *   "deleteWithoutGrandTotalUpdate"
 	 * @throws {Error}
-	 *   If <code>sUseCase</code> is unknown, <code>aPaths</code> are not supported by the given use
-	 *   case, <code>oContext</code> is given for another use case than "delete" or
-	 *   "deleteWithoutGrandTotalUpdate", or if <code>bNoRequest</code> is set and the header
-	 *   context gets outdated or the property with the given path contributes to the grand total
+	 *   If <code>sUseCase</code> is unknown, <code>aPaths</code> is not supported by the given use
+	 *   case or contains <code>""</code>, <code>oContext</code> is given for another use case than
+	 *   "delete" or "deleteWithoutGrandTotalUpdate", or if <code>bNoRequest</code> is set and the
+	 *   header context gets outdated or the property with the given path contributes to the grand
+	 *   total
 	 *
 	 * @private
 	 */
@@ -5540,6 +5545,9 @@ sap.ui.define([
 			}
 			if (oContext && !sUseCase.startsWith("delete")) {
 				throw new Error(`Use case '${sUseCase}' does not support a context`);
+			}
+			if (aPaths?.includes("")) { // Note: "" means refresh => MUST not become outdated
+				throw new Error("Unsupported empty navigation property path");
 			}
 			const oAggregation = this.mParameters.$$aggregation;
 			const bHasSearchOrCustomQueryOptions = this.mParameters.$search || oAggregation.search
