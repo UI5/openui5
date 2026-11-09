@@ -5020,6 +5020,7 @@ sap.ui.define([
 			}).catch(function(oResult) {
 				assert.strictEqual(oResult.message, "400 Bad Request", "request is unsuccessful");
 				assert.strictEqual(oResult.response.status, 400, "status code is 400");
+				assert.strictEqual(oResult.responseStatus, 400, "responseStatus is 400");
 				assert.notOk(oResult.response.ok, "request is unsuccessful");
 				assert.strictEqual(oResult.responseText, "Error", "status text is 'Error'");
 				assert.strictEqual(oResult._requestSettings.url, '/fakeService/Products', "request URL is resolved");

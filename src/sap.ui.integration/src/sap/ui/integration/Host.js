@@ -194,7 +194,8 @@ sap.ui.define([
 
 					/**
 					 * Fired when a message from channels like navigator.serviceWorker is received.
-					 * @ui5-experimental-since 1.91
+					 * @ui5-restricted sap.ui.integration
+					 * @since 1.91
 					 */
 					message: {
 						parameters: {

@@ -3275,10 +3275,23 @@ sap.ui.define([
 	 *
 	 * @typedef {object} sap.ui.integration.CardRequestError
 	 * @property {string} message The error message
-	 * @property {object} response The response object
+	 * @property {int} responseStatus The HTTP status code of the response
 	 * @property {string} responseText The response text
 	 * @public
-	 * @ui5-experimental-since 1.139
+	 * @since 1.139
+	 */
+
+	/**
+	 * Settings for card request error, including the raw response object.
+	 *
+	 * <b>Note:</b> This type is restricted because its <code>response</code> property is of type
+	 * {@link module:sap/base/util/SimpleResponse}, which is a restricted type.
+	 *
+	 * @typedef {sap.ui.integration.CardRequestError} sap.ui.integration.CardRequestErrorInternal
+	 * @property {module:sap/base/util/SimpleResponse|Response} response The response object
+	 * @private
+	 * @ui5-restricted sap.insights, Work Zone
+	 * @since 1.139
 	 */
 
 	/**
@@ -3349,6 +3362,7 @@ sap.ui.define([
 
 					oResult.message = e.getParameter("message");
 					oResult.response = e.getParameter("response");
+					oResult.responseStatus = oResult.response ? oResult.response.status : undefined;
 					oResult.responseText = e.getParameter("responseText");
 					oResult._requestSettings = e.getParameter("settings");
 
