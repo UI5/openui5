@@ -305,7 +305,7 @@
             <copyright>Mathias Bynens</copyright>
             <pattern>sap/ui/thirdparty/punycode.js</pattern>
         </lib>
-        <lib name="handlebars" displayName="handlebars" npmName="handlebars" version="4.7.10" hash="337f06f556928dec20091f7079916041" homepage="http://handlebarsjs.com/" id="73555000106100058827">
+        <lib name="handlebars" displayName="handlebars" npmName="handlebars" version="4.7.10" hash="337f06f556928dec20091f7079916041" homepage="http://handlebarsjs.com/" id="73555000106100457111">
             <license url="https://github.com/handlebars-lang/handlebars.js/" type="MIT" />
             <copyright>2011-2019 by Yehuda Katz</copyright>
             <pattern>sap/ui/thirdparty/handlebars.js</pattern>
