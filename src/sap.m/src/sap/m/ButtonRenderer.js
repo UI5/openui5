@@ -16,28 +16,28 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.m.ButtonType
-	var ButtonType = library.ButtonType;
+	const ButtonType = library.ButtonType;
 
 	// shortcut for sap.m.ButtonAccessibilityType
-	var ButtonAccessibilityType = library.ButtonAccessibilityType;
+	const ButtonAccessibilityType = library.ButtonAccessibilityType;
 
 	// shortcut for sap.m.LinkAccessibleRole
-	var ButtonAccessibleRole = library.ButtonAccessibleRole;
+	const ButtonAccessibleRole = library.ButtonAccessibleRole;
 
 	// shortcut for sap.ui.core.TextDirection
-	var TextDirection = coreLibrary.TextDirection;
+	const TextDirection = coreLibrary.TextDirection;
 
 	// shortcut for sap.m.BadgeState
-	var BadgeState = library.BadgeState;
+	const BadgeState = library.BadgeState;
 
 	// shortcut for sap.ui.core.aria.HasPopup
-	var AriaHasPopup = coreLibrary.aria.HasPopup;
+	const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 	/**
 	 * Button renderer.
 	 * @namespace
 	 */
-	var ButtonRenderer = {apiVersion: 2};
+	const ButtonRenderer = {apiVersion: 2};
 
 	/**
 	 * Renders the HTML for the given control, using the provided
@@ -52,19 +52,18 @@ sap.ui.define([
 	ButtonRenderer.render = function(oRm, oButton) {
 
 		// get control properties
-		var sButtonId = oButton.getId();
-		var sType = oButton.getType();
-		var bEnabled = oButton.getEnabled();
-		var sWidth = oButton.getWidth();
-		var sTooltip = oButton._getTooltip();
-		var sText = oButton._getText();
-		var sTextDir = oButton.getTextDirection();
-		var bRenderBDI = (sTextDir === TextDirection.Inherit);
-		var bEnhancedTooltip = !!oButton._oTooltipEnablement;
+		const sButtonId = oButton.getId();
+		const sType = oButton.getType();
+		const bEnabled = oButton.getEnabled();
+		const sWidth = oButton.getWidth();
+		const sTooltip = oButton._getTooltip();
+		const sText = oButton._getText();
+		const sTextDir = oButton.getTextDirection();
+		const bRenderBDI = (sTextDir === TextDirection.Inherit);
+		const bEnhancedTooltip = !!oButton._oTooltipEnablement;
 
 		// get icon from icon pool
-		var sBackURI = IconPool.getIconURI("nav-back");
-		var sMinWidth;
+		const sBackURI = IconPool.getIconURI("nav-back");
 
 		// start button tag
 		oRm.openStart("button", oButton);
@@ -78,7 +77,7 @@ sap.ui.define([
 		}
 
 		//ARIA attributes
-		var mAccProps = ButtonRenderer.generateAccProps(oButton);
+		const mAccProps = ButtonRenderer.generateAccProps(oButton);
 
 		//descendants (e.g. ToggleButton) callback
 		if (this.renderAccessibilityAttributes) {
@@ -119,11 +118,7 @@ sap.ui.define([
 			//this is a workaround until we move all button property classes to the root element
 			//we need different min-width of the button in different cases
 			//we may also need it different in different themes, but not possible with this workaround
-			if (oButton._getAppliedIcon() && sText) {
-				sMinWidth = "4rem";
-			} else { //text only, icon only OR no text no icon
-				sMinWidth = "2.25rem";
-			}
+			const sMinWidth = oButton._getAppliedIcon() && sText ? "4rem" : "2.25rem";
 			oRm.style("min-width", sMinWidth);
 		}
 		renderTabIndex(oButton, oRm);
@@ -137,7 +132,7 @@ sap.ui.define([
 		oRm.openEnd();
 
 		// start inner button tag
-		oRm.openStart("span", sButtonId + "-inner");
+		oRm.openStart("span", `${sButtonId}-inner`);
 
 		// button style class
 		if (!oButton._isUnstyled()) {
@@ -178,7 +173,7 @@ sap.ui.define([
 		// set button specific styles
 		if (!oButton._isUnstyled() && sType !== "") {
 			// set button specific styles
-			oRm.class("sapMBtn" + sType);
+			oRm.class(`sapMBtn${sType}`);
 		}
 
 		//apply on the inner level as well as not applying it will allow for focusing the button after a mouse click
@@ -212,7 +207,7 @@ sap.ui.define([
 
 		// add legacy tooltip span only if the native tooltip is used
 		if (sTooltip && !bEnhancedTooltip) {
-			oRm.openStart("span", sButtonId + "-tooltip");
+			oRm.openStart("span", `${sButtonId}-tooltip`);
 			oRm.class("sapUiInvisibleText");
 			oRm.openEnd();
 			oRm.text(sTooltip);
@@ -238,9 +233,9 @@ sap.ui.define([
 	 * @private
 	 */
 	ButtonRenderer.writeImgHtml = function(oRm, oButton) {
-		var sType = oButton.getType(),
-			bHasExplicitIcon = oButton.getIcon(),
-			bIsBackType = (sType === ButtonType.Back) || (sType === ButtonType.Up);
+		const sType = oButton.getType();
+		const bHasExplicitIcon = oButton.getIcon();
+		const bIsBackType = (sType === ButtonType.Back) || (sType === ButtonType.Up);
 
 		// Avoid duplicated rendering of the default Back/Up icon. Due to legacy
 		// reasons, those types are different than the others and can have 2 icons
@@ -254,7 +249,7 @@ sap.ui.define([
 		}
 
 		oRm.renderControl(oButton._getImage(
-			oButton.getId() + "-img",
+			`${oButton.getId()}-img`,
 			oButton._getAppliedIcon(),
 			oButton.getActiveIcon(),
 			oButton.getIconDensityAware()));
@@ -271,11 +266,11 @@ sap.ui.define([
 	 * HTML for internal image (icon pool)
 	 */
 	ButtonRenderer.writeInternalIconPoolHtml = function(oRm, oButton, sURI) {
-		oRm.renderControl(oButton._getInternalIconBtn((oButton.getId() + "-iconBtn"), sURI));
+		oRm.renderControl(oButton._getInternalIconBtn(`${oButton.getId()}-iconBtn`, sURI));
 	};
 
 	ButtonRenderer.writeButtonText = function(oRm, oButton, sTextDir, bRenderBDI){
-		oRm.openStart("span", oButton.getId() + "-content");
+		oRm.openStart("span", `${oButton.getId()}-content`);
 		oRm.class("sapMBtnContent");
 		// check if textDirection property is not set to default "Inherit" and add "dir" attribute
 		if (sTextDir !== TextDirection.Inherit) {
@@ -289,7 +284,7 @@ sap.ui.define([
 		oRm.openEnd();
 
 		if (bRenderBDI) {
-			oRm.openStart("bdi", oButton.getId() + "-BDI-content");
+			oRm.openStart("bdi", `${oButton.getId()}-BDI-content`);
 			oRm.openEnd();
 		}
 		oRm.text(oButton.getText());
@@ -310,7 +305,7 @@ sap.ui.define([
 		}
 	}
 
-	var mARIATextKeys = {
+	const mARIATextKeys = {
 		Accept: "BUTTON_ARIA_TYPE_ACCEPT",
 		Reject: "BUTTON_ARIA_TYPE_REJECT",
 		Attention: "BUTTON_ARIA_TYPE_ATTENTION",
@@ -329,10 +324,10 @@ sap.ui.define([
 	};
 
 	ButtonRenderer.generateAccProps = function (oButton) {
-		var sText = oButton._getText(),
-			sHasPopupType = oButton.getAriaHasPopup(),
-			mAccProps,
-			sAccessibleRole = oButton.getAccessibleRole();
+		const sText = oButton._getText();
+		const sHasPopupType = oButton.getAriaHasPopup();
+		let mAccProps;
+		const sAccessibleRole = oButton.getAccessibleRole();
 
 		if (sText) {
 			mAccProps = ButtonRenderer.generateTextButtonAccProps(oButton);
@@ -354,17 +349,17 @@ sap.ui.define([
 	};
 
 	ButtonRenderer.generateIconOnlyButtonAccProps = function (oButton) {
-		var sButtonId = oButton.getId(),
-			sTypeId = ButtonRenderer.getButtonTypeAriaLabelId(oButton.getType()),
-			sBadgeTextId = this.getBadgeTextId(oButton),
-			sTooltip = oButton._getTooltip(),
-			sTooltipId = sButtonId + "-tooltip", // Icon-only buttons will always have a tooltip
-			sAccessibilityType = oButton._determineAccessibilityType(),
-			bEnhancedTooltip = !!oButton._oTooltipEnablement,
-			sNewTooltipAnchor = bEnhancedTooltip
-				? (oButton._oTooltipEnablement.getInvisibleTooltipId() || "") : "",
-			mAccProps = {},
-			sDescription;
+		const sButtonId = oButton.getId();
+		const sTypeId = ButtonRenderer.getButtonTypeAriaLabelId(oButton.getType());
+		const sBadgeTextId = this.getBadgeTextId(oButton);
+		const sTooltip = oButton._getTooltip();
+		const sTooltipId = `${sButtonId}-tooltip`; // Icon-only buttons will always have a tooltip
+		const sAccessibilityType = oButton._determineAccessibilityType();
+		const bEnhancedTooltip = !!oButton._oTooltipEnablement;
+		const sNewTooltipAnchor = bEnhancedTooltip
+			? (oButton._oTooltipEnablement.getInvisibleTooltipId() || "") : "";
+		const mAccProps = {};
+		let sDescription;
 
 		switch (sAccessibilityType) {
 			case ButtonAccessibilityType.Default:
@@ -376,9 +371,9 @@ sap.ui.define([
 			case ButtonAccessibilityType.Described:
 				mAccProps["label"] = { value: sTooltip, append: true };
 
-				sDescription = (sTypeId + " " + sBadgeTextId).trim();
+				sDescription = `${sTypeId} ${sBadgeTextId}`.trim();
 				if (sNewTooltipAnchor) {
-					sDescription = (sDescription + " " + sNewTooltipAnchor).trim();
+					sDescription = `${sDescription} ${sNewTooltipAnchor}`.trim();
 				}
 				sDescription && (mAccProps["describedby"] = { value: sDescription, append: true });
 				break;
@@ -391,10 +386,10 @@ sap.ui.define([
 				break;
 			case ButtonAccessibilityType.Combined:
 				if (bEnhancedTooltip) {
-					sDescription = (sNewTooltipAnchor + " " + sTypeId + " " + sBadgeTextId).trim();
+					sDescription = `${sNewTooltipAnchor} ${sTypeId} ${sBadgeTextId}`.trim();
 					sDescription && (mAccProps["describedby"] = { value: sDescription, append: true });
 				} else {
-					mAccProps["describedby"] = { value: (sTooltipId + " " + sTypeId + " " + sBadgeTextId).trim(), append: true };
+					mAccProps["describedby"] = { value: `${sTooltipId} ${sTypeId} ${sBadgeTextId}`.trim(), append: true };
 				}
 				break;
 			default:
@@ -405,27 +400,27 @@ sap.ui.define([
 	};
 
 	ButtonRenderer.generateTextButtonAccProps = function (oButton) {
-		var sButtonId = oButton.getId(),
-			sTypeId = ButtonRenderer.getButtonTypeAriaLabelId(oButton.getType()),
-			sBadgeTextId = this.getBadgeTextId(oButton),
-			sTooltip = oButton._getTooltip(),
-			bEnhancedTooltip = !!oButton._oTooltipEnablement,
-			sLegacyTooltipId = sTooltip ? sButtonId + "-tooltip" : "",
-			sTooltipId = bEnhancedTooltip
-				? (oButton._oTooltipEnablement.getInvisibleTooltipId() || "")
-				: sLegacyTooltipId,
-			sInnerTextId = sButtonId + "-content",
-			sAccessibilityType = oButton._determineAccessibilityType(),
-			bPlaceSelfReference = oButton._determineSelfReferencePresence(),
-			mAccProps = {},
-			sDescription;
+		const sButtonId = oButton.getId();
+		const sTypeId = ButtonRenderer.getButtonTypeAriaLabelId(oButton.getType());
+		const sBadgeTextId = this.getBadgeTextId(oButton);
+		const sTooltip = oButton._getTooltip();
+		const bEnhancedTooltip = !!oButton._oTooltipEnablement;
+		const sLegacyTooltipId = sTooltip ? `${sButtonId}-tooltip` : "";
+		const sTooltipId = bEnhancedTooltip
+			? (oButton._oTooltipEnablement.getInvisibleTooltipId() || "")
+			: sLegacyTooltipId;
+		const sInnerTextId = `${sButtonId}-content`;
+		const sAccessibilityType = oButton._determineAccessibilityType();
+		const bPlaceSelfReference = oButton._determineSelfReferencePresence();
+		const mAccProps = {};
+		let sDescription;
 
 		switch (sAccessibilityType) {
 			case ButtonAccessibilityType.Default:
 				sTooltipId && (mAccProps["describedby"] = { value: sTooltipId, append: true });
 				break;
 			case ButtonAccessibilityType.Described:
-				sDescription = (sTooltipId + " " + sTypeId + " " + sBadgeTextId).trim();
+				sDescription = `${sTooltipId} ${sTypeId} ${sBadgeTextId}`.trim();
 				sDescription && (mAccProps["describedby"] = { value: sDescription, append: true });
 				break;
 			case ButtonAccessibilityType.Labelled:
@@ -433,7 +428,7 @@ sap.ui.define([
 				sTooltipId && (mAccProps["describedby"] = { value: sTooltipId, append: true });
 				break;
 			case ButtonAccessibilityType.Combined:
-				sDescription = (sTooltipId + " " + sTypeId + " " + sBadgeTextId).trim();
+				sDescription = `${sTooltipId} ${sTypeId} ${sBadgeTextId}`.trim();
 				sDescription && (mAccProps["describedby"] = { value: sDescription, append: true });
 				bPlaceSelfReference && (mAccProps["labelledby"] = { value: sInnerTextId, append: true });
 				break;

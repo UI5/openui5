@@ -39,22 +39,22 @@ sap.ui.define([
 	"use strict";
 
 	// shortcut for sap.m.BadgeStyle
-	var BadgeStyle = mobileLibrary.BadgeStyle;
+	const BadgeStyle = mobileLibrary.BadgeStyle;
 
 	// shortcut for sap.ui.core.TextDirection
-	var TextDirection = coreLibrary.TextDirection;
+	const TextDirection = coreLibrary.TextDirection;
 
 	// shortcut for sap.m.ButtonType
-	var ButtonType = mobileLibrary.ButtonType;
+	const ButtonType = mobileLibrary.ButtonType;
 
 	// shortcut for sap.m.ButtonAccessibilityType
-	var ButtonAccessibilityType = mobileLibrary.ButtonAccessibilityType;
+	const ButtonAccessibilityType = mobileLibrary.ButtonAccessibilityType;
 
 	// shortcut for sap.m.ButtonAccessibleRole
-	var ButtonAccessibleRole = mobileLibrary.ButtonAccessibleRole;
+	const ButtonAccessibleRole = mobileLibrary.ButtonAccessibleRole;
 
 	function createDivWithTopMargin(sName) {
-		var div = createAndAppendDiv(sName);
+		const div = createAndAppendDiv(sName);
 		div.style.marginTop = "10px";
 		return div;
 	}
@@ -76,24 +76,38 @@ sap.ui.define([
 
 
 
-	var b1, b2, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15, msg;
+	let b1;
+	let b2;
+	let b4;
+	let b5;
+	let b6;
+	let b7;
+	let b8;
+	let b9;
+	let b10;
+	let b11;
+	let b12;
+	let b13;
+	let b14;
+	let b15;
+	let msg;
 
-	var sText = "Button Text",
-		sButtonTypeDefault = ButtonType.Default,
-		sButtonTypeBack = ButtonType.Back,
-		sButtonTypeAccept = ButtonType.Accept,
-		sButtonTypeReject = ButtonType.Reject,
-		sButtonTypeTransparent = ButtonType.Transparent,
-		sButtonTypeUp = ButtonType.Up,
-		sButtonTypeUnstyled = ButtonType.Unstyled,
-		sWidth = "200px",
-		bEnabled = true,
-		bDisabled = false,
-		sIcon = "../images/analytics_64.png",
-		sPressMessage = "Button Tapped Event!";
+	const sText = "Button Text";
+	const sButtonTypeDefault = ButtonType.Default;
+	const sButtonTypeBack = ButtonType.Back;
+	const sButtonTypeAccept = ButtonType.Accept;
+	const sButtonTypeReject = ButtonType.Reject;
+	const sButtonTypeTransparent = ButtonType.Transparent;
+	const sButtonTypeUp = ButtonType.Up;
+	const sButtonTypeUnstyled = ButtonType.Unstyled;
+	const sWidth = "200px";
+	const bEnabled = true;
+	const bDisabled = false;
+	const sIcon = "../images/analytics_64.png";
+	const sPressMessage = "Button Tapped Event!";
 
 	function tabEventHandler1() {
-		throw sPressMessage + " - Exception";
+		throw `${sPressMessage} - Exception`;
 	}
 
 	function tabEventHandler2() {
@@ -101,7 +115,7 @@ sap.ui.define([
 	}
 
 	// Default Button
-	var oBtnDefault = new Button("b1");
+	const oBtnDefault = new Button("b1");
 	oBtnDefault.setText(sText);
 	oBtnDefault.setType(sButtonTypeDefault);
 	oBtnDefault.setEnabled(bEnabled);
@@ -109,7 +123,7 @@ sap.ui.define([
 	oBtnDefault.placeAt("contentBtnDefault");
 
 	// Back Button
-	var oBtnBack = new Button("b2");
+	const oBtnBack = new Button("b2");
 	oBtnBack.setText("Back Button");
 	oBtnBack.setType(sButtonTypeBack);
 	oBtnBack.setEnabled(bEnabled);
@@ -117,7 +131,7 @@ sap.ui.define([
 	oBtnBack.placeAt("contentBtnBack");
 
 	// Accept Button
-	var oBtnAccept = new Button("b4");
+	const oBtnAccept = new Button("b4");
 	oBtnAccept.setText("Accept Button");
 	oBtnAccept.setType(sButtonTypeAccept);
 	oBtnAccept.setEnabled(bEnabled);
@@ -125,7 +139,7 @@ sap.ui.define([
 	oBtnAccept.placeAt("contentBtnAccept");
 
 	// Reject Button
-	var oBtnReject = new Button("b5");
+	const oBtnReject = new Button("b5");
 	oBtnReject.setText("Reject Button");
 	oBtnReject.setType(sButtonTypeReject);
 	oBtnReject.setEnabled(bEnabled);
@@ -133,7 +147,7 @@ sap.ui.define([
 	oBtnReject.placeAt("contentBtnReject");
 
 	// Transparent Button
-	var oBtnTransparent = new Button("b6");
+	const oBtnTransparent = new Button("b6");
 	oBtnTransparent.setText("Transparent Button");
 	oBtnTransparent.setType(sButtonTypeTransparent);
 	oBtnTransparent.setEnabled(bEnabled);
@@ -141,7 +155,7 @@ sap.ui.define([
 	oBtnTransparent.placeAt("contentBtnTransparent");
 
 	// Button Width
-	var oBtnWidth = new Button("b7");
+	const oBtnWidth = new Button("b7");
 	oBtnWidth.setText("Button with 200 pixel");
 	oBtnWidth.setType(sButtonTypeDefault);
 	oBtnWidth.setEnabled(bEnabled);
@@ -150,7 +164,7 @@ sap.ui.define([
 	oBtnWidth.placeAt("contentBtnWidth");
 
 	// Disabled Button
-	var oBtnDisabled = new Button("b8");
+	const oBtnDisabled = new Button("b8");
 	oBtnDisabled.setText("Disabled Button");
 	oBtnDisabled.setType(sButtonTypeDefault);
 	oBtnDisabled.setEnabled(bDisabled);
@@ -159,7 +173,7 @@ sap.ui.define([
 	oBtnDisabled.placeAt("contentBtnDisabled");
 
 	// Icon Button
-	var oBtnIcon = new Button("b9");
+	const oBtnIcon = new Button("b9");
 	oBtnIcon.setText("Icon Button");
 	oBtnIcon.setType(sButtonTypeDefault);
 	oBtnIcon.setEnabled(bEnabled);
@@ -168,7 +182,7 @@ sap.ui.define([
 	oBtnIcon.placeAt("contentBtnIcon");
 
 	// Up Button
-	var oBtnUp = new Button("b10");
+	const oBtnUp = new Button("b10");
 	oBtnUp.setText("Up Button");
 	oBtnUp.setType(sButtonTypeUp);
 	oBtnUp.setEnabled(bEnabled);
@@ -176,35 +190,35 @@ sap.ui.define([
 	oBtnUp.placeAt("contentBtnUp");
 
 	// Unstyled Button
-	var oBtnUp = new Button("b11");
-	oBtnUp.setText("Unstyled Button");
-	oBtnUp.setType(sButtonTypeUnstyled);
-	oBtnUp.setEnabled(bEnabled);
-	oBtnUp.attachPress(tabEventHandler2);
-	oBtnUp.placeAt("contentBtnUnstyled");
+	const oBtnUnstyled = new Button("b11");
+	oBtnUnstyled.setText("Unstyled Button");
+	oBtnUnstyled.setType(sButtonTypeUnstyled);
+	oBtnUnstyled.setEnabled(bEnabled);
+	oBtnUnstyled.attachPress(tabEventHandler2);
+	oBtnUnstyled.placeAt("contentBtnUnstyled");
 
 	// Invisible Button
-	var oBtnUp = new Button("b12");
-	oBtnUp.setText("Invisible Button");
-	oBtnUp.setVisible(false);
-	oBtnUp.placeAt("contentBtnInvisible");
+	const oBtnInvisible = new Button("b12");
+	oBtnInvisible.setText("Invisible Button");
+	oBtnInvisible.setVisible(false);
+	oBtnInvisible.placeAt("contentBtnInvisible");
 
 	// RTL Button
-	var oBtnRtl = new Button("b13");
+	const oBtnRtl = new Button("b13");
 	oBtnRtl.setText("Button TextDirection RTL");
 	oBtnRtl.setIcon(IconPool.getIconURI("employee"));
 	oBtnRtl.setTextDirection(TextDirection.RTL);
 	oBtnRtl.placeAt("contentBtnTextDirectionRTL");
 
 	// LTR Button
-	var oBtnLtr = new Button("b14");
+	const oBtnLtr = new Button("b14");
 	oBtnLtr.setText("Button TextDirection LTR");
 	oBtnLtr.setIcon(IconPool.getIconURI("employee"));
 	oBtnLtr.setTextDirection(TextDirection.LTR);
 	oBtnLtr.placeAt("contentBtnTextDirectionLTR");
 
 	// Icon Button for tap test
-	var oBtnIconTap = new Button("b15");
+	const oBtnIconTap = new Button("b15");
 	oBtnIconTap.setText("Tap Button");
 	oBtnIconTap.setType(sButtonTypeDefault);
 	oBtnIconTap.setEnabled(bEnabled);
@@ -285,28 +299,28 @@ sap.ui.define([
 	});
 
 	QUnit.test("TextDirectionRtlOk", function(assert) {
-		var $btnText = b13.$().find('.sapMBtnContent');
+		const $btnText = b13.$().find('.sapMBtnContent');
 		assert.equal($btnText.attr("dir"), "rtl", "Control text has 'dir' property set to right-to-left");
-		var $btnBDITag = document.getElementById('b13-content').firstChild.nodeName.toLowerCase() === "bdi";
+		const $btnBDITag = document.getElementById('b13-content').firstChild.nodeName.toLowerCase() === "bdi";
 		assert.ok(!$btnBDITag, "Control doesn't have bidi tag set when it has explicitly set direction");
 	});
 
 	QUnit.test("TextDirectionLtrOk", function(assert) {
-		var $btnText = b14.$().find('.sapMBtnContent');
+		const $btnText = b14.$().find('.sapMBtnContent');
 		assert.equal($btnText.attr("dir"), "ltr", "Control text has 'dir' property set to left-to-right");
-		var $btnBDITag = document.getElementById('b14-content').firstChild.nodeName.toLowerCase() === "bdi";
+		const $btnBDITag = document.getElementById('b14-content').firstChild.nodeName.toLowerCase() === "bdi";
 		assert.ok(!$btnBDITag, "Control doesn't have bidi tag set when it has explicitly set direction");
 	});
 
 	QUnit.test("BDI set when no textdirection is given explicitly", function(assert) {
-		var $btnBDITag = document.getElementById('b1-content').firstChild.nodeName;
+		const $btnBDITag = document.getElementById('b1-content').firstChild.nodeName;
 
 		assert.equal($btnBDITag.toLowerCase(), "bdi", "Control has bdi tag set");
 	});
 
 	QUnit.test("BDI set after using the setter of the text property", function(assert) {
 		b1.setText("New Button Text");
-		var $btnBDITag = document.getElementById('b1-content').firstChild.nodeName;
+		const $btnBDITag = document.getElementById('b1-content').firstChild.nodeName;
 
 		assert.equal($btnBDITag.toLowerCase(), "bdi", "Control has bdi tag set after using the setter of the text property");
 	});
@@ -316,8 +330,8 @@ sap.ui.define([
 			b1.firePress();
 			assert.ok(false,"Exception should have been thrown!");
 		} catch (e) {
-			assert.ok(e == sPressMessage + " - Exception","Button1 - Exception was thrown correctly!");
-			assert.equal(e,sPressMessage + " - Exception","Button1 - Exception was thrown correctly!");
+			assert.ok(e == `${sPressMessage} - Exception`,"Button1 - Exception was thrown correctly!");
+			assert.equal(e,`${sPressMessage} - Exception`,"Button1 - Exception was thrown correctly!");
 		}
 		b2.firePress();
 		assert.ok(msg == sPressMessage, "Button2 - Event was fired correctly!");
@@ -344,14 +358,14 @@ sap.ui.define([
 		this.stub(Device, "system").value({ desktop : oTestDescription.desktop });
 
 		// System under Test
-		var oButton = new Button({
+		const oButton = new Button({
 			enabled : oTestDescription.enabled
 		});
 		oButton.placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
 
 		// Act
-		var bHoverable = oButton._isHoverable();
+		const bHoverable = oButton._isHoverable();
 
 		// Assert
 		assert.strictEqual(bHoverable, oTestDescription.shouldBeHoverable, "The button determines whether it should be hoverable");
@@ -396,16 +410,15 @@ sap.ui.define([
 
 	QUnit.test("Should not re-render the button if the text is changed", async function(assert) {
 		// Arrange
-		var sTextToSet = "<script>alert(\"HAACKED\");<\/script>",
-			oResult,
-			oConstructor = { text : "No empty text"};
+		const sTextToSet = "<script>alert(\"HAACKED\");<\/script>";
+		const oConstructor = { text : "No empty text"};
 
 		// System under Test
-		var oButton = new Button(oConstructor).placeAt("qunit-fixture");
+		const oButton = new Button(oConstructor).placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
 
 		// Act
-		oResult = oButton.setText(sTextToSet);
+		const oResult = oButton.setText(sTextToSet);
 		await nextUIUpdate(this.clock);
 
 		// Assert
@@ -422,13 +435,12 @@ sap.ui.define([
 	 */
 	QUnit.test("Tap event should not be fired when the button is set to invisible", function(assert) {
 		// Arrange
-		var oRenderSpy,
-			oConstructor = { visible : false };
+		const oConstructor = { visible : false };
 
 		// System under Test
-		var oButton = new Button(oConstructor).placeAt("qunit-fixture");
+		const oButton = new Button(oConstructor).placeAt("qunit-fixture");
 
-		oRenderSpy = this.spy(oButton, "fireTap");
+		const oRenderSpy = this.spy(oButton, "fireTap");
 
 		// Act
 		oButton.ontap({ setMarked:  this.stub() });
@@ -447,8 +459,8 @@ sap.ui.define([
 			safari: true
 		});
 
-		var oButton = new Button({text: "MyText", icon: "sap-icon://search"}).placeAt("qunit-fixture"),
-			oFocusSpy = this.spy(oButton, "_setButtonFocus");
+		const oButton = new Button({text: "MyText", icon: "sap-icon://search"}).placeAt("qunit-fixture");
+		const oFocusSpy = this.spy(oButton, "_setButtonFocus");
 
 		// Act
 		oButton.ontouchstart({ setMarked: this.stub() , preventDefault: this.stub(), targetTouches: { length: 1 }, originalEvent: { type: "mousedown" }, target: { id: 'fake-button-id' }});
@@ -467,8 +479,8 @@ sap.ui.define([
 			firefox: true
 		});
 
-		var oButton = new Button({text: "MyText", icon: "sap-icon://search"}).placeAt("qunit-fixture"),
-			oFocusSpy = this.spy(oButton, "_setButtonFocus");
+		const oButton = new Button({text: "MyText", icon: "sap-icon://search"}).placeAt("qunit-fixture");
+		const oFocusSpy = this.spy(oButton, "_setButtonFocus");
 
 		// Act
 		oButton.ontouchstart({ setMarked: this.stub() , preventDefault: this.stub(), targetTouches: { length: 1 }, originalEvent: { type: "mousedown" }, target: { id: 'fake-button-id' }});
@@ -521,7 +533,7 @@ sap.ui.define([
 	QUnit.test("Tooltip is recognized", function(assert) {
 
 		// Arrange
-		var oButton = new Button({text: "MyText",
+		const oButton = new Button({text: "MyText",
 			icon: "sap-icon://search"});
 
 		assert.strictEqual(oButton._getTooltip(), undefined, "Should not return tooltip");
@@ -540,7 +552,7 @@ sap.ui.define([
 	QUnit.test("Tooltip is derived for icon-only buttons", function(assert) {
 
 		// Arrange
-		var oButton = new Button({tooltip: "MyTooltip",
+		const oButton = new Button({tooltip: "MyTooltip",
 			icon: "sap-icon://search"});
 
 		assert.strictEqual(oButton._getTooltip(), "MyTooltip", "Should return the primary tooltip");
@@ -564,14 +576,14 @@ sap.ui.define([
 
 	QUnit.test("getAccessibilityInfo", async function(assert) {
 		// Arrange
-		var oButton = new Button({tooltip: "Tooltip"}).placeAt("qunit-fixture");
+		const oButton = new Button({tooltip: "Tooltip"}).placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
 
 		// Assert
 		assert.ok(!!oButton.getAccessibilityInfo, "Button has a getAccessibilityInfo function");
 
 		// Act
-		var oInfo = oButton.getAccessibilityInfo();
+		let oInfo = oButton.getAccessibilityInfo();
 
 		// Assert
 		assert.ok(!!oInfo, "getAccessibilityInfo returns a info object");
@@ -624,7 +636,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("getAccessibilityInfo", async function(assert) {
-		var oButton = new Button("btnLink", {
+		const oButton = new Button("btnLink", {
 			accessibleRole: ButtonAccessibleRole.Link
 		}).placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
@@ -634,12 +646,12 @@ sap.ui.define([
 	// BCP: 0020751294 0000677825 2019
 	QUnit.test("Press event fires once", async function(assert) {
 		// arrange
-		var pressSpy = this.spy(),
-			oTouchEndEvent = { setMarked: function() { }, which: 1, originalEvent: { buttons: 0, type: "mouseup"}, target: { id: "btn1-BDI-content" } },
-			oTapEvent = { setMarked: function() { } },
-			oButton = new Button("btn1", {
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oTouchEndEvent = { setMarked: () => { }, which: 1, originalEvent: { buttons: 0, type: "mouseup"}, target: { id: "btn1-BDI-content" } };
+		const oTapEvent = { setMarked: () => { } };
+		const oButton = new Button("btn1", {
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
 
 		oButton._bRenderActive = true; //simulate pressed state
@@ -657,11 +669,11 @@ sap.ui.define([
 
 	QUnit.test("Right click should not trigger press event", async function(assert) {
 		// Arrange
-		var pressSpy = this.spy(),
-			oTouchEndEvent = { setMarked: function() { }, which: 3, originalEvent: { type: "mouseup" }, target: { id: "btn1-BDI-content" } },
-			oButton = new Button("btn1", {
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oTouchEndEvent = { setMarked: () => { }, which: 3, originalEvent: { type: "mouseup" }, target: { id: "btn1-BDI-content" } };
+		const oButton = new Button("btn1", {
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -679,11 +691,11 @@ sap.ui.define([
 
 	QUnit.test("Right click should not trigger press event: Scenario 2", async function(assert) {
 		// Arrange
-		var pressSpy = this.spy(),
-			oTouchEndEvent = { setMarked: function() { }, which: 3, originalEvent: { type: "mouseup" }, target: { id: "btn1-inner" } },
-			oButton = new Button("btn1", {
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oTouchEndEvent = { setMarked: () => { }, which: 3, originalEvent: { type: "mouseup" }, target: { id: "btn1-inner" } };
+		const oButton = new Button("btn1", {
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		// This is simulating a button with an icon, that removes its icon on right click
 		// Causing the IDs to be different between the touchstart and touchend events.
@@ -703,12 +715,12 @@ sap.ui.define([
 
 	QUnit.test("_activeButton _inactiveButton", async function(assert) {
 		//sut
-		var sIconURI = 'sap-icon://slim-arrow-down',
-			sActiveIconURI = 'sap-icon://slim-arrow-up',
-			oButton = new Button({
-				icon: sIconURI,
-				activeIcon: sActiveIconURI
-			});
+		const sIconURI = 'sap-icon://slim-arrow-down';
+		const sActiveIconURI = 'sap-icon://slim-arrow-up';
+		const oButton = new Button({
+			icon: sIconURI,
+			activeIcon: sActiveIconURI
+		});
 
 		oButton.placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
@@ -748,10 +760,10 @@ sap.ui.define([
 
 	QUnit.test("Enter event should fire press on keydown", async function(assert) {
 		// System under Test
-		var pressSpy = this.spy(),
-			oButton = new Button({
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oButton = new Button({
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -775,10 +787,10 @@ sap.ui.define([
 
 	QUnit.test("Enter event should not fire press on keyup", async function(assert) {
 		// System under Test
-		var pressSpy = this.spy(),
-			oButton = new Button({
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oButton = new Button({
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -794,10 +806,10 @@ sap.ui.define([
 
 	QUnit.test("Space event should not fire press on keydown", async function(assert) {
 		// System under Test
-		var pressSpy = this.spy(),
-			oButton = new Button({
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oButton = new Button({
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -813,10 +825,10 @@ sap.ui.define([
 
 	QUnit.test("Space event should not fire press on keyup if there was no keydown on the button", async function(assert) {
 		// System under Test
-		var pressSpy = this.spy(),
-			oButton = new Button({
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oButton = new Button({
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -832,10 +844,10 @@ sap.ui.define([
 
 	QUnit.test("Space event should fire press on keyup", async function(assert) {
 		// System under Test
-		var pressSpy = this.spy(),
-			oButton = new Button({
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oButton = new Button({
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -852,10 +864,10 @@ sap.ui.define([
 
 	QUnit.test("Space event should not fire press if ESCAPE is pressed and released after the Space is released", async function(assert) {
 		// System under Test
-		var pressSpy = this.spy(),
-			oButton = new Button({
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oButton = new Button({
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -875,10 +887,10 @@ sap.ui.define([
 
 	QUnit.test("Space event should not fire press if ESCAPE is pressed then Space is released and then Escape is released", async function(assert) {
 		// System under Test
-		var pressSpy = this.spy(),
-			oButton = new Button({
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oButton = new Button({
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -898,7 +910,7 @@ sap.ui.define([
 
 	QUnit.test("_bPressedSpace is reset on Escape", async function(assert) {
 		// System under Test
-		var oButton = new Button().placeAt("qunit-fixture");
+		const oButton = new Button().placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -917,10 +929,10 @@ sap.ui.define([
 
 	QUnit.test("Space event should not fire press if SHIFT is pressed and released after the Space is released", async function(assert) {
 		// System under Test
-		var pressSpy = this.spy(),
-			oButton = new Button({
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oButton = new Button({
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -940,10 +952,10 @@ sap.ui.define([
 
 	QUnit.test("Space event should not fire press if SHIFT is pressed then Space is released and then SHIFT is released", async function(assert) {
 		// System under Test
-		var pressSpy = this.spy(),
-			oButton = new Button({
-				press: pressSpy
-			}).placeAt("qunit-fixture");
+		const pressSpy = this.spy();
+		const oButton = new Button({
+			press: pressSpy
+		}).placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -963,10 +975,10 @@ sap.ui.define([
 
 	QUnit.test("All keys should be ignored when Space is pressed", async function(assert) {
 		// System under Test
-		var oEvent = {
-				preventDefault: this.spy()
-			},
-			oButton = new Button().placeAt("qunit-fixture");
+		const oEvent = {
+			preventDefault: this.spy()
+		};
+		const oButton = new Button().placeAt("qunit-fixture");
 
 		await nextUIUpdate(this.clock);
 
@@ -987,7 +999,7 @@ sap.ui.define([
 		this.stub(Device, "browser").value({"firefox": true});
 
 		// System under Test
-		var oButton = new Button({
+		const oButton = new Button({
 			text: "Test",
 			dragDropConfig: new DragInfo()
 		});
@@ -1008,9 +1020,9 @@ sap.ui.define([
 	//BCP: 1970026521
 	QUnit.test("on mouse enter, button returns to active if the left mouse button is pressed", function(assert) {
 		// System under Test
-		var oButton = new Button();
+		const oButton = new Button();
 
-		var spyActivate = this.spy(oButton, "_activeButton");
+		const spyActivate = this.spy(oButton, "_activeButton");
 
 		// Action
 		// enter when left mouse and wheel are depressed
@@ -1027,9 +1039,9 @@ sap.ui.define([
 	//BCP: 1970231584
 	QUnit.test("on mouse enter, button doesn't get active if it wasn't pressed before and the left mouse button is pressed", function(assert) {
 		// System under Test
-		var oButton = new Button();
+		const oButton = new Button();
 
-		var spyActivate = this.spy(oButton, "_activeButton");
+		const spyActivate = this.spy(oButton, "_activeButton");
 
 		// Action
 		// enter when left mouse and wheel are depressed
@@ -1045,7 +1057,7 @@ sap.ui.define([
 
 	QUnit.test("Types Negative, Critical, Success, Neutral implied icon is applied", async function(assert) {
 		// arrange
-		var oButton = new Button({
+		const oButton = new Button({
 			text: "button"
 		});
 		oButton.placeAt("qunit-fixture");
@@ -1104,7 +1116,7 @@ sap.ui.define([
 
 	QUnit.test("Icon is preferred over the type's implied icon", async function(assert) {
 		// arrange
-		var oButton = new Button({
+		const oButton = new Button({
 			text: "button",
 			icon: "sap-icon://message-information"
 		});
@@ -1138,7 +1150,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Rendering of icons for Back/Up type", async function (assert) {
-		var oButton = new Button({
+		const oButton = new Button({
 			type: ButtonType.Back
 		});
 
@@ -1171,16 +1183,16 @@ sap.ui.define([
 	 * @deprecated as of version 1.20, replaced by <code>press</code> event
 	 */
 	QUnit.test("Trigger TAP event in some cases missed by the core (for non-IE browsers only)", function(assert) {
-		var spy = this.spy(b15, "ontap");
+		const spy = this.spy(b15, "ontap");
 
 		// events needed
-		var oEventDown = new Event("mousedown", {bubbles: true, cancelable: true});
-		var oEventUp = new Event("mouseup", {bubbles: true, cancelable: true});
+		const oEventDown = new Event("mousedown", {bubbles: true, cancelable: true});
+		const oEventUp = new Event("mouseup", {bubbles: true, cancelable: true});
 
-		var oBdiContent = document.getElementById("b15-BDI-content");
-		var oContent = document.getElementById("b15-content");
-		var oInner = document.getElementById("b15-inner");
-		var oImg = document.getElementById("b15-img");
+		const oBdiContent = document.getElementById("b15-BDI-content");
+		const oContent = document.getElementById("b15-content");
+		const oInner = document.getElementById("b15-inner");
+		const oImg = document.getElementById("b15-img");
 
 		// cases where we don't get tap, check if artificial tap is working
 
@@ -1286,7 +1298,7 @@ sap.ui.define([
 
 	QUnit.test("Labelled (via enhanceAccessibilityState)", async function (assert) {
 		// prepare
-		var ButtonContainer = Control.extend("test.lib.ButtonContainer", {
+		const ButtonContainer = Control.extend("test.lib.ButtonContainer", {
 			metadata: {
 				aggregations: {
 					button: { type: 'sap.m.Button', multiple: false }
@@ -1306,7 +1318,7 @@ sap.ui.define([
 			mAriaProps["labelledby"] = "test";
 		};
 
-		var oContainer = new ButtonContainer({
+		const oContainer = new ButtonContainer({
 			button: new Button({ text: "test" })
 		});
 		oContainer.placeAt("qunit-fixture");
@@ -1391,7 +1403,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Described (via semantic type)", async function (assert) {
-		var sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
+		const sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
 
 		this.oButton.setType(ButtonType.Emphasized);
 		await nextUIUpdate(this.clock);
@@ -1440,7 +1452,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Combined (via association and semantic type)", async function (assert) {
-		var sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
+		const sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
 
 		this.oButton.addAriaLabelledBy(this.oLabel);
 		this.oButton.setType(ButtonType.Emphasized);
@@ -1448,11 +1460,11 @@ sap.ui.define([
 
 		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-labelledby"), "label", "Label is added");
 		assert.strictEqual(this.oButtonDomRef.getAttribute("title"), "Add", "Tooltip is set");
-		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-describedby"), "btn-tooltip " + sTypeId, "Both tooltip and type are added in aria-describedby");
+		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-describedby"), `btn-tooltip ${sTypeId}`, "Both tooltip and type are added in aria-describedby");
 	});
 
 	QUnit.test("Combined (via labelFor and semantic type)", async function (assert) {
-		var sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
+		const sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
 
 		this.oLabel.setLabelFor(this.oButton);
 		this.oButton.setType(ButtonType.Emphasized);
@@ -1460,7 +1472,7 @@ sap.ui.define([
 
 		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-labelledby"), "label", "Label is added");
 		assert.strictEqual(this.oButtonDomRef.getAttribute("title"), "Add", "Tooltip is set");
-		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-describedby"), "btn-tooltip " + sTypeId, "Both tooltip and type are added in aria-describedby");
+		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-describedby"), `btn-tooltip ${sTypeId}`, "Both tooltip and type are added in aria-describedby");
 	});
 
 	QUnit.module("Text button w/ tooltip ARIA", {
@@ -1507,12 +1519,12 @@ sap.ui.define([
 	});
 
 	QUnit.test("Described (via semantic type)", async function (assert) {
-		var sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
+		const sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
 
 		this.oButton.setType(ButtonType.Emphasized);
 		await nextUIUpdate(this.clock);
 
-		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-describedby"), "btn-tooltip " + sTypeId, "Both tooltip and type are added in aria-describedby");
+		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-describedby"), `btn-tooltip ${sTypeId}`, "Both tooltip and type are added in aria-describedby");
 		assert.strictEqual(this.oButtonDomRef.getAttribute("title"), "Tooltip", "Tooltip is set");
 	});
 
@@ -1555,7 +1567,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Combined (via association and semantic type)", async function (assert) {
-		var sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
+		const sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
 
 		this.oButton.addAriaLabelledBy(this.oLabel);
 		this.oButton.setType(ButtonType.Emphasized);
@@ -1563,11 +1575,11 @@ sap.ui.define([
 
 		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-labelledby"), "label btn-content", "Self-reference is added in addition to the label");
 		assert.strictEqual(this.oButtonDomRef.getAttribute("title"), "Tooltip", "Tooltip is set");
-		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-describedby"), "btn-tooltip " + sTypeId, "Both tooltip and type are added in aria-describedby");
+		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-describedby"), `btn-tooltip ${sTypeId}`, "Both tooltip and type are added in aria-describedby");
 	});
 
 	QUnit.test("Combined (via labelFor and semantic type)", async function (assert) {
-		var sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
+		const sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
 
 		this.oLabel.setLabelFor(this.oButton);
 		this.oButton.setType(ButtonType.Emphasized);
@@ -1575,7 +1587,7 @@ sap.ui.define([
 
 		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-labelledby"), "label btn-content", "Self-reference is added in addition to the label");
 		assert.strictEqual(this.oButtonDomRef.getAttribute("title"), "Tooltip", "Tooltip is set");
-		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-describedby"), "btn-tooltip " + sTypeId, "Both tooltip and type are added in aria-describedby");
+		assert.strictEqual(this.oButtonDomRef.getAttribute("aria-describedby"), `btn-tooltip ${sTypeId}`, "Both tooltip and type are added in aria-describedby");
 	});
 
 	QUnit.module("Text button w/o tooltip ARIA", {
@@ -1617,7 +1629,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Described (via semantic type)", async function (assert) {
-		var sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
+		const sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
 
 		this.oButton.setType(ButtonType.Emphasized);
 		await nextUIUpdate(this.clock);
@@ -1658,7 +1670,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Combined (via association and semantic type)", async function (assert) {
-		var sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
+		const sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
 
 		this.oButton.addAriaLabelledBy(this.oLabel);
 		this.oButton.setType(ButtonType.Emphasized);
@@ -1669,7 +1681,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Combined (via labelFor and semantic type)", async function (assert) {
-		var sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
+		const sTypeId = InvisibleText.getStaticId("sap.m", "BUTTON_ARIA_TYPE_EMPHASIZED");
 
 		this.oLabel.setLabelFor(this.oButton);
 		this.oButton.setType(ButtonType.Emphasized);
@@ -1682,10 +1694,10 @@ sap.ui.define([
 	QUnit.module("General ARIA");
 
 	QUnit.test("Default tooltip for Back/Up type", async function (assert) {
-		var oButton = new Button({
-				type: ButtonType.Back
-			}),
-			sTooltip = oButton._getTooltip();
+		const oButton = new Button({
+			type: ButtonType.Back
+		});
+		const sTooltip = oButton._getTooltip();
 
 		oButton.placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
@@ -1698,16 +1710,15 @@ sap.ui.define([
 	});
 
 	QUnit.test("Appearance of the aria-haspopup attribute", async function (assert) {
-		var oButton = new Button("btn", {
-				text: "I am a button"
-			}),
-			AriaHasPopup = coreLibrary.aria.HasPopup,
-			oButtonDomRef;
+		const oButton = new Button("btn", {
+			text: "I am a button"
+		});
+		const AriaHasPopup = coreLibrary.aria.HasPopup;
 
 		// setup
 		oButton.placeAt("qunit-fixture");
 		await nextUIUpdate(this.clock);
-		oButtonDomRef = oButton.getDomRef();
+		const oButtonDomRef = oButton.getDomRef();
 
 		// check initial aria-haspopup state
 		assert.notOk(oButtonDomRef.getAttribute("aria-haspopup"), "There is no aria-haspopup attribute initially.");
@@ -1733,12 +1744,12 @@ sap.ui.define([
 
 	QUnit.test("aria-live attribute", async function (assert) {
 		// text
-		var oTextButton = new Button({
+		const oTextButton = new Button({
 			text:'text'
 		}).placeAt('qunit-fixture');
 
 		// icon
-		var oIconButton = new Button({
+		const oIconButton = new Button({
 			icon:'sap-icon://save'
 		}).placeAt('qunit-fixture');
 
@@ -1793,7 +1804,7 @@ sap.ui.define([
 	});
 
 	QUnit.test("Check badge visibility and value", async function (assert) {
-		var $oBadgeIndicator = this.oButton.$().find(".sapMBadgeIndicator").first();
+		const $oBadgeIndicator = this.oButton.$().find(".sapMBadgeIndicator").first();
 
 		// check for badge visibility and value
 		assert.equal($oBadgeIndicator.hasClass(	"sapMBadgeAnimationAdd"), true, "Badge Indicator DOM element exists and is visible");
@@ -1814,12 +1825,12 @@ sap.ui.define([
 	});
 
 	QUnit.test("Check badge aria-describedby and invisible text", async function (assert) {
-		var oBadgeInvisibleText = this.oButton._getBadgeInvisibleText();
+		const oBadgeInvisibleText = this.oButton._getBadgeInvisibleText();
 
 		// check invisible text
 		assert.ok(oBadgeInvisibleText, "Invisible text for badge exists");
 		// check if aria-describedby contains invisible text id
-		assert.ok(this.oButton.$().attr("aria-describedby").indexOf(oBadgeInvisibleText.getId()) !== -1,
+		assert.ok(this.oButton.$().attr("aria-describedby").includes(oBadgeInvisibleText.getId()),
 				  "When the Badge is visible, aria-describedby attribute of the button contains invisible text id");
 
 		// hide badge
@@ -1833,7 +1844,7 @@ sap.ui.define([
 
 	QUnit.test("Badge value range", async function (assert) {
 		//Arrange
-		var $oBadgeIndicator = this.oButton.$().find(".sapMBadgeIndicator").first();
+		let $oBadgeIndicator = this.oButton.$().find(".sapMBadgeIndicator").first();
 
 		//Act
 		this.oBadgeData.setValue("10000");
@@ -1932,8 +1943,8 @@ sap.ui.define([
 
 	QUnit.test("Buttton.prototype._updateBadgeInvisibleText", function(assert) {
 		// Prepare
-		var oButton = new Button();
-		var oConsoleErrorSpy = this.spy(console, "error");
+		const oButton = new Button();
+		const oConsoleErrorSpy = this.spy(console, "error");
 
 		// Act
 		oButton._updateBadgeInvisibleText("text");
