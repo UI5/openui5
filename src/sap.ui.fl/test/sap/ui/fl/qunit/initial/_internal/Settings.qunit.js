@@ -139,6 +139,25 @@ sap.ui.define([
 				"then the warning message is correct"
 			);
 		});
+
+		QUnit.test("isVersionMetadataUpdateAvailable default and backend value", async function(assert) {
+			const oDefaultSettings = await Settings.getInstance();
+			assert.strictEqual(
+				oDefaultSettings.getIsVersionMetadataUpdateAvailable(),
+				false,
+				"then the setting defaults to false when not provided by the backend"
+			);
+
+			Settings.clearInstance();
+			this.oLoadFeaturesStub.restore();
+			sandbox.stub(Storage, "loadFeatures").resolves({ isVersionMetadataUpdateAvailable: true });
+			const oLoadedSettings = await Settings.getInstance();
+			assert.strictEqual(
+				oLoadedSettings.getIsVersionMetadataUpdateAvailable(),
+				true,
+				"then the value provided by the backend is used"
+			);
+		});
 	});
 
 	QUnit.module("Settings with Connector responses stubbed", {

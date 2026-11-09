@@ -55,6 +55,19 @@ sap.ui.define([
 		},
 
 		/**
+		 * Determines if the connected backend supports updating version metadata (title, comment)
+		 * and that comments exist for versions.
+		 *
+		 * @returns {Promise<boolean>} Promise resolving with a flag if version metadata update is available
+		 *
+		 * @private
+		 * @ui5-restricted
+		 */
+		isVersionMetadataUpdateAvailable() {
+			return Settings.getInstance().then((oSettings) => oSettings.getIsVersionMetadataUpdateAvailable());
+		},
+
+		/**
 		 * Determines if Save As app variants feature is available in the connected backend.
 		 *
 		 * @param {string} sLayer - Layer to check for key user app variants

@@ -153,6 +153,11 @@ sap.ui.define([
 				isVariantSharingEnabled: { type: "boolean", defaultValue: false },
 
 				/**
+				 * Indicates whether the backend supports updating version metadata (title, comment) and that comments exist for versions
+				 */
+				isVersionMetadataUpdateAvailable: { type: "boolean", defaultValue: false },
+
+				/**
 				 * Indicates per layer if draft handling is enabled
 				 */
 				isVersioningEnabled: { type: "boolean", defaultValue: false },
@@ -200,6 +205,7 @@ sap.ui.define([
 		isPublishAvailable: [Layer.CUSTOMER],
 		isSeenFeaturesAvailable: [Layer.CUSTOMER],
 		isVariantPersonalizationEnabled: [Layer.USER],
+		isVersionMetadataUpdateAvailable: [Layer.CUSTOMER],
 		isVersioningEnabled: [Layer.CUSTOMER]
 	};
 
