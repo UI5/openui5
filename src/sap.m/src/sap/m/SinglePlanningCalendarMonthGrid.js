@@ -536,11 +536,11 @@ sap.ui.define([
 		};
 
 		/**
-		 * Handles the <code>mouseup</code> event on the grid.
+		 * Handles the <code>tap</code> event on the grid.
 		 *
 		 * @param {jQuery.Event} oEvent The event object
 		 */
-		SinglePlanningCalendarMonthGrid.prototype.onmouseup = function(oEvent) {
+		SinglePlanningCalendarMonthGrid.prototype.ontap = function(oEvent) {
 			if (oEvent.target.classList.contains("sapMSPCMonthWeekNumber")) {
 				const iWeekNumber = Number(oEvent.target.textContent);
 
