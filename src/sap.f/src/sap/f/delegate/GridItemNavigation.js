@@ -7,14 +7,17 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/base/Log",
 	"sap/f/library",
-	"sap/f/GridNavigationMatrix"
+	"sap/f/GridNavigationMatrix",
+	"sap/ui/thirdparty/jquery",
+	"sap/ui/dom/jquery/Selectors"
 ], function (
 	Element,
 	ItemNavigation,
 	KeyCodes,
 	Log,
 	library,
-	GridNavigationMatrix
+	GridNavigationMatrix,
+	jQuery
 ) {
 	"use strict";
 
@@ -62,6 +65,31 @@ sap.ui.define([
 		if (oEvent.target === this.oDomRef) {
 			this.resetFocusPosition();
 		}
+	};
+
+	/**
+	 * @override
+	 */
+	GridItemNavigation.prototype.onmousedown = function (oEvent) {
+		const oSource = oEvent.target;
+
+		if (this.oDomRef && this.oDomRef.contains(oSource)) {
+			const aItemDomRefs = this.getItemDomRefs();
+
+			for (let i = 0; i < aItemDomRefs.length; i++) {
+				const oItem = aItemDomRefs[i];
+
+				// mousedown on a focusable element inside a grid item must not move the focus
+				// to the item root, otherwise large items are scrolled into view (scroll jump)
+				if (oItem && oItem !== oSource && oItem.contains(oSource) && jQuery(oSource).closest(":sapFocusable").get(0) !== oItem) {
+					this.setFocusedIndex(i);
+					this.resetFocusPosition();
+					return;
+				}
+			}
+		}
+
+		ItemNavigation.prototype.onmousedown.call(this, oEvent);
 	};
 
 	/**
