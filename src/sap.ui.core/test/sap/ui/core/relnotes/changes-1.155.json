@@ -3,6 +3,21 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "b16f43a26417390c03b8b67fd1b61e4682a311e1",
+        "type": "FIX",
+        "text": " sap.ui.model.odata.v4.ODataMetaModel#getETags: missing URL parameters for $metadata"
+      },
+      {
+        "id": "71ed12cdef1e1eb051e60c0e37d9782741110625",
+        "type": "FIX",
+        "text": " sap.m.OverflowToolbar: Overflow menu can now be opened on mobile devices"
+      },
+      {
+        "id": "ddadf1d7e6aecbf515724b37f05a83516442b3c3",
+        "type": "FEATURE",
+        "text": " sap.ui.core.tooltip.Tooltip: horizontalAlign and verticalAlign are now supported"
+      },
+      {
         "id": "60877dcc754ff72b933bc5e4bda9341d1a935072",
         "type": "FIX",
         "text": " Localization: broken links are fixed"

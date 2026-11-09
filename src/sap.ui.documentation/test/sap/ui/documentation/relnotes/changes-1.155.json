@@ -3,6 +3,11 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "3883108f296b3ebd4790f401e2375279b6f1c888",
+        "type": "FIX",
+        "text": " sap.ui.documentation: fix Appearance auto-theme OPA test"
+      },
+      {
         "id": "b2f5d8010cd304c985ff1659795b4f135c734e15",
         "type": "FIX",
         "text": " DemoKit: prevent duplicate requests for index.json"

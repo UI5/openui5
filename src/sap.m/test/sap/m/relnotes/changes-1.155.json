@@ -3,9 +3,59 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "24ce594eb65361e7f51cccfd1890da9c57a217d7",
+        "type": "FIX",
+        "text": " sap.m.GenericTag: Mark press event to stop propagation to parent"
+      },
+      {
+        "id": "19f9f33de419eaf064043d5d0a26c56bb2f05ea1",
+        "type": "FEATURE",
+        "text": " sap.m.Input: enable enhanced tooltip"
+      },
+      {
+        "id": "1214600b6fb4269c3ef090bd309b4c86e3a20071",
+        "type": "FIX",
+        "text": " We've fixed an issue where UploadSet announced 'No data' to screen readers instead of the correct empty state message"
+      },
+      {
+        "id": "71ed12cdef1e1eb051e60c0e37d9782741110625",
+        "type": "FIX",
+        "text": " sap.m.OverflowToolbar: Overflow menu can now be opened on mobile devices"
+      },
+      {
+        "id": "278113f1bd74f8f6de55b1f07ef8ecb2e6d2ec3d",
+        "type": "FIX",
+        "text": " sap.m.ViewSettingsDialog: correct header title color and height"
+      },
+      {
+        "id": "9408fabbafced3e829d8ab8ba3a502145ef8e1cc",
+        "type": "FIX",
+        "text": " We've now fixed JAWS not announcing the file name when the preview dialog opens, and when navigating through carousel items"
+      },
+      {
+        "id": "d9b42f49fb8d817356d9222921cfa6d97539d65d",
+        "type": "FIX",
+        "text": " sap.m.StepInput: prevent double value change on keyboard events"
+      },
+      {
+        "id": "1a8daa4d34aab1ef9275cceb0c81a06872baf746",
+        "type": "FIX",
+        "text": " sap.m.Tokenizer: fix double disabled opacity in MultiComboBox/MultiInput"
+      },
+      {
         "id": "510e47f8f497e94dcfb6c283c05e01b12f1d1341",
         "type": "FIX",
         "text": " sap.m.Link: doesn't have href attribute when EmptyIndicatorMode"
+      },
+      {
+        "id": "13d4c645dce55db957a7490281f9513714ce56eb",
+        "type": "FIX",
+        "text": " DataStateIndicator: avoid orphaned aria-labelledby ids"
+      },
+      {
+        "id": "73ff6dbf0044fca9146dc2601405b33f4b192971",
+        "type": "FIX",
+        "text": " sap.m.GenericTag: setValue(null) throws null exception"
       },
       {
         "id": "1e3935de9ec4ca53e556059e2cd8b3f12563ba87",

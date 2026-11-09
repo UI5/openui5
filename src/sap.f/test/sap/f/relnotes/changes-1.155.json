@@ -3,6 +3,16 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "26cfa67795cad9a86f2eedf8483d1f1c02e1c48d",
+        "type": "FIX",
+        "text": " sap.f: fire invalidate event when rendering is suppressed"
+      },
+      {
+        "id": "835fdac5c39c5ec3f3964f825f86094fc9a02b87",
+        "type": "FIX",
+        "text": " sap.f - correct type exports"
+      },
+      {
         "id": "b9b97ee94ab9dfb4740564d6ec63ead972881d3d",
         "type": "FIX",
         "text": " sap.f.GridContainer: Remove sentinel divs aria-hidden=\"true\""

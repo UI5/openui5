@@ -3,6 +3,16 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "209a7ad6f6fdbddab15d66f8721ad08efc03c6fa",
+        "type": "FIX",
+        "text": " sap.ui.integration.cards.CalendarContent: Show past appointments in calendar cards"
+      },
+      {
+        "id": "70ac1243a9dd3e331322ee08564bf5ee8235daca",
+        "type": "FEATURE",
+        "text": " sap.ui.integration: WebPage card features are productized"
+      },
+      {
         "id": "bef1e44cf41f36dcde9b11ab6989cb5768aac005",
         "type": "FEATURE",
         "text": " sap.ui.integration: Micro charts feature is productized"

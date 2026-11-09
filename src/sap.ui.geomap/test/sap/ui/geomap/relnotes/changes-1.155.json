@@ -3,6 +3,11 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "57fc2a6197a9d1982f648f7e7a4153c483eb5555",
+        "type": "FIX",
+        "text": " sap.ui.geomap - correct type exports"
+      },
+      {
         "id": "dcb865f749611a4ecacd62df90e2ca2380788677",
         "type": "FEATURE",
         "text": " sap.ui.geomap: library and Geomap JSDoc are now expanded"

@@ -3,6 +3,11 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "e9dbcfcfda09e8c2695af2d70bad08c0ac00af5c",
+        "type": "FIX",
+        "text": " Field: timezone not shown"
+      },
+      {
         "id": "a395cc7ec6c647a5d04a608c9024f9fea9c591b8",
         "type": "FIX",
         "text": " FilterBar: AdaptFiltersPanel now has no error on removing last filter"
