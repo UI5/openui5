@@ -622,6 +622,25 @@ sap.ui.define([
 			});
 		});
 
+		QUnit.test("when needs restart is asked for a manifest command with needsReload set to false", async function(assert) {
+			const oManifestCommand = await CommandFactory.getCommandFor(this.oInput1, "addLibrary", {
+				reference: COMPONENT_NAME,
+				parameters: {
+					libraries: {
+						"sap.ui.rta": {
+							lazy: false,
+							minVersion: "1.48"
+						}
+					}
+				},
+				appComponent: oMockedAppComponent
+			}, {}, { layer: Layer.CUSTOMER });
+			oManifestCommand.needsReload = false;
+			await this.oCommandStack.pushAndExecute(oManifestCommand);
+			const bNeedsRestart = await this.oSerializer.needsReload();
+			assert.notOk(bNeedsRestart, "then restart is not necessary when needsReload is set to false on the instance");
+		});
+
 		QUnit.test("Execute 1 'Remove' command and 1 'ControlVariantSwitch' command and save commands", function(assert) {
 			const oSaveChangeSpy = sandbox.spy(PersistenceWriteAPI, "save");
 			sandbox.stub(this.oVM, "getCurrentVariantReference").returns("variantReference");
