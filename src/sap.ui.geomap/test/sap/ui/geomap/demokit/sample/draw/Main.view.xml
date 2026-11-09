@@ -1,0 +1,38 @@
+<mvc:View controllerName="sap.ui.geomap.sample.draw.Main"
+		width="100%" height="100%"
+		xmlns:mvc="sap.ui.core.mvc"
+		xmlns="sap.m"
+		xmlns:gm="sap.ui.geomap">
+
+	<App id="MyApp" defaultTransitionName="show">
+		<Page id="P0" title="Draw a polygon" titleLevel="H1">
+			<Text class="sapUiResponsiveMargin" text="Click on the map to place corner points. Click the first point to close the polygon." />
+			<gm:Geomap id="map"
+				width="100%"
+				height="90%"
+				centerLat="40"
+				centerLng="-3"
+				zoom="6"
+				mapClick=".onMapClick"
+				mapMousemove=".onMapMousemove"
+				mapMouseup=".onMapMouseup">
+				<gm:mapControls>
+					<gm:GeomapProvider id="mapProvider"></gm:GeomapProvider>
+					<gm:GeomapNavigationControl></gm:GeomapNavigationControl>
+					<gm:GeomapScaleControl position="BottomLeft"></gm:GeomapScaleControl>
+					<gm:GeomapCopyrightControl position="BottomRight">
+						<Text class="copyright" text="Map data from "/>
+						<Link class="sapUiTinyMarginBegin" target="_blank" text="OpenStreetMap" href="https://www.openstreetmap.org/copyright"/>
+					</gm:GeomapCopyrightControl>
+				</gm:mapControls>
+				<!-- Filled polygon, shown once the drawing is closed -->
+				<gm:GeomapPolygon id="polygon" fillColor="orange" opacity="0.5"></gm:GeomapPolygon>
+				<!-- Outline of the completed or in-progress polygon -->
+				<gm:GeomapLine id="outline" color="red" width="2"></gm:GeomapLine>
+				<!-- Preview line from last corner to mouse cursor -->
+				<gm:GeomapLine id="preview" color="pink" width="2"></gm:GeomapLine>
+			</gm:Geomap>
+		</Page>
+	</App>
+
+</mvc:View>

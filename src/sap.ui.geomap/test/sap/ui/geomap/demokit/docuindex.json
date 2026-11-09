@@ -8,6 +8,18 @@
 			{
 				"namespace": "sap.ui.geomap.sample.basic",
 				"ref": "test-resources/sap/ui/geomap/demokit/sample/basic"
+			},
+			{
+				"namespace": "sap.ui.geomap.sample.dynamic",
+				"ref": "test-resources/sap/ui/geomap/demokit/sample/dynamic"
+			},
+			{
+				"namespace": "sap.ui.geomap.sample.draw",
+				"ref": "test-resources/sap/ui/geomap/demokit/sample/draw"
+			},
+			{
+				"namespace": "sap.ui.geomap.sample.drive",
+				"ref": "test-resources/sap/ui/geomap/demokit/sample/drive"
 			}
 		],
 		"entities": [
@@ -17,7 +29,10 @@
 				"category": "Container",
 				"since": "1.142",
 				"samples": [
-					"sap.ui.geomap.sample.basic"
+					"sap.ui.geomap.sample.basic",
+					"sap.ui.geomap.sample.dynamic",
+					"sap.ui.geomap.sample.draw",
+					"sap.ui.geomap.sample.drive"
 				]
 			}
 		],
@@ -25,7 +40,22 @@
 			{
 				"id": "sap.ui.geomap.sample.basic",
 				"name": "Basic usage",
-				"description": "Basic usage of Geomap displaying spot."
+				"description": "Basic usage of Geomap displaying a spot."
+			},
+			{
+				"id": "sap.ui.geomap.sample.dynamic",
+				"name": "Dynamic data",
+				"description": "Live earthquake data updated every second using GeomapSource and layer expressions."
+			},
+			{
+				"id": "sap.ui.geomap.sample.draw",
+				"name": "Draw a polygon",
+				"description": "Click the map to place corner points and close a polygon. Drag corners to reshape it."
+			},
+			{
+				"id": "sap.ui.geomap.sample.drive",
+				"name": "Drive on a map",
+				"description": "Animate a marker driving along a predefined route from Heidelberg to Walldorf."
 			}
 		]
 	}

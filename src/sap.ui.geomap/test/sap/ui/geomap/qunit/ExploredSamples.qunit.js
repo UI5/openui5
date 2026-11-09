@@ -9,6 +9,9 @@ sap.ui.define([
 	new SampleTester(
 		'sap.ui.geomap',
 		[
+			'sap.ui.geomap.sample.dynamic',
+			'sap.ui.geomap.sample.draw',
+			'sap.ui.geomap.sample.drive'
 		]
 	).placeAt('content');
 
