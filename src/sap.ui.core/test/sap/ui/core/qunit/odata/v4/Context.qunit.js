@@ -5657,13 +5657,45 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
+[false, true].forEach((bListBinding) => {
+	const sTitle = "setOutdated: not a header context, list binding: " + bListBinding;
+
+	QUnit.test(sTitle, function (assert) {
+		const oBinding = {
+			...(bListBinding && {getHeaderContext : mustBeMocked})
+		};
+		const oContext = Context.create({/*oModel*/}, oBinding, "/path");
+		assert.notOk("bOutdated" in oContext);
+
+		if (bListBinding) {
+			this.mock(oBinding).expects("getHeaderContext").withExactArgs()
+				.returns({/*any other context*/});
+		}
+		this.mock(_Helper).expects("fireChange").never();
+
+		assert.throws(() => {
+			// code under test
+			oContext.setOutdated("~bOutdated~");
+		}, new Error("Unsupported context: " + oContext));
+
+		// code under test
+		assert.notOk("bOutdated" in oContext, "unchanged");
+	});
+});
+
+	//*********************************************************************************************
 	QUnit.test("setOutdated, bOutdated", function (assert) {
-		const oContext = Context.create({/*oModel*/}, {/*oBinding*/}, "/path");
+		const oBinding = {
+			getHeaderContext : mustBeMocked
+		};
+		const oContext = Context.create({/*oModel*/}, oBinding, "/path");
 		oContext.mChangeListeners = "~mChangeListeners~";
 
 		// code under test
 		assert.notOk("bOutdated" in oContext);
 
+		const oBindingMock = this.mock(oBinding);
+		oBindingMock.expects("getHeaderContext").withExactArgs().returns(oContext);
 		const oHelperMock = this.mock(_Helper);
 		oHelperMock.expects("fireChange")
 			.withExactArgs("~mChangeListeners~", "@$ui5.context.isOutdated", true)
@@ -5675,6 +5707,7 @@ sap.ui.define([
 		// code under test
 		oContext.setOutdated(true);
 
+		oBindingMock.expects("getHeaderContext").withExactArgs().returns(oContext);
 		oHelperMock.expects("fireChange")
 			.withExactArgs("~mChangeListeners~", "@$ui5.context.isOutdated", false)
 			.callsFake(() => {

@@ -2469,14 +2469,21 @@ sap.ui.define([
 
 	/**
 	 * Sets this context's outdated attribute. Fires a change event for "@$ui5.context.isOutdated"
-	 * to update bindings.
+	 * to update bindings. Must only be called on a list binding's
+	 * {@link sap.ui.model.odata.v4.ODataListBinding#getHeaderContext header context}.
 	 *
-	 * @param {boolean} bOutdated - Whether this context is outdated
+	 * @param {boolean} bOutdated - Whether this header context is outdated
+	 *
+	 * @throws {Error} If this context is not a list binding's header context
 	 *
 	 * @private
 	 * @see #isOutdated
 	 */
 	Context.prototype.setOutdated = function (bOutdated) {
+		if (this.oBinding.getHeaderContext?.() !== this) {
+			throw new Error("Unsupported context: " + this);
+		}
+
 		this.bOutdated = bOutdated;
 		_Helper.fireChange(this.mChangeListeners, "@$ui5.context.isOutdated", bOutdated);
 	};
