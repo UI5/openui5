@@ -48,8 +48,6 @@ sap.ui.define([
 				];
 				if (oTest.$app === null) {
 					aLinks[0] = aLinks[1] = null;
-				} else if (sName.startsWith("Tutorial")) { // cannot run w/o its mock server!
-					aLinks[1] = null;
 				}
 				mTests[sOpa + "&supportAssistant=true"] = "both";
 				if (oTest.realOData !== false) {
