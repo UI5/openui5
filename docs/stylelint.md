@@ -14,6 +14,309 @@ npx stylelint "src/sap.m/**/*.less" --fix    # auto-fix where possible
 
 Two rules are **not** auto-fixable: `max-nesting-depth` and `selector-max-compound-selectors`.
 
+### Local selector-complexity checks
+
+`max-nesting-depth` and `selector-max-compound-selectors` provide local refactoring advice.
+They are **disabled by default** for `npm run lint:styles`, direct Stylelint runs, and
+Maven Stylelint. Central voters and nightly builds therefore do not report these findings.
+All other checks, including the no-LESS-features warnings, remain enabled.
+
+To include the two complexity checks in a local run on macOS, Windows, or Linux, use:
+
+```sh
+npm run lint:styles:complexity
+npm run lint:styles:complexity -- --fix
+```
+
+The command selects [`scripts/stylelint/complexity.config.mjs`](../scripts/stylelint/complexity.config.mjs),
+which reuses the default config and adds only these two rules. Both complexity checks
+remain non-auto-fixable. The script also works with pnpm:
+
+```sh
+pnpm run lint:styles:complexity
+pnpm run lint:styles:complexity --fix
+```
+
+For a specific library, explicitly select the local config:
+
+```sh
+npx stylelint "src/sap.m/**/*.less" --config scripts/stylelint/complexity.config.mjs
+```
+
+No environment variable or CI/Jenkins/Gerrit detection is involved. The former
+`lint:styles:no-complexity` shortcut and `STYLELINT_DISABLE_COMPLEXITY_WARNINGS` opt-out
+are no longer needed: the default configuration already excludes complexity findings.
+Per-library severity overrides and all other rules are unchanged.
+
+Run the configuration regression tests with:
+
+```sh
+node --test scripts/stylelint/test/config.test.mjs
+```
+
+### Excluded files
+
+The root `.stylelintignore` and library-local copies exclude build outputs, dependencies,
+generated theme artifacts, third-party sources, and legacy themes: `sap_bluecrystal`,
+all `sap_belize*` variants (including `sap_belize_base`), and `sap_hcb`.
+Keep the library-local copies in sync so Maven and root-level npm runs use the same exclusions.
+
+---
+
+## No LESS Features (`openui5/no-less-*`)
+
+OpenUI5 is migrating all library styles from LESS features to **CSS custom properties** (`var(--...)`).
+The rules below flag LESS constructs so touched files can be cleaned up incrementally.
+All rules run only on `.less` files (via the `overrides` block in `.stylelintrc.mjs`) and require
+`postcss-less` to see the full LESS AST.
+
+All rules are at **`warning` severity** globally. Once a library is clean, set `severity: "error"` in
+a per-library `.stylelintrc` override to gate future regressions:
+
+```json
+// src/sap.m/.stylelintrc.json — opt in to error severity for one lib
+{
+  "overrides": [{
+    "files": ["**/*.less"],
+    "rules": {
+      "openui5/no-less-var-declaration": [true, { "severity": "error" }],
+      "openui5/no-less-var-usage":       [true, { "severity": "error" }]
+    }
+  }]
+}
+```
+
+### Per-library & changed-files linting (Maven)
+
+The authoritative per-library, changed-files-only stylelint gate is the Maven `stylelintnode.build`
+profile. It mirrors `eslintnode.build` — each library module runs independently. When
+`sap.ui5.stylelint.onlyChangedFiles=true`, the default comparison is:
+
+- **Gerrit voter:** `HEAD~1` to `HEAD`, if `GERRIT_NEWREV` (falling back to
+  `GERRIT_PATCHSET_REVISION`) matches `HEAD`; otherwise the module is skipped.
+- **Local:** `HEAD~1` to the working tree, including staged and unstaged changes but not
+  untracked files, as in ESLint.
+
+No target branch or remote is required. If the parent commit is unavailable (root commit
+or shallow checkout), the runner warns and lints the whole library.
+
+**Opt a library in** by adding to its `pom.xml` `<properties>`:
+
+```xml
+<sap.ui5.stylelint.skip.validation>false</sap.ui5.stylelint.skip.validation>
+```
+
+**Key properties** (reactor defaults in root `pom.xml`; override via `-D`):
+
+| Property | Default | Description |
+|---|---|---|
+| `sap.ui5.stylelint.skip.validation` | `true` | Set to `false` to opt a library in |
+| `sap.ui5.stylelint.onlyChangedFiles` | `true` | Lint changed files relative to the previous commit by default |
+| `sap.ui5.stylelint.diffBase` | (unset) | Optional plugin property: use this ref's merge-base with `HEAD` instead |
+| `sap.ui5.stylelint.failonerror` | `true` | Fail build on `error`-severity findings |
+| `sap.ui5.stylelint.sendGerritComment` | `true` | Post results as Gerrit inline comments |
+| `sap.ui5.stylelint.quite` | `true` | Suppress info output |
+| `sap.ui5.stylelint.tools.version` | `0.1.5` | Prebuilt `stylelint-tools` runner version downloaded from the npm registry |
+
+The profile selects `mavenProject=com.sap.openui5:reactor` from Maven's collected reactor model.
+The owning project may be excluded by `-pl`, but must be included in that model and supply
+`package.json` and `package-lock.json`. This keeps OpenUI5 dependencies rooted in OpenUI5 even
+when `openui5.build` includes it in a SAPUI5 reactor. An explicit `packageJson` remains available
+for path-based setups, but is ignored when `mavenProject` is configured.
+Stylelint, plugins, configs and custom syntaxes are declared in that manifest and locked by
+`package-lock.json`; there are no corresponding Maven dependency-version pins.
+The first participating library runs `npm ci --include=dev` at the root, even if
+`node_modules` already exists. Other libraries in the same Maven invocation wait
+for and reuse that preparation. Workspace manifests are coordinated by npm's actual installation
+root (`npm prefix`), rather than treating each workspace directory as an independent tree.
+Missing manifests, inconsistent lockfiles and npm failures fail the build. The runner TGZ is retrieved with `npm pack` using the project's
+npm registry/authentication configuration, then unpacked by node-core; it is not installed.
+The pack command does not install dependencies or execute package scripts.
+
+**Run changed-files lint for one library:**
+
+```sh
+mvn -P stylelintnode.build -pl :sap.m verify \
+  -Dsap.ui5.stylelint.skip.validation=false \
+  -Dsap.ui5.stylelint.onlyChangedFiles=true
+```
+
+**Run full-library lint (no changed-files filter):**
+
+```sh
+mvn -P stylelintnode.build -pl :sap.m verify \
+  -Dsap.ui5.stylelint.skip.validation=false \
+  -Dsap.ui5.stylelint.onlyChangedFiles=false
+```
+
+To explicitly compare against a branch's merge-base, add
+`-Dsap.ui5.stylelint.diffBase=origin/<branch>` or set `STYLELINT_DIFF_BASE` (the explicit
+plugin option takes precedence). In this override mode, local runs also include
+untracked files; Gerrit runs only include committed changes and still check the patchset
+revision. Invalid explicit refs fail the run rather than silently skipping validation.
+
+---
+
+### `function-disallowed-list` (LESS color functions)
+
+LESS color manipulation functions are forbidden — use `color-mix()` or CSS custom properties instead.
+
+Disallowed: `darken`, `lighten`, `saturate`, `desaturate`, `fade`, `fadein`, `fadeout`, `mix`,
+`spin`, `tint`, `shade`, `greyscale`, `contrast`.
+
+❌ Bad
+```less
+.sapMBtn {
+	background: darken(@sapUiButtonBackground, 10%);
+	color: lighten(@sapUiBrand, 5%);
+	border-color: fade(@sapUiTextColor, 60%);
+}
+```
+
+✅ Good — use CSS custom properties or color-mix()
+```less
+.sapMBtn {
+	background: var(--sapButton_Background);
+	color: var(--sapBrandColor);
+}
+```
+
+---
+
+### `openui5/no-less-var-declaration`
+
+LESS `@variable:` declarations are forbidden. Use CSS custom properties (`--name: value`).
+
+Theme parameters (`@sapUi*`, `@_sap*`) are **allowlisted** in phase 1 — they are resolved
+at build time and require a dedicated migration. Only non-theme variables are flagged.
+
+❌ Bad
+```less
+@mySize: 16px;
+@myColor: #333;
+```
+
+✅ Good — CSS custom property
+```less
+:root {
+	--mySize: 16px;
+	--myColor: #333;
+}
+```
+
+---
+
+### `openui5/no-less-var-usage`
+
+LESS `@variable` references used as values are forbidden. Use `var(--name)`.
+
+Theme parameters (`@sapUi*`, `@_sap*`) are allowlisted in phase 1.
+
+❌ Bad
+```less
+.sapMBtn {
+	font-size: @mySize;
+	color: @myColor;
+}
+```
+
+✅ Good
+```less
+.sapMBtn {
+	font-size: var(--mySize);
+	color: var(--myColor);
+}
+```
+
+---
+
+### `openui5/no-less-mixin`
+
+LESS mixin definitions and calls are forbidden.
+
+❌ Bad
+```less
+.myMixin(@color) {
+	color: @color;
+	border: 1px solid @color;
+}
+
+.sapMBtn {
+	.myMixin(@sapUiBrand);
+}
+```
+
+✅ Good — extract shared declarations to a plain CSS class or use custom properties
+```less
+.sapMBtn {
+	color: var(--sapBrandColor);
+	border: 1px solid var(--sapBrandColor);
+}
+```
+
+---
+
+### `openui5/no-less-guard`
+
+LESS `when(...)` guards and conditional loops are forbidden.
+
+❌ Bad
+```less
+.myMixin() when (@myVar = true) {
+	display: block;
+}
+```
+
+✅ Good — use CSS `@layer`, `@supports`, or static declarations
+
+---
+
+### CSS-compatible nesting with `&`
+
+The `&` nesting selector is valid native CSS and is allowed. There is no blanket
+`openui5/no-parent-selector` rule.
+
+✅ Good — CSS-compatible nesting
+```less
+.sapMBtn {
+	&.sapMBtnActive {
+		background: red;
+	}
+	&:hover {
+		opacity: 0.8;
+	}
+}
+```
+
+LESS-only selector concatenation such as `&Active` is not valid native CSS. Rewrite it
+using a complete class name (for example, `.sapMBtnActive`). Removing the blanket `&`
+check does not add a dedicated concatenation check.
+
+---
+
+### `openui5/no-less-arithmetic` *(Phase 3 — disabled)*
+
+Flags arithmetic in LESS variable values (e.g. `@x: 10px + 5px`). Deferred because of
+potential `calc(~"...")` entanglement. Enable when the `calc()` migration is understood.
+
+---
+
+### `openui5/no-less-interpolation` *(Phase 3 — disabled)*
+
+Flags LESS escape strings (`~"..."`) and variable interpolation (`@{varName}`). Deferred for
+the same reason as `no-less-arithmetic`.
+
+---
+
+## Phased severity rollout
+
+| Phase | What ships | Notes |
+|---|---|---|
+| **0** | `postcss-less` + `customSyntax` in overrides | Changes how all existing rules see `.less`. Re-baseline before enabling new rules. |
+| **1** | Color functions, mixins, guards, LESS vars — all at `warning` | Theme params allowlisted; CSS-compatible `&` nesting allowed. |
+| **2** | Flip LESS-var rules to `error` per library | One library at a time via per-lib `.stylelintrc`. CI gates new violations only (changed-files mode). |
+| **3** | `no-less-arithmetic`, `no-less-interpolation` | After `calc()` migration is understood. |
+
 ---
 
 ## Formatting & Style (`@stylistic/` plugin)
@@ -245,7 +548,9 @@ Attribute selector values must always be quoted.
 
 ### `selector-max-compound-selectors: [4, { disableFix: true }]`
 
-A selector chain may contain at most 4 compound parts. This rule is **not auto-fixable** — violations require manual refactoring.
+A selector chain may contain at most 4 compound parts when using the **local complexity
+configuration** (`npm run lint:styles:complexity`). The default config disables this rule.
+It is **not auto-fixable** — violations require manual refactoring.
 
 ❌ Bad (5 compound parts)
 ```css
@@ -275,7 +580,9 @@ Disabled — SAP class names such as `sapUiBtnDefault` or `sapMITBHead` do not f
 
 ### `max-nesting-depth: [4, { disableFix: true }]`
 
-LESS nesting may be at most 4 levels deep. This rule is **not auto-fixable**.
+LESS nesting may be at most 4 levels deep when using the **local complexity configuration**
+(`npm run lint:styles:complexity`). The default config disables this rule.
+It is **not auto-fixable**.
 
 ❌ Bad (depth 5)
 ```less

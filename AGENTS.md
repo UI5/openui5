@@ -16,7 +16,14 @@ OpenUI5 is an enterprise-grade JavaScript UI framework implementing SAP Fiori de
 ## Linting
 
 After editing sources, run `npm run lint` (ESLint over `src/`, cached). This is also the repo's `npm test` script.
-For LESS/theme changes, run `npm run lint:styles`.
+For LESS/theme changes, run `npm run lint:styles`. The linter enforces a "no LESS features"
+policy — LESS variables, mixins, guards, and color manipulation functions are flagged (at
+`warning` severity) as part of the migration to CSS custom properties. CSS-compatible nesting
+with `&` is allowed. Theme parameters (`@sapUi*`) are
+allowlisted in phase 1. See [docs/stylelint.md](docs/stylelint.md) for the full rule reference,
+the phased rollout plan, and per-library opt-in instructions for the Maven `stylelintnode.build`
+profile. Selector-complexity advice is disabled by default; use `npm run lint:styles:complexity`
+only for local refactoring checks.
 
 ## Starting the Testsuite Server
 
@@ -52,6 +59,7 @@ When working on the `sap.ui.mdc` library (Metadata-Driven Controls), read `src/s
 **Additional references:**
 - [Development Setup & Workflow](docs/developing.md) — dev server, SDK build, testing with UI5 CLI
 - [ESLint Configuration](docs/eslint.md) — lint rules and enforcement
+- [Stylelint Rules & No-LESS Policy](docs/stylelint.md) — no-LESS-features rules, phased rollout, per-lib Maven opt-in
 - [JS Namespace Conventions](docs/guidelines/jsnamespaces.md) — module naming rules
 - [JSDoc Best Practices](docs/guidelines/jsdoc.md) — descriptions, tags, type syntax
 - [JSDoc Pitfalls](docs/guidelines/jsdocpitfalls.md) — common JSDoc mistakes to avoid

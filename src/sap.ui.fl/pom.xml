@@ -48,6 +48,9 @@
 		<!-- enable eslint validation -->
 		<sap.ui5.eslint.skip.validation>false</sap.ui5.eslint.skip.validation>
 
+		<!-- enable stylelint validation -->
+		<sap.ui5.stylelint.skip.validation>false</sap.ui5.stylelint.skip.validation>
+
 		<!-- enable the packaging of the NPM resources -->
 		<npm.package.phase>package</npm.package.phase>
 

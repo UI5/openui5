@@ -115,6 +115,11 @@
 		<npm.version>11.19.1</npm.version>
 		<npm.registry>${xmake.import.NPM.0}</npm.registry>
 
+		<!-- Eslint tools version -->
+		<sap.ui5.eslint.tools.version>0.3.0</sap.ui5.eslint.tools.version>
+
+		<!-- ESLint version (for all OpenUI5 projects, to be aligned with package.json) -->
+		<sap.openui5.eslintnode.version>8.57.1</sap.openui5.eslintnode.version>
 		<!-- skip eslint validation -->
 		<sap.ui5.eslint.skip.validation>true</sap.ui5.eslint.skip.validation>
 		<!-- fail on eslint error -->
@@ -125,10 +130,20 @@
 		<sap.ui5.eslint.sendGerritComment>true</sap.ui5.eslint.sendGerritComment>
 		<!-- quite or verbose execution -->
 		<sap.ui5.eslint.quite>true</sap.ui5.eslint.quite>
-		<!-- Eslint tools version -->
-		<sap.ui5.eslint.tools.version>0.3.0</sap.ui5.eslint.tools.version>
-		<!-- ESLint version (for all OpenUI5 projects, to be aligned with package.json) -->
-		<sap.openui5.eslintnode.version>8.57.1</sap.openui5.eslintnode.version>
+
+		<!-- stylelint-tools npm package version; Stylelint dependencies are owned by package.json -->
+		<sap.ui5.stylelint.tools.version>0.1.5</sap.ui5.stylelint.tools.version>
+		<!-- skip stylelint validation -->
+		<sap.ui5.stylelint.skip.validation>true</sap.ui5.stylelint.skip.validation>
+		<!-- fail on stylelint error -->
+		<sap.ui5.stylelint.failonerror>true</sap.ui5.stylelint.failonerror>
+		<!-- only validate the changed files -->
+		<sap.ui5.stylelint.onlyChangedFiles>true</sap.ui5.stylelint.onlyChangedFiles>
+		<!-- send stylelint result as Gerrit inline comment -->
+		<sap.ui5.stylelint.sendGerritComment>true</sap.ui5.stylelint.sendGerritComment>
+		<!-- quite or verbose execution -->
+		<sap.ui5.stylelint.quite>true</sap.ui5.stylelint.quite>
+
  	</properties>
 
 
@@ -310,6 +325,49 @@
 		</profile>
 
 		<profile>
+			<id>stylelintnode.build</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.sap.ui5.tools.maven</groupId>
+						<artifactId>stylelintnode-maven-plugin</artifactId>
+						<version>0.1.4</version>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>stylelint</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<!-- node configuration for stylelint -->
+							<nodeType>SHARED</nodeType>
+							<nodeVersion>${node.version}</nodeVersion>
+							<nodeLocation>${node.location}</nodeLocation>
+							<npmRegistry>${npm.registry}</npmRegistry>
+							<npmVersion>${npm.version}</npmVersion>
+							<!-- stylelint configuration -->
+							<mavenProject>com.sap.openui5:reactor</mavenProject>
+							<formatters>
+								<formatter>
+									<name>sonar</name>
+									<output>${project.build.directory}/stylelint/stylelint.xml</output>
+								</formatter>
+							</formatters>
+							<failOnError>${sap.ui5.stylelint.failonerror}</failOnError>
+							<onlyChangedFiles>${sap.ui5.stylelint.onlyChangedFiles}</onlyChangedFiles>
+							<sendGerritComment>${sap.ui5.stylelint.sendGerritComment}</sendGerritComment>
+							<stylelintToolsVersion>${sap.ui5.stylelint.tools.version}</stylelintToolsVersion>
+							<quiet>${sap.ui5.stylelint.quite}</quiet>
+							<skip>${sap.ui5.stylelint.skip.validation}</skip>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
 
 			<id>nightly.build</id>
 
@@ -325,6 +383,10 @@
 				<sap.ui5.eslint.onlyChangedFiles>false</sap.ui5.eslint.onlyChangedFiles>
 				<!-- don't send Gerrit comment in nightly build -->
 				<sap.ui5.eslint.sendGerritComment>false</sap.ui5.eslint.sendGerritComment>
+				<!-- validate all files for the nightly build (attention: profile nightly.build must stay after stylelintnode.build!) -->
+				<sap.ui5.stylelint.onlyChangedFiles>false</sap.ui5.stylelint.onlyChangedFiles>
+				<!-- don't send Gerrit comment in nightly build -->
+				<sap.ui5.stylelint.sendGerritComment>false</sap.ui5.stylelint.sendGerritComment>
 			</properties>
 
 		</profile>
