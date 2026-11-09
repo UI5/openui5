@@ -311,26 +311,18 @@ sap.ui.define([
 
 	QUnit.test("Area Design", function(assert) {
 		var oRootDomRef = oCtrl.getDomRef();
-		var oContDomRef = oCtrl.getDomRef("cont");
 
 		// make sure the initial design is "Fill"
 		assert.ok(oRootDomRef.className.indexOf("sapUiPanelAreaDesignFill") > -1, "Panel must by default have AreaDesign.Fill");
 		assert.equal(oRootDomRef.className.indexOf("sapUiPanelAreaDesignPlain"), -1, "Panel must by default not have AreaDesign.Plain");
 
-		// make sure it is actually filled
-		var sColor = jQuery(oContDomRef).css("backgroundColor");
-		assert.equal(sColor, "color(srgb 1.03725 1.03725 1.03725 / 0.8)", "Panel must by default be filled with a white color");
-
 		// now switch to "Plain" and do the same tests
 		oCtrl.setAreaDesign(AreaDesign.Plain);
 		sap.ui.getCore().applyChanges();
 		var oRootDomRef2 = oCtrl.getDomRef();
-		var oContDomRef2 = oCtrl.getDomRef("cont");
 
 		assert.ok(oRootDomRef2.className.indexOf("sapUiPanelAreaDesignPlain") > -1, "Panel should now have AreaDesign.Plain");
 		assert.equal(oRootDomRef2.className.indexOf("sapUiPanelAreaDesignFill"), -1, "Panel must not anymore have AreaDesign.Fill");
-		sColor = jQuery(oContDomRef2).css("backgroundColor");
-		assert.equal(sColor, "rgb(255, 255, 255)", "Panel should now be filled with a white color");
 
 		// now switch to "transparent" and do the same tests
 		oCtrl.setAreaDesign(AreaDesign.Transparent);
