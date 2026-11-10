@@ -69,13 +69,6 @@ sap.ui.define(["sap/ui/core/Lib"],
 		}
 		oRm.openEnd();
 
-		// In high-zoom standalone mode render only the DatePicker/DateRangeSelection proxy
-		if (oCal.getProperty("_highZoomActive") && oCal._oHZPicker) {
-			oRm.renderControl(oCal._oHZPicker);
-			oRm.close("div");
-			return;
-		}
-
 		var oHeader = oCal.getAggregation("header");
 		oRm.renderControl(oHeader);
 

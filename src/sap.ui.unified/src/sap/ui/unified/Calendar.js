@@ -223,9 +223,6 @@ sap.ui.define([
 			 */
 			_currentPicker : {type : "string", group : "Appearance", visibility: "hidden"},
 
-			/** Whether the high-zoom (≤300px) picker is active. @private */
-			_highZoomActive : {type : "boolean", defaultValue : false, visibility: "hidden"},
-
 			/**
 			 * If set, the calendar week numbering is used for display.
 			 * If not set, the calendar week numbering of the global configuration is used.
@@ -393,8 +390,6 @@ sap.ui.define([
 		YEAR_RANGE_PICKER: "yearRangePicker"  // represents the "yearRangePicker" aggregation
 	};
 
-	const HIGH_ZOOM_VIEWPORT_THRESHOLD = 300;
-
 	Calendar.prototype.init = function(){
 
 		this._iBreakPointTablet = Device.media._predefinedRangeSets[Device.media.RANGESETS.SAP_STANDARD_EXTENDED].points[0];
@@ -439,11 +434,6 @@ sap.ui.define([
 		//when used in a DatePicker, in mobile there is no cancel button
 		this._bSkipCancelButtonRendering = false;
 		this._bActionTriggeredFromSecondHeader = false;
-
-		// High-zoom (≤300px) support — only for standalone Calendar (not embedded in DatePicker)
-		this._oHZPicker = null;
-		this._bHZListenersRegistered = false;
-		this._fnHZResizeHandler = this._onHZResize.bind(this);
 	};
 
 	Calendar.prototype.exit = function(){
@@ -468,19 +458,6 @@ sap.ui.define([
 		}
 
 		this._oSelectedMonth = null;
-
-		// Cleanup high-zoom
-		if (this._bHZListenersRegistered) {
-			if (window.visualViewport) {
-				window.visualViewport.removeEventListener("resize", this._fnHZResizeHandler);
-			}
-			window.removeEventListener("resize", this._fnHZResizeHandler);
-		}
-		this._fnHZResizeHandler = null;
-		if (this._oHZPicker) {
-			this._oHZPicker.destroy();
-			this._oHZPicker = null;
-		}
 	};
 
 	Calendar.prototype._initializeHeader = function() {
@@ -669,25 +646,6 @@ sap.ui.define([
 	};
 
 	Calendar.prototype.onAfterRendering = function(oEvent){
-
-		// Check zoom state after first render (resize handler skips before DOM exists)
-		if (!this._oSpecialDatesControlOrigin) {
-			// Register listeners lazily so embedded Calendars (inside DatePicker) never get them
-			if (!this._bHZListenersRegistered) {
-				if (window.visualViewport) {
-					window.visualViewport.addEventListener("resize", this._fnHZResizeHandler);
-				}
-				window.addEventListener("resize", this._fnHZResizeHandler);
-				this._bHZListenersRegistered = true;
-			}
-			const bHighZoom = this._isHighZoom();
-			if (bHighZoom !== this.getProperty("_highZoomActive")) {
-				this.setProperty("_highZoomActive", bHighZoom);
-				if (bHighZoom) {
-					this._initHZPicker();
-				}
-			}
-		}
 
 		// check if day names and month names are too big -> use smaller ones
 		if (!this._getSucessorsPickerPopup()) {
@@ -1236,18 +1194,6 @@ sap.ui.define([
 		}
 
 		return this.setProperty("intervalSelection", bEnabled);
-	};
-
-	// Override to invalidate the high-zoom picker when interval selection changes
-	// so the correct picker type (DatePicker vs DateRangeSelection) is used on next zoom-in.
-	const _origSetIntervalSelection = Calendar.prototype.setIntervalSelection;
-	Calendar.prototype.setIntervalSelection = function(bEnabled) {
-		if (this._oHZPicker) {
-			this.removeDependent(this._oHZPicker);
-			this._oHZPicker.destroy();
-			this._oHZPicker = null;
-		}
-		return _origSetIntervalSelection.call(this, bEnabled);
 	};
 
 	/**
@@ -3205,133 +3151,6 @@ sap.ui.define([
 	function _handleYearPickerPageChange() {
 		this._updateHeadersYearPrimaryText(this._getYearString());
 	}
-
-	// ============================================================
-	// High-zoom (≤300px) support for standalone Calendar
-	// At ≤300px a DatePicker (or DateRangeSelection for intervalSelection)
-	// is shown instead of the calendar grid. DatePicker automatically
-	// activates its own DateHighZoomInputs layout at that viewport width.
-	// ============================================================
-
-	/**
-	 * Returns true when the viewport is ≤ 300 px.
-	 * @returns {boolean}
-	 * @private
-	 */
-	Calendar.prototype._isHighZoom = function() {
-		const iWidth = (window.visualViewport && window.visualViewport.width) || window.innerWidth;
-		return iWidth <= HIGH_ZOOM_VIEWPORT_THRESHOLD;
-	};
-
-	/**
-	 * Called on viewport resize. Activates or deactivates high-zoom mode
-	 * only for standalone Calendar (not when embedded in DatePicker).
-	 * @private
-	 */
-	Calendar.prototype._onHZResize = function() {
-		// Skip when Calendar is embedded in a picker — the picker manages zoom
-		if (this._oSpecialDatesControlOrigin) { return; }
-		// Skip until first render — visualViewport fires during initial layout
-		if (!this.getDomRef()) { return; }
-
-		const bHighZoom = this._isHighZoom();
-		if (bHighZoom === this.getProperty("_highZoomActive")) { return; }
-
-		if (bHighZoom) {
-			this.setProperty("_highZoomActive", true);
-			this._initHZPicker();
-		} else {
-			// Destroy the picker so Calendar re-renders cleanly as its own DOM root.
-			if (this._oHZPicker) {
-				this.removeDependent(this._oHZPicker);
-				this._oHZPicker.destroy();
-				this._oHZPicker = null;
-			}
-			this.setProperty("_highZoomActive", false);
-		}
-	};
-
-	/**
-	 * Lazily loads DatePicker (or DateRangeSelection) via runtime require
-	 * and shows it in place of the calendar grid at high zoom.
-	 * sap.ui.unified → sap.m is not a build-time dependency so we use
-	 * sap.ui.require (same pattern as FileUploader.js in this library).
-	 * @private
-	 */
-	Calendar.prototype._initHZPicker = function() {
-		const sModule = this.getIntervalSelection()
-			? "sap/m/DateRangeSelection"
-			: "sap/m/DatePicker";
-
-		const FnClass = sap.ui.require(sModule);
-		if (FnClass) {
-			this._createHZPicker(FnClass);
-		} else {
-			sap.ui.require([sModule], function(Cls) {
-				if (!this.bIsDestroyed) {
-					this._createHZPicker(Cls);
-				}
-			}.bind(this));
-		}
-	};
-
-	/**
-	 * Creates and configures the high-zoom picker (DatePicker or DateRangeSelection).
-	 * @param {function} FnClass - DatePicker or DateRangeSelection constructor
-	 * @private
-	 */
-		Calendar.prototype._createHZPicker = function(FnClass) {
-		if (!this._oHZPicker) {
-			const bRange = this.getIntervalSelection();
-			const sSecondary = this.getSecondaryCalendarType();
-			const sPrimary   = this.getProperty("primaryCalendarType");
-
-			const oPicker = new FnClass(this.getId() + "-hzPicker", {
-				displayFormat: "dd.MM.yyyy",
-				displayFormatType: sPrimary || undefined,
-				minDate: this._oMinDate.toLocalJSDate(),
-				maxDate: this._oMaxDate.toLocalJSDate(),
-				change: function(oEvent) {
-					// Propagate the selected date(s) back to the Calendar aggregation
-					const oDateValue = oPicker.getDateValue();
-					if (!oDateValue) { return; }
-
-					// DateRange is guaranteed loaded (transitive dep via Month/MonthPicker/YearPicker)
-					const DateRange = sap.ui.require("sap/ui/unified/DateRange");
-
-					if (DateRange) {
-						const oRange = new DateRange({ startDate: oDateValue });
-						if (bRange && oPicker.getSecondDateValue()) {
-							oRange.setEndDate(oPicker.getSecondDateValue());
-						}
-						this.removeAllSelectedDates();
-						this.addSelectedDate(oRange);
-						this.fireSelect();
-					}
-				}.bind(this)
-			});
-
-			// Pre-fill from current Calendar selection
-			const aSelected = this.getSelectedDates();
-			if (aSelected.length > 0 && aSelected[0].getStartDate()) {
-				oPicker.setDateValue(aSelected[0].getStartDate());
-				if (bRange && aSelected[0].getEndDate()) {
-					oPicker.setSecondDateValue(aSelected[0].getEndDate());
-				}
-			}
-
-			this._oHZPicker = oPicker;
-			// Use the setter so _bSecondaryCalendarTypeSet is flagged correctly —
-			// passing secondaryCalendarType in the constructor bypasses the setter.
-			if (sSecondary) {
-				oPicker.setSecondaryCalendarType(sSecondary);
-			}
-			this.addDependent(oPicker);
-		}
-
-		this._oHZPicker.setVisible(true);
-		this.invalidate();
-	};
 
 	return Calendar;
 
