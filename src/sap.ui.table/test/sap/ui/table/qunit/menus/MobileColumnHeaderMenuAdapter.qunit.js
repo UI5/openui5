@@ -377,6 +377,7 @@ sap.ui.define([
 	QUnit.test("Quick Freeze", async function(assert) {
 		const oTable = this.oTable;
 		const oColumnFreezeSpy = this.spy();
+		const oApplyColumnFreezeSpy = this.spy(TableUtils, "applyUserColumnFreeze");
 		oTable.attachColumnFreeze((oEvent) => {
 			oColumnFreezeSpy(oEvent.getParameters());
 		});
@@ -402,7 +403,10 @@ sap.ui.define([
 			qutils.triggerKeyup(oSwitch.getDomRef(), "SPACE");
 		});
 
+		assert.ok(oApplyColumnFreezeSpy.calledOnceWithExactly(oTable, 2),
+			"applyUserColumnFreeze is triggered with the correct parameters when freezing");
 		assert.equal(oTable.getFixedColumnCount(), 2, "fixedColumnCount is set to column index + 1 when freezing");
+		oApplyColumnFreezeSpy.reset();
 
 		// With fixedColumnCount=2, only the last frozen column (column 1) shows the switch ON
 		await this.openColumnMenu(0);
@@ -417,6 +421,8 @@ sap.ui.define([
 			oMenu.attachEventOnce("afterClose", resolve);
 			qutils.triggerKeyup(oSwitch.getDomRef(), "SPACE");
 		});
+		assert.ok(oApplyColumnFreezeSpy.calledOnceWithExactly(oTable, 0),
+			"applyUserColumnFreeze is triggered with the correct parameters when unfreezing");
 		assert.equal(oTable.getFixedColumnCount(), 0, "fixedColumnCount is set to 0 when unfreezing");
 
 		oTable.setEnableColumnFreeze(false);

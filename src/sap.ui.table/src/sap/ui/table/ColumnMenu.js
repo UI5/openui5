@@ -294,11 +294,7 @@ sap.ui.define([
 
 					// execute the column freezing
 					if (bExecuteDefault) {
-						if (bIsFixedColumn) {
-							oTable.setFixedColumnCount(0);
-						} else {
-							oTable.setFixedColumnCount(iColumnIndex + 1);
-						}
+						TableUtils.applyUserColumnFreeze(oTable, bIsFixedColumn ? 0 : iColumnIndex + 1);
 					}
 				}
 			));

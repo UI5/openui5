@@ -232,7 +232,7 @@ sap.ui.define([
 		/**
 		 * Returns whether the table has row header cells.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether the table has row header cells.
 		 */
 		hasRowHeader: function(oTable) {
@@ -243,7 +243,7 @@ sap.ui.define([
 		/**
 		 * Returns whether the table has a SelectAll checkbox.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether the table has a SelectAll checkbox.
 		 */
 		hasSelectAll: function(oTable) {
@@ -254,7 +254,7 @@ sap.ui.define([
 		/**
 		 * Returns whether the table has row highlights.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether the table has row highlights.
 		 */
 		hasRowHighlights: function(oTable) {
@@ -277,7 +277,7 @@ sap.ui.define([
 		/**
 		 * Returns whether the table has navigation indicators for rows.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether the table has navigation indicators for rows
 		 */
 		hasRowNavigationIndicators: function(oTable) {
@@ -299,7 +299,7 @@ sap.ui.define([
 		/**
 		 * Returns whether the table has a row action column.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether the table has row actions.
 		 */
 		hasRowActions: function(oTable) {
@@ -313,7 +313,7 @@ sap.ui.define([
 		/**
 		 * Returns whether selection is allowed on the cells of a row (not row selector).
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether selection is also possible on cells that are no selection cells.
 		 */
 		isRowSelectionAllowed: function(oTable) {
@@ -324,7 +324,7 @@ sap.ui.define([
 		/**
 		 * Returns whether selection is allowed via the row selector.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether selection is possible on selection cells.
 		 */
 		isRowSelectorSelectionAllowed: function(oTable) {
@@ -337,7 +337,7 @@ sap.ui.define([
 		 * The "no data text" is shown if the table has no visible columns, or if the <code>showNoData</code> property is <code>true</code> and the
 		 * table has no data.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether the no data text is shown.
 		 */
 		isNoDataVisible: function(oTable) {
@@ -347,7 +347,7 @@ sap.ui.define([
 		/**
 		 * Returns whether the table currently has data.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether the table has data.
 		 */
 		hasData: function(oTable) {
@@ -370,7 +370,7 @@ sap.ui.define([
 		/**
 		 * Toggles the selection state of the row which contains the given cell DOM element.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @param {jQuery | HTMLElement | int | sap.ui.table.Row} vRowIndicator
 		 *     The data cell in the row, the index of the row in the aggregation, or the row instance on which to toggle the selection state.
 		 * @param {boolean} [bSelect] If defined, then instead of toggling the desired state is set.
@@ -420,7 +420,7 @@ sap.ui.define([
 		 * If the table does not have columns, it returns the content of the <code>_noColumnsMessage</code> aggregation. If the aggregation is
 		 * empty, it returns the default "no columns" text.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {sap.ui.core.Control | string} The no data control or text message.
 		 */
 		getNoContentMessage: function(oTable) {
@@ -434,7 +434,7 @@ sap.ui.define([
 		/**
 		 * Returns the number of currently rendered columns.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {int} The number of currently rendered columns.
 		 */
 		getVisibleColumnCount: function(oTable) {
@@ -444,7 +444,7 @@ sap.ui.define([
 		/**
 		 * Returns the number of header rows.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {int} The number of rows in the table header.
 		 */
 		getHeaderRowCount: function(oTable) {
@@ -471,7 +471,7 @@ sap.ui.define([
 		/**
 		 * Checks whether all conditions for pixel-based scrolling (Variable Row Height) are fulfilled.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether variable row height support is enabled.
 		 */
 		isVariableRowHeightEnabled: function(oTable) {
@@ -482,7 +482,7 @@ sap.ui.define([
 		/**
 		 * Returns the number of rows that are not empty.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {int} The number of rows that are not empty.
 		 */
 		getNonEmptyRowCount: function(oTable) {
@@ -492,7 +492,7 @@ sap.ui.define([
 		/**
 		 * Returns a combined info about the currently focused item (based on the item navigation).
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {sap.ui.table.utils.TableUtils.FocusedItemInfo | null} Returns the information about the focused item, or <code>null</code>, if
 		 *     the item navigation is not yet initialized.
 		 * @typedef {object} sap.ui.table.utils.TableUtils.FocusedItemInfo
@@ -521,7 +521,7 @@ sap.ui.define([
 		/**
 		 * Returns the index of the row (in the rows aggregation) of the current focused cell.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {int} The row index.
 		 *
 		 */
@@ -534,7 +534,7 @@ sap.ui.define([
 		 * Returns whether column with the given index (in the array of visible columns (see Table._getVisibleColumns()))
 		 * is a fixed column.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @param {int} iColumnIndex Index of column in the tables columns aggregation.
 		 * @returns {boolean} Whether the column is fixed.
 		 */
@@ -545,7 +545,7 @@ sap.ui.define([
 		/**
 		 * Returns whether the table has fixed columns.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {boolean} Whether the table has fixed column.
 		 */
 		hasFixedColumns: function(oTable) {
@@ -557,7 +557,7 @@ sap.ui.define([
 		 * If <code>bReverse</code> is true the <code>firstVisibleRow</code> property of the Table is set to <code>iIndex</code> - 1,
 		 * otherwise to <code>iIndex</code> - row count + 2.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @param {int} iIndex The index of the row to which to scroll to.
 		 * @param {boolean} bReverse Whether the row should be displayed at the bottom of the table.
 		 * @returns {Promise} A promise that resolves when the table is scrolled.
@@ -589,7 +589,7 @@ sap.ui.define([
 		 * Displays a notification Popover beside the row selector that indicates a limited selection. The given index
 		 * references the index of the data context in the binding.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @param {number} iIndex Index of the data context
 		 * @param {number} iLimit Maximum number of rows that can be selected at once
 		 * @returns {Promise} A Promise that resolves after the notification popover has been opened
@@ -675,6 +675,32 @@ sap.ui.define([
 			}
 
 			oPopover.openBy(oRowSelector);
+		},
+
+		/**
+		 * Sets the fixed column count. If the table is not wide enough to display the fixed columns it displays a message to inform the user.
+		 *
+		 * @param {sap.ui.table.Table} oTable Instance of the table
+		 * @param {int} iFixedColumnCount The number of fixed columns.
+		 */
+		applyUserColumnFreeze: function(oTable, iFixedColumnCount) {
+			oTable.setFixedColumnCount(iFixedColumnCount);
+			if (iFixedColumnCount === 0 || !oTable._bIgnoreFixedColumnCount || oTable._bFixedColumnsNotActiveMessageOpen) {
+				return;
+			}
+
+			const openMessageBox = (MessageBox) => {
+				MessageBox.information(TableUtils.getResourceText("TBL_FIXED_COLUMNS_NOT_DISPLAYED"), {
+					onClose: () => {
+						oTable._bFixedColumnsNotActiveMessageOpen = false;
+					}
+				});
+				oTable._bFixedColumnsNotActiveMessageOpen = true;
+			};
+
+			Lib.load({name: "sap.m"}).then(() => {
+				sap.ui.require(["sap/m/MessageBox"], openMessageBox);
+			});
 		},
 
 		_onFirstVisibleRowChange: function(oEvent) {
@@ -848,7 +874,7 @@ sap.ui.define([
 		 * Returns the Row, Column and Cell instances for the given row index (in the rows aggregation)
 		 * and column index (in the array of visible columns (see Table._getVisibleColumns()).
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @param {int} iRowIdx Index of row in the tables rows aggregation.
 		 * @param {int} iColIdx Index of column in the list of visible columns.
 		 * @param {boolean} bIdxInColumnAgg Whether the given column index is the index in the columns (<code>true</code>)
@@ -884,7 +910,7 @@ sap.ui.define([
 		/**
 		 * Returns the table cell which is either the parent of an element, or returns the element if it is a table cell itself.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table used as the context within which to search for the cell.
+		 * @param {sap.ui.table.Table} oTable Instance of the table used as the context within which to search for the cell
 		 * @param {jQuery | HTMLElement} oElement A table cell or an element inside a table cell.
 		 * @param {jQuery | HTMLElement} [bIncludePseudoCells=false] Whether to include pseudo cells.
 		 * @returns {jQuery | null} Returns <code>null</code>, if the element is neither a table cell nor inside a table cell.
@@ -916,7 +942,7 @@ sap.ui.define([
 		/**
 		 * Returns the table cell which is the parent of an element.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table used as the context within which to search for the parent cell.
+		 * @param {sap.ui.table.Table} oTable Instance of the table used as the context within which to search for the parent cell
 		 * @param {jQuery | HTMLElement} oElement An element inside a table cell.
 		 * @param {jQuery | HTMLElement} [bIncludePseudoCells=false] Whether to include pseudo cells.
 		 * @returns {jQuery | null} Returns <code>null</code>, if the element is not inside a table cell.
@@ -939,7 +965,7 @@ sap.ui.define([
 		 * deregistered before registering the new one.
 		 *
 		 * @param {sap.ui.table.Table} oTable
-		 *     Instance of the table.
+		 *     Instance of the table
 		 * @param {string} sHandlerId
 		 *     ID of the resize handler. Required to deregister the resize handler.
 		 * @param {Function} fnHandler
@@ -981,7 +1007,7 @@ sap.ui.define([
 		 * Deregister resize handlers. If no resize handler id is given, all known resize handlers are deregistered.
 		 *
 		 * @param {sap.ui.table.Table} oTable
-		 *     Instance of the table.
+		 *     Instance of the table
 		 * @param {string | Array.<string> | undefined} [vHandlerId]
 		 *     ID of the resize handler to deregister. If not specified, all resize handlers are deregistered.
 		 */
@@ -1023,7 +1049,7 @@ sap.ui.define([
 		 * If at the same level, several style classes are defined, this is the priority:
 		 * sapUiSizeCompact, sapUiSizeCondensed, sapUiSizeCozy
 		 *
-		 * @param {sap.ui.table.Table} oControl Instance of the table.
+		 * @param {sap.ui.table.Table} oControl Instance of the table
 		 * @returns {string | undefined} name of the content density style class or undefined if none was found.
 		 */
 		getContentDensity: function(oControl) {
@@ -1108,7 +1134,7 @@ sap.ui.define([
 		/**
 		 * Returns the index of the first fixed bottom row in the <code>rows</code> aggregation.
 		 *
-		 * @param {sap.ui.table.Table} oTable Instance of the table.
+		 * @param {sap.ui.table.Table} oTable Instance of the table
 		 * @returns {int} The index of the first fixed bottom row in the <code>rows</code> aggregation, or <code>-1</code>.
 		 */
 		getFirstFixedBottomRowIndex: function(oTable) {
