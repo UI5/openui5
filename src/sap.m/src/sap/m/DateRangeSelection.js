@@ -812,7 +812,12 @@ sap.ui.define([
 					sValue = oBinding.getType().formatValue([oDate1, oDate2], "string");
 				}
 			} else {
-				sValue = oFormat.format([oDate1, oDate2 || null]);
+				const sDelimiter = this._getDelimiter();
+				if (sDelimiter && sDelimiter !== "" && oDate2) {
+					sValue = oFormat.format([oDate1, null]) + " " + sDelimiter + " " + oFormat.format([oDate2, null]);
+				} else {
+					sValue = oFormat.format([oDate1, null]);
+				}
 			}
 		}
 
