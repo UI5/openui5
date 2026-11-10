@@ -52,7 +52,7 @@ sap.ui.define([
 	var VerticalPlacementType = mobileLibrary.VerticalPlacementType;
 
 
-	function runAllTimersAndRestore(oClock, bRunToLast = false) {
+	async function runAllTimersAndRestore(oClock, bRunToLast = false) {
 		if (!oClock) {
 			return;
 		}
@@ -66,6 +66,7 @@ sap.ui.define([
 		} finally {
 			oClock.restore();
 		}
+		await nextUIUpdate();
 	}
 
 	QUnit.module("Public API", {
@@ -158,7 +159,7 @@ sap.ui.define([
 				qutils.triggerEvent("tap", oItem);
 			});
 		},
-		afterEach: function () {
+		afterEach: async function () {
 			this.oMessagePopover.destroy();
 			this.oButton.destroy();
 
@@ -168,7 +169,7 @@ sap.ui.define([
 			this.oMockupData = null;
 			this.oMessageTemplate.destroy();
 
-			runAllTimersAndRestore(this.clock);
+			await runAllTimersAndRestore(this.clock);
 		}
 	});
 
@@ -516,26 +517,27 @@ sap.ui.define([
 			"callback should be called with correct argument");
 	});
 
-	QUnit.test("AfterOpen should always load control's overview screen", function (assert) {
+	QUnit.test("AfterOpen should always load control's overview screen", async function (assert) {
 		this.clock = sinon.useFakeTimers();
 		assert.expect(2);
-		var done = assert.async(),
-			that = this,
-			fnAfterOpen = function() {
-				assert.ok(that.oMessagePopover._oMessageView._isListPage());
-				that.oMessagePopover._oMessageView._navContainer.to(that.oMessagePopover._oMessageView._detailsPage);
-				that.oMessagePopover.close();
-				that.clock.tick(500);
-			};
+		var that = this,
+			pAfterOpen = new Promise(function(resolve) {
+				that.oMessagePopover.attachAfterOpen(function() {
+					assert.ok(that.oMessagePopover._oMessageView._isListPage());
+					that.oMessagePopover._oMessageView._navContainer.to(that.oMessagePopover._oMessageView._detailsPage);
+					that.oMessagePopover.close();
+					that.clock.tick(500);
+					resolve();
+				});
+			});
 
-			that.oMessagePopover.attachAfterOpen(fnAfterOpen);
 			that.oMessagePopover.openBy(that.oButton);
 			that.clock.tick(500);
 
 			assert.ok(that.oMessagePopover._oMessageView._isListPage());
 
-			runAllTimersAndRestore(that.clock, true);
-			done();
+			await pAfterOpen;
+			await runAllTimersAndRestore(that.clock, true);
 	});
 
 	QUnit.test("addStyleClass should add class", function (assert) {
@@ -746,7 +748,7 @@ sap.ui.define([
 		// store pages
 		oMessagePopoverCurrentPage = oMessagePopover._oMessageView._navContainer.getCurrentPage();
 		assert.strictEqual(oMessagePopover._oMessageView._listPage, oMessagePopoverCurrentPage, "List Page should be visible");
-		runAllTimersAndRestore(this.clock, true);
+		await runAllTimersAndRestore(this.clock, true);
 		oBtn.destroy();
 		oMessagePopover.destroy();
 	});
@@ -817,14 +819,14 @@ sap.ui.define([
 			this.oButton.placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
-		afterEach: function () {
+		afterEach: async function () {
 			this.oMessagePopover.destroy();
 			this.oButton.destroy();
 
 			this.oMessagePopover = null;
 			this.oButton = null;
 
-			runAllTimersAndRestore(this.clock);
+			await runAllTimersAndRestore(this.clock);
 		}
 	});
 
@@ -1098,7 +1100,7 @@ sap.ui.define([
 				qutils.triggerEvent("tap", oItem);
 			});
 		},
-		afterEach: function() {
+		afterEach: async function() {
 			this.oMessagePopover.destroy();
 			this.oButton.destroy();
 
@@ -1108,49 +1110,40 @@ sap.ui.define([
 			this.oMockupData = null;
 			this.oMessageTemplate.destroy();
 
-			runAllTimersAndRestore(this.clock);
+			await runAllTimersAndRestore(this.clock);
 		}
 	});
 
-	QUnit.test("Async description handler", function (assert) {
+	QUnit.test("Async description handler", async function (assert) {
 		this.clock = sinon.useFakeTimers();
-		var done = assert.async();
 
 		this.bindMessagePopover(this.oMessagePopover, this.oMockupData);
-
-		const that = this;
-		this.promiseDescription.then(function () {
-			assert.ok(true, "Default async description handler has been executed");
-
-			runAllTimersAndRestore(that.clock, true);
-
-			done();
-		});
 
 		this.openDetailPageAfterOpen(this.oMessagePopover, 4);
 
 		this.oMessagePopover.openBy(this.oButton);
 		this.clock.tick(500);
+
+		await this.promiseDescription;
+		assert.ok(true, "Default async description handler has been executed");
+
+		await runAllTimersAndRestore(this.clock, true);
 	});
 
-	QUnit.test("Async URL handler", function (assert) {
+	QUnit.test("Async URL handler", async function (assert) {
 		this.clock = sinon.useFakeTimers();
-		var done = assert.async();
 
 		this.bindMessagePopover(this.oMessagePopover, this.oMockupData);
-
-		const that = this;
-
-		this.promiseURL.then(function () {
-			assert.ok(true, "Default async URL handler has been executed");
-			runAllTimersAndRestore(that.clock, true);
-			done();
-		});
 
 		this.openDetailPageAfterOpen(this.oMessagePopover, 4);
 
 		this.oMessagePopover.openBy(this.oButton);
 		this.clock.tick(500);
+
+		await this.promiseURL;
+		assert.ok(true, "Default async URL handler has been executed");
+
+		await runAllTimersAndRestore(this.clock, true);
 	});
 
 	QUnit.test("MessageItems type Navigation", function (assert) {
@@ -1335,14 +1328,14 @@ sap.ui.define([
 			this.oButton2.placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
-		afterEach: function () {
+		afterEach: async function () {
 			this.oMessagepopover2.destroy();
 			this.oMessagepopover2 = null;
 
 			this.oButton2.destroy();
 			this.oButton2 = null;
 
-			runAllTimersAndRestore(this.clock);
+			await runAllTimersAndRestore(this.clock);
 		}
 	});
 
@@ -1549,7 +1542,7 @@ sap.ui.define([
 		await oChangeToWarningBtn.firePress();
 		assert.strictEqual(oMessagePopover._oMessageView._oLists.all.getItems()[0].getTitle(), sWarningText, "Text should be warning");
 		assert.strictEqual(oMessagePopover._oMessageView._oLists.all.getItems()[0].getIcon(), IconPool.getIconURI("alert"), "Icon should be warning");
-		runAllTimersAndRestore(this.clock, true);
+		await runAllTimersAndRestore(this.clock, true);
 		oButton.destroy();
 		oMessagePopover.destroy();
 		oChangeToWarningBtn.destroy();
@@ -1594,7 +1587,7 @@ sap.ui.define([
 
 			this.oButton.placeAt("qunit-fixture");
 		},
-		afterEach: function () {
+		afterEach: async function () {
 			// Clean
 			this.oButton.destroy();
 			this.oButton = null;
@@ -1604,7 +1597,7 @@ sap.ui.define([
 
 			this.oModel = null;
 
-			runAllTimersAndRestore(this.clock);
+			await runAllTimersAndRestore(this.clock);
 		}
 	});
 
@@ -1900,7 +1893,7 @@ sap.ui.define([
 			"List page is preserved after a resize"
 		);
 
-		runAllTimersAndRestore(this.clock, true);
+		await runAllTimersAndRestore(this.clock, true);
 	});
 
 	QUnit.test("Close and reopen shows details view for single item", async function (assert) {
@@ -1930,7 +1923,7 @@ sap.ui.define([
 			"Details page is shown again on reopen for a single item"
 		);
 
-		runAllTimersAndRestore(this.clock, true);
+		await runAllTimersAndRestore(this.clock, true);
 	});
 
 	QUnit.test("Adding a message so the count transitions to 1 auto-navigates to details", async function (assert) {
@@ -1963,7 +1956,7 @@ sap.ui.define([
 
 		oMessagePopover.close();
 		oMessagePopover.destroy();
-		runAllTimersAndRestore(this.clock, true);
+		await runAllTimersAndRestore(this.clock, true);
 	});
 
 	QUnit.test("Details page title reflects the latest message when a new message arrives while closed", async function (assert) {
@@ -2010,6 +2003,6 @@ sap.ui.define([
 			"Details page title is updated to the latest message received while the popover was closed"
 		);
 
-		runAllTimersAndRestore(this.clock, true);
+		await runAllTimersAndRestore(this.clock, true);
 	});
 });
