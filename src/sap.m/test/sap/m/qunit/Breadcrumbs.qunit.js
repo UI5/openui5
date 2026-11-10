@@ -601,6 +601,38 @@ function(Library, DomUnitsRem, Parameters, Breadcrumbs, Link, OverflowToolBar, T
 		assert.equal(this.oStandardBreadCrumbsControl._getSelect().getVisible(), false, "select is not shown");
 	});
 
+	QUnit.test("Does not overflow its container before async redistribution (no transient scrollbar)", function (assert) {
+		// Arrange: a container wide enough to fit the whole breadcrumb trail initially
+		const oWrapper = document.createElement("div");
+		oWrapper.style.width = "2000px";
+		document.getElementById("qunit-fixture").appendChild(oWrapper);
+
+		this.oStandardBreadCrumbsControl = oFactory.getBreadCrumbControlWithLinks(6, "Current location text");
+		this.oStandardBreadCrumbsControl.placeAt(oWrapper);
+		Core.applyChanges();
+
+		// Precondition: at full width the whole trail fits, so the overflow Select is hidden
+		assert.notOk(this.oStandardBreadCrumbsControl._getSelect().getVisible(),
+			"precondition: whole trail fits at full width, overflow Select is hidden");
+
+		// Act: shrink the container. The ResizeHandler redistributes links into the Select
+		// only on its ~200ms poll, so synchronously we are in the transient window the
+		// overflow:hidden/max-width fix is meant to cover (the DOM still holds the full trail).
+		oWrapper.style.width = "150px";
+
+		// Assert: reading scrollWidth forces a synchronous reflow. The Breadcrumbs must clip
+		// its still-wide content instead of pushing it past the container, i.e. it must not
+		// create a horizontal scrollbar before the asynchronous redistribution happens.
+		assert.ok(oWrapper.scrollWidth <= oWrapper.clientWidth,
+			"Breadcrumbs does not overflow its container (scrollWidth " + oWrapper.scrollWidth +
+			" <= clientWidth " + oWrapper.clientWidth + ")");
+		assert.strictEqual(window.getComputedStyle(this.oStandardBreadCrumbsControl.getDomRef()).overflow, "hidden",
+			"Breadcrumbs clips overflowing content (overflow: hidden)");
+
+		// Clean up
+		oWrapper.remove();
+	});
+
 	QUnit.test("Skip overflow recalculations when no width change", async function (assert) {
 		const oLink1 = new Link({text: "link1"});
 		const oLink2 = new Link({text: "link2"});
