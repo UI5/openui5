@@ -45,9 +45,13 @@
 				<m:Title level="H1"
 					text="{header>$count} Flight Bookings ({header>$selectionCount} selected)"/>
 				<m:SearchField placeholder="Search for anything..." search=".onSearch"
-					value="{ui>/sSearch}" width="40%"/>
+					value="{ui>/sSearch}" width="35%"/>
 				<m:Button icon="sap-icon://download" press=".onDownload" tooltip="Download"/>
 				<m:Button icon="sap-icon://response" press=".onRefresh" tooltip="Refresh"/>
+				<m:Button icon="sap-icon://appointment" press=".onRefreshFlightDates"
+					tooltip="Side Effect for All Flight Dates"/>
+				<m:Button icon="sap-icon://travel-expense" press=".onRefreshFlightPrices"
+					tooltip="Side Effect for All Flight Prices"/>
 				<m:Button id="showMessages" icon="sap-icon://message-popup" tooltip="Show messages"
 					press=".onToggleMessagePopover" text="{ui>/iMessages}"
 					type="{= ${ui>/iMessages} ? 'Emphasized' : 'Default' }"/>
@@ -222,7 +226,7 @@
 						press=".onRefreshBooking" tooltip="Refresh"/>
 					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://refresh"
 						press=".onRefreshBookingViaSideEffects" tooltip="Side-Effects Refresh"/>
-					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://synchronize"
+					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://appointment"
 						press=".onRefreshFlightDate" tooltip="Side Effect for Flight Date"/>
 					<m:Button enabled="{= !!%{BookingID} }" icon="sap-icon://travel-expense"
 						press=".onRefreshFlightPrice" tooltip="Side Effect for Flight Price"/>

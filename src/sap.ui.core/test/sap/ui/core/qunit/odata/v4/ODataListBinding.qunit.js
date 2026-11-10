@@ -9838,9 +9838,6 @@ sap.ui.define([
 	//*********************************************************************************************
 [false, true].forEach(function (bHeader) {
 	const sTitle = "requestSideEffects: refresh needed, refresh fails, " + bHeader + " #" + iMode;
-	if (bDataAggregation) {
-		return; // data aggregation with !bSingle has a separate implementation
-	}
 
 	QUnit.test(sTitle, function (assert) {
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
@@ -9852,7 +9849,9 @@ sap.ui.define([
 		oBinding.iCurrentEnd = 42;
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
-			.returns(bDataAggregation); // see return above
+			.returns(bDataAggregation);
+		this.mock(oBinding.oHeaderContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs().returns(false);
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs(sGroupId).returns(false);
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
@@ -9887,9 +9886,10 @@ sap.ui.define([
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation);
+		this.mock(oBinding.oHeaderContext).expects("isAggregated").never();
+		this.mock(_AggregationHelper).expects("isAffected").never();
 		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
 			.withExactArgs().returns(false);
-		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").never();
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
 		this.mock(oBinding).expects("setOutdated").never();
@@ -9914,9 +9914,6 @@ sap.ui.define([
 	//*********************************************************************************************
 [false, true].forEach(function (bHeader) {
 	const sTitle = "requestSideEffects: deleting in other group, " + bHeader + " #" + iMode;
-	if (bDataAggregation) {
-		return; // data aggregation with !bSingle has a separate implementation
-	}
 
 	QUnit.test(sTitle, function (assert) {
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
@@ -9925,7 +9922,9 @@ sap.ui.define([
 
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
-			.returns(bDataAggregation); // see return above
+			.returns(bDataAggregation);
+		this.mock(oBinding.oHeaderContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs().returns(false);
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs("group").returns(true);
 		oCacheMock.expects("getPendingRequestsPromise").never();
@@ -9958,9 +9957,10 @@ sap.ui.define([
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation);
+		this.mock(oBinding.oHeaderContext).expects("isAggregated").never();
+		this.mock(_AggregationHelper).expects("isAffected").never();
 		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
 			.withExactArgs().returns(false);
-		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").never();
 		oCacheMock.expects("getPendingRequestsPromise").twice().withExactArgs()
 			.returns(oPendingRequestsPromise);
@@ -9984,9 +9984,6 @@ sap.ui.define([
 	//*********************************************************************************************
 	QUnit.test("requestSideEffects: call refreshInternal for relative binding #" + iMode,
 			function (assert) {
-		if (bDataAggregation) {
-			return; // data aggregation with !bSingle has a separate implementation
-		}
 		var oBinding = bindList(this, "relative", this.oModel.createBindingContext("/")),
 			oContext = oBinding.getHeaderContext(),
 			oResult = {};
@@ -9994,7 +9991,9 @@ sap.ui.define([
 		oBinding.iCurrentEnd = 42;
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
-			.returns(false);
+			.returns(bDataAggregation);
+		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs().returns(false);
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		this.mock(oBinding).expects("setOutdated").never();
 		this.mock(oBinding).expects("refreshSingle").never();
@@ -10018,6 +10017,7 @@ sap.ui.define([
 
 		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
 			.withExactArgs().returns(false);
+		this.mock(oBinding.oHeaderContext).expects("isAggregated").never();
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		this.mock(this.oModel).expects("withUnresolvedBindings")
 			.withExactArgs("removeCachesAndMessages", "EMPLOYEES('42')");
@@ -10042,10 +10042,6 @@ sap.ui.define([
 			var sTitle = "requestSideEffects: efficient request possible, header=" + bHeader
 					+ ", reject=" + bRecursionRejects + ", has cache=" + bHasCache
 					+ " #" + iMode;
-
-			if (bDataAggregation && bHeader) {
-				return; // data aggregation with !bSingle has a separate implementation
-			}
 
 	QUnit.test(sTitle, function (assert) {
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
@@ -10080,10 +10076,11 @@ sap.ui.define([
 
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
-			.returns(bDataAggregation); // see return above
+			.returns(bDataAggregation);
 		this.mock(oContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
 			.withExactArgs().returns(false);
 		this.mock(_AggregationHelper).expects("isAffected").never();
+		this.mock(oBinding).expects("refreshInternal").never();
 		oCacheMock.expects("isDeletingInOtherGroup").exactly(bHeader && bHasCache ? 1 : 0)
 			.withExactArgs(sGroupId).returns(false);
 		oCacheMock.expects("getPendingRequestsPromise").exactly(bHasCache ? 1 : 0).withExactArgs()
@@ -10113,7 +10110,6 @@ sap.ui.define([
 				sinon.match.same(oCanceledError));
 		oModelMock.expects("reportError").exactly(bRecursionRejects ? 1 : 0)
 			.withExactArgs("Failed to request side effects", sClassName, sinon.match.same(oError));
-		this.mock(oBinding).expects("refreshInternal").never();
 
 		// code under test
 		oResult = oBinding.requestSideEffects(sGroupId, aPaths, oContext, "~bSkipKeptElements~");
@@ -10135,9 +10131,6 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("requestSideEffects: fallback to refresh #" + iMode, function (assert) {
-		if (bDataAggregation) {
-			return; // data aggregation with !bSingle has a separate implementation
-		}
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
 			oBinding = bindList(this, "/Set"),
 			oError = new Error(),
@@ -10146,7 +10139,9 @@ sap.ui.define([
 		oBinding.iCurrentEnd = 8;
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
-			.returns(bDataAggregation); // see return above
+			.returns(bDataAggregation);
+		this.mock(oBinding.oHeaderContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs().returns(false);
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs(sGroupId).returns(false);
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
@@ -10174,15 +10169,14 @@ sap.ui.define([
 
 	//*********************************************************************************************
 	QUnit.test("requestSideEffects: no data read => no refresh #" + iMode, function (assert) {
-		if (bDataAggregation) {
-			return; // data aggregation with !bSingle has a separate implementation
-		}
 		var oCacheMock = this.getCacheMock(), // must be called before creating the binding
 			oBinding = bindList(this, "/Set");
 
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
-			.returns(bDataAggregation); // see return above
+			.returns(bDataAggregation);
+		this.mock(oBinding.oHeaderContext).expects("isAggregated").exactly(bDataAggregation ? 1 : 0)
+			.withExactArgs().returns(false);
 		this.mock(_AggregationHelper).expects("isAffected").never();
 		oCacheMock.expects("isDeletingInOtherGroup").withExactArgs("group").returns(false);
 		oCacheMock.expects("getPendingRequestsPromise").withExactArgs().returns(null);
@@ -10200,10 +10194,17 @@ sap.ui.define([
 }); // END of forEach: iMode **********************************************************************
 
 	//*********************************************************************************************
-[false, true].forEach(function (bRefresh) {
-	[false, true].forEach(function (bHeaderContext) {
-		var sTitle = "requestSideEffects: $$aggregation, refresh=" + bRefresh + ", headerContext="
-				+ bHeaderContext;
+[false, true].forEach(function (bAffected) {
+	[false, true].forEach(function (bHasGroupLevels) {
+		[false, true].forEach(function (bAggregated) {
+			[false, true].forEach(function (bHeaderContext) { // !bSingle
+	const sTitle = "requestSideEffects: refresh for data aggregation, isAffected=" + bAffected
+		+ ", has groupLevels=" + bHasGroupLevels + ", is aggregated=" + bAggregated
+		+ ", headerContext=" + bHeaderContext;
+
+	if (!bHasGroupLevels && !bAggregated) {
+		return; // efficient request: tested elsewhere
+	}
 
 	QUnit.test(sTitle, function (assert) {
 		var oBinding = this.bindList("/Set"),
@@ -10213,30 +10214,39 @@ sap.ui.define([
 			oPromise,
 			oRefreshPromise = {};
 
+		oBinding.mParameters = {
+			$$aggregation : {
+				groupLevels : bHasGroupLevels ? ["foo"] : []
+			}
+		};
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(true);
-		this.mock(oBinding.oCache).expects("requestSideEffects").never();
-		this.mock(oBinding.aFilters).expects("concat").withExactArgs(oBinding.aApplicationFilters)
-			.returns(aFilters);
+		this.mock(oBinding.oHeaderContext).expects("isAggregated").exactly(bHasGroupLevels ? 0 : 1)
+			.withExactArgs().returns(bAggregated);
 		this.mock(_AggregationHelper).expects("isAffected")
 			.withExactArgs(sinon.match.same(oBinding.mParameters.$$aggregation),
 				sinon.match.same(aFilters), sinon.match.same(aPaths))
-			.returns(bRefresh);
+			.returns(bAffected);
+		this.mock(oBinding.oCache).expects("requestSideEffects").never();
+		this.mock(oBinding.aFilters).expects("concat").withExactArgs(oBinding.aApplicationFilters)
+			.returns(aFilters);
 		this.mock(oBinding).expects("setOutdated").never();
-		this.mock(oBinding).expects("refreshInternal").exactly(bRefresh ? 1 : 0)
+		this.mock(oBinding).expects("refreshInternal").exactly(bAffected ? 1 : 0)
 			.withExactArgs("", "group", false, true)
 			.returns(oRefreshPromise);
 
 		// code under test
 		oPromise = oBinding.requestSideEffects("group", aPaths, oContext);
 
-		if (bRefresh) {
-			assert.strictEqual(oPromise, oRefreshPromise);
-		} else {
+		if (!bAffected) {
 			assert.strictEqual(oPromise, SyncPromise.resolve());
+		} else {
+			assert.strictEqual(oPromise, oRefreshPromise);
 		}
 	});
+			});
+		});
 	});
 });
 
@@ -10286,6 +10296,12 @@ sap.ui.define([
 				isEffectivelyKeptAlive : function () {},
 				getProperty : mustBeMocked
 			},
+			oCreatedContext0Mock = this.mock(oCreatedContext0),
+			oCreatedContext2Mock = this.mock(oCreatedContext2),
+			oPreviousContext0Mock = this.mock(oPreviousContext0),
+			oPreviousContext2Mock = this.mock(oPreviousContext2),
+			oContext0Mock = this.mock(oContext0),
+			oContext1Mock = this.mock(oContext1),
 			aResult;
 
 		oBinding.aContexts = [oCreatedContext0, oCreatedContext1, oCreatedContext2,
@@ -10306,20 +10322,32 @@ sap.ui.define([
 			.returns(false);
 		this.mock(oPreviousContext2).expects("isEffectivelyKeptAlive").withExactArgs()
 			.returns(true);
-		this.mock(oCreatedContext0).expects("getProperty")
+		oCreatedContext0Mock.expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(false);
+		oCreatedContext0Mock.expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
 		this.mock(oCreatedContext1).expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(true);
-		this.mock(oCreatedContext2).expects("getProperty")
+		oCreatedContext2Mock.expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(false);
-		this.mock(oPreviousContext0).expects("getProperty")
+		oCreatedContext2Mock.expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
+		oPreviousContext0Mock.expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(false);
-		this.mock(oPreviousContext2).expects("getProperty")
+		oPreviousContext0Mock.expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
+		oPreviousContext2Mock.expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(false);
-		this.mock(oContext0).expects("getProperty")
+		oPreviousContext2Mock.expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
+		oContext0Mock.expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(false);
-		this.mock(oContext1).expects("getProperty")
+		oContext0Mock.expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
+		oContext1Mock.expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(false);
+		oContext1Mock.expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
 		this.mock(oBinding).expects("destroyLater").never();
 
 		// code under test
@@ -10347,7 +10375,7 @@ sap.ui.define([
 	//*********************************************************************************************
 [false, true].forEach((bTransient) => {
 	[false, true].forEach(function (bContext6Created) {
-		var sTitle = "keepOnlyVisibleContexts: destroy others, unless created; transient: "
+		var sTitle = "keepOnlyVisibleContexts: destroy others, unless created or total; transient: "
 				+ bTransient + "; oContext6 is created: " + bContext6Created;
 
 	QUnit.test(sTitle, function (assert) {
@@ -10357,13 +10385,21 @@ sap.ui.define([
 				getProperty : function () {},
 				iIndex : -1
 			},
-			oContext0 = {iIndex : 0, created : mustBeMocked}, // to be destroyed
+			oContext0 = { // to be destroyed
+				iIndex : 0,
+				created : mustBeMocked,
+				getProperty : mustBeMocked
+			},
 			oContext1 = { // NOT to be destroyed
 				iIndex : 1,
 				created : mustBeMocked,
 				getProperty : mustBeMocked
 			},
-			oContext2 = {iIndex : 2, created : mustBeMocked}, // to be destroyed
+			oContext2 = { // to be destroyed
+				iIndex : 2,
+				created : mustBeMocked,
+				getProperty : mustBeMocked
+			},
 			oContext3 = { // in
 				iIndex : 3,
 				getProperty : mustBeMocked
@@ -10372,19 +10408,45 @@ sap.ui.define([
 				iIndex : 4,
 				getProperty : mustBeMocked
 			},
-			oContext5 = {iIndex : 5, created : mustBeMocked}, // to be destroyed
+			oContext5 = { // to be destroyed
+				iIndex : 5,
+				created : mustBeMocked,
+				getProperty : mustBeMocked
+			},
 			oContext6 = { // NOT to be destroyed if bContext6Created
 				iIndex : 6,
 				created : mustBeMocked,
 				getProperty : mustBeMocked
 			},
-			oContext7 = {iIndex : 7, created : mustBeMocked}, // to be destroyed
-			oContext8 = {iIndex : 8, created : mustBeMocked}, // to be destroyed
-			oContext9 = {iIndex : 9, created : mustBeMocked}, // to be destroyed
+			oContext7 = { // to be destroyed
+				iIndex : 7,
+				created : mustBeMocked,
+				getProperty : mustBeMocked
+			},
+			oContext8 = { // to be destroyed
+				iIndex : 8,
+				created : mustBeMocked,
+				getProperty : mustBeMocked
+			},
+			oContext9 = { // to be destroyed
+				iIndex : 9,
+				created : mustBeMocked,
+				getProperty : mustBeMocked
+			},
+			oContext10 = { // NOT to be destroyed
+				iIndex : 10,
+				created : mustBeMocked,
+				getProperty : mustBeMocked
+			},
+			oContext1Mock = this.mock(oContext1),
+			oContext3Mock = this.mock(oContext3),
+			oContext4Mock = this.mock(oContext4),
+			oContext6Mock = this.mock(oContext6),
+			oContext10Mock = this.mock(oContext10),
 			aResult;
 
 		oBinding.aContexts = [oCreatedContext0, oContext0, oContext1, oContext2, oContext3,
-			oContext4, oContext5, oContext6, oContext7, oContext8, oContext9];
+			oContext4, oContext5, oContext6, oContext7, oContext8, oContext9, oContext10];
 		oBinding.iCreatedContexts = 1;
 		oBinding.iCurrentBegin = 4;
 		oBinding.iCurrentEnd = 6;
@@ -10392,14 +10454,31 @@ sap.ui.define([
 		this.mock(oCreatedContext0).expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(true);
 		this.mock(oContext0).expects("created").withExactArgs().returns(undefined);
-		this.mock(oContext1).expects("created").withExactArgs().returns(Promise.resolve());
+		this.mock(oContext0).expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
+		oContext1Mock.expects("created").withExactArgs().returns(Promise.resolve());
 		this.mock(oContext2).expects("created").withExactArgs().returns(undefined);
+		this.mock(oContext2).expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
 		this.mock(oContext5).expects("created").withExactArgs().returns(undefined);
-		this.mock(oContext6).expects("created").withExactArgs()
+		this.mock(oContext5).expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
+		oContext6Mock.expects("created").withExactArgs()
 			.returns(bContext6Created ? Promise.resolve() : undefined);
+		oContext6Mock.expects("getProperty").exactly(bContext6Created ? 0 : 1)
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
 		this.mock(oContext7).expects("created").withExactArgs().returns(undefined);
+		this.mock(oContext7).expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
 		this.mock(oContext8).expects("created").withExactArgs().returns(undefined);
+		this.mock(oContext8).expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
 		this.mock(oContext9).expects("created").withExactArgs().returns(undefined);
+		this.mock(oContext9).expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(undefined);
+		oContext10Mock.expects("created").withExactArgs().returns(undefined);
+		oContext10Mock.expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(true);
 		oBindingMock.expects("destroyLater").on(oBinding).withArgs(sinon.match.same(oContext0));
 		oBindingMock.expects("destroyLater").on(oBinding).withArgs(sinon.match.same(oContext2));
 		oBindingMock.expects("destroyLater").on(oBinding).withArgs(sinon.match.same(oContext5));
@@ -10408,14 +10487,26 @@ sap.ui.define([
 		oBindingMock.expects("destroyLater").on(oBinding).withArgs(sinon.match.same(oContext7));
 		oBindingMock.expects("destroyLater").on(oBinding).withArgs(sinon.match.same(oContext8));
 		oBindingMock.expects("destroyLater").on(oBinding).withArgs(sinon.match.same(oContext9));
-		this.mock(oContext1).expects("getProperty")
+		oContext1Mock.expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(bTransient);
-		this.mock(oContext3).expects("getProperty")
+		oContext1Mock.expects("getProperty").exactly(bTransient ? 0 : 1)
+			.withExactArgs("@$ui5.node.isTotal").returns(false);
+		oContext3Mock.expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(bTransient);
-		this.mock(oContext4).expects("getProperty")
+		oContext3Mock.expects("getProperty").exactly(bTransient ? 0 : 1)
+			.withExactArgs("@$ui5.node.isTotal").returns(false);
+		oContext4Mock.expects("getProperty")
 			.withExactArgs("@$ui5.context.isTransient").returns(bTransient);
-		this.mock(oContext6).expects("getProperty").exactly(bContext6Created ? 1 : 0)
+		oContext4Mock.expects("getProperty").exactly(bTransient ? 0 : 1)
+			.withExactArgs("@$ui5.node.isTotal").returns(false);
+		oContext6Mock.expects("getProperty").exactly(bContext6Created ? 1 : 0)
 			.withExactArgs("@$ui5.context.isTransient").returns(bTransient);
+		oContext6Mock.expects("getProperty").exactly(!bContext6Created || bTransient ? 0 : 1)
+			.withExactArgs("@$ui5.node.isTotal").returns(false);
+		oContext10Mock.expects("getProperty")
+			.withExactArgs("@$ui5.context.isTransient").returns(undefined);
+		oContext10Mock.expects("getProperty")
+			.withExactArgs("@$ui5.node.isTotal").returns(true);
 
 		// code under test
 		aResult = oBinding.keepOnlyVisibleContexts();
@@ -10432,8 +10523,8 @@ sap.ui.define([
 			assert.strictEqual(aResult[3], bContext6Created ? oContext6 : undefined);
 		}
 		assert.deepEqual(oBinding.aContexts, bContext6Created
-			? [oCreatedContext0,, oContext1,, oContext3, oContext4,, oContext6]
-			: [oCreatedContext0,, oContext1,, oContext3, oContext4]);
+			? [oCreatedContext0,, oContext1,, oContext3, oContext4,, oContext6,,,, oContext10]
+			: [oCreatedContext0,, oContext1,, oContext3, oContext4,,,,,, oContext10]);
 	});
 	});
 });

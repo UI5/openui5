@@ -4032,14 +4032,15 @@ sap.ui.define([
 		let iNewLength = 0;
 
 		/**
-		 * Keeps and requests created contexts, destroys others.
+		 * Keeps and requests created contexts and (grand) totals, destroys others.
 		 *
 		 * @param {number} iBase - A base index
 		 * @param {sap.ui.model.odata.v4.Context} oContext0 - A context, maybe created
 		 * @param {number} iIndex - A relative index
 		 */
 		function keepOrDestroy(iBase, oContext0, iIndex) {
-			if (oContext0.created()) { // e.g. Recursive Hierarchy maintenance
+			if (oContext0.created() // e.g. Recursive Hierarchy maintenance
+					|| oContext0.getProperty("@$ui5.node.isTotal")) { // e.g. grand total
 				aContexts.push(oContext0);
 				iNewLength = iBase + iIndex + 1;
 			} else {
@@ -4058,10 +4059,11 @@ sap.ui.define([
 		}
 
 		return aContexts.filter((oContext) => {
-			// cannot request side effects for transient contexts
+			// cannot request side effects for transient contexts or (grand) totals
 			// Note: do not use #isTransient because #created() may not be resolved yet,
 			// although already persisted (timing issue, see caller)
-			return !oContext.getProperty("@$ui5.context.isTransient");
+			return !oContext.getProperty("@$ui5.context.isTransient")
+				&& !oContext.getProperty("@$ui5.node.isTotal");
 		});
 	};
 
@@ -4917,13 +4919,15 @@ sap.ui.define([
 
 		if (_Helper.isDataAggregation(this.mParameters)) {
 			if (!bSingle) {
-				return _AggregationHelper.isAffected(this.mParameters.$$aggregation,
-						this.aFilters.concat(this.aApplicationFilters), aPaths)
-					? this.refreshInternal("", sGroupId, false, true)
-					: SyncPromise.resolve();
-			}
-
-			if (oContext.isAggregated()) {
+				if (this.mParameters.$$aggregation.groupLevels.length
+						|| this.oHeaderContext.isAggregated()) {
+					return _AggregationHelper.isAffected(this.mParameters.$$aggregation,
+							this.aFilters.concat(this.aApplicationFilters), aPaths)
+						? this.refreshInternal("", sGroupId, false, true)
+						: SyncPromise.resolve();
+				}
+				// fall through
+			} else if (oContext.isAggregated()) {
 				throw new Error("Unsupported on aggregated data: " + oContext);
 			}
 			// fall through

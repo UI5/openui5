@@ -3972,6 +3972,8 @@ sap.ui.define([
 	 *   in this case
 	 * @param {boolean} bWithMessages
 	 *   Whether the "@com.sap.vocabularies.Common.v1.Messages" path is treated specially
+	 * @param {boolean} [bSortSystemQueryOptions]
+	 *   Whether system query options are sorted alphabetically and moved to the query string's end
 	 * @returns {Promise<void>|sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a defined result, or rejected with an error if loading
 	 *   of side effects fails
@@ -3982,7 +3984,7 @@ sap.ui.define([
 	 * @public
 	 */
 	_CollectionCache.prototype.requestSideEffects = function (oGroupLock, aPaths, aPredicates,
-			bSingle, bWithMessages) {
+			bSingle, bWithMessages, bSortSystemQueryOptions) {
 		var aElements,
 			mMergeableQueryOptions,
 			mQueryOptions,
@@ -4043,7 +4045,8 @@ sap.ui.define([
 		mMergeableQueryOptions = _Helper.extractMergeableQueryOptions(mQueryOptions);
 		aPaths = _Helper.getUsedPaths(aPaths, mMergeableQueryOptions);
 		sResourcePathWithQuery = this.sResourcePath + (bSingle ? aPredicates[0] : "")
-			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false, true);
+			+ this.oRequestor.buildQueryString(this.sMetaPath, mQueryOptions, false,
+				/*bSortExpandSelect*/true, bSortSystemQueryOptions);
 
 		return this.oRequestor.request("GET", sResourcePathWithQuery, oGroupLock, undefined,
 				undefined, undefined, undefined, this.sMetaPath, undefined, false,

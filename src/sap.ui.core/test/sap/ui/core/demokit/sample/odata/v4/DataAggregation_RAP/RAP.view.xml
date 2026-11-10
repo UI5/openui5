@@ -35,6 +35,10 @@
 					value="{ui>/sSearch}" width="40%"/>
 				<m:Button icon="sap-icon://download" press=".onDownload" tooltip="Download"/>
 				<m:Button icon="sap-icon://response" press=".onRefresh" tooltip="Refresh"/>
+				<m:Button icon="sap-icon://appointment" press=".onRefreshFlightDates"
+					tooltip="Side Effect for All Flight Dates"/>
+				<m:Button icon="sap-icon://travel-expense" press=".onRefreshFlightPrices"
+					tooltip="Side Effect for All Flight Prices"/>
 				<m:Button id="showMessages" icon="sap-icon://message-popup" tooltip="Show messages"
 					press=".onToggleMessagePopover" text="{ui>/iMessages}"
 					type="{= ${ui>/iMessages} ? 'Emphasized' : 'Default' }"/>
@@ -154,7 +158,7 @@
 				<m:Button icon="sap-icon://response" press=".onRefreshBooking" tooltip="Refresh"/>
 				<m:Button icon="sap-icon://refresh" press=".onRefreshBookingViaSideEffects"
 					tooltip="Side-Effects Refresh"/>
-				<m:Button icon="sap-icon://synchronize" press=".onRefreshFlightDate"
+				<m:Button icon="sap-icon://appointment" press=".onRefreshFlightDate"
 					tooltip="Side Effect for Flight Date"/>
 				<m:Button icon="sap-icon://travel-expense" press=".onRefreshFlightPrice"
 					tooltip="Side Effect for Flight Price"/>

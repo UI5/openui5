@@ -2842,7 +2842,7 @@ sap.ui.define([
 		},
 
 		/**
-		 *  Create a view with a relative ODataListBinding which is ready to create a new entity.
+		 * Create a view with a relative ODataListBinding which is ready to create a new entity.
 		 *
 		 * @param {object} assert The QUnit assert object
 		 * @returns {Promise} A promise that is resolved when the view is created and ready to
@@ -2904,6 +2904,33 @@ sap.ui.define([
 				suspended : !bRelative,
 				template : oTemplate
 			});
+		},
+
+		/**
+		 * Resets the outdated attribute of each current context, taking care of expected changes.
+		 * Assumes that "isOutdatedHeader" and "isOutdated" are the proper IDs.
+		 *
+		 * @param {object} assert - The QUnit assert object
+		 * @param {sap.ui.model.odata.v4.ODataListBinding} oListBinding - A list binding
+		 * @returns {Promise} The promise from {@link #waitForChanges}
+		 */
+		resetOutdated : function (assert, oListBinding) {
+			oListBinding.oCache.bAllSubtotalsOutdated = false;
+			oListBinding.oCache.oOutdatedSubtotals = null;
+
+			this.expectChange("isOutdatedHeader", false);
+			oListBinding.getHeaderContext().setOutdated(false);
+
+			const iIndexOfPredicate = oListBinding.getHeaderContext().getPath().length;
+			oListBinding._getAllExistingContexts().forEach((oContext) => {
+				if (oContext.isOutdated()) {
+					this.expectChange("isOutdated", [undefined], oContext.getIndex());
+					oListBinding.oCache.setProperty("@$ui5.context.isOutdated", undefined,
+						oContext.getPath().slice(iIndexOfPredicate));
+				}
+			});
+
+			return this.waitForChanges(assert, "reset outdated");
 		},
 
 		/**
@@ -21736,6 +21763,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// No "AddVirtualContext" / "RemoveVirtualContext" events with data aggregation.
 	// JIRA: CPOUI5ODATAV4-2756
+	//
+	// Side effects for single column w/o key predicates: full refresh (JIRA: CPOUI5ODATAV4-3715)
 	QUnit.test("Data Aggregation: suspend/resume: call setAggregation on a suspended ODLB",
 			function (assert) {
 		var oBinding,
@@ -21794,6 +21823,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			return that.waitForChanges(assert);
 		}).then(function () {
+			// Note: checkTable doesn't work here, no _AC!
+			assert.deepEqual(oBinding.getCurrentContexts().map(getPath), [
+				"/BusinessPartnerList/0", // Note: _AC.calculateKeyPredicate not active!
+				"/BusinessPartnerList/1"
+			]);
+
 			// code under test
 			assert.strictEqual(oBinding.getHeaderContext().isAggregated(), true,
 				"JIRA: CPOUI5ODATAV4-2760");
@@ -21801,6 +21836,35 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				// code under test (JIRA: CPOUI5ODATAV4-3350)
 				oBinding.create({}, /*bSkipRefresh*/true);
 			}, new Error("Unsupported on aggregated data: " + oBinding));
+
+			const oContext = oBinding.getCurrentContexts()[0];
+			// code under test (JIRA: CPOUI5ODATAV4-3715)
+			return oContext.requestSideEffects(["BusinessPartnerRole"])
+				.then(mustFail(assert), function (oError) {
+					assert.strictEqual(oError.message,
+						"Unsupported on aggregated data: " + oContext);
+				});
+		}).then(function () {
+			that.expectEvents(assert, oBinding, [
+					[, "refresh", {reason : "refresh"}],
+					[, "dataRequested"],
+					[, "change", {reason : "refresh"}],
+					[, "dataReceived", {data : {}}]
+				])
+				.expectRequest("BusinessPartnerList?$apply=groupby((BusinessPartnerRole))"
+					+ "&$skip=0&$top=100", {
+					value : [{
+						BusinessPartnerRole : "03"
+					}]
+				})
+				.expectChange("role", ["03"]);
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3715)
+				oBinding.getHeaderContext().requestSideEffects(["BusinessPartnerRole"]),
+				that.waitForChanges(assert,
+					"side effects for single column => refresh due to missing key predicates")
+			]);
 		});
 	});
 
@@ -25122,6 +25186,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Delete on aggregated data is not allowed, even w/o visual grouping (JIRA: CPOUI5ODATAV4-3229)
 	// Avoid unsupported (by RAP) duplicate filter for unit (JIRA: CPOUI5ODATAV4-3458)
 	// "additionally" must work w/o autoExpandSelect! (JIRA: CPOUI5ODATAV4-3438)
+	// Side effects for single column w/ aggregated leaves: full refresh (JIRA: CPOUI5ODATAV4-3715)
 	QUnit.test("Data Aggregation: $$aggregation w/ grand total w/ unit", function (assert) {
 		var oModel = this.createSalesOrdersModel({autoExpandSelect : false}), // see scenario!
 			sView = '\
@@ -25241,6 +25306,25 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			// code under test (JIRA: CPOUI5ODATAV4-2756)
 			assert.strictEqual(await oContext.requestProperty("Note"), undefined);
+
+			that.expectRequest("SalesOrderList?$apply=filter(CurrencyCode eq 'EUR')"
+					+ "/concat(aggregate(GrossAmount,CurrencyCode)"
+					+ ",groupby((LifecycleStatus,LifecycleStatusDesc)"
+						+ ",aggregate(GrossAmount,CurrencyCode))"
+					+ "/orderby(LifecycleStatusDesc asc)"
+					+ "/concat(aggregate($count as UI5__count),top(99)))", {
+					value : [
+						{CurrencyCode : null, GrossAmount : "0"},
+						{UI5__count : "0", "UI5__count@odata.type" : "#Decimal"}
+					]
+				});
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3715)
+				oListBinding.getHeaderContext().requestSideEffects(["LifecycleStatusDesc"]),
+				that.waitForChanges(assert,
+					"side effects for single column => refresh due to aggregated leaves")
+			]);
 		});
 	});
 
@@ -25292,6 +25376,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	//
 	// Requesting side effects via a :1 nav.prop. works fine (JIRA: CPOUI5ODATAV4-3514)
 	// Test single refresh for messages (JIRA: CPOUI5ODATAV4-3390)
+	// Side effects for single column (incl. $expand/$select): no refresh (JIRA: CPOUI5ODATAV4-3715)
 	//
 	// A kept-alive context outside the collection can be deleted. Both the count and the grand
 	// total are requested in the same $batch, but as the deleted entity was excluded by the filter,
@@ -25405,7 +25490,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 			that.oView.byId("isOutdatedHeader").setBindingContext(oHeaderContext);
 
-			return that.waitForChanges(assert);
+			return that.waitForChanges(assert, "set header context");
 		}).then(function () {
 			const aCurrentContexts = oBinding.getCurrentContexts();
 
@@ -25499,11 +25584,52 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				oGrandTotalContext.requestProperty("Note").then(function (sNote) {
 					assert.strictEqual(sNote, undefined, "No late property on grand total");
 				}),
-				that.waitForChanges(assert)
+				that.waitForChanges(assert, "late properties")
 			]);
 		}).then(function () {
 			assert.strictEqual(oBinding.getCount(), 3);
 
+			that.expectChange("isOutdated", [true,,,, true]) // Note: due to grand total
+				.expectChange("isOutdatedHeader", true) // Note: due to search (and filter)
+				.expectRequest("SalesOrderList?sap-client=123&custom=foo"
+					+ "&$expand=SO_2_BP($select=Address/City,Address/Country,Address/PostalCode"
+						+ ",BusinessPartnerID)"
+					+ "&$filter=SalesOrderID eq '24' or SalesOrderID eq '25'"
+						+ " or SalesOrderID eq '26'"
+					+ "&$select=LifecycleStatus,SalesOrderID&$top=3", {
+					value : [
+						{LifecycleStatus : "X", SalesOrderID : "24", SO_2_BP : null},
+						{LifecycleStatus : "Y", SalesOrderID : "25", SO_2_BP : {
+							Address : {
+								City : "Handschuhsheim",
+								Country : "BW",
+								PostalCode : "69121"
+							},
+							BusinessPartnerID : "n/a"
+						}},
+						{LifecycleStatus : "Z", SalesOrderID : "26", SO_2_BP : null}
+					]
+				})
+				.expectChange("city", [,, "Handschuhsheim"]);
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3715)
+				oHeaderContext.requestSideEffects(["LifecycleStatus", "SO_2_BP"]),
+				that.waitForChanges(assert, "side effects for LifecycleStatus and SO_2_BP")
+			]);
+		}).then(function () {
+			const oContext25 = oBinding.getCurrentContexts()[2];
+			assert.deepEqual(oContext25.getObject("SO_2_BP"), {
+				Address : {
+					City : "Handschuhsheim",
+					Country : "BW",
+					PostalCode : "69121"
+				},
+				BusinessPartnerID : "n/a"
+			}, "side effects for $expand/$select");
+
+			return that.resetOutdated(assert, oBinding);
+		}).then(function () {
 			that.expectRequest("#0 DELETE SalesOrderList('26')?sap-client=123&custom=foo")
 				.expectRequest("#0 SalesOrderList?sap-client=123&custom=foo"
 					+ "&$apply=filter(LifecycleStatus gt 'P' and GrossAmount lt 100)"
@@ -25520,7 +25646,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("lifecycleStatus", [, "Y", "X", null])
 				.expectChange("grossAmount", [, "2", "3", "5"])
 				.expectChange("salesOrderID", [, "25", "24", null])
-				.expectChange("city", [, "Walldorf", "", null]);
+				.expectChange("city", [, "Handschuhsheim", "", null]);
 
 			return Promise.all([
 				// code under test (JIRA: CPOUI5ODATAV4-3229)
@@ -25575,15 +25701,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					that.waitForChanges(assert, sScenario)
 				]);
 			} else if (sScenario === "request properties of a context via side effects") {
-				that.expectRequest("#0 SalesOrderList('25')?sap-client=123"
-						+ "&$select=LifecycleStatus,Note&custom=foo", {
+				that.expectRequest("#0 SalesOrderList('25')?sap-client=123&custom=foo"
+						+ "&$select=LifecycleStatus,Note", {
 						LifecycleStatus : "Y*",
 						Note : "Late*"
 					})
-					.expectRequest("#0 SalesOrderList('25')?sap-client=123"
+					.expectRequest("#0 SalesOrderList('25')?sap-client=123&custom=foo"
 						+ "&$expand=SO_2_BP($select=Address/City,Address/Country,Address/PostalCode"
 							+ ",BusinessPartnerID)"
-						+ "&$select=SO_2_BP&custom=foo", {
+						+ "&$select=SO_2_BP", {
 						SO_2_BP : {
 							Address : {City : "Heidelberg", Country : "DE", PostalCode : "69121"},
 							BusinessPartnerID : "n/a"
@@ -25656,7 +25782,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("isOutdated", [undefined,,, undefined])
 				.expectChange("lifecycleStatus", [, "Y"])
 				.expectChange("grossAmount", ["15", "7", "8", "15"])
-				.expectChangeIf(sScenario !== "setProperty", "city", [, "Walldorf"])
+				.expectChange("city", [, "Walldorf"])
 				.expectChange("isOutdatedHeader", false);
 
 			await Promise.all([
@@ -25687,14 +25813,14 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.strictEqual(oBinding.getCount(), 2);
 			assert.strictEqual(oBinding.getLength(), 4);
 
-			that.expectRequest("#7 DELETE SalesOrderList('23')?sap-client=123&custom=foo")
-				.expectRequest("#7 SalesOrderList?sap-client=123&custom=foo&$count=true"
+			that.expectRequest("#0 DELETE SalesOrderList('23')?sap-client=123&custom=foo")
+				.expectRequest("#0 SalesOrderList?sap-client=123&custom=foo&$count=true"
 					+ "&$filter=LifecycleStatus gt 'P' and GrossAmount lt 100&$search=covfefe"
 					+ "&$top=0", {
 					"@odata.count" : "2", // unchanged count
 					value : []
 				})
-				.expectRequest("#7 SalesOrderList?sap-client=123&custom=foo"
+				.expectRequest("#0 SalesOrderList?sap-client=123&custom=foo"
 					+ "&$apply=filter(LifecycleStatus gt 'P' and GrossAmount lt 100)"
 					+ "/search(covfefe)/aggregate(GrossAmount)", {
 					value : [{GrossAmount : "15"}] // unchanged grand total
@@ -25723,7 +25849,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				[false, "", "true", "0", "", "15", "", ""]
 			]);
 
-			that.expectRequest("#8 DELETE SalesOrderList('25')?sap-client=123", {
+			that.expectRequest("DELETE SalesOrderList('25')?sap-client=123", {
 					groupId : "$single",
 					headers : {
 						"If-Match" : "*"
@@ -25820,6 +25946,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3260
 	//
 	// Check that manual $expand/$select works w/ auto-$expand/$select (JIRA: CPOUI5ODATAV4-3438)
+	// Check side effects for $expand/$select (JIRA: CPOUI5ODATAV4-3715)
 	QUnit.test("Data Aggregation: delete kept-alive outside collection", async function (assert) {
 		const oModel = this.createSalesOrdersModel123({autoExpandSelect : true},
 			/*bExpandAfterConcatSupported*/true);
@@ -26060,6 +26187,67 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[undefined, "false", "1", "420", "42"], // shows duplicate
 			[false, "true", "0", "980", ""]
 		], 43);
+
+		this.expectRequest("#0 SalesOrderList?sap-client=123&$filter=SalesOrderID eq '42'"
+				+ "&$select=GrossAmount,SalesOrderID", {
+				value : [{GrossAmount : "419.99", SalesOrderID : "42"}]
+			})
+			.expectRequest("#0 SalesOrderList?sap-client=123&$apply="
+				+ "filter(LifecycleStatus gt 'P')/aggregate(GrossAmount)", {
+				value : [{GrossAmount : "979.99"}]
+			})
+			.expectChange("grossAmount", ["419.99", "419.99",, "979.99"], 39);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3715)
+			oBinding.getHeaderContext().requestSideEffects(["GrossAmount"]),
+			this.waitForChanges(assert, "side effects for GrossAmount")
+		]);
+
+		checkTable("after side effects for GrossAmount", assert, oTable, [
+			"/SalesOrderList('42')",
+			"/SalesOrderList('42')",
+			"/SalesOrderList()"
+		], [ // isOutdated|isTotal|level|GrossAmount|SalesOrderID
+			[undefined, "false", "1", "419.99", "42"],
+			[undefined, "false", "1", "419.99", "42"], // duplicate also updated!
+			[false, "true", "0", "979.99", ""]
+		], 43);
+
+		this.expectRequest("SalesOrderList?sap-client=123&$expand=SO_2_BP"
+				+ "&$filter=SalesOrderID eq '42'&$select=CurrencyCode,SalesOrderID", {
+				value : [{
+					CurrencyCode : "EUR",
+					SalesOrderID : "42",
+					SO_2_BP : {
+						BusinessPartnerID : "2",
+						CompanyName : "SAP" // etc.
+					}
+				}]
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3715)
+			oBinding.getHeaderContext().requestSideEffects(["CurrencyCode", "SO_2_BP"]),
+			this.waitForChanges(assert, "side effects for $expand/$select")
+		]);
+
+		oBinding.getCurrentContexts()
+			.filter((oContext) => !oContext.getProperty("@$ui5.node.isTotal"))
+			.map((oContext) => oContext.getObject())
+			.forEach((oObject) => { // duplicate also updated!
+				assert.deepEqual(oObject, {
+					"@$ui5.node.isTotal" : false,
+					"@$ui5.node.level" : 1,
+					CurrencyCode : "EUR",
+					GrossAmount : "419.99",
+					SalesOrderID : "42",
+					SO_2_BP : {
+						BusinessPartnerID : "2",
+						CompanyName : "SAP"
+					}
+				});
+			});
 	});
 
 	//*********************************************************************************************
@@ -32777,6 +32965,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// perform a side-effects refresh on the whole list in parallel. The processing of the separate
 	// grand total refresh is skipped due to the pending side-effects refresh.
 	// SNOW: DINC1076734
+	//
+	// Side effects for single column: no refresh (JIRA: CPOUI5ODATAV4-3715)
 	QUnit.test("Data Aggregation: create before read is finished", async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true},
 			/*bExpandAfterConcatSupported*/true);
@@ -32861,7 +33051,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		checkTable("after created at start", assert, oTable, [
 			oCreatedContext0
 		], [ // isOutdated|isTotal|Id|Region|SalesAmount
-			[, false, "2", "New", "200"]
+			[undefined, false, "2", "New", "200"]
 		], 10 + 1, /*bLengthFinal*/false);
 
 		this.expectChange("region", [, "A", null]);
@@ -32875,8 +33065,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/BusinessPartners(1)",
 			"/BusinessPartners()"
 		], [ // isOutdated|isTotal|Id|Region|SalesAmount
-			[, false, "2", "New", "200"],
-			[, false, "1", "A", "100"],
+			[undefined, false, "2", "New", "200"],
+			[undefined, false, "1", "A", "100"],
 			[true, true, "", "", "100"] // not yet up-to-date
 		]);
 
@@ -32936,8 +33126,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oCreatedContext1,
 			"/BusinessPartners()"
 		], [ // isOutdated|isTotal|Id|Region|SalesAmount
-			[, false, "3", "A1", "200"],
-			[, false, "4", "B1", "300"],
+			[undefined, false, "3", "A1", "200"],
+			[undefined, false, "4", "B1", "300"],
 			[false, true, "", "", "500"]
 		]);
 
@@ -32975,9 +33165,54 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/BusinessPartners(4)",
 			"/BusinessPartners()"
 		], [ // isOutdated|isTotal|Id|Region|SalesAmount
-			[, false, "", "C0", ""],
-			[, false, "4", "B1", "300"],
-			[, true, "", "", "300"]
+			[undefined, false, "", "C0", ""],
+			[undefined, false, "4", "B1", "300"],
+			[undefined, true, "", "", "300"]
+		]);
+
+		this.expectRequest("#0 BusinessPartners?$filter=Id eq 4&$select=Id,SalesAmount", {
+				value : [{Id : 4, SalesAmount : "301.99"}]
+			})
+			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesAmount)", {
+				value : [{SalesAmount : "302", "SalesAmount@odata.type" : "#Decimal"}]
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3715)
+			oListBinding.getHeaderContext().requestSideEffects(["SalesAmount"]),
+			this.waitForChanges(assert, "side effects for SalesAmount")
+		]);
+
+		checkTable("after side effects for SalesAmount", assert, oTable, [
+			oInactive,
+			"/BusinessPartners(4)",
+			"/BusinessPartners()"
+		], [ // isOutdated|isTotal|Id|Region|SalesAmount
+			[undefined, false, "", "C0", ""],
+			[undefined, false, "4", "B1", "301.99"],
+			[false, true, "", "", "302"]
+		]);
+
+		// Note: NO request for grand total!
+		this.expectRequest("#0 BusinessPartners?$filter=Id eq 4&$select=Id,Region", {
+				value : [{Id : 4, Region : "B1*"}]
+			})
+			.expectChange("region", [, "B1*"]);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3715)
+			oListBinding.getHeaderContext().requestSideEffects(["Region"]),
+			this.waitForChanges(assert, "side effects for Region")
+		]);
+
+		checkTable("after side effects for Region", assert, oTable, [
+			oInactive,
+			"/BusinessPartners(4)",
+			"/BusinessPartners()"
+		], [ // isOutdated|isTotal|Id|Region|SalesAmount
+			[undefined, false, "", "C0", ""],
+			[undefined, false, "4", "B1*", "301.99"],
+			[false, true, "", "", "302"]
 		]);
 	});
 
@@ -33445,6 +33680,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Automatically update grand total because there are no filter, search, or custom query
 	// options.
 	// JIRA: CPOUI5ODATAV4-3482
+	//
+	// Side effects for single column: no refresh (JIRA: CPOUI5ODATAV4-3715)
 [false, true].forEach((bAtBottom) => {
 	const sTitle = "Data Aggregation: create at end; grand total at bottom: " + bAtBottom;
 
@@ -33534,6 +33771,28 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			[, false, 1, "1", "100", "EUR"],
 			[, false, 1, "2", "200", "EUR"],
 			bAtBottom && [true, true, 0, "", "300", "EUR"]
+		]);
+
+		this.expectRequest("#0 BusinessPartners?$filter=Id eq 1 or Id eq 2&$select=Currency,Id"
+				+ "&$top=2", {
+				value : [{Id : 1, Currency : "Euro"}, {Id : 2, Currency : "€"}] // ;-)
+			})
+			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesAmount,Currency)", {
+				value : [{Currency : "EUR", SalesAmount : "299.99"}]
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3715)
+			oListBinding.getHeaderContext().requestSideEffects(["Currency"]),
+			this.waitForChanges(assert, "side effects for Currency")
+		]);
+
+		checkTable("after side effects for Currency", assert, oTable, aExpectedContexts, [
+			// Expanded|Total|level|Id|SalesAmount|Currency
+			bAtBottom || [true, true, 0, "", "299.99", "EUR"],
+			[, false, 1, "1", "100", "Euro"],
+			[, false, 1, "2", "200", "€"],
+			bAtBottom && [true, true, 0, "", "299.99", "EUR"]
 		]);
 	});
 });
