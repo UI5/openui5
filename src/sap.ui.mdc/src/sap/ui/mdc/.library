@@ -46,7 +46,18 @@
 			<component>
 				<name>CA-UI5-TBL</name>
 				<modules>
+					<module>sap/ui/mdc/ActionToolbar</module>
+					<module>sap/ui/mdc/Field</module>
+					<module>sap/ui/mdc/FilterField</module>
+					<module>sap/ui/mdc/MultiValueField</module>
 					<module>sap/ui/mdc/Table</module>
+					<module>sap/ui/mdc/ValueHelp</module>
+					<module>sap/ui/mdc/valuehelp/Dialog</module>
+					<module>sap/ui/mdc/valuehelp/Popover</module>
+					<module>sap/ui/mdc/valuehelp/content/Conditions</module>
+					<module>sap/ui/mdc/valuehelp/content/FixedList</module>
+					<module>sap/ui/mdc/valuehelp/content/MDCTable</module>
+					<module>sap/ui/mdc/valuehelp/content/MTable</module>
 				</modules>
 			</component>
 		</ownership>
