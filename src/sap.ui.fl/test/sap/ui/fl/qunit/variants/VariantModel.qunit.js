@@ -258,15 +258,10 @@ sap.ui.define([
 			assert.ok(this.oModel._getURLHandler(), "then the URLHandler is created");
 		});
 
-		QUnit.test("when updateData() sets default UI properties on variants", function(assert) {
+		QUnit.test("when updateData() sets UI properties on variants", function(assert) {
 			const oFreshModel = new VariantModel({}, { appComponent: this.oComponent, vmReference: sVMReference, vmControl: this.oVMControl });
 			const oVMData = oFreshModel.getData();
 
-			oVMData.variants.forEach((oVariant) => {
-				assert.strictEqual(oVariant.rename, true, `variant '${oVariant.key}' has rename=true by default`);
-				assert.strictEqual(oVariant.change, true, `variant '${oVariant.key}' has change=true by default`);
-				assert.strictEqual(oVariant.remove, true, `variant '${oVariant.key}' has remove=true by default`);
-			});
 			// USER layer variant gets Private sharing, all others get Public
 			const oUserVariant = oVMData.variants.find((oV) => oV.layer === Layer.USER);
 			assert.strictEqual(oUserVariant.sharing, "Private", "USER layer variant has Private sharing");
@@ -274,7 +269,51 @@ sap.ui.define([
 				assert.strictEqual(oVariant.sharing, "Public", `'${oVariant.key}' (${oVariant.layer}) has Public sharing`);
 			});
 
+			// authorization flags are computed by updateData() directly via getVariantAuthorizationProperties();
+			// non-USER/PUBLIC variants (VENDOR, CUSTOMER) are not editable in personalization mode
+			oVMData.variants.filter((oV) => oV.layer !== Layer.USER && oV.layer !== Layer.PUBLIC).forEach((oVariant) => {
+				assert.strictEqual(oVariant.rename, false, `variant '${oVariant.key}' (${oVariant.layer}) has rename=false`);
+				assert.strictEqual(oVariant.change, false, `variant '${oVariant.key}' (${oVariant.layer}) has change=false`);
+			});
+
 			oFreshModel.destroy();
+		});
+
+		QUnit.test("when a lazy-loaded PUBLIC variant is added via updateData()", function(assert) {
+			const sOtherUser = "OtherUser";
+			sandbox.stub(Settings, "getInstanceOrUndef").returns({
+				getIsKeyUser: () => false,
+				getIsPublicFlVariantEnabled: () => true,
+				getIsVariantPersonalizationEnabled: () => true,
+				getUser: () => "Me",
+				getUserId: () => "Me123"
+			});
+			this.oVMControl.setEditable(true);
+
+			// Simulate the lazy-load path: VariantManagerApply.loadAllVariantsForVM calls
+			// FlexState.addNewObjects, which triggers updateData() via the DataSelector listener.
+			FlexState.addNewObjects({
+				reference: sReference,
+				componentId: sReference,
+				newData: {
+					variants: [{
+						fileName: "lazyVariant",
+						fileType: "ctrl_variant",
+						layer: Layer.PUBLIC,
+						variantManagementReference: sVMReference,
+						variantReference: sVMReference,
+						support: { user: sOtherUser, userId: sOtherUser },
+						content: {},
+						texts: { variantName: { value: "Lazy Public Variant", type: "XFLD" } }
+					}]
+				}
+			});
+
+			const oLazyVariantData = this.oModel.getData().variants.find((oV) => oV.key === "lazyVariant");
+			assert.ok(oLazyVariantData, "the lazy-loaded variant is present in the model");
+			assert.strictEqual(oLazyVariantData.rename, false, "non-author cannot rename the lazy-loaded PUBLIC variant");
+			assert.strictEqual(oLazyVariantData.change, false, "non-author cannot change the lazy-loaded PUBLIC variant");
+			assert.strictEqual(oLazyVariantData.remove, false, "non-author cannot remove the lazy-loaded PUBLIC variant");
 		});
 
 		QUnit.test("when destroy() is called", function(assert) {
