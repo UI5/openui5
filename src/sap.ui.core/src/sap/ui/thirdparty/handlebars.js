@@ -1,7 +1,7 @@
 /**!
 
  @license
- handlebars v4.7.9
+ handlebars v4.7.10
 
 Copyright (C) 2011-2019 by Yehuda Katz
 
@@ -98,9 +98,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _handlebarsCompilerBase = __webpack_require__(84);
 
-	var _handlebarsCompilerCompiler = __webpack_require__(89);
+	var _handlebarsCompilerCompiler = __webpack_require__(90);
 
-	var _handlebarsCompilerJavascriptCompiler = __webpack_require__(90);
+	var _handlebarsCompilerJavascriptCompiler = __webpack_require__(91);
 
 	var _handlebarsCompilerJavascriptCompiler2 = _interopRequireDefault(_handlebarsCompilerJavascriptCompiler);
 
@@ -278,7 +278,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _internalProtoAccess = __webpack_require__(73);
 
-	var VERSION = '4.7.9';
+	var VERSION = '4.7.10';
 	exports.VERSION = VERSION;
 	var COMPILER_REVISION = 8;
 	exports.COMPILER_REVISION = COMPILER_REVISION;
@@ -452,8 +452,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function escapeExpression(string) {
 	  if (typeof string !== 'string') {
-	    // don't escape SafeStrings, since they're already safe
-	    if (string && string.toHTML) {
+	    // don't escape SafeStrings, since they're already safe. Other values with a
+	    // "toHTML" key, e.g. from JSON context data, are escaped like any object.
+	    if (string && typeof string.toHTML === 'function') {
 	      return string.toHTML();
 	    } else if (string == null) {
 	      return '';
@@ -516,11 +517,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      column = undefined,
 	      endColumn = undefined;
 
-	  if (loc) {
+	  // Hand-built ASTs may carry a partial loc; never let the location
+	  // bookkeeping mask the actual error message.
+	  if (loc && loc.start) {
 	    line = loc.start.line;
-	    endLineNumber = loc.end.line;
 	    column = loc.start.column;
-	    endColumn = loc.end.column;
+	    if (loc.end) {
+	      endLineNumber = loc.end.line;
+	      endColumn = loc.end.column;
+	    }
 
 	    message += ' - ' + line + ':' + column;
 	  }
@@ -728,6 +733,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _exception2 = _interopRequireDefault(_exception);
 
+	/**
+	 * Close an unfinished iterator after the block body threw, like for...of does,
+	 * so that generators can run their cleanup code.
+	 *
+	 * Errors thrown while closing, including by a `return` getter, are ignored:
+	 * the block's error is the cause and is the one the caller must see.
+	 *
+	 * @param {Iterator} iterator the iterator that was being consumed
+	 */
+	function closeIterator(iterator) {
+	  try {
+	    var _close = iterator['return'];
+	    if (_utils.isFunction(_close)) {
+	      _close.call(iterator);
+	    }
+	  } catch (closeError) {
+	    // NOP
+	  }
+	}
+
 	exports['default'] = function (instance) {
 	  instance.registerHelper('each', function (context, options) {
 	    if (!options) {
@@ -753,7 +778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      data = _utils.createFrame(options.data);
 	    }
 
-	    function execIteration(field, index, last) {
+	    function execIteration(field, index, last, value) {
 	      if (data) {
 	        data.key = field;
 	        data.index = index;
@@ -765,9 +790,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 
-	      ret = ret + fn(context[field], {
+	      ret = ret + fn(value, {
 	        data: data,
-	        blockParams: _utils.blockParams([context[field], field], [contextPath + field, null])
+	        blockParams: _utils.blockParams([value, field], [contextPath + field, null])
 	      });
 	    }
 
@@ -775,18 +800,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (_utils.isArray(context)) {
 	        for (var j = context.length; i < j; i++) {
 	          if (i in context) {
-	            execIteration(i, i, i === context.length - 1);
+	            execIteration(i, i, i === context.length - 1, context[i]);
 	          }
 	        }
 	      } else if (typeof _Symbol === 'function' && context[_Symbol$iterator]) {
-	        var newContext = [];
 	        var iterator = _getIterator(context);
-	        for (var it = iterator.next(); !it.done; it = iterator.next()) {
-	          newContext.push(it.value);
-	        }
-	        context = newContext;
-	        for (var j = context.length; i < j; i++) {
-	          execIteration(i, i, i === context.length - 1);
+	        var current = iterator.next();
+	        while (!current.done) {
+	          var next = iterator.next();
+	          try {
+	            execIteration(i, i, next.done, current.value);
+	          } catch (e) {
+	            if (!next.done) {
+	              closeIterator(iterator);
+	            }
+	            throw e;
+	          }
+	          current = next;
+	          i++;
 	        }
 	      } else {
 	        (function () {
@@ -797,13 +828,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // the last iteration without have to scan the object twice and create
 	            // an itermediate keys array.
 	            if (priorKey !== undefined) {
-	              execIteration(priorKey, i - 1);
+	              execIteration(priorKey, i - 1, false, context[priorKey]);
 	            }
 	            priorKey = key;
 	            i++;
 	          });
 	          if (priorKey !== undefined) {
-	            execIteration(priorKey, i - 1, true);
+	            execIteration(priorKey, i - 1, true, context[priorKey]);
 	          }
 	        })();
 	      }
@@ -2040,6 +2071,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.__esModule = true;
 	exports.createProtoAccessControl = createProtoAccessControl;
 	exports.resultIsAllowed = resultIsAllowed;
+	exports.isPrototypeConstructor = isPrototypeConstructor;
 	exports.resetLoggedProperties = resetLoggedProperties;
 
 	var _utils = __webpack_require__(5);
@@ -2084,6 +2116,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    return checkWhiteList(protoAccessControl.properties, propertyName);
 	  }
+	}
+
+	/**
+	 * Detect a prototype object's own "constructor" back-reference, e.g.
+	 * `Function.prototype.constructor === Function`. Because "constructor" is an
+	 * "own" property of such objects, it would otherwise bypass the prototype-access
+	 * checks and expose dangerous constructors (allowing arbitrary code execution).
+	 *
+	 * Only functions can be constructors, so other values are never treated as one
+	 * and their `prototype` is never read.
+	 *
+	 * @param {*} parent the object the property is being read from
+	 * @param {string} propertyName the property being looked up
+	 * @param {*} result the already-resolved value of `parent[propertyName]`
+	 * @returns {boolean} true if the lookup resolves `parent`'s own constructor
+	 */
+
+	function isPrototypeConstructor(parent, propertyName, result) {
+	  return propertyName === 'constructor' && typeof result === 'function' && parent === result.prototype;
 	}
 
 	function checkWhiteList(protoAccessControlForType, propertyName) {
@@ -2232,7 +2283,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var result = env.VM.invokePartial.call(this, partial, context, options);
 
+	    // An empty result normally means the partial is template source that still
+	    // has to be compiled. A function partial has already been invoked, so an
+	    // empty result from it is a bug in that partial.
+	    if (result == null && Utils.isFunction(partial)) {
+	      throw new _exception2['default']('The partial ' + options.name + ' returned no output: partials must return a string');
+	    }
+
 	    if (result == null && env.compile) {
+	      // Only template source registered as a partial may be compiled here.
+	      // Anything else (e.g. an AST-shaped object) must not become code.
+	      if (typeof partial !== 'string') {
+	        throw new _exception2['default']('The partial ' + options.name + ' could not be compiled: partials must be strings or functions returning strings');
+	      }
 	      options.partials[options.name] = env.compile(partial, templateSpec.compilerOptions, env);
 	      result = options.partials[options.name](context, options);
 	    }
@@ -2269,7 +2332,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (result == null) {
 	        return result;
 	      }
-	      if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+	      // Own properties are trusted context data and returned as-is, except for
+	      // a prototype's own "constructor" back-reference (e.g.
+	      // Function.prototype.constructor === Function): that must still pass the
+	      // prototype-access deny list, otherwise the Function constructor becomes
+	      // reachable and arbitrary code can be executed.
+	      if (Object.prototype.hasOwnProperty.call(parent, propertyName) && !_internalProtoAccess.isPrototypeConstructor(parent, propertyName, result)) {
 	        return result;
 	      }
 
@@ -2443,8 +2511,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else {
 	      partial = lookupOwnProperty(options.partials, options.name);
 	    }
-	  } else if (!partial.call && !options.name) {
-	    // This is a dynamic partial that returned a string
+	  } else if (typeof partial !== 'function' && !options.name) {
+	    // This is a dynamic partial that returned a name rather than a compiled
+	    // partial. Only functions are accepted as partials here; any other value
+	    // (including an object with a "call" property) is treated as a name, so
+	    // that context data can never be compiled as a template.
 	    options.name = partial;
 	    partial = lookupOwnProperty(options.partials, partial);
 	  }
@@ -2658,8 +2729,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _Object$keys = __webpack_require__(60)['default'];
-
 	var _interopRequireDefault = __webpack_require__(1)['default'];
 
 	var _interopRequireWildcard = __webpack_require__(3)['default'];
@@ -2676,13 +2745,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _whitespaceControl2 = _interopRequireDefault(_whitespaceControl);
 
-	var _helpers = __webpack_require__(88);
+	var _helpers = __webpack_require__(89);
 
 	var Helpers = _interopRequireWildcard(_helpers);
-
-	var _exception = __webpack_require__(6);
-
-	var _exception2 = _interopRequireDefault(_exception);
 
 	var _utils = __webpack_require__(5);
 
@@ -2694,9 +2759,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function parseWithoutProcessing(input, options) {
 	  // Just return if an already-compiled AST was passed in.
 	  if (input.type === 'Program') {
-	    // When a pre-parsed AST is passed in, validate all node values to prevent
-	    // code injection via type-confused literals.
-	    validateInputAst(input);
 	    return input;
 	  }
 
@@ -2717,58 +2779,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var strip = new _whitespaceControl2['default'](options);
 
 	  return strip.accept(ast);
-	}
-
-	function validateInputAst(ast) {
-	  validateAstNode(ast);
-	}
-
-	function validateAstNode(node) {
-	  if (node == null) {
-	    return;
-	  }
-
-	  if (Array.isArray(node)) {
-	    node.forEach(validateAstNode);
-	    return;
-	  }
-
-	  if (typeof node !== 'object') {
-	    return;
-	  }
-
-	  if (node.type === 'PathExpression') {
-	    if (!isValidDepth(node.depth)) {
-	      throw new _exception2['default']('Invalid AST: PathExpression.depth must be an integer');
-	    }
-	    if (!Array.isArray(node.parts)) {
-	      throw new _exception2['default']('Invalid AST: PathExpression.parts must be an array');
-	    }
-	    for (var i = 0; i < node.parts.length; i++) {
-	      if (typeof node.parts[i] !== 'string') {
-	        throw new _exception2['default']('Invalid AST: PathExpression.parts must only contain strings');
-	      }
-	    }
-	  } else if (node.type === 'NumberLiteral') {
-	    if (typeof node.value !== 'number' || !isFinite(node.value)) {
-	      throw new _exception2['default']('Invalid AST: NumberLiteral.value must be a number');
-	    }
-	  } else if (node.type === 'BooleanLiteral') {
-	    if (typeof node.value !== 'boolean') {
-	      throw new _exception2['default']('Invalid AST: BooleanLiteral.value must be a boolean');
-	    }
-	  }
-
-	  _Object$keys(node).forEach(function (propertyName) {
-	    if (propertyName === 'loc') {
-	      return;
-	    }
-	    validateAstNode(node[propertyName]);
-	  });
-	}
-
-	function isValidDepth(depth) {
-	  return typeof depth === 'number' && isFinite(depth) && Math.floor(depth) === depth && depth >= 0;
 	}
 
 /***/ }),
@@ -3568,7 +3578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // If we are on a standalone node, save the indent info for partials
 	        if (current.type === 'PartialStatement') {
 	          // Pull out the whitespace from the final line
-	          current.indent = /([ \t]+$)/.exec(body[i - 1].original)[1];
+	          current.indent = /(?:^|[^ \t])([ \t]+)$/.exec(body[i - 1].original)[1];
 	        }
 	      }
 	    }
@@ -3676,7 +3686,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  if (prev.type === 'ContentStatement') {
-	    return (sibling || !isRoot ? /\r?\n\s*?$/ : /(^|\r?\n)\s*?$/).test(prev.original);
+	    // Matches when the trailing whitespace contains a newline (or, for the
+	    // root's first node, is the whole string). See omitLeft for the anchoring.
+	    return (sibling || !isRoot ? /(?:^|\S)[^\S\n]*\n\s*$/ : /^\s*$|(?:^|\S)[^\S\n]*\n\s*$/).test(prev.original);
 	  }
 	}
 	function isNextWhitespace(body, i, isRoot) {
@@ -3728,7 +3740,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // We omit the last node if it's whitespace only and not preceded by a non-content node.
 	  var original = current.value;
-	  current.value = current.value.replace(multiple ? /\s+$/ : /[ \t]+$/, '');
+	  // The match must start after a non-whitespace character (or at the start):
+	  // a plain /\s+$/ is retried at every position of a whitespace run, which
+	  // takes quadratic time on long runs.
+	  current.value = current.value.replace(multiple ? /(^|\S)\s+$/ : /(^|[^ \t])[ \t]+$/, '$1');
 	  current.leftStripped = current.value !== original;
 	  return current.leftStripped;
 	}
@@ -3750,8 +3765,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _exception2 = _interopRequireDefault(_exception);
 
+	var _utils = __webpack_require__(5);
+
+	var _nodeTypes = __webpack_require__(88);
+
 	function Visitor() {
 	  this.parents = [];
+	}
+
+	/**
+	 * Whether a visitor may dispatch on a node type.
+	 *
+	 * A type is dispatchable if the parser produces it, or if the visitor
+	 * (typically a subclass) defines a handler for it that is not a method of
+	 * Visitor itself. `in` is used for the latter so that accept, acceptKey and
+	 * everything inherited from Object.prototype (constructor, __proto__, ...)
+	 * can never be reached through a crafted `type`.
+	 *
+	 * Subclasses that visit untrusted ASTs, such as WhitespaceControl, must
+	 * therefore define nothing but node handlers as function properties.
+	 *
+	 * @param {Visitor} visitor the visitor that would handle the node
+	 * @param {*} type the untrusted `type` of the node
+	 * @returns {boolean} true if the visitor may call its `type` method
+	 */
+	function isDispatchable(visitor, type) {
+	  return _utils.indexOf(_nodeTypes.NODE_TYPES, type) !== -1 || !(type in Visitor.prototype) && typeof visitor[type] === 'function';
 	}
 
 	Visitor.prototype = {
@@ -3762,9 +3801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  acceptKey: function acceptKey(node, name) {
 	    var value = this.accept(node[name]);
 	    if (this.mutating) {
-	      // Hacky sanity check: This may have a few false positives for type for the helper
-	      // methods but will generally do the right thing without a lot of overhead.
-	      if (value && !Visitor.prototype[value.type]) {
+	      if (value && !isDispatchable(this, value.type)) {
 	        throw new _exception2['default']('Unexpected node type "' + value.type + '" found when accepting ' + name + ' on ' + node.type);
 	      }
 	      node[name] = value;
@@ -3800,8 +3837,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return;
 	    }
 
-	    /* istanbul ignore next: Sanity code */
-	    if (!this[object.type]) {
+	    // Dispatching on an unknown type could call an arbitrary method of the
+	    // visitor (e.g. `accept` itself) with an untrusted AST node.
+	    if (!isDispatchable(this, object.type) || !this[object.type]) {
 	      throw new _exception2['default']('Unknown type: ' + object.type, object);
 	    }
 
@@ -3881,6 +3919,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 /* 88 */
+/***/ (function(module, exports) {
+
+	// AST node types produced by the parser. Visitor#accept and Compiler#accept
+	// dispatch on the untrusted `node.type`, so they must never call any other
+	// method of the visiting object. The Compiler only accepts these types; a
+	// Visitor also accepts types for which a subclass defines its own handler.
+	'use strict';
+
+	exports.__esModule = true;
+	var NODE_TYPES = ['Program', 'BlockStatement', 'DecoratorBlock', 'PartialStatement', 'PartialBlockStatement', 'Decorator', 'MustacheStatement', 'ContentStatement', 'CommentStatement', 'SubExpression', 'PathExpression', 'StringLiteral', 'NumberLiteral', 'BooleanLiteral', 'UndefinedLiteral', 'NullLiteral', 'Hash', 'HashPair'];
+	exports.NODE_TYPES = NODE_TYPES;
+
+/***/ }),
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4111,7 +4163,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* eslint-disable new-cap */
@@ -4136,6 +4188,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _ast = __webpack_require__(83);
 
 	var _ast2 = _interopRequireDefault(_ast);
+
+	var _nodeTypes = __webpack_require__(88);
 
 	var slice = [].slice;
 
@@ -4216,8 +4270,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  accept: function accept(node) {
-	    /* istanbul ignore next: Sanity code */
-	    if (!this[node.type]) {
+	    // Dispatching on an unknown type could call an arbitrary Compiler method.
+	    if (_utils.indexOf(_nodeTypes.NODE_TYPES, node.type) === -1 || !this[node.type]) {
 	      throw new _exception2['default']('Unknown type: ' + node.type, node);
 	    }
 
@@ -4228,6 +4282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  Program: function Program(program) {
+	    validateBlockParams(program);
 	    this.options.blockParams.unshift(program.blockParams);
 
 	    var body = program.body,
@@ -4343,6 +4398,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  ContentStatement: function ContentStatement(content) {
+	    if (content.value != null && typeof content.value !== 'string') {
+	      throw invalidAst(content, 'value must be a string');
+	    }
 	    if (content.value) {
 	      this.opcode('appendContent', content.value);
 	    }
@@ -4367,7 +4425,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        name = path.parts[0],
 	        isBlock = program != null || inverse != null;
 
-	    this.opcode('getContext', path.depth);
+	    this.opcode('getContext', validateDepth(path));
 
 	    this.opcode('pushProgram', program);
 	    this.opcode('pushProgram', inverse);
@@ -4404,35 +4462,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  PathExpression: function PathExpression(path) {
-	    this.addDepth(path.depth);
-	    this.opcode('getContext', path.depth);
+	    // Validate AST values at the compiler boundary: javascript-compiler.js
+	    // trusts all opcode arguments to be safe.
+	    var depth = validateDepth(path);
+	    var parts = validateParts(path);
 
-	    var name = path.parts[0],
+	    this.addDepth(depth);
+	    this.opcode('getContext', depth);
+
+	    var name = parts[0],
 	        scoped = _ast2['default'].helpers.scopedId(path),
-	        blockParamId = !path.depth && !scoped && this.blockParamIndex(name);
+	        blockParamId = !depth && !scoped && this.blockParamIndex(name);
 
 	    if (blockParamId) {
-	      this.opcode('lookupBlockParam', blockParamId, path.parts);
+	      this.opcode('lookupBlockParam', blockParamId, parts);
 	    } else if (!name) {
 	      // Context reference, i.e. `{{foo .}}` or `{{foo ..}}`
 	      this.opcode('pushContext');
 	    } else if (path.data) {
 	      this.options.data = true;
-	      this.opcode('lookupData', path.depth, path.parts, path.strict);
+	      this.opcode('lookupData', depth, parts, path.strict);
 	    } else {
-	      this.opcode('lookupOnContext', path.parts, path.falsy, path.strict, scoped);
+	      this.opcode('lookupOnContext', parts, path.falsy, path.strict, scoped);
 	    }
 	  },
 
 	  StringLiteral: function StringLiteral(string) {
+	    validateLiteral(string);
 	    this.opcode('pushString', string.value);
 	  },
 
 	  NumberLiteral: function NumberLiteral(number) {
+	    validateLiteral(number);
 	    this.opcode('pushLiteral', number.value);
 	  },
 
 	  BooleanLiteral: function BooleanLiteral(bool) {
+	    validateLiteral(bool);
 	    this.opcode('pushLiteral', bool.value);
 	  },
 
@@ -4447,7 +4513,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Hash: function Hash(hash) {
 	    var pairs = hash.pairs,
 	        i = 0,
-	        l = pairs.length;
+	        l = undefined;
+
+	    if (!_utils.isArray(pairs)) {
+	      throw invalidAst(hash, 'pairs must be an array');
+	    }
+	    l = pairs.length;
+	    for (var j = 0; j < l; j++) {
+	      if (!pairs[j] || typeof pairs[j].key !== 'string') {
+	        throw invalidAst(hash, 'pair keys must be strings');
+	      }
+	    }
 
 	    this.opcode('pushHash');
 
@@ -4478,6 +4554,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  classifySexpr: function classifySexpr(sexpr) {
+	    // The first part is used as a helper name below, e.g. for known helpers,
+	    // before the PathExpression handler gets to validate the parts.
+	    validateParts(sexpr.path);
 	    var isSimple = _ast2['default'].helpers.simpleId(sexpr.path);
 
 	    var isBlockParam = isSimple && !!this.blockParamIndex(sexpr.path.parts[0]);
@@ -4519,17 +4598,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  pushParam: function pushParam(val) {
+	    // Literal params are not visited by their node handlers in stringParams
+	    // mode, so their values must be validated here as well.
+	    validateLiteral(val);
 	    var value = val.value != null ? val.value : val.original || '';
+	    var depth = validateDepth(val);
 
 	    if (this.stringParams) {
+	      // pushStringParam emits non-string values as raw JavaScript literals.
+	      // Literal values are validated above, but `original` is not, so
+	      // anything that is not a number or boolean is stringified.
+	      if (typeof value !== 'number' && typeof value !== 'boolean') {
+	        value = String(value);
+	      }
 	      if (value.replace) {
 	        value = value.replace(/^(\.?\.\/)*/g, '').replace(/\//g, '.');
 	      }
-
-	      if (val.depth) {
-	        this.addDepth(val.depth);
+	      if (depth) {
+	        this.addDepth(depth);
 	      }
-	      this.opcode('getContext', val.depth || 0);
+	      this.opcode('getContext', depth);
 	      this.opcode('pushStringParam', value, val.type);
 
 	      if (val.type === 'SubExpression') {
@@ -4540,8 +4628,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else {
 	      if (this.trackIds) {
 	        var blockParamIndex = undefined;
-	        if (val.parts && !_ast2['default'].helpers.scopedId(val) && !val.depth) {
-	          blockParamIndex = this.blockParamIndex(val.parts[0]);
+	        if (val.parts && !_ast2['default'].helpers.scopedId(val) && !depth) {
+	          // The parts are read here before the PathExpression handler,
+	          // invoked by accept() below, gets to validate them.
+	          blockParamIndex = this.blockParamIndex(validateParts(val)[0]);
 	        }
 	        if (blockParamIndex) {
 	          var blockParamChild = val.parts.slice(1).join('.');
@@ -4650,6 +4740,111 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
+	/**
+	 * Create the exception thrown for an AST node that fails validation.
+	 *
+	 * @param {Object} node the offending AST node; its `type` is included in the
+	 *   message and its `loc`, if present, in the error location
+	 * @param {string} message what is wrong with the node
+	 * @returns {Exception} the exception to throw
+	 */
+	function invalidAst(node, message) {
+	  return new _exception2['default']('Invalid AST: ' + node.type + ' ' + message, node);
+	}
+
+	/**
+	 * Validate the `depth` of a path or param node.
+	 *
+	 * A missing depth is treated as 0, because ASTs built by hand or by other
+	 * tools commonly omit it. Any depth that is present must be a non-negative
+	 * integer, since it is written into the generated code.
+	 *
+	 * @param {Object} node the AST node whose `depth` is validated
+	 * @returns {number} the validated depth, or 0 if the node has none
+	 * @throws {Exception} if the depth is present but not a non-negative integer
+	 */
+	function validateDepth(node) {
+	  var depth = node.depth;
+	  if (depth == null) {
+	    return 0;
+	  }
+	  if (typeof depth !== 'number' || !isFinite(depth) || Math.floor(depth) !== depth || depth < 0) {
+	    throw invalidAst(node, 'depth must be a non-negative integer');
+	  }
+	  return depth;
+	}
+
+	/**
+	 * Validate the `value` of a StringLiteral, NumberLiteral or BooleanLiteral.
+	 *
+	 * Literal values are written into the generated code, so they must have
+	 * exactly the type their node promises. Nodes of any other type pass through
+	 * unchanged.
+	 *
+	 * Numbers need not be finite: the parser produces Infinity for very long
+	 * number literals, and Infinity and NaN are emitted as the read-only globals
+	 * of the same name.
+	 *
+	 * @param {Object} node the AST node to validate
+	 * @throws {Exception} if the value does not match the literal type
+	 */
+	function validateLiteral(node) {
+	  var value = node.value;
+	  if (node.type === 'StringLiteral' && typeof value !== 'string') {
+	    throw invalidAst(node, 'value must be a string');
+	  } else if (node.type === 'NumberLiteral' && typeof value !== 'number') {
+	    throw invalidAst(node, 'value must be a number');
+	  } else if (node.type === 'BooleanLiteral' && typeof value !== 'boolean') {
+	    throw invalidAst(node, 'value must be a boolean');
+	  }
+	}
+
+	/**
+	 * Validate that a node property is an array containing only strings.
+	 *
+	 * @param {Object} node the AST node the property belongs to, for the error
+	 * @param {*} value the property value to validate
+	 * @param {string} name the property name, used in the error message
+	 * @returns {string[]} the validated array
+	 * @throws {Exception} if the value is not an array or contains non-strings
+	 */
+	function validateStringArray(node, value, name) {
+	  if (!_utils.isArray(value)) {
+	    throw invalidAst(node, name + ' must be an array');
+	  }
+	  for (var i = 0; i < value.length; i++) {
+	    if (typeof value[i] !== 'string') {
+	      throw invalidAst(node, name + ' must only contain strings');
+	    }
+	  }
+	  return value;
+	}
+
+	/**
+	 * Validate the `parts` of a PathExpression node.
+	 *
+	 * @param {Object} path the PathExpression node
+	 * @returns {string[]} the validated parts
+	 * @throws {Exception} if `parts` is not an array of strings
+	 */
+	function validateParts(path) {
+	  return validateStringArray(path, path.parts, 'parts');
+	}
+
+	/**
+	 * Validate the optional `blockParams` of a Program node. Its length is
+	 * written into the generated code, so it must be an array of strings when
+	 * present.
+	 *
+	 * @param {Object} program the Program node
+	 * @throws {Exception} if `blockParams` is present and not an array of strings
+	 */
+	function validateBlockParams(program) {
+	  if (program.blockParams != null) {
+	    validateStringArray(program, program.blockParams, 'blockParams');
+	  }
+	}
+
 	function argEquals(a, b) {
 	  if (a === b) {
 	    return true;
@@ -4682,7 +4877,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4701,7 +4896,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utils = __webpack_require__(5);
 
-	var _codeGen = __webpack_require__(91);
+	var _codeGen = __webpack_require__(92);
 
 	var _codeGen2 = _interopRequireDefault(_codeGen);
 
@@ -4718,7 +4913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.internalNameLookup(parent, name);
 	  },
 	  depthedLookup: function depthedLookup(name) {
-	    return [this.aliasable('container.lookup'), '(depths, ', JSON.stringify(name), ')'];
+	    return [this.aliasable('container.lookup'), '(depths, ', this.quotedString(name), ')'];
 	  },
 
 	  compilerInfo: function compilerInfo() {
@@ -4753,7 +4948,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // END PUBLIC API
 	  internalNameLookup: function internalNameLookup(parent, name) {
 	    this.lookupPropertyFunctionIsUsed = true;
-	    return ['lookupProperty(', parent, ',', JSON.stringify(name), ')'];
+	    return ['lookupProperty(', parent, ',', this.quotedString(name), ')'];
 	  },
 
 	  lookupPropertyFunctionIsUsed: false,
@@ -5428,7 +5623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (indent) {
-	      options.indent = JSON.stringify(indent);
+	      options.indent = this.quotedString(indent);
 	    }
 	    options.helpers = 'helpers';
 	    options.partials = 'partials';
@@ -5484,7 +5679,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  pushId: function pushId(type, name, child) {
 	    if (type === 'BlockParam') {
-	      this.pushStackLiteral('blockParams[' + name[0] + '].path[' + name[1] + ']' + (child ? ' + ' + JSON.stringify('.' + child) : ''));
+	      this.pushStackLiteral('blockParams[' + name[0] + '].path[' + name[1] + ']' + (child ? ' + ' + this.quotedString('.' + child) : ''));
 	    } else if (type === 'PathExpression') {
 	      this.pushString(name);
 	    } else if (type === 'SubExpression') {
@@ -5799,7 +5994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  setupHelperArgs: function setupHelperArgs(helper, paramSize, params, useRegister) {
 	    var options = this.setupParams(helper, paramSize, params);
-	    options.loc = JSON.stringify(this.source.currentLocation);
+	    options.loc = locationLiteral(this);
 	    options = this.objectLiteral(options);
 	    if (useRegister) {
 	      this.useRegister('options');
@@ -5831,6 +6026,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return !JavaScriptCompiler.RESERVED_WORDS[name] && /^[a-zA-Z_$][0-9a-zA-Z_$]*$/.test(name);
 	};
 
+	/**
+	 * The compiler's current source location as a JavaScript literal.
+	 *
+	 * Hand-built ASTs may omit `loc`; emitting the literal `undefined` then
+	 * keeps the generated code valid and drops the key from object literals.
+	 * The location's `source` is the `srcName` option, so it is escaped like
+	 * every other string in the generated code.
+	 *
+	 * @param {JavaScriptCompiler} compiler the compiler whose location is emitted
+	 * @returns {string} a JSON object literal, or the string "undefined"
+	 */
+	function locationLiteral(compiler) {
+	  var loc = compiler.source.currentLocation;
+	  return loc ? _codeGen.safeJsonLiteral(loc) : 'undefined';
+	}
+
 	function strictLookup(requireTerminal, compiler, parts, startPartIndex, type) {
 	  var stack = compiler.popStack(),
 	      len = parts.length;
@@ -5843,7 +6054,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  if (requireTerminal) {
-	    return [compiler.aliasable('container.strict'), '(', stack, ', ', compiler.quotedString(parts[len]), ', ', JSON.stringify(compiler.source.currentLocation), ' )'];
+	    return [compiler.aliasable('container.strict'), '(', stack, ', ', compiler.quotedString(parts[len]), ', ', locationLiteral(compiler), ' )'];
 	  } else {
 	    return stack;
 	  }
@@ -5853,7 +6064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* global define, require */
@@ -5862,8 +6073,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _Object$keys = __webpack_require__(60)['default'];
 
 	exports.__esModule = true;
+	exports.safeJsonLiteral = safeJsonLiteral;
 
 	var _utils = __webpack_require__(5);
+
+	// Matches any character that quotedString may have to escape: quotes,
+	// backslashes, control characters, line separators, surrogates and "<". Most
+	// strings, e.g. lookup names, contain none of them and can skip the escaping.
+	// eslint-disable-next-line no-control-regex
+	var NEEDS_ESCAPING = /[\x00-\x1f\\"\u2028\u2029<\ud800-\udfff]/;
+
+	// Per HTML "Restrictions for contents of script elements": "<!--", "<script"
+	// and "</script" can end or change the parsing of an enclosing <script>
+	// element.
+	var SCRIPT_DELIMITERS = /<(?=!--|\/?script)/gi;
+
+	/**
+	 * Escape the "<" of every sequence that could end or change the parsing of
+	 * an enclosing <script> element.
+	 *
+	 * Only pass JavaScript or JSON code in which "<" can only occur inside string
+	 * literals, where "\u003C" has the same value.
+	 *
+	 * @param {string} code the code to escape
+	 * @returns {string} the escaped code
+	 */
+	function escapeScriptDelimiters(code) {
+	  return code.replace(SCRIPT_DELIMITERS, '\\u003C');
+	}
+
+	/**
+	 * Escape a UTF-16 surrogate code unit as a "\uXXXX" escape sequence.
+	 *
+	 * @param {string} surrogate a single surrogate code unit
+	 * @returns {string} the escape sequence
+	 */
+	function escapeSurrogate(surrogate) {
+	  return '\\u' + surrogate.charCodeAt(0).toString(16);
+	}
+
+	/**
+	 * Convert a value to a JSON literal that is safe to write into generated
+	 * code: valid in ES5, where line and paragraph separators end string literals,
+	 * encodable as UTF-8 on every engine, and safe inside an enclosing <script>
+	 * element.
+	 *
+	 * @param {*} value the value to convert
+	 * @returns {string} the JavaScript literal
+	 */
+
+	function safeJsonLiteral(value) {
+	  return escapeScriptDelimiters(JSON.stringify(value).replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029')
+	  // Engines before ES2019 leave lone surrogates unescaped, and those cannot
+	  // be encoded as UTF-8. Escaping paired ones as well keeps the value.
+	  .replace(/[\ud800-\udfff]/g, escapeSurrogate));
+	}
 
 	var SourceNode = undefined;
 
@@ -5976,8 +6240,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  quotedString: function quotedString(str) {
-	    return '"' + (str + '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\u2028/g, '\\u2028') // Per Ecma-262 7.3 + 7.8.4
-	    .replace(/\u2029/g, '\\u2029') + '"';
+	    str = str + '';
+	    // Fast path: quotedString runs for every lookup name and content string,
+	    // and the chain of replacements below is much slower than a single test.
+	    if (!NEEDS_ESCAPING.test(str)) {
+	      return '"' + str + '"';
+	    }
+
+	    // JSON.stringify escapes quotes, backslashes and control characters;
+	    // safeJsonLiteral adds line separators, surrogates and script delimiters.
+	    return safeJsonLiteral(str);
 	  },
 
 	  objectLiteral: function objectLiteral(obj) {
@@ -6024,7 +6296,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	exports['default'] = CodeGen;
-	module.exports = exports['default'];
 
 /***/ })
 /******/ ])
