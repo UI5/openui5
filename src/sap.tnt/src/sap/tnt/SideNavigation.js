@@ -21,6 +21,9 @@ sap.ui.define([
 	// shortcut for SideNavigationDesign in sap.tnt library
 	const SideNavigationDesign = library.SideNavigationDesign;
 
+	// expand/collapse width animation duration in ms
+	const SIDE_NAVIGATION_ANIMATION_DURATION = 350;
+
 	/**
 	 * Constructor for a new <code>SideNavigation</code>.
 	 *
@@ -168,6 +171,7 @@ sap.ui.define([
 			this.getDomRef().removeEventListener("transitionend", this._fnTransitionEnd);
 			this._fnTransitionEnd = null;
 		}
+		clearTimeout(this._iAnimationTimeout);
 	};
 
 	SideNavigation.prototype.setAggregation = function (aggregationName, oObject) {
@@ -353,19 +357,28 @@ sap.ui.define([
 		if (this._fnTransitionEnd) {
 			oDomRef.removeEventListener("transitionend", this._fnTransitionEnd);
 		}
+		clearTimeout(this._iAnimationTimeout);
+
+		const fnEndAnimation = () => {
+			this.removeStyleClass("sapTntSideNavigationAnimating");
+			oDomRef.removeEventListener("transitionend", this._fnTransitionEnd);
+			clearTimeout(this._iAnimationTimeout);
+			this._fnTransitionEnd = null;
+			this._iAnimationTimeout = null;
+			this._bAnimating = false;
+		};
 
 		this._fnTransitionEnd = (oEvent) => {
 			if (oEvent.target !== oDomRef || oEvent.propertyName !== "width") {
 				return;
 			}
 
-			this.removeStyleClass("sapTntSideNavigationAnimating");
-			oDomRef.removeEventListener("transitionend", this._fnTransitionEnd);
-			this._fnTransitionEnd = null;
-			this._bAnimating = false;
+			fnEndAnimation();
 		};
 
 		oDomRef.addEventListener("transitionend", this._fnTransitionEnd);
+
+		this._iAnimationTimeout = setTimeout(fnEndAnimation, SIDE_NAVIGATION_ANIMATION_DURATION);
 	};
 
 	return SideNavigation;

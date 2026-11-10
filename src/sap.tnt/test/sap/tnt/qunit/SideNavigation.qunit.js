@@ -4,6 +4,7 @@ sap.ui.define([
 	'sap/tnt/SideNavigationSearchField',
 	'sap/tnt/NavigationList',
 	'sap/tnt/NavigationListItem',
+	"sap/m/NavContainer",
 	"sap/ui/core/Element",
 	"sap/ui/core/Lib",
 	"sap/ui/core/ControlBehavior",
@@ -16,6 +17,7 @@ sap.ui.define([
 	SideNavigationSearchField,
 	NavigationList,
 	NavigationListItem,
+	NavContainer,
 	Element,
 	Library,
 	ControlBehavior,
@@ -1127,5 +1129,48 @@ sap.ui.define([
 
 		assert.strictEqual(oDomRef.tagName, "DIV", "the outer element is a plain div, not a nav element");
 		assert.notOk(oDomRef.getAttribute("role"), "the outer element does not carry a role, so it is not an implicit landmark");
+	});
+
+	QUnit.module("Animating class inside a NavContainer", {
+		beforeEach: function () {
+			this.oAnimationStub = sinon.stub(ControlBehavior, "getAnimationMode").returns(AnimationMode.full);
+			this.navContainer = new NavContainer({
+				width: "16rem",
+				pages: [
+					new SideNavigation({
+						expanded: true,
+						item: new NavigationList({
+							items: [new NavigationListItem({ text: "A long navigation item label", icon: "sap-icon://employee" })]
+						})
+					})
+				]
+			});
+			this.navContainer.placeAt(DOM_RENDER_LOCATION);
+		},
+		afterEach: function () {
+			this.navContainer.destroy();
+			this.oAnimationStub.restore();
+		}
+	});
+
+	QUnit.test("animating class is cleared even when no width transitionend fires", async function (assert) {
+		// arrange
+		await nextUIUpdate(this.clock);
+		const oSideNavigation = this.navContainer.getPages()[0];
+
+		// act
+		oSideNavigation.setExpanded(false);
+		await nextUIUpdate(this.clock);
+
+		// assert
+		assert.ok(oSideNavigation.getDomRef().classList.contains("sapTntSideNavigationAnimating"),
+			"animating class is added while collapsing");
+
+		// act
+		this.clock.tick(500);
+
+		// assert
+		assert.notOk(oSideNavigation.getDomRef().classList.contains("sapTntSideNavigationAnimating"),
+			"animating class is cleared after the animation duration even without a width transitionend");
 	});
 });
