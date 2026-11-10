@@ -56,6 +56,14 @@ sap.ui.define([
 				visible: {type: "boolean", group: "Misc", defaultValue: true},
 
 				/**
+				 * Determines whether the item is enabled. A disabled item remains visible but cannot be activated
+				 * by pointer interaction, keyboard interaction, keyboard shortcuts, or selection in the overflow menu.
+				 *
+				 * @since 1.155
+				 */
+				enabled: {type: "boolean", group: "Behavior", defaultValue: true},
+
+				/**
 				 * The text of the item. It is used as tooltip and for accessibility purposes.
 				 */
 				text: {type: "string", group: "Misc", defaultValue: ""},
@@ -100,18 +108,32 @@ sap.ui.define([
 
 	Item.prototype.setIcon = function(sIcon) {
 		this.setProperty("icon", sIcon, true);
-		if (this._oIcon) {
-			this._oIcon.setSrc(this._getIconUri());
-		}
+		this._updateIcon();
+		this._updateOverflowMenuItem();
 		return this;
 	};
 
 	Item.prototype.setText = function(sText) {
 		this.setProperty("text", sText, true);
-		if (this._oIcon) {
-			this._oIcon.setTooltip(sText);
-		}
+		this._updateIcon();
+		this._updateOverflowMenuItem();
 		return this;
+	};
+
+	Item.prototype.setEnabled = function(bEnabled) {
+		this.setProperty("enabled", bEnabled, true);
+		this._updateIcon();
+		this._updateOverflowMenuItem();
+		return this;
+	};
+
+	/**
+	 * @inheritDoc
+	 */
+	Item.prototype.enhanceAccessibilityState = function(oElement, mAriaProps) {
+		if (oElement === this._oIcon) {
+			mAriaProps.disabled = this.getEnabled() ? null : true;
+		}
 	};
 
 	/**
@@ -121,6 +143,11 @@ sap.ui.define([
 	 */
 	Item.prototype._firePress = function() {
 		const oRowAction = this.getRowAction();
+
+		if (!this.getEnabled() || !this.getVisible()
+			|| (oRowAction && (!oRowAction.getVisible() || oRowAction._getSize() === 0))) {
+			return;
+		}
 
 		this.firePress({
 			item: this,
@@ -150,21 +177,36 @@ sap.ui.define([
 
 	/**
 	 * Returns an icon control which represents this action item.
+	 *
 	 * @returns {sap.ui.core.Icon} The icon control.
 	 * @private
 	 */
 	Item.prototype._getIcon = function() {
 		if (!this._oIcon) {
 			this._oIcon = new Icon({
-				src: this._getIconUri(),
 				decorative: false,
-				tooltip: this._getText(),
 				press: [this._firePress, this]
 			});
 			this.addDependent(this._oIcon);
 		}
 
+		this._updateIcon();
+
 		return this._oIcon;
+	};
+
+	/**
+	 * Updates the existing action icon without creating it.
+	 *
+	 * @private
+	 */
+	Item.prototype._updateIcon = function() {
+		if (this._oIcon) {
+			this._oIcon.setSrc(this._getIconUri());
+			this._oIcon.setTooltip(this._getText(true));
+			this._oIcon.setNoTabStop(!this.getEnabled());
+			this._oIcon.toggleStyleClass("sapUiTableActionItemDisabled", !this.getEnabled());
+		}
 	};
 
 	/**
@@ -190,19 +232,34 @@ sap.ui.define([
 
 	/**
 	 * Returns a menu item representing this action item.
+	 *
 	 * @returns {sap.ui.unified.MenuItem} A menu item representing this action item
 	 * @private
 	 */
 	Item.prototype._getOverflowMenuItem = function() {
-		return new MenuItem({
-			text: this._getText(),
-			icon: this._getIconUri(),
+		this._oMenuItem = new MenuItem({
 			select: [this._firePress, this]
 		});
+		this._updateOverflowMenuItem();
+		return this._oMenuItem;
+	};
+
+	/**
+	 * Updates the existing overflow menu item without creating it.
+	 *
+	 * @private
+	 */
+	Item.prototype._updateOverflowMenuItem = function() {
+		if (this._oMenuItem && !this._oMenuItem.isDestroyed()) {
+			this._oMenuItem.setText(this._getText());
+			this._oMenuItem.setIcon(this._getIconUri());
+			this._oMenuItem.setEnabled(this.getEnabled());
+		}
 	};
 
 	/**
 	 * Handles a keyboard shortcut
+	 *
 	 * @param {string} sType type of the shortcut
 	 * @private
 	 */

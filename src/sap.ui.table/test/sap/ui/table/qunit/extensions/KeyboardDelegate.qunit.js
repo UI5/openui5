@@ -6612,36 +6612,42 @@ sap.ui.define([
 	});
 
 	QUnit.test("F2 - On a Row Action Cell", async function(assert) {
-		this.oTable.setRowActionTemplate(TableQUnitUtils.createRowAction());
-		this.oTable.setRowActionCount(2);
-		await this.oTable.qunit.rendered();
+		const oKeyboardExtension = this.oTable._getKeyboardExtension();
+		const aScenarios = [
+			{name: "Enabled inline actions", count: 2, enabled: true, hasFocusableAction: true},
+			{name: "No actions", count: 2, empty: true, hasFocusableAction: false},
+			{name: "Disabled inline actions", count: 2, enabled: false, hasFocusableAction: false},
+			{name: "Disabled overflow actions", count: 1, enabled: false, hasFocusableAction: true}
+		];
 
-		// Focus cell with a focusable & tabbable element inside.
-		let oElem = this.oTable.qunit.getRowActionCell(0);
-		oElem.focus();
-		TableQUnitUtils.assertFocus(assert, oElem);
-		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Focus row action cell with content: Table is in Navigation Mode");
+		for (const oScenario of aScenarios) {
+			this.oTable.destroyRowActionTemplate();
+			this.oTable.setRowActionCount(oScenario.count);
+			this.oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(oScenario.empty ? null : [
+				{type: "Navigation", enabled: oScenario.enabled},
+				{type: "Delete", enabled: oScenario.enabled}
+			]));
+			await this.oTable.qunit.rendered();
 
-		// Enter action mode.
-		qutils.triggerKeydown(oElem, Key.F2);
-		oElem = TableUtils.getInteractiveElements(oElem)[0];
-		assert.strictEqual(document.activeElement, oElem, "F2: First interactive element in the row action cell is focused");
-		assert.ok(this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Action Mode");
+			const oCell = this.oTable.qunit.getRowActionCell(0);
+			const oRowAction = this.oTable.getRows()[0].getRowAction();
+			const oAction = oScenario.count === 1 ? oRowAction._oOverflowIcon : oRowAction.getItems()[1]?._oIcon;
+			oCell.focus();
+			assert.strictEqual(document.activeElement, oCell, oScenario.name + ": The row action cell is focused");
+			assert.notOk(oKeyboardExtension.isInActionMode(), oScenario.name + ": The table starts in Navigation Mode");
 
-		// Leave action mode.
-		qutils.triggerKeydown(oElem, Key.F2);
-		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowActionCell(0));
-		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
+			qutils.triggerKeydown(oCell, Key.F2);
+			assert.strictEqual(document.activeElement, oScenario.hasFocusableAction ? oAction.getDomRef() : oCell,
+				oScenario.name + ": F2 focuses the first action or keeps focus on the cell");
+			assert.strictEqual(oKeyboardExtension.isInActionMode(), oScenario.hasFocusableAction,
+				oScenario.name + ": F2 enters Action Mode only when an interactive action is available");
 
-		// No content in row action cell
-		this.oTable.setRowActionTemplate(TableQUnitUtils.createRowAction(null));
-		await this.oTable.qunit.rendered();
-		oElem = this.oTable.qunit.getRowActionCell(0);
-		oElem.focus();
-		TableQUnitUtils.assertFocus(assert, oElem);
-		qutils.triggerKeydown(oElem, Key.F2);
-		TableQUnitUtils.assertFocus(assert, this.oTable.qunit.getRowActionCell(0));
-		assert.ok(!this.oTable._getKeyboardExtension().isInActionMode(), "Table is in Navigation Mode");
+			if (oScenario.hasFocusableAction) {
+				qutils.triggerKeydown(oAction.getDomRef(), Key.F2);
+				assert.strictEqual(document.activeElement, oCell, oScenario.name + ": F2 returns focus to the cell");
+				assert.notOk(oKeyboardExtension.isInActionMode(), oScenario.name + ": F2 restores Navigation Mode");
+			}
+		}
 	});
 
 	QUnit.test("F2 - On a cell with a tree icon", async function(assert) {

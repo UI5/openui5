@@ -19,6 +19,13 @@
 	line-height: var(--_sap_ui_table_RowActionItemSize);
 	color: var(--sapContent_IconColor);
 	font-size: 1rem;
+	padding: var(--sapContent_FocusWidth);
+
+	&.sapUiTableActionItemDisabled {
+		opacity: var(--sapContent_DisabledOpacity);
+		cursor: default;
+		pointer-events: none;
+	}
 
 	/* If the first action item is hidden, move the second item to the position where it would be if the first item wasn't hidden. */
 	.sapUiTableAction > .sapUiTableActionHidden + & {
