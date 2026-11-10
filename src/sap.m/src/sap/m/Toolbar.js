@@ -466,13 +466,15 @@ function(
 					return oElement && oElement.isA(vType);
 				});
 			},
-			bIsSelectOrComboBox = fnHasType(["sap.m.Select", "sap.m.ComboBox"]),
+			bIsSelectOrComboBox = fnHasType(["sap.m.Select", "sap.m.ComboBox", "sap.m.MultiComboBox"]),
+			bIsMenuButton = fnHasType("sap.m.MenuButton"),
 			bIsUpOrDownArrowKey = [KeyCodes.ARROW_UP, KeyCodes.ARROW_DOWN].includes(oEvent.keyCode),
 			bIsBreadcrumbs = fnHasType("sap.m.Breadcrumbs"),
 			bIsSlider = fnHasType(["sap.m.Slider", "sap.m.RangeSlider"]),
-			bIsTokenizer = fnHasType("sap.m.Tokenizer");
+			bIsTokenizer = fnHasType(["sap.m.OverflowToolbarTokenizer", "sap.m.Tokenizer"]),
+			bIsSearchField = fnHasType("sap.m.SearchField");
 
-		if (bIsUpOrDownArrowKey && bIsSelectOrComboBox || bIsBreadcrumbs || bIsSlider || bIsTokenizer) {
+		if (bIsUpOrDownArrowKey && (bIsSelectOrComboBox  || bIsMenuButton || bIsBreadcrumbs || bIsSlider || bIsTokenizer || bIsSearchField)) {
 			return true;
 		}
 
