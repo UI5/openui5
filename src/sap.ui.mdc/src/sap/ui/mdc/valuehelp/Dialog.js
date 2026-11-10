@@ -325,7 +325,7 @@ sap.ui.define([
 			aContentPromises.push(this._getIconTabBar(oDialog));
 		} else {
 			if (!this._oStandaloneTab) {
-				this._oStandaloneTab = new DialogTab(this.getId() + "-Standalone-DT", { content: { path: "/_selectableContents/0/displayContent", model: "$help" }, layoutData: new FlexItemData({ growFactor: 1, minHeight: "0" }) });
+				this._oStandaloneTab = new DialogTab(this.getId() + "-Standalone-DT", { content: { path: "/_selectableContents/0/displayContent", model: "$help" }, layoutData: new FlexItemData(this.getId() + "-Standalone-DT-FID", { growFactor: 1, minHeight: "0" }) });
 			}
 			aContentPromises.push(this._oStandaloneTab);
 		}
@@ -530,7 +530,7 @@ sap.ui.define([
 						stretchContentHeight: true,
 						headerMode: IconTabHeaderMode.Inline,
 						select: this._onTabBarSelect.bind(this),
-						layoutData: new FlexItemData({ growFactor: 1 }),
+						layoutData: new FlexItemData(this.getId() + "-ITB-FID", { growFactor: 1 }),
 						selectedKey: "{path: '$help>/_selectedContentKey', mode: 'OneWay'}"
 					});
 					// this._oIconTabBar.setModel(this._oManagedObjectModel, "$help");
@@ -617,8 +617,8 @@ sap.ui.define([
 					}).addStyleClass("sapMdcTokenizerPanelHeader sapMTitle sapMTitleStyleH5 sapMTitleNoWrap sapMTitleMaxWidth");
 					oHeaderText.addDelegate({
 						onAfterRendering: (oEvent) => {
-							const oDomRef = oEvent.srcControl.getDomRef();
-							oDomRef?.setAttribute("role", "status");
+							const oDomRef = oEvent.srcControl.getLayoutData().getDomRef(); // layout data are rendered as parent node
+							oDomRef?.setAttribute("role", "status"); // put on parent to as node with role=status cannot be used as label
 							oDomRef?.setAttribute("aria-live", "polite");
 							oDomRef?.setAttribute("aria-atomic", "true");
 						}
@@ -662,7 +662,7 @@ sap.ui.define([
 							}
 
 						}.bind(this),
-						layoutData: new FlexItemData({ growFactor: 1, maxWidth: "calc(100% - 2rem)" })
+						layoutData: new FlexItemData(this.getId() + "-Tokenizer-FID", { growFactor: 1, maxWidth: "calc(100% - 2rem)" })
 					});
 
 					// show right count on more-indicator even if not all loaded
