@@ -8,12 +8,6 @@
 
 .sapUiMdcListGridList {
 
-	/* Default 1rem gap between cards. GridBoxLayout writes an inline 0.5rem grid-gap on
-	   .sapMListUl, so !important is required. No public API is exposed to change it. */
-	.sapMListUl {
-		grid-gap: 1rem !important;
-	}
-
 	/* Each card gets its own stacking context so the absolutely-positioned action buttons
 	   (z-index: 2) cannot escape the card and paint over the sticky list toolbar. */
 	.sapFGLI {

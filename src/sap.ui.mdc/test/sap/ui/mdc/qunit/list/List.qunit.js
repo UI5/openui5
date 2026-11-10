@@ -6,6 +6,8 @@ sap.ui.define([
 	"sap/ui/mdc/list/ItemActionItem",
 	"sap/ui/mdc/enums/ListP13nMode",
 	"sap/ui/mdc/actiontoolbar/ActionToolbarAction",
+	"sap/ui/layout/cssgrid/GridBoxLayout",
+	"sap/ui/layout/cssgrid/GridBasicLayout",
 	"sap/m/VBox",
 	"sap/m/Title",
 	"sap/m/Text",
@@ -13,7 +15,7 @@ sap.ui.define([
 	"sap/m/Menu",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/qunit/utils/nextUIUpdate"
-], function(MDCList, GridListType, ListType, ItemSettings, ItemActionItem, ListP13nMode, ActionToolbarAction, VBox, Title, Text, Button, Menu, JSONModel, nextUIUpdate) {
+], function(MDCList, GridListType, ListType, ItemSettings, ItemActionItem, ListP13nMode, ActionToolbarAction, GridBoxLayout, GridBasicLayout, VBox, Title, Text, Button, Menu, JSONModel, nextUIUpdate) {
 
 	"use strict";
 	/*global QUnit */
@@ -264,6 +266,73 @@ sap.ui.define([
 	QUnit.test("noData forwarded to inner list", function(assert) {
 		const oInnerList = this.oList._oList;
 		assert.equal(oInnerList.getNoDataText(), "No data", "noData is forwarded");
+	});
+
+	QUnit.module("Grid layout", {
+		beforeEach: async function() {
+			this.oList = await createMDCList({
+				type: new GridListType({
+					boxMinWidth: "20rem",
+					boxWidth: "25rem",
+					boxesPerRowConfig: "XL4 L3 M2 S1"
+				}),
+				itemContentTemplate: createGridListItemContentTemplate()
+			});
+			return waitForInitialized(this.oList);
+		},
+		afterEach: function() {
+			this.oList.destroy();
+		}
+	});
+
+	QUnit.test("Box properties build the default GridBoxLayout and update it live", function(assert) {
+		const oLayout = this.oList._oList.getCustomLayout();
+		assert.ok(oLayout.isA("sap.ui.layout.cssgrid.GridBoxLayout"), "Inner list uses a GridBoxLayout by default");
+		assert.equal(oLayout.getBoxMinWidth(), "20rem", "boxMinWidth is passed to the layout");
+		assert.equal(oLayout.getBoxWidth(), "25rem", "boxWidth is passed to the layout");
+		assert.equal(oLayout.getBoxesPerRowConfig(), "XL4 L3 M2 S1", "boxesPerRowConfig is passed to the layout");
+
+		this.oList.getType().setBoxMinWidth("30rem");
+		assert.equal(oLayout.getBoxMinWidth(), "30rem", "A box property change updates the layout without a rebind");
+	});
+
+	QUnit.test("A custom layout takes precedence over box properties and its grid styles reach the DOM", async function(assert) {
+		const oType = this.oList.getType();
+		oType.setLayout(new GridBasicLayout({
+			gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))",
+			gridGap: "5rem"
+		}));
+		await nextUIUpdate();
+
+		const oComputed = window.getComputedStyle(this.oList._oList.getItemsContainerDomRef());
+		assert.strictEqual(oComputed.display, "grid", "Inner list container is display:grid");
+		assert.strictEqual(oComputed.rowGap, "80px", "The custom layout's 5rem gap is applied (not overridden by a theme default)");
+
+		oType.setBoxMinWidth("40rem");
+		assert.strictEqual(this.oList._oList.getCustomLayout().getGridGap(), "5rem", "Box property change does not affect the custom layout");
+
+		oType.destroyLayout();
+		assert.strictEqual(oType.getLayout(), null, "layout is null after destroy");
+	});
+
+	QUnit.test("layout stays applied across a switch to another list type and back", async function(assert) {
+		const oGridListType = this.oList.getType();
+		const oCustomLayout = new GridBoxLayout({boxMinWidth: "11rem"});
+		oGridListType.setLayout(oCustomLayout);
+
+		assert.strictEqual(this.oList._oList.getCustomLayout(), oCustomLayout, "Custom layout is applied before the switch");
+
+		this.oList.setItemContentTemplate(createListItemContentTemplate());
+		this.oList.setType(new ListType());
+		await waitForInitialized(this.oList);
+		assert.notOk(this.oList._oList.isA("sap.f.GridList"), "Switched away to a non-grid list");
+
+		this.oList.setItemContentTemplate(createGridListItemContentTemplate());
+		this.oList.setType(oGridListType);
+		await waitForInitialized(this.oList);
+
+		assert.ok(this.oList._oList.isA("sap.f.GridList"), "Back to a GridList");
+		assert.strictEqual(this.oList._oList.getCustomLayout(), oCustomLayout, "Custom layout is re-applied to the recreated inner list");
 	});
 
 	QUnit.module("Toolbar", {

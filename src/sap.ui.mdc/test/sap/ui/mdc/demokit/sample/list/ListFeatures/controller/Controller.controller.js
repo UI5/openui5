@@ -2,13 +2,16 @@ sap.ui.define([
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/mdc/list/GridListType",
 	"sap/ui/mdc/list/ListType",
+	"sap/ui/layout/cssgrid/GridBasicLayout",
 	"sap/m/VBox",
 	"sap/m/HBox",
 	"sap/m/Title",
 	"sap/m/Text",
 	"sap/m/MessageToast"
-], function(Controller, GridListType, ListType, VBox, HBox, Title, Text, MessageToast) {
+], function(Controller, GridListType, ListType, GridBasicLayout, VBox, HBox, Title, Text, MessageToast) {
 	"use strict";
+
+	const aGridLayoutControlIds = ["sepGridLayout", "lblBoxWidth", "sliderBoxWidth", "lblGap", "sliderGap"];
 
 	return Controller.extend("mdc.sample.controller.Controller", {
 		onInit: function() {
@@ -21,37 +24,31 @@ sap.ui.define([
 		// --- Layout type (Grid / List) ---
 
 		onListTypeChange: function(oEvent) {
-			const sKey = oEvent.getParameter("item").getKey();
+			const bGrid = oEvent.getParameter("item").getKey() === "GridListType";
 			const oList = this.getView().byId("list");
-			if (sKey === "ListType") {
-				oList.setType(this._getListType());
-				oList.setItemContentTemplate(this._createListItemContentTemplate());
-			} else {
-				oList.setType(this._getGridListType());
-				oList.setItemContentTemplate(this._createGridListItemContentTemplate());
-			}
+			oList.setType(bGrid ? this._getGridListType() : this._getListType());
+			oList.setItemContentTemplate(bGrid ? this._createGridListItemContentTemplate() : this._createListItemContentTemplate());
+			aGridLayoutControlIds.forEach((sId) => this.getView().byId(sId).setVisible(bGrid));
 		},
 
 		// --- Selection mode ---
 
 		onSelectionModeChange: function(oEvent) {
 			const sKey = oEvent.getParameter("item").getKey();
-			const oList = this.getView().byId("list");
-			oList.setSelectionMode(sKey);
+			this.getView().byId("list").setSelectionMode(sKey);
 			MessageToast.show("Selection mode: " + sKey);
 		},
 
-		// --- boxMinWidth (GridListType only) ---
+		// --- Custom layout (GridListType only) ---
 
-		onBoxMinWidthChange: function(oEvent) {
-			const sValue = oEvent.getParameter("value");
-			const oType = this.getView().byId("list").getType();
-			if (oType?.setBoxMinWidth) {
-				oType.setBoxMinWidth(sValue);
-				MessageToast.show("Box min width: " + sValue);
-			} else {
-				MessageToast.show("boxMinWidth applies to Grid List mode only");
-			}
+		onGridLayoutChange: function() {
+			const oView = this.getView();
+			const fBoxWidth = oView.byId("sliderBoxWidth").getValue();
+			const fGap = oView.byId("sliderGap").getValue();
+			oView.byId("list").getType().setLayout(new GridBasicLayout({
+				gridTemplateColumns: "repeat(auto-fit, minmax(" + fBoxWidth + "rem, 1fr))",
+				gridGap: fGap + "rem"
+			}));
 		},
 
 		// --- Item events ---
