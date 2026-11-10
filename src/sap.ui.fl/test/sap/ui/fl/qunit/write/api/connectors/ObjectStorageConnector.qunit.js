@@ -388,6 +388,139 @@ sap.ui.define([
 				});
 			});
 
+			QUnit.test("versioning: update the metadata of an activated version", async function(assert) {
+				const sReference = "sap.ui.fl.test";
+				const mPropertyBag = {
+					reference: sReference,
+					layer: Layer.CUSTOMER,
+					storage: oConnector.storage
+				};
+				const oChange1 = {
+					creation: "2024-05-04T12:57:32.231Z",
+					fileName: "oChange",
+					fileType: "change",
+					reference: sReference,
+					layer: Layer.CUSTOMER,
+					selector: { id: "selector" },
+					changeType: "type"
+				};
+				await oConnector.write({ flexObjects: [oChange1], layer: Layer.CUSTOMER });
+				const oActivatedVersion = await oConnector.versions.activate.call(oConnector, {
+					...mPropertyBag,
+					version: Version.Number.Draft,
+					title: "Initial title",
+					comment: "Initial comment"
+				});
+				const sVersionId = oActivatedVersion.version;
+				assert.strictEqual(oActivatedVersion.title, "Initial title", "the version was activated with the title");
+				assert.strictEqual(oActivatedVersion.comment, "Initial comment", "the version was activated with the comment");
+
+				// update title, comment and hide the version
+				const oUpdateResponse = await oConnector.versions.update.call(oConnector, {
+					...mPropertyBag,
+					updatedVersions: {
+						[sVersionId]: { title: "New title", comment: "New comment", isHidden: true }
+					}
+				});
+				assert.strictEqual(oUpdateResponse.response.length, 1, "one version was updated");
+
+				let aVersions = await oConnector.versions.load.call(oConnector, mPropertyBag);
+				let oVersion = aVersions.find((oCurrentVersion) => oCurrentVersion.version === sVersionId);
+				assert.strictEqual(oVersion.title, "New title", "the title was updated and persisted");
+				assert.strictEqual(oVersion.comment, "New comment", "the comment was updated and persisted");
+				assert.strictEqual(oVersion.isHidden, true, "the version was hidden and persisted");
+
+				// partial update: only the comment, other properties stay untouched
+				await oConnector.versions.update.call(oConnector, {
+					...mPropertyBag,
+					updatedVersions: {
+						[sVersionId]: { comment: "Only comment changed" }
+					}
+				});
+				aVersions = await oConnector.versions.load.call(oConnector, mPropertyBag);
+				oVersion = aVersions.find((oCurrentVersion) => oCurrentVersion.version === sVersionId);
+				assert.strictEqual(oVersion.title, "New title", "the title stays untouched on a partial update");
+				assert.strictEqual(oVersion.comment, "Only comment changed", "the comment was updated on a partial update");
+				assert.strictEqual(oVersion.isHidden, true, "the hiding stays untouched on a partial update");
+			});
+
+			QUnit.test("versioning: update is ignored for a draft version and for unknown version IDs", async function(assert) {
+				const sReference = "sap.ui.fl.test";
+				const mPropertyBag = {
+					reference: sReference,
+					layer: Layer.CUSTOMER,
+					storage: oConnector.storage
+				};
+				const oChange1 = {
+					creation: "2024-05-04T12:57:32.231Z",
+					fileName: "oChange",
+					fileType: "change",
+					reference: sReference,
+					layer: Layer.CUSTOMER,
+					selector: { id: "selector" },
+					changeType: "type"
+				};
+				await oConnector.write({ flexObjects: [oChange1], layer: Layer.CUSTOMER });
+
+				const oUpdateResponse = await oConnector.versions.update.call(oConnector, {
+					...mPropertyBag,
+					updatedVersions: {
+						[Version.Number.Draft]: { title: "Should be ignored" },
+						unknownVersionId: { title: "Should be ignored" }
+					}
+				});
+				assert.strictEqual(oUpdateResponse.response.length, 0, "no version was updated");
+
+				const aVersions = await oConnector.versions.load.call(oConnector, mPropertyBag);
+				const oDraftVersion = aVersions.find((oCurrentVersion) => oCurrentVersion.isDraft);
+				assert.notStrictEqual(oDraftVersion.title, "Should be ignored", "the draft title was not changed");
+			});
+
+			QUnit.test("versioning: reactivating a hidden version resets its visibility", async function(assert) {
+				const sReference = "sap.ui.fl.test";
+				const mPropertyBag = {
+					reference: sReference,
+					layer: Layer.CUSTOMER,
+					storage: oConnector.storage
+				};
+				const oChange1 = {
+					creation: "2024-05-04T12:57:32.231Z",
+					fileName: "oChange",
+					fileType: "change",
+					reference: sReference,
+					layer: Layer.CUSTOMER,
+					selector: { id: "selector" },
+					changeType: "type"
+				};
+				await oConnector.write({ flexObjects: [oChange1], layer: Layer.CUSTOMER });
+				const oActivatedVersion = await oConnector.versions.activate.call(oConnector, {
+					...mPropertyBag,
+					version: Version.Number.Draft,
+					title: "Initial title"
+				});
+				const sVersionId = oActivatedVersion.version;
+				assert.strictEqual(oActivatedVersion.isHidden, false, "an activated version is visible by default");
+
+				// hide the version
+				await oConnector.versions.update.call(oConnector, {
+					...mPropertyBag,
+					updatedVersions: { [sVersionId]: { isHidden: true } }
+				});
+
+				// reactivate the (now hidden) version
+				const oReactivatedVersion = await oConnector.versions.activate.call(oConnector, {
+					...mPropertyBag,
+					version: sVersionId,
+					title: "Reactivated title",
+					isHidden: false
+				});
+				assert.strictEqual(oReactivatedVersion.isHidden, false, "the reactivated version is visible again");
+
+				const aVersions = await oConnector.versions.load.call(oConnector, mPropertyBag);
+				const oPersisted = aVersions.find((oCurrentVersion) => oCurrentVersion.version === oReactivatedVersion.version);
+				assert.strictEqual(oPersisted.isHidden, false, "the reset visibility was persisted");
+			});
+
 			QUnit.test("versioning: create a two comp variants, then activate the draft, then delete one variant base on the activate version, switch to last activated version", function(assert) {
 				const sReference = "sap.ui.fl.test";
 				const mPropertyBag = {
@@ -517,6 +650,8 @@ sap.ui.define([
 					assert.strictEqual(oFeatures.isKeyUser, true, "the key user is available");
 					assert.strictEqual(oFeatures.isVariantSharingEnabled, true, "the variant sharing is available");
 					assert.strictEqual(oFeatures.isContextSharingEnabled, false, "context sharing is not available");
+					assert.strictEqual(oFeatures.isVersioningEnabled, true, "versioning is available");
+					assert.strictEqual(oFeatures.isVersionMetadataUpdateAvailable, true, "version metadata update is available");
 					assert.strictEqual(oFeatures.logonUser, "DEFAULT_USER", "logonUser is DEFAULT_USER");
 				});
 			});

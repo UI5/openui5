@@ -440,6 +440,22 @@ sap.ui.define([
 		publish(mPropertyBag) {
 			return StorageUtils.getWriteConnectors()
 			.then(_executeActionByName.bind(undefined, "versions.publish", mPropertyBag));
+		},
+
+		/**
+		 * Updates the metadata (<code>title</code>, <code>comment</code>, <code>isHidden</code>) of already activated versions.
+		 *
+		 * @param {object} mPropertyBag - Property bag
+		 * @param {sap.ui.fl.Layer} mPropertyBag.layer - Layer
+		 * @param {string} mPropertyBag.reference - Flex reference
+		 * @param {object} mPropertyBag.updatedVersions - Map of version IDs to the metadata properties
+		 * (<code>title</code>, <code>comment</code>, <code>isHidden</code>) that should be changed; only the changed properties are sent
+		 * @returns {Promise} Resolves after the version metadata was updated;
+		 * rejects if an error occurs or the layer does not support versioning
+		 */
+		update(mPropertyBag) {
+			return StorageUtils.getWriteConnectors()
+			.then(_executeActionByName.bind(undefined, "versions.update", mPropertyBag));
 		}
 	};
 

@@ -1495,6 +1495,74 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("Calling the Storage: Given Versions.updateVersion is called", {
+		beforeEach() {
+			this.sReference = "com.sap.app";
+			this.oUpdateStub = sandbox.stub(Storage.versions, "update").resolves({ response: [] });
+			this.oVersionsModel = new JSONModel({
+				versions: [
+					{ version: Version.Number.Draft, title: "", comment: "", isHidden: false },
+					{ version: "2", title: "Second", comment: "", isHidden: false },
+					{ version: "1", title: "First", comment: "old comment", isHidden: false }
+				]
+			});
+			sandbox.stub(Versions, "getVersionsModel").returns(this.oVersionsModel);
+		},
+		afterEach() {
+			sandbox.restore();
+		}
+	}, function() {
+		QUnit.test("then the storage is called and the model entries are updated", function(assert) {
+			const mPropertyBag = {
+				reference: this.sReference,
+				layer: Layer.CUSTOMER,
+				updatedVersions: {
+					2: { title: "New title", comment: "New comment", isHidden: true }
+				}
+			};
+			return Versions.updateVersion(mPropertyBag).then(function() {
+				assert.ok(this.oUpdateStub.calledOnceWith(mPropertyBag), "the storage update was called with the property bag");
+				const aVersions = this.oVersionsModel.getProperty("/versions");
+				assert.strictEqual(aVersions[1].title, "New title", "the title was updated in the model");
+				assert.strictEqual(aVersions[1].comment, "New comment", "the comment was updated in the model");
+				assert.strictEqual(aVersions[1].isHidden, true, "the hiding was updated in the model");
+				assert.strictEqual(aVersions[2].title, "First", "a non-targeted version stays untouched");
+			}.bind(this));
+		});
+
+		QUnit.test("then only the provided properties are changed on a partial update", function(assert) {
+			const mPropertyBag = {
+				reference: this.sReference,
+				layer: Layer.CUSTOMER,
+				updatedVersions: {
+					1: { comment: "Only comment changed" }
+				}
+			};
+			return Versions.updateVersion(mPropertyBag).then(function() {
+				const aVersions = this.oVersionsModel.getProperty("/versions");
+				assert.strictEqual(aVersions[2].title, "First", "the title stays untouched");
+				assert.strictEqual(aVersions[2].comment, "Only comment changed", "the comment was updated");
+				assert.strictEqual(aVersions[2].isHidden, false, "the hiding stays untouched");
+			}.bind(this));
+		});
+
+		QUnit.test("then a draft version is not updated in the model (matching the connector)", function(assert) {
+			const mPropertyBag = {
+				reference: this.sReference,
+				layer: Layer.CUSTOMER,
+				updatedVersions: {
+					[Version.Number.Draft]: { title: "Should be ignored", comment: "Should be ignored", isHidden: true }
+				}
+			};
+			return Versions.updateVersion(mPropertyBag).then(function() {
+				const oDraft = this.oVersionsModel.getProperty("/versions")[0];
+				assert.strictEqual(oDraft.title, "", "the draft title was not changed in the model");
+				assert.strictEqual(oDraft.comment, "", "the draft comment was not changed in the model");
+				assert.strictEqual(oDraft.isHidden, false, "the draft hiding was not changed in the model");
+			}.bind(this));
+		});
+	});
+
 	QUnit.done(function() {
 		document.getElementById("qunit-fixture").style.display = "none";
 	});

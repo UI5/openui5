@@ -604,6 +604,53 @@ sap.ui.define([
 		});
 	});
 
+	QUnit.module("Given VersionsAPI.updateVersion is called", {
+		beforeEach() {
+			sandbox.stub(Utils, "getAppComponentForControl").returns(oAppComponent);
+		},
+		afterEach() {
+			cleanUp();
+		}
+	}, function() {
+		QUnit.test("when no control is provided", function(assert) {
+			return VersionsAPI.updateVersion({ layer: Layer.CUSTOMER, updatedVersions: {} }).catch(function(oError) {
+				assert.strictEqual(oError.message, "No control was provided", "then an Error is thrown");
+			});
+		});
+
+		QUnit.test("when no layer is provided", function(assert) {
+			return VersionsAPI.updateVersion({ control: new Control(), updatedVersions: {} }).catch(function(oError) {
+				assert.strictEqual(oError.message, "No layer was provided", "then an Error is thrown");
+			});
+		});
+
+		QUnit.test("when no versions to update are provided", function(assert) {
+			return VersionsAPI.updateVersion({ control: new Control(), layer: Layer.CUSTOMER }).catch(function(oError) {
+				assert.strictEqual(oError.message, "No versions to update were provided", "then an Error is thrown");
+			});
+		});
+
+		QUnit.test("when control, layer and updatedVersions are provided", function(assert) {
+			const oUpdatedVersions = {
+				2: { title: "New title", comment: "New comment", isHidden: true }
+			};
+			const mPropertyBag = {
+				layer: Layer.CUSTOMER,
+				control: oAppComponent,
+				updatedVersions: oUpdatedVersions
+			};
+			const oUpdateVersionStub = sandbox.stub(Versions, "updateVersion").resolves();
+
+			return VersionsAPI.updateVersion(mPropertyBag).then(function() {
+				assert.strictEqual(oUpdateVersionStub.callCount, 1, "then Versions.updateVersion was called once");
+				const oArgs = oUpdateVersionStub.getCall(0).args[0];
+				assert.strictEqual(oArgs.reference, sReference, "then the reference was determined");
+				assert.strictEqual(oArgs.layer, Layer.CUSTOMER, "then the layer was passed");
+				assert.deepEqual(oArgs.updatedVersions, oUpdatedVersions, "then the updated versions were passed");
+			});
+		});
+	});
+
 	QUnit.module("Given VersionsAPI.discardDraft is called", {
 		beforeEach() {
 			sandbox.stub(Utils, "getAppComponentForControl").returns(oAppComponent);

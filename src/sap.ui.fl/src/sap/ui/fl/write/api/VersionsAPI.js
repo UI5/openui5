@@ -283,6 +283,39 @@ sap.ui.define([
 	};
 
 	/**
+	 * Updates the metadata (title, comment, hiding) of already activated versions.
+	 *
+	 * @param {object} mPropertyBag - Property bag
+	 * @param {sap.ui.core.Control} mPropertyBag.control - Control for which the request is done
+	 * @param {string} mPropertyBag.layer - Layer for which the versions should be retrieved
+	 * @param {object} mPropertyBag.updatedVersions - Map of version IDs to the metadata properties
+	 * (<code>title</code>, <code>comment</code>, <code>isHidden</code>) that should be changed; only the changed properties are sent
+	 *
+	 * @ui5-restricted sap.ui.rta
+	 *
+	 * @returns {Promise} Promise resolving once the version metadata was updated;
+	 * rejects if a parameter is missing or the application could not be determined
+	 */
+	VersionsAPI.updateVersion = function(mPropertyBag) {
+		if (!mPropertyBag.control) {
+			return Promise.reject(new Error("No control was provided"));
+		}
+		if (!mPropertyBag.layer) {
+			return Promise.reject(new Error("No layer was provided"));
+		}
+		if (!mPropertyBag.updatedVersions) {
+			return Promise.reject(new Error("No versions to update were provided"));
+		}
+
+		const oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
+		return Versions.updateVersion({
+			reference: getFlexReferenceForControl(oAppComponent),
+			layer: mPropertyBag.layer,
+			updatedVersions: mPropertyBag.updatedVersions
+		});
+	};
+
+	/**
 	 * Discards the current draft within a given layer; This sends a call to the connector in case a draft exists and will
 	 * update the FlexState accordingly in case the <code>updateState</code> flag is set; This API does not revert the changes
 	 * and the consumer must take care of making a reload of the application itself.

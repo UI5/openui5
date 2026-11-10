@@ -35,6 +35,7 @@ sap.ui.define([
 		isCondensingEnabled: true,
 		isContextSharingEnabled: false,
 		isVersioningEnabled: true,
+		isVersionMetadataUpdateAvailable: true,
 		logonUser: "DEFAULT_USER",
 		isVariantAuthorNameAvailable: false,
 		isAnnotationChangeEnabled: true,
@@ -583,6 +584,11 @@ sap.ui.define([
 				}
 				const sKey = ObjectStorageUtils.createFlexKey(oActivateVersion.id);
 				oActivateVersion.title = mPropertyBag.title;
+				if (mPropertyBag.comment !== undefined) {
+					oActivateVersion.comment = mPropertyBag.comment;
+				}
+				// an activated version is always visible; a reactivated hidden version must reset its visibility
+				oActivateVersion.isHidden = !!mPropertyBag.isHidden;
 				oActivateVersion.activatedAt = new Date(Date.now()).toISOString();
 				oActivateVersion.activatedBy = mFeatures.logonUser;
 				oActivateVersion.isDraft = false;
@@ -616,6 +622,32 @@ sap.ui.define([
 				});
 
 				await Promise.all(aDiscardPromises);
+			},
+
+			/**
+			 * @inheritDoc
+			 */
+			async update(mPropertyBag) {
+				const aVersions = await this.versions.load.call(this, mPropertyBag);
+				const aUpdatedVersions = [];
+				const aMetadataProperties = ["title", "comment", "isHidden"];
+				for (const [sVersionId, oVersionObject] of Object.entries(mPropertyBag.updatedVersions || {})) {
+					const oVersion = aVersions.find((oCurrentVersion) => oCurrentVersion.version === sVersionId);
+					// only already activated versions can be updated
+					if (!oVersion || oVersion.isDraft) {
+						continue;
+					}
+					aMetadataProperties.forEach((sProperty) => {
+						if (oVersionObject[sProperty] !== undefined) {
+							oVersion[sProperty] = oVersionObject[sProperty];
+						}
+					});
+					const sKey = ObjectStorageUtils.createFlexKey(oVersion.id);
+					const vFlexObject = this.storage._itemsStoredAsObjects ? oVersion : JSON.stringify(oVersion);
+					await this.storage.setItem(sKey, vFlexObject);
+					aUpdatedVersions.push(oVersion);
+				}
+				return { response: aUpdatedVersions };
 			}
 		}
 	});

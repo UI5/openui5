@@ -333,6 +333,7 @@ sap.ui.define([
 	 * @param {string} mPropertyBag.title - Title of the to be activated version
 	 * @param {string} mPropertyBag.appComponent - Application Component
 	 * @param {string} mPropertyBag.displayedVersion - Id of the displayed version
+	 * @param {string} [mPropertyBag.comment] - Comment for the to be activated version
 	 * @returns {Promise<sap.ui.fl.Version>} Promise resolving with the updated list of versions for the application
 	 * when the version was activated;
 	 * rejects if an error occurs, the layer does not support draft handling, there is unsaved content, there is no draft to activate or
@@ -347,6 +348,7 @@ sap.ui.define([
 			return Promise.reject(new Error("Version is already active"));
 		}
 		mPropertyBag.version = mPropertyBag.displayedVersion;
+		mPropertyBag.isHidden = false;
 
 		return Storage.versions.activate(mPropertyBag)
 		.then(function(oVersion) {
@@ -432,6 +434,38 @@ sap.ui.define([
 			});
 			oModel.updateBindings(true);
 		});
+	};
+
+	/**
+	 * Updates the metadata (title, comment, hiding) of already activated versions and reflects the change in the model.
+	 *
+	 * @param {object} mPropertyBag - Property Bag
+	 * @param {string} mPropertyBag.reference - ID of the application for which the versions are requested (this reference must not contain the ".Component" suffix)
+	 * @param {string} mPropertyBag.layer - Layer for which the versions should be retrieved
+	 * @param {object} mPropertyBag.updatedVersions - Map of version IDs to the metadata properties
+	 * (<code>title</code>, <code>comment</code>, <code>isHidden</code>) that should be changed; only the changed properties are sent
+	 * @returns {Promise} Resolves once the version metadata was updated in the backend and the model;
+	 * rejects if an error occurs or the layer does not support draft handling
+	 */
+	Versions.updateVersion = async function(mPropertyBag) {
+		const oModel = Versions.getVersionsModel(mPropertyBag);
+		await Storage.versions.update(mPropertyBag);
+		const aVersions = oModel.getProperty("/versions");
+		const aMetadataProperties = ["title", "comment", "isHidden"];
+		Object.entries(mPropertyBag.updatedVersions).forEach(function([sVersionId, oMetadata]) {
+			const oVersion = aVersions.find(function(oCurrentVersion) {
+				return oCurrentVersion.version === sVersionId;
+			});
+			// the connector only updates already activated versions, so drafts must not be touched in the model either
+			if (oVersion && oVersion.version !== Version.Number.Draft) {
+				aMetadataProperties.forEach(function(sProperty) {
+					if (oMetadata[sProperty] !== undefined) {
+						oVersion[sProperty] = oMetadata[sProperty];
+					}
+				});
+			}
+		});
+		oModel.updateBindings(true);
 	};
 
 	return Versions;

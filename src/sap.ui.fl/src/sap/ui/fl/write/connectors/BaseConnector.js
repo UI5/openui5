@@ -250,6 +250,21 @@ sap.ui.define([
 			 */
 			discardDraft() {
 				return Promise.reject(new Error("versions.discardDraft is not implemented"));
+			},
+
+			/**
+			 * Interface called to update the metadata (<code>title</code>, <code>comment</code>, <code>isHidden</code>)
+			 * of already activated versions.
+			 *
+			 * @param {object} mPropertyBag Property bag
+			 * @param {sap.ui.fl.Layer} mPropertyBag.layer Layer
+			 * @param {string} mPropertyBag.reference Flex reference
+			 * @param {object} mPropertyBag.updatedVersions Map of version IDs to the metadata properties that should be
+			 * changed; only the changed properties are sent
+			 * @returns {Promise} Resolves after the version metadata was updated.
+			 */
+			update() {
+				return Promise.reject(new Error("versions.update is not implemented"));
 			}
 		},
 
