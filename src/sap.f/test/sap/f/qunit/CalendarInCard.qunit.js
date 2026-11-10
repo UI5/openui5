@@ -24,11 +24,11 @@ sap.ui.define([
 	});
 
 	QUnit.test("Initialization of pickers", async function(assert) {
-		var oCalendar = this.oCal,
-			oMonthPicker = oCalendar._getMonthPicker(),
-			oYearPicker = oCalendar._getYearPicker(),
-			oYearRangePicker = oCalendar._getYearRangePicker(),
-			oPickerBtn = oCalendar._oPickerBtn;
+		const oCalendar = this.oCal;
+		const oMonthPicker = oCalendar._getMonthPicker();
+		const oYearPicker = oCalendar._getYearPicker();
+		const oYearRangePicker = oCalendar._getYearRangePicker();
+		const oPickerBtn = oCalendar._oPickerBtn;
 
 		// Act
 		oCalendar._handlePickerButtonPress();
@@ -57,12 +57,12 @@ sap.ui.define([
 	});
 
 	QUnit.test("Selecting a date from the pickers", async function(assert) {
-		var oCalendar = this.oCal,
-			oMonth = oCalendar.getAggregation("month")[0],
-			oMonthPicker = oCalendar._getMonthPicker(),
-			oYearPicker = oCalendar._getYearPicker(),
-			oYearRangePicker = oCalendar._getYearRangePicker(),
-			oPickerBtn = oCalendar._oPickerBtn;
+		const oCalendar = this.oCal;
+		const oMonth = oCalendar.getAggregation("month")[0];
+		const oMonthPicker = oCalendar._getMonthPicker();
+		const oYearPicker = oCalendar._getYearPicker();
+		const oYearRangePicker = oCalendar._getYearRangePicker();
+		const oPickerBtn = oCalendar._oPickerBtn;
 
 		// Arrange
 		// initialization of pickers
@@ -122,10 +122,10 @@ sap.ui.define([
 	});
 
 	QUnit.test("Navigating in the pickers", async function(assert) {
-		var oCalendar = this.oCal,
-			oPickerBtn = oCalendar._oPickerBtn,
-			oYearPicker = oCalendar._getYearPicker(),
-			oYearRangePicker = oCalendar._getYearRangePicker();
+		const oCalendar = this.oCal;
+		const oPickerBtn = oCalendar._oPickerBtn;
+		const oYearPicker = oCalendar._getYearPicker();
+		const oYearRangePicker = oCalendar._getYearRangePicker();
 
 		// Act
 		oCalendar._handlePickerButtonPress();
@@ -177,15 +177,15 @@ sap.ui.define([
 	});
 
 	QUnit.test("Today button", async function(assert) {
-		var oFakeNow = UI5Date.getInstance(2020, 0, 1),
-			oOldDate = UI5Date.getInstance(2019, 11, 1),
-			clock = sinon.useFakeTimers(oFakeNow.getTime()),
-			oCalendar = this.oCal,
-			oPickerBtn = oCalendar._oPickerBtn,
-			oMonthPicker = oCalendar._getMonthPicker(),
-			oYearPicker = oCalendar._getYearPicker(),
-			oYearRangePicker = oCalendar._getYearRangePicker(),
-			oAddMonthDelegateSpy = this.spy(oCalendar, "_addMonthFocusDelegate");
+		const oFakeNow = UI5Date.getInstance(2020, 0, 1);
+		const oOldDate = UI5Date.getInstance(2019, 11, 1);
+		const clock = sinon.useFakeTimers(oFakeNow.getTime());
+		const oCalendar = this.oCal;
+		const oPickerBtn = oCalendar._oPickerBtn;
+		const oMonthPicker = oCalendar._getMonthPicker();
+		const oYearPicker = oCalendar._getYearPicker();
+		const oYearRangePicker = oCalendar._getYearRangePicker();
+		const oAddMonthDelegateSpy = this.spy(oCalendar, "_addMonthFocusDelegate");
 
 		// Act
 		oCalendar._handleTodayPress();
