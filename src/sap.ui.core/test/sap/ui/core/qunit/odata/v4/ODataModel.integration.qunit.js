@@ -32990,13 +32990,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// subtotals read later by scrolling. A refresh resets all outdated flags.
 	// JIRA: CPOUI5ODATAV4-3502
 	//
-	// Deleting a leaf only marks its ancestors and their copies as outdated. Unrelated subtotals
-	// remain unchanged, including those restored from the cache or read later.
+	// Deleting a leaf via Context#delete only marks its ancestors and their copies as outdated.
+	// Unrelated subtotals remain unchanged, including those restored from the cache or read later.
 	// Multiple deletions accumulate the affected ancestors. If a kept-alive entity's grouping
 	// values are unavailable, deletion falls back to marking all subtotals as outdated.
 	// JIRA: CPOUI5ODATAV4-3737
-[false, true].forEach((bDelete) => {
-	const sTitle = "Data Aggregation: isOutdated with visual grouping, delete: " + bDelete;
+	//
+	// ODataModel#delete and Context#delete treat subtotals equally (JIRA: CPOUI5ODATAV4-3752)
+["setProperty", "Context#delete", "ODataModel#delete"].forEach((sScenario) => {
+	const sTitle = "Data Aggregation: isOutdated with visual grouping, " + sScenario;
 
 	QUnit.test(sTitle, async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
@@ -33129,27 +33131,56 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		const oBusinessPartner2 = oListBinding.getCurrentContexts()[4];
 
 		this.expectChange("isOutdatedHeader", true);
-		if (bDelete) {
-			this.expectRequest("#0 DELETE BusinessPartners(2)");
-		} else {
-			this.expectRequest("#0 PATCH BusinessPartners(2)", {
-					payload : {SalesNumber : 25}
-				}, {Id : 2, SalesNumber : 25});
+
+		const sGrandTotalURL = "#0 BusinessPartners?$apply=aggregate(SalesNumber)";
+		let oScenarioPromise;
+		switch (sScenario) {
+			case "setProperty":
+				this.expectRequest("#0 PATCH BusinessPartners(2)", {
+						payload : {SalesNumber : 25}
+					}, {Id : 2, SalesNumber : 25})
+					.expectRequest(sGrandTotalURL, {
+						value : [{SalesNumber : 155}]
+					});
+
+				// code under test (JIRA: CPOUI5ODATAV4-3502)
+				oScenarioPromise = oBusinessPartner2.setProperty("SalesNumber", 25);
+				break;
+
+			case "Context#delete":
+				this.expectRequest("#0 DELETE BusinessPartners(2)")
+					.expectRequest(sGrandTotalURL, {
+						value : [{SalesNumber : 140}]
+					});
+
+				// code under test (JIRA: CPOUI5ODATAV4-3737)
+				oScenarioPromise = oBusinessPartner2.delete();
+				break;
+
+			case "ODataModel#delete":
+				this.expectRequest("#0 DELETE BusinessPartners(2)", {headers : {"If-Match" : "*"}});
+
+				// code under test (JIRA: CPOUI5ODATAV4-3752)
+				oScenarioPromise = oModel.delete(oBusinessPartner2.getPath());
+				break;
+
+			default:
+				throw new Error("Unsupported scenario: " + sScenario);
 		}
-		this.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
-			value : [{SalesNumber : bDelete ? 140 : 155}]
-		});
 
 		await Promise.all([
-			bDelete
-				// code under test (JIRA: CPOUI5ODATAV4-3737)
-				? oBusinessPartner2.delete()
-				// code under test (JIRA: CPOUI5ODATAV4-3502)
-				: oBusinessPartner2.setProperty("SalesNumber", 25),
-			this.waitForChanges(assert, "modify the leaf -> outdated subtotals;"
-				+ " leaves and the grand total are not outdated")
+			oScenarioPromise,
+			this.waitForChanges(assert, sScenario + " -> outdated subtotals")
 		]);
 
+		const bDelete = sScenario !== "setProperty";
+		const bDeleteViaModel = sScenario === "ODataModel#delete";
+		// ODataModel#delete does not request the grand total, so it has to be set to outdated
+		const bGrandTotalOutdated = bDeleteViaModel;
+		// eslint-disable-next-line no-nested-ternary
+		const sUpdatedGrandTotal = sScenario === "setProperty"
+			? "155"
+			: bDeleteViaModel ? "150" : "140";
 		checkTable("after modifying the leaf", assert, oTable, [
 			"/BusinessPartners()",
 			oContextA,
@@ -33160,7 +33191,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/BusinessPartners(Country='C')",
 			"/BusinessPartners(Country='D')"
 		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
-			[false, true, 0, "", "", "", bDelete ? "140" : "155"],
+			[bGrandTotalOutdated, true, 0, "", "", "", sUpdatedGrandTotal],
 			[bDelete ? undefined : true, true, 1, "A", "", "", "10"],
 			[true, true, 1, "B", "", "", "20"],
 			[true, true, 2, "B", "b", "", "20"],
@@ -33186,7 +33217,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/BusinessPartners(Country='C')",
 			"/BusinessPartners(Country='D')"
 		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
-			[false, true, 0, "", "", "", bDelete ? "140" : "155"],
+			[bGrandTotalOutdated, true, 0, "", "", "", sUpdatedGrandTotal],
 			[bDelete ? undefined : true, true, 1, "A", "", "", "10"],
 			[bDelete ? undefined : true, true, 2, "A", "a", "", "10"],
 			[bDelete ? undefined : true, true, 1, "", "", "", "10"],
@@ -33288,15 +33319,20 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oListBinding.getCurrentContexts()[3].expand(),
 			this.waitForChanges(assert, "expand 'C/c' down to the leaves")
 		]);
+		const oBusinessPartner4 = oListBinding.getCurrentContexts()[4];
 
-		this.expectRequest("#0 DELETE BusinessPartners(4)")
-			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+		this.expectRequest("#0 DELETE BusinessPartners(4)",
+				bDeleteViaModel ? {headers : {"If-Match" : "*"}} : undefined)
+			.expectRequestIf(sScenario !== "ODataModel#delete", sGrandTotalURL, {
 				value : [{SalesNumber : 130}]
 			});
 
 		await Promise.all([
-			// code under test (JIRA: CPOUI5ODATAV4-3737)
-			oListBinding.getCurrentContexts()[4].delete(),
+			bDeleteViaModel
+				// code under test (JIRA: CPOUI5ODATAV4-3752)
+				? oModel.delete(oBusinessPartner4.getPath())
+				// code under test (JIRA: CPOUI5ODATAV4-3737)
+				: oBusinessPartner4.delete(),
 			this.waitForChanges(assert, "delete another leaf in a different branch")
 		]);
 
@@ -33329,7 +33365,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				return mOutdated;
 			}, {}),
 			{
-				"/BusinessPartners()" : false,
+				"/BusinessPartners()" : bGrandTotalOutdated,
 				"/BusinessPartners(Country='A')" : bDelete ? undefined : true,
 				"/BusinessPartners(Country='A',Region='a')" : bDelete ? undefined : true,
 				"/BusinessPartners(Country='A',$isTotal=true)" : bDelete ? undefined : true,
@@ -33409,15 +33445,18 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		this.expectChange("isOutdatedHeader", true)
 			.expectRequest("#0 DELETE BusinessPartners(6)", {
-				headers : {"If-Match" : "etag"}
+				headers : {"If-Match" : bDeleteViaModel ? "*" : "etag"}
 			})
-			.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+			.expectRequestIf(sScenario !== "ODataModel#delete", sGrandTotalURL, {
 				value : [{SalesNumber : 120}]
 			});
 
 		await Promise.all([
-			// code under test (JIRA: CPOUI5ODATAV4-3737)
-			oBusinessPartner6.delete(undefined, /*bDoNotRequestCount*/true),
+			bDeleteViaModel
+				// code under test (JIRA: CPOUI5ODATAV4-3752)
+				? oModel.delete(oBusinessPartner6.getPath())
+				// code under test (JIRA: CPOUI5ODATAV4-3737)
+				: oBusinessPartner6.delete(undefined, /*bDoNotRequestCount*/true),
 			this.waitForChanges(assert,
 				"delete without known grouping values -> all subtotals outdated")
 		]);
@@ -33430,7 +33469,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			"/BusinessPartners(Country='D')",
 			oLeafContext
 		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
-			[false, true, 0, "", "", "", "120"],
+			[bGrandTotalOutdated, true, 0, "", "", "", bGrandTotalOutdated ? "130" : "120"],
 			[true, true, 1, "A", "", "", "10"],
 			[true, true, 1, "B", "", "", bDelete ? "10" : "35"],
 			[true, true, 1, "C", "", "", bDelete ? "20" : "30"],
@@ -34305,7 +34344,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Deleting an entity with empty grouping values also marks ancestors with duplicate predicates
 	// as outdated.
 	// JIRA: CPOUI5ODATAV4-3737
-	QUnit.test("Data Aggregation: DINC0380951", async function (assert) {
+	//
+	// ODataModel#delete and Context#delete treat subtotals equally (JIRA: CPOUI5ODATAV4-3752)
+[false, true].forEach((bDeleteViaModel) => {
+	const sTitle = "Data Aggregation: DINC0380951, delete via model: " + bDeleteViaModel;
+
+	QUnit.test(sTitle, async function (assert) {
 		const oModel = this.createAggregationModel({autoExpandSelect : true});
 		const sView = `
 <t:Table id="table" rows="{path : '/BusinessPartners',
@@ -34668,11 +34712,15 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert, "read the kept-alive entity's grouping values")
 		]);
 
-		this.expectRequest("DELETE BusinessPartners(42)");
+		this.expectRequest("DELETE BusinessPartners(42)",
+				bDeleteViaModel ? {headers : {"If-Match" : "*"}} : undefined);
 
 		await Promise.all([
-			// code under test
-			oKeptContext.delete(undefined, /*bDoNotRequestCount*/true),
+			bDeleteViaModel
+				// code under test (JIRA: CPOUI5ODATAV4-3752)
+				? oModel.delete(oKeptContext.getPath())
+				// code under test (JIRA: CPOUI5ODATAV4-3737)
+				: oKeptContext.delete(undefined, /*bDoNotRequestCount*/true),
 			this.waitForChanges(assert, "delete an entity with duplicate ancestors")
 		]);
 
@@ -34703,6 +34751,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"/BusinessPartners(Country='',$duplicate=...,$isTotal=true): true"
 			], "All ancestors with empty grouping values, including duplicates, are outdated");
 	});
+});
 
 	//*********************************************************************************************
 	// Scenario: check that 'subtotals' can be changed and that $$aggregation can be removed again,
