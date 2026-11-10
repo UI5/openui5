@@ -4590,10 +4590,13 @@ sap.ui.define([
 			.returns([oDependentBinding1, oDependentBinding2]);
 		this.mock(oDependentBinding1).expects("resetChanges").withExactArgs().callsFake(reset);
 		this.mock(oDependentBinding2).expects("resetChanges").withExactArgs().callsFake(reset);
+		let oSetOutdatedExpectation;
 		if (bOutdated) {
-			this.mock(oBinding).expects("setOutdated").withExactArgs("deleteViaPath");
+			oSetOutdatedExpectation = this.mock(oBinding).expects("setOutdated")
+				.withExactArgs("deleteWithoutGrandTotalUpdate", undefined, undefined,
+					sinon.match.same(oContext));
 		}
-		this.mock(oBinding).expects("delete")
+		const oDeleteExpectation = this.mock(oBinding).expects("delete")
 			.withExactArgs(null, "canonical/path", sinon.match.same(oContext))
 			.callsFake(function () {
 				assert.strictEqual(iResets, 3);
@@ -4601,6 +4604,12 @@ sap.ui.define([
 
 		// code under test
 		oBinding.onDelete("/canonical/path");
+
+		if (bOutdated) {
+			// call setOutdated before the entry is deleted from the cache to be able to determine
+			// the affected subtotals based on the grouping values
+			sinon.assert.callOrder(oSetOutdatedExpectation, oDeleteExpectation);
+		}
 	});
 });
 

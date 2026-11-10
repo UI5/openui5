@@ -5466,13 +5466,23 @@ sap.ui.define([
 
 	/**
 	 * Sets the outdated flags at the grand total, the subtotals, and the header context, depending
-	 * on the given use case and paths, the current filters, sorters, search, custom query options,
-	 * and grouping information.
+	 * on the given use case, paths and context as well as the current filters, sorters, search,
+	 * custom query options, and grouping information.
 	 *
 	 * If search or custom query options are used, the client cannot know whether they affect the
 	 * grand total, the subtotals, or the table structure, so a manual refresh might be needed and
-	 * the grand total, the subtotals and the header context are set to outdated (except when
-	 * deleting an entity via its context).
+	 * the grand total, the subtotals and the header context are set to outdated.
+	 *
+	 * When deleting an entity all subtotals belonging to the deleted entity's ancestors are
+	 * affected and set to outdated. A manual refresh is needed to get the current values. If the
+	 * deleted entity's ancestors cannot be determined because not all grouping values are
+	 * available, it cannot be determined which subtotals are affected so all subtotals are marked
+	 * as outdated.
+	 *
+	 * When deleting an entity via its context, the grand total is automatically requested, so the
+	 * grand total is not set to outdated. When deleting an entity via its canonical path, the grand
+	 * total is not automatically requested so the grand total may have changed and needs to be
+	 * marked as outdated.
 	 *
 	 * Setting the outdated flag at the header context means that a manual refresh might be needed
 	 * to get the list up-to-date, so setting the grand total or subtotals to outdated also causes
@@ -5490,9 +5500,10 @@ sap.ui.define([
 	 *       list and no refresh is needed; the grand total is never set to outdated; subtotals
 	 *       belonging to the deleted entity's ancestors are set to outdated if its grouping values
 	 *       are available, otherwise all subtotals are set to outdated;
-	 *     <li> "deleteViaPath": an entity was deleted via its path and no grand total is requested,
-	 *       so a manual refresh is needed; the grand total is set to outdated; subtotals are set to
-	 *       outdated;
+	 *     <li> "deleteWithoutGrandTotalUpdate": an entity was deleted via its canonical path; the
+	 *       grand total is not requested automatically, so it is outdated and a manual refresh is
+	 *       needed; subtotals belonging to the deleted entity's ancestors are set to outdated if
+	 *       their grouping values are available, otherwise all subtotals are set to outdated;
 	 *     <li> "refreshEntity": a single entity is refreshed; if there are filters, sorters or
 	 *       grouping, a manual refresh might be needed; the grand total is additionally set to
 	 *       outdated if there are any filters; subtotals are set to outdated;
@@ -5512,12 +5523,13 @@ sap.ui.define([
 	 *   Whether the properties given in <code>aPaths</code> are updated without sending a PATCH
 	 *   request to the server; if <code>true</code>, <code>aPaths</code> is mandatory
 	 * @param {sap.ui.model.odata.v4.Context} [oContext]
-	 *   The affected context; supported only for use case "delete"
+	 *   The affected context; supported only for use cases "delete" and
+	 *   "deleteWithoutGrandTotalUpdate"
 	 * @throws {Error}
 	 *   If <code>sUseCase</code> is unknown, <code>aPaths</code> are not supported by the given use
-	 *   case, <code>oContext</code> is given for another use case than "delete", or if
-	 *   <code>bNoRequest</code> is set and the header context gets outdated or the property with
-	 *   the given path contributes to the grand total
+	 *   case, <code>oContext</code> is given for another use case than "delete" or
+	 *   "deleteWithoutGrandTotalUpdate", or if <code>bNoRequest</code> is set and the header
+	 *   context gets outdated or the property with the given path contributes to the grand total
 	 *
 	 * @private
 	 */
@@ -5526,7 +5538,7 @@ sap.ui.define([
 			if (sUseCase && aPaths) {
 				throw new Error(`Use case '${sUseCase}' does not support paths`);
 			}
-			if (oContext && sUseCase !== "delete") {
+			if (oContext && !sUseCase.startsWith("delete")) {
 				throw new Error(`Use case '${sUseCase}' does not support a context`);
 			}
 			const oAggregation = this.mParameters.$$aggregation;
@@ -5551,7 +5563,7 @@ sap.ui.define([
 					// if the last entry in a group is deleted
 					bHeaderContextOutdated = bVisualGrouping;
 					break;
-				case "deleteViaPath":
+				case "deleteWithoutGrandTotalUpdate":
 					// no grand total is requested -> set grand total and header context to outdated
 					bGrandTotalOutdated = true;
 					bHeaderContextOutdated = true;

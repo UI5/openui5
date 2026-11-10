@@ -11178,7 +11178,8 @@ sap.ui.define([
 //*********************************************************************************************
 [false, true].forEach((bDataAggregation) => {
 	[false, true].forEach((bWithAggregationCache) => {
-		["createActive", "deleteViaPath", "delete", "refreshEntity"].forEach((sUseCase) => {
+		["createActive", "deleteWithoutGrandTotalUpdate", "delete", "refreshEntity"]
+			.forEach((sUseCase) => {
 			[{
 				title : "$search parameter",
 				setup : function (oBinding) {
@@ -11237,8 +11238,8 @@ sap.ui.define([
 		+ ", aGroupLevels=" + JSON.stringify(aGroupLevels) + ", bWithContext=" + bWithContext
 		+ ", " + oFixture.title;
 
-	if (sUseCase !== "delete" && bWithContext) {
-		return; // context is only supported for the "delete" use case
+	if (sUseCase !== "delete" && sUseCase !== "deleteWithoutGrandTotalUpdate" && bWithContext) {
+		return; // context is only supported for deletion
 	}
 
 	QUnit.test(sTitle, function (assert) {
@@ -11251,7 +11252,7 @@ sap.ui.define([
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
 			.returns(bDataAggregation);
-		const bForce = sUseCase === "deleteViaPath";
+		const bForce = sUseCase === "deleteWithoutGrandTotalUpdate";
 		this.mock(oBinding).expects("isFilteredBy")
 			.exactly(bDataAggregation && !bForce && "isFilteredByResult" in oFixture
 				&& sUseCase !== "delete" ? 1 : 0)
@@ -11473,7 +11474,8 @@ sap.ui.define([
 	});
 
 	//*********************************************************************************************
-	QUnit.test("setOutdated: use case does not support a context", function (assert) {
+["", "createActive", "refreshEntity", "foo"].forEach((sUseCase) => {
+	QUnit.test("setOutdated: use case does not support a context: " + sUseCase, function (assert) {
 		const oBinding = this.bindList("/EMPLOYEES");
 		this.mock(_Helper).expects("isDataAggregation")
 			.withExactArgs(sinon.match.same(oBinding.mParameters))
@@ -11481,9 +11483,10 @@ sap.ui.define([
 
 		assert.throws(() => {
 			// code under test
-			oBinding.setOutdated("foo", undefined, undefined, "~context~");
-		}, new Error("Use case 'foo' does not support a context"));
+			oBinding.setOutdated(sUseCase, undefined, undefined, "~context~");
+		}, new Error(`Use case '${sUseCase}' does not support a context`));
 	});
+});
 
 	//*********************************************************************************************
 	QUnit.test("setOutdated: unknown use case", function (assert) {
