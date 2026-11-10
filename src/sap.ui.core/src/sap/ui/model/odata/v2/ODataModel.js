@@ -2919,7 +2919,7 @@ sap.ui.define([
 	 * Please make sure that the metadata document is loaded before using this function.
 	 *
 	 * @param {string} sCollection Name of the collection
-	 * @param {Object<string, string>} oKeyProperties Object containing at least all the key properties of the entity type
+	 * @param {Object<string, any>} oKeyProperties Object containing at least all the key properties of the entity type
 	 * @returns {string} Key of the entry
 	 * @public
 	 */
