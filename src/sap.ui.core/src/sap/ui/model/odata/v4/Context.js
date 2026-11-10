@@ -451,7 +451,7 @@ sap.ui.define([
 	 *   binding. W/o a lock, this is ignored.
 	 * @param {sap.ui.model.odata.v4.ODataParentBinding} oBinding
 	 *   The binding to perform the deletion at
-	 * @param {function} fnCallback
+	 * @param {function(number,number,boolean):void} fnCallback
 	 *   A function which is called immediately when an entity has been deleted from the cache, or
 	 *   when it was re-inserted; the index of the entity and an offset (-1 for deletion, 1 for
 	 *   re-insertion) are passed as parameter; additionally, in case of deletion with undefined

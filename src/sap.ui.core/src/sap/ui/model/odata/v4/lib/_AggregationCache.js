@@ -111,9 +111,10 @@ sap.ui.define([
 	 * @param {object} [oETagEntity]
 	 *   An entity with the ETag of the binding for which the deletion was requested, see
 	 *   {@link sap.ui.model.odata.v4.lib._Cache#_delete}
-	 * @param {function(number,number):void} fnCallback
+	 * @param {function(number,number,boolean):void} fnCallback
 	 *   A function which is called immediately with the node's index and offset -1 as parameter
-	 *   when the node has been deleted from the cache; reinsertion does not occur
+	 *   when the node has been deleted from the cache; reinsertion does not occur; additionally, in
+	 *   case of deletion with undefined index, a flag is passed whether the leaf count has changed
 	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a result in case of success, or rejected with an
 	 *   instance of <code>Error</code> in case of failure

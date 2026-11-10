@@ -641,10 +641,12 @@ sap.ui.define([
 	 *   An entity with the ETag of the binding for which the deletion was requested. This is
 	 *   provided if the deletion is delegated from a context binding with empty path to a list
 	 *   binding. W/o a lock, this is ignored.
-	 * @param {function} fnCallback
-	 *  A function which is called immediately when an entity has been deleted from the cache, or
+	 * @param {function(number,number,boolean):void} fnCallback
+	 *   A function which is called immediately when an entity has been deleted from the cache, or
 	 *   when it was re-inserted; the index of the entity and an offset (-1 for deletion, 1 for
-	 *   re-insertion) are passed as parameter
+	 *   re-insertion) are passed as parameter; additionally, in case of deletion with undefined
+	 *   index (which cannot happen for a recursive hierarchy), a flag is passed whether the leaf
+	 *   count has changed
 	 * @returns {sap.ui.base.SyncPromise<void>}
 	 *   A promise which is resolved without a result in case of success, or rejected with an
 	 *   instance of <code>Error</code> in case of failure; returns <code>undefined</code> if the
