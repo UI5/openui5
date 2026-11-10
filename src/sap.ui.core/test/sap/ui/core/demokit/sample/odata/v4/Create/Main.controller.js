@@ -1,9 +1,8 @@
 sap.ui.define([
 	"sap/m/MessageBox",
 	"sap/ui/core/Messaging",
-	"sap/ui/core/message/MessageType",
 	"sap/ui/core/mvc/Controller"
-], function (MessageBox, Messaging, MessageType, Controller) {
+], function (MessageBox, Messaging, Controller) {
 	"use strict";
 
 	return Controller.extend("sap.ui.core.sample.odata.v4.Create.Main", {
@@ -36,9 +35,7 @@ sap.ui.define([
 
 		onSaveSalesOrder : function () {
 			const aAllMessages = Messaging.getMessageModel().getObject("/");
-			const aValidationErrors = aAllMessages.filter((oMessage) => {
-				return oMessage.getType() === MessageType.Error && !oMessage.getPersistent();
-			});
+			const aValidationErrors = aAllMessages.filter((oMessage) => oMessage.isValidation());
 			if (!aValidationErrors.length) {
 				Messaging.removeMessages( // drop old backend messages to try again
 					aAllMessages.filter((oMessage) => oMessage.getPersistent()));
