@@ -572,35 +572,34 @@ sap.ui.define([
 			aDates;
 
 		// act
-		aDates = oDateRangeSelection._parseValue("17.01.2019 " + String.fromCharCode(45) + " 18.01.2019");
+		aDates = oDateRangeSelection._splitValueByDelimiter("17.01.2019 " + String.fromCharCode(45) + " 18.01.2019");
 		//assert
-		assert.ok(aDates[0], "Using hyphen(45) as delimiter: The first date is parsed");
-		assert.ok(aDates[1], "Using hyphen(45) as delimiter: The second date is parsed");
+		assert.notEqual(aDates[0], null, "Using hyphen(45) as delimiter: The first value exists");
+		assert.notEqual(aDates[1], undefined, "Using dash 45 as delimiter: The second value exists");
 
 		// act
-		aDates = oDateRangeSelection._parseValue("17.01.2019 " + String.fromCharCode(8211) + " 18.01.2019");
+		aDates = oDateRangeSelection._splitValueByDelimiter("17.01.2019 " + String.fromCharCode(8211) + " 18.01.2019");
 		//assert
-		assert.ok(aDates[0], "Using endash(8211) as delimiter: The first date is parsed");
-		assert.ok(aDates[1], "Using endash(8211) as delimiter: The second date is parsed");
+		assert.notEqual(aDates[0], null, "Using endash(8211) as delimiter: The first value exists");
+		assert.notEqual(aDates[1], undefined, "Using dash 8211 as delimiter: The second value exists");
 
 		// act
-		aDates = oDateRangeSelection._parseValue("17.01.2019 " + String.fromCharCode(8212) + " 18.01.2019");
+		aDates = oDateRangeSelection._splitValueByDelimiter("17.01.2019 " + String.fromCharCode(8212) + " 18.01.2019");
 		//assert
-		assert.ok(aDates[0], "Using emdash(8212) as delimiter: The first date is parsed");
-		assert.ok(aDates[1], "Using emdash(8212) as delimiter: The second date is parsed");
+		assert.notEqual(aDates[0], null, "Using emdash(8212) as delimiter: The first value exists");
+		assert.notEqual(aDates[1], undefined, "Using dash 8212 as delimiter: The second value exists");
 
 		// act
-		aDates = oDateRangeSelection._parseValue("17.01.2019");
+		aDates = oDateRangeSelection._splitValueByDelimiter("17.01.2019");
 		//assert
-		assert.ok(aDates[0], "Passing only one date without a delimiter: The first date is parsed");
-		assert.notOk(aDates[1], "Passing only one date without a delimiter: The second date is not parsed");
+		assert.notEqual(aDates[0], null, "Passing only one date without a delimiter: The first value exists");
+		assert.ok(!aDates[1], "Passing only one date without a delimiter: The second value does not exist");
 
 		// act
-		aDates = oDateRangeSelection._parseValue("");
+		aDates = oDateRangeSelection._splitValueByDelimiter("");
 		//assert
 		assert.ok(Array.isArray(aDates), "Passing an empty string as a value: The returned value is an array");
-		assert.notOk(aDates[0], "Passing an empty string as a value: The first date is not parsed");
-		assert.notOk(aDates[1], "Passing an empty string as a value: The second date is not parsed");
+		assert.equal(aDates.length, 0, "Passing an empty string as a value: The returned array is empty");
 
 		//clean
 		oDateRangeSelection.destroy();
@@ -619,9 +618,15 @@ sap.ui.define([
 				dateValue: UI5Date.getInstance(2019,0,17),
 				secondDateValue: UI5Date.getInstance(2019,0,18)
 			});
+		let aDates;
 
 		// act
-		const aDates = oDateRangeSelection._parseValue(sFirstDate + String.fromCharCode(45) + sSecondDate);
+		aDates = oDateRangeSelection._splitValueByDelimiter(sFirstDate + String.fromCharCode(45) + sSecondDate);
+		//assert
+		assert.strictEqual(aDates.length, 6, "When the same symbol is used as both the delimiter and separator, an array of all the date components is obtained");
+
+		// act
+		aDates = oDateRangeSelection._parseValue(sFirstDate + String.fromCharCode(45) + sSecondDate);
 
 		//assert
 		assert.strictEqual(aDates.length, 2, "When the same symbol is used as both the delimiter and separator, the array contains only two dates");
@@ -642,9 +647,15 @@ sap.ui.define([
 				delimiter:'-',
 				value: "Nov 1, 2022"
 			});
+		let aDates;
 
 		// act
-		const aDates = oDateRangeSelection._parseValue(sFirstDate);
+		aDates = oDateRangeSelection._splitValueByDelimiter(sFirstDate);
+		//assert
+		assert.strictEqual(aDates.length, 3, "");
+
+		// act
+		aDates = oDateRangeSelection._parseValue(sFirstDate);
 
 		//assert
 		assert.strictEqual(aDates.length, 2, "When a date is submitted, it is expected to be broken down into three components.");
@@ -1673,10 +1684,10 @@ sap.ui.define([
 				displayFormat: "yyyyMMdd",
 				delimiter: "-"
 			}),
-			sExpectedErrorMsg1 = "dateValue " + oSut.getDateValue().toString() + "(value=20170101) does " +
+			sExpectedErrorMsg1 = "dateValue " + oSut.getDateValue().toString() + "(value=20170101 - 20170101) does " +
 				"not match min/max date range(" + oNewMinDate.toString() + " - " + oDefaultMaxDate.toString() + "). " +
 				"App. developers should take care to maintain dateValue/value accordingly.",
-			sExpectedErrorMsg2 = "secondDateValue " + oSut.getSecondDateValue().toString() + "(value=20170101) " +
+			sExpectedErrorMsg2 = "secondDateValue " + oSut.getSecondDateValue().toString() + "(value=20170101 - 20170101) " +
 				"does not match min/max date range(" + oNewMinDate.toString() + " - " + oDefaultMaxDate.toString() + "). " +
 				"App. developers should take care to maintain secondDateValue/value accordingly.",
 			oSpySetProperty = this.spy(oSut, "setProperty"),
@@ -1712,11 +1723,11 @@ sap.ui.define([
 				displayFormat: "yyyyMMdd",
 				delimiter: "-"
 			}),
-			sExpectedErrorMsg1 = "dateValue " + oSut.getDateValue().toString() + "(value=20170101) does" +
+			sExpectedErrorMsg1 = "dateValue " + oSut.getDateValue().toString() + "(value=20170101 - 20170101) does" +
 				" not match min/max date range(" + oDefaultMinDate.toString() + " - " +
 				UI5Date.getInstance(oNewMaxDate.setHours(23, 59, 59)).toString() + "). App. developers should take care to " +
 				"maintain dateValue/value accordingly.",
-			sExpectedErrorMsg2 = "secondDateValue " + oSut.getSecondDateValue().toString() + "(value=20170101) does" +
+			sExpectedErrorMsg2 = "secondDateValue " + oSut.getSecondDateValue().toString() + "(value=20170101 - 20170101) does" +
 				" not match min/max date range(" + oDefaultMinDate.toString() + " - " +
 				UI5Date.getInstance(oNewMaxDate.setHours(23, 59, 59)).toString() + "). App. developers should take care to " +
 				"maintain secondDateValue/value accordingly.",
