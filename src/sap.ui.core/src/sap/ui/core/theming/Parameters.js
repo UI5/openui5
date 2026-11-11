@@ -43,6 +43,7 @@ sap.ui.define([
 	const parsedLibraries = new Set();
 	const aCallbackRegistry = [];
 	const rCssUrl = /url[\s]*\('?"?([^\'")]*)'?"?\)/;
+	const rSingleCssUrl = /^\s*url\s*\('?"?([^'")]*)'?"?\)\s*$/;
 
 	/** @deprecated */
 	const sBootstrapOrigin = new URL(sap.ui.require.toUrl(""), document.baseURI).origin;
@@ -76,6 +77,29 @@ sap.ui.define([
 		}
 
 		return sUrl;
+	}
+
+	/**
+	 * Checks whether the given parameter value consists of a single relative CSS URL.
+	 *
+	 * Values with further content besides the URL (e.g. <code>url(img.png) no-repeat</code>) and empty URLs are
+	 * not considered, as the resolved library parameter would only contain the URL or point to the theme folder.
+	 *
+	 * @param {string} sValue the parameter value
+	 * @returns {boolean} whether the value is a relative CSS URL
+	 */
+	function isRelativeCssUrl(sValue) {
+		const aMatch = rSingleCssUrl.exec(sValue);
+		if (!aMatch?.[1]) {
+			// no URL or an empty URL (e.g. "url()"), which must not be resolved to the theme folder
+			return false;
+		}
+		try {
+			return !new _URL(aMatch[1]).isAbsolute();
+		} catch (e) {
+			// not a valid URL: keep the value as is
+			return false;
+		}
 	}
 
 	function mergeParameters(mNewParameters, sThemeBaseUrl) {
@@ -324,8 +348,23 @@ sap.ui.define([
 					//       However: empty values for our theming parameters are most likely not valid, so the simple empty check should be enough.
 					//       Still, without an existence check we cannot cache empty results as momentarily non-existent parameter might come async through another library.
 					if (sCustomPropValue.trim() !== "") {
-						mCustomPropertiesParameters[sCustomPropName] = sCustomPropValue;
-						return mCustomPropertiesParameters[sCustomPropName];
+						if (!isRelativeCssUrl(sCustomPropValue)) {
+							mCustomPropertiesParameters[sCustomPropName] = sCustomPropValue;
+							return sCustomPropValue;
+						}
+						// The computed value of a CSS custom property contains relative URLs as declared, but not the
+						// location of the stylesheet declaring it. Resolving such a URL against the document or any
+						// other stylesheet would point to the wrong location, so the URL is taken from the library
+						// parameters, which are resolved against the theme folder of the declaring library.
+						processLibraries(parseParameters);
+						const sResolvedValue = mParameters[sParameterName];
+						if (sResolvedValue !== undefined) {
+							mCustomPropertiesParameters[sCustomPropName] = sResolvedValue;
+							return sResolvedValue;
+						}
+						// No library parameter available: return the value as declared (not cached, as the
+						// library parameters might still become available, e.g. via another library)
+						return sCustomPropValue;
 					}
 				}
 			} else {
@@ -526,7 +565,8 @@ sap.ui.define([
 			const resolveWithParameter = function () {
 				Theming.detachApplied(resolveWithParameter);
 				const vParams = this.get({ // Don't pass callback again
-					name: vName.name
+					name: vName.name,
+					_restrictedParseUrls: bParseUrls
 				});
 
 				if (!vParams || (typeof vParams === "object" && (Object.keys(vParams).length !== aNames.length))) {

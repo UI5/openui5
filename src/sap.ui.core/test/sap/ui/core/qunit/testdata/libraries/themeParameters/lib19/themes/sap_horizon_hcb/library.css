@@ -1,0 +1,13 @@
+/* Inline theming parameters */
+#sap-ui-theme-testlibs\.themeParameters\.lib19{background-image:url('data:text/plain;utf-8,%7B%22default%22%3A%7B%22sapUiTstCssVarRelUrl%22%3A%22url(..%2F..%2Fimg%2Flogo.png)%22%2C%22sapUiTstCssVarAbsUrl%22%3A%22url(%27https%3A%2F%2Fexample.com%2Flogo.png%27)%22%2C%22sapUiTstCssVarRelUrlWithTokens%22%3A%22url(..%2F..%2Fimg%2Fbg.png)%20no-repeat%22%2C%22sapUiTstCssVarEmptyUrl%22%3A%22url()%22%7D%2C%22scopes%22%3A%7B%7D%7D')}
+
+/* CSS custom properties: relative URLs are relative to this stylesheet */
+:root {
+	--sapUiTstCssVarRelUrl: url(../../img/logo.png);
+	--sapUiTstCssVarAbsUrl: url('https://example.com/logo.png');
+	--sapUiTstCssVarRelUrlOnly: url(../../img/only.png);
+	--sapUiTstCssVarInvalidUrl: url(http://[);
+	--sapUiTstCssVarRelUrlWithTokens: url(../../img/bg.png) no-repeat;
+	--sapUiTstCssVarPlain: #fafafa;
+	--sapUiTstCssVarEmptyUrl: url();
+}
