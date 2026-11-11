@@ -16,7 +16,10 @@ sap.ui.define([
 	"sap/ui/core/date/UI5Date",
 	"sap/ui/integration/formatters/IconFormatter",
 	"qunit/designtime/EditorQunitUtils",
-	"sap/base/util/deepEqual"
+	"sap/base/util/deepEqual",
+	"sap/ui/integration/editor/EditorFieldManager",
+	"sap/ui/integration/editor/fields/ObjectField",
+	"sap/ui/integration/editor/fields/ObjectListField"
 ], function(
 	merge,
 	x,
@@ -34,7 +37,10 @@ sap.ui.define([
 	UI5Date,
 	IconFormatter,
 	EditorQunitUtils,
-	deepEqual
+	deepEqual,
+	EditorFieldManager,
+	ObjectField,
+	ObjectListField
 ) {
 	"use strict";
 
@@ -4088,6 +4094,108 @@ sap.ui.define([
 				}.bind(this));
 			}.bind(this));
 		});*/
+	});
+
+	QUnit.module("Concurrent editor initialization", {
+		beforeEach: function () {
+			this._savedFields = EditorFieldManager.Fields;
+			this._savedPromise = EditorFieldManager._requireFieldsPromise;
+			EditorFieldManager.Fields = null;
+			EditorFieldManager._requireFieldsPromise = null;
+			this.aEditors = [];
+		},
+		afterEach: function () {
+			sandbox.restore();
+			EditorFieldManager.Fields = this._savedFields;
+			EditorFieldManager._requireFieldsPromise = this._savedPromise;
+			this.aEditors.forEach(function (oEditor) {
+				EditorQunitUtils.destroyEditor(oEditor);
+			});
+			this.aEditors = [];
+		}
+	}, function () {
+		QUnit.test("Fields set only after loadDependencies resolves", function (assert) {
+			const done = assert.async();
+
+			let fnResolveDeps;
+			const oDeferredPromise = new Promise(function (resolve) {
+				fnResolveDeps = resolve;
+			});
+
+			sandbox.stub(ObjectField, "loadDependencies").returns(oDeferredPromise);
+			sandbox.stub(ObjectListField, "loadDependencies").returns(oDeferredPromise);
+
+			const oDesigntime = {
+				form: {
+					items: {
+						"objectParam": {
+							"manifestpath": "/sap.card/configuration/parameters/objectParam/value",
+							"type": "object",
+							"label": "Object Field",
+							"properties": {
+								"key": { "label": "Key" },
+								"text": { "label": "Text" }
+							}
+						},
+						"objectListParam": {
+							"manifestpath": "/sap.card/configuration/parameters/objectListParam/value",
+							"type": "object[]",
+							"label": "Object List Field",
+							"properties": {
+								"key": { "label": "Key" },
+								"text": { "label": "Text" }
+							}
+						}
+					}
+				}
+			};
+
+			const oFirstPromise = EditorFieldManager.requireFields();
+			const oSecondPromise = EditorFieldManager.requireFields();
+			assert.strictEqual(oFirstPromise, oSecondPromise, "requireFields() returns the same promise on concurrent calls (1st === 2nd)");
+			assert.strictEqual(EditorFieldManager.Fields, null, "Fields is null while loadDependencies is pending");
+
+			let oContent = document.getElementById("content");
+			if (!oContent) {
+				oContent = document.createElement("div");
+				oContent.setAttribute("id", "content");
+				document.body.appendChild(oContent);
+			}
+
+			const iEditorCount = 5;
+			const aReadyPromises = [];
+			for (var i = 0; i < iEditorCount; i++) {
+				var oEditor = new Editor({ designtime: oDesigntime });
+				oEditor.setJson({
+					baseUrl: sBaseUrl,
+					manifest: {
+						"sap.app": { "id": "test.sample", "i18n": "../i18n/i18n.properties" },
+						"sap.card": {
+							"type": "List",
+							"configuration": {
+								"parameters": {
+									"objectParam": { "value": { "key": "key01", "text": "text01" } },
+									"objectListParam": { "value": [{ "key": "key01", "text": "text01" }] }
+								}
+							}
+						}
+					}
+				});
+				oEditor.placeAt(oContent);
+				this.aEditors.push(oEditor);
+
+				aReadyPromises.push(EditorQunitUtils.isFieldReady(oEditor).then(function (oEd) {
+					assert.ok(oEd.isFieldReady(), "Editor " + oEd.getId() + " fired fieldReady after deps resolved");
+				}.bind(null, oEditor)));
+			}
+
+			const oThirdPromise = EditorFieldManager.requireFields();
+			assert.strictEqual(oFirstPromise, oThirdPromise, "requireFields() still returns the same promise after editors started");
+			assert.strictEqual(EditorFieldManager.Fields, null, "Fields is still null while editors are initializing and deps are pending");
+			fnResolveDeps();
+
+			Promise.all(aReadyPromises).then(done);
+		});
 	});
 
 	QUnit.done(function () {

@@ -63,6 +63,7 @@ sap.ui.define([
 
 	// Loaded field classes, populated by requireFields
 	EditorFieldManager.Fields = null;
+	EditorFieldManager._requireFieldsPromise = null;
 
 	/**
 	 * Loads all field modules registered in EditorFieldManager._fieldMap and stores the classes in EditorFieldManager.Fields
@@ -70,27 +71,32 @@ sap.ui.define([
 	 * @returns {Promise}
 	 */
 	EditorFieldManager.requireFields = function () {
-		if (EditorFieldManager.Fields) {
-			return Promise.resolve();
+		if (EditorFieldManager._requireFieldsPromise) {
+			return EditorFieldManager._requireFieldsPromise;
 		}
-		return new Promise(function (resolve) {
+
+		EditorFieldManager._requireFieldsPromise = new Promise(function (resolve) {
 			sap.ui.require(Object.values(EditorFieldManager._fieldMap), function () {
-				EditorFieldManager.Fields = {};
+				const oFields = {};
 				for (var n in EditorFieldManager._fieldMap) {
-					EditorFieldManager.Fields[n] = arguments[Object.keys(EditorFieldManager._fieldMap).indexOf(n)];
+					oFields[n] = arguments[Object.keys(EditorFieldManager._fieldMap).indexOf(n)];
 				}
 
 				const aFieldsDependencies = [];
 
-				for (const FieldClass of Object.values(EditorFieldManager.Fields)) {
+				for (const FieldClass of Object.values(oFields)) {
 					if (FieldClass.loadDependencies) {
 						aFieldsDependencies.push(FieldClass.loadDependencies());
 					}
 				}
 
-				Promise.all(aFieldsDependencies).then(resolve);
+				Promise.all(aFieldsDependencies).then(function () {
+					EditorFieldManager.Fields = oFields;
+					resolve();
+				});
 			});
 		});
+		return EditorFieldManager._requireFieldsPromise;
 	};
 
 	/**
