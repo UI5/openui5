@@ -390,6 +390,45 @@ sap.ui.define([
 			return this.oAddIFrameDialog.open(this.oDialogSettings, oReferenceControl);
 		});
 
+		QUnit.test("When searching available parameters then names and values are considered", function(assert) {
+			this.oAddIFrameDialog.attachOpened(() => {
+				const oSearchField = Element.getElementById("sapUiRtaAddIFrameDialog_ParametersSearch");
+				const oBinding = Element.getElementById("sapUiRtaAddIFrameDialog_ParameterTable").getBinding("items");
+				const aSearchCases = [{
+					query: "reg",
+					labels: ["Region"]
+				}, {
+					query: "germ",
+					labels: ["Region"]
+				}, {
+					query: "name",
+					labels: ["CampaignName", "BrandName"]
+				}, {
+					query: "langnese",
+					labels: ["CampaignName", "BrandName"]
+				}, {
+					query: "202",
+					labels: ["Year"]
+				}, {
+					query: "no match",
+					labels: []
+				}, {
+					query: "",
+					labels: this.oDialogSettings.parameters.map((oParameter) => oParameter.label)
+				}];
+				aSearchCases.forEach((oSearchCase) => {
+					oSearchField.fireLiveChange({ newValue: oSearchCase.query });
+					assert.deepEqual(
+						oBinding.getContexts().map((oContext) => oContext.getProperty("label")),
+						oSearchCase.labels,
+						`then searching for '${oSearchCase.query}' returns the matching parameters`
+					);
+				});
+				clickOnCancel();
+			});
+			return this.oAddIFrameDialog.open(this.oDialogSettings, oReferenceControl);
+		});
+
 		QUnit.test("When URL parameters are added then the frame URL is built correctly", function(assert) {
 			this.oAddIFrameDialog.attachOpened(async () => {
 				await setTextAreaValue(this.oAddIFrameDialog._oDialog, "someUrl");
@@ -490,6 +529,8 @@ sap.ui.define([
 				);
 				const oPopover = Element.getElementById("sapUiRtaAddIFrameDialog_ParametersInfoPopover");
 				assert.ok(oPopover, "then the info popover exists as a dependent of the dialog");
+				assert.notOk(oPopover.getShowHeader(), "then the popover has no unnecessary header");
+				assert.strictEqual(oPopover.getContentWidth(), "20rem", "then the popover has the intended content width");
 				assert.notOk(oPopover.isOpen(), "then the popover is initially closed");
 				oPopover.attachEventOnce("afterOpen", function() {
 					assert.ok(oPopover.isOpen(), "then the popover opens when the info button is pressed");

@@ -459,9 +459,9 @@
 		<dependents>
 			<Popover
 				id="sapUiRtaAddIFrameDialog_ParametersInfoPopover"
-				title="{i18n>IFRAME_ADDIFRAME_DIALOG_PARAMETERS_LABEL}"
 				placement="Auto"
 				contentWidth="20rem"
+				showHeader="false"
 				class="sapUiContentPadding sapUiRtaAddIFrameDialogParametersInfoPopover"
 			>
 				<Text text="{i18n>IFRAME_ADDIFRAME_DIALOG_PARAMETERS_INFO_TEXT}"/>

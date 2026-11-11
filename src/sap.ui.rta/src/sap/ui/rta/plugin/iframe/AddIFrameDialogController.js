@@ -275,7 +275,21 @@ sap.ui.define([
 		 * @param {sap.ui.base.Event} oEvent - Event
 		 */
 		onLiveChange(oEvent) {
-			const oFilter = new Filter("label", FilterOperator.Contains, oEvent.getParameter("newValue"));
+			const sSearchValue = oEvent.getParameter("newValue").toLowerCase();
+			const oFilter = new Filter({
+				filters: [
+					new Filter("label", FilterOperator.Contains, sSearchValue),
+					new Filter({
+						path: "value",
+						test: (vValue) => (
+							vValue !== null
+							&& vValue !== undefined
+							&& String(vValue).toLowerCase().includes(sSearchValue)
+						)
+					})
+				],
+				and: false
+			});
 			const oBinding = Element.getElementById("sapUiRtaAddIFrameDialog_ParameterTable").getBinding("items");
 			oBinding.filter([oFilter]);
 		},
