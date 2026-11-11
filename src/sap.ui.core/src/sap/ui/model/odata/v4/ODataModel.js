@@ -1615,8 +1615,8 @@ sap.ui.define([
 	 *   been deleted by someone else and report success
 	 * @returns {Promise<void>}
 	 *   A promise which is resolved without a defined result when the delete succeeded, or rejected
-	 *   with an instance of Error otherwise. In the latter case the HTTP status code of the
-	 *   response is given in the error's property <code>status</code>.
+	 *   with an instance of Error otherwise. If the DELETE request fails, the HTTP status code of
+	 *   the response is given in the error's property <code>status</code>.
 	 * @throws {Error} If
 	 *   <ul>
 	 *     <li> the path does not start with a '/',
@@ -1663,9 +1663,9 @@ sap.ui.define([
 				} // else: map 404/412 to 204
 			}).then(function () {
 				if (bInAllBindings) {
-					that.aAllBindings.forEach(function (oBinding) {
-						oBinding.onDelete(vCanonicalPath);
-					});
+					return SyncPromise.all(that.aAllBindings.map((oBinding) => {
+						return oBinding.onDelete(vCanonicalPath);
+					})).then(() => {}); // resolve without a result
 				}
 			});
 		});

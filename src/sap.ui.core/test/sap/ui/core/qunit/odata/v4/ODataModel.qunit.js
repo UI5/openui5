@@ -3475,7 +3475,8 @@ sap.ui.define([
 	{iStatus : 412, bSuccess : true},
 	{iStatus : 500, bSuccess : false},
 	{bRejectIfNotFound : true, iStatus : 404, bSuccess : false},
-	{bRejectIfNotFound : true, iStatus : 412, bSuccess : false}
+	{bRejectIfNotFound : true, iStatus : 412, bSuccess : false},
+	{bOnDeleteRejects : true, iStatus : 204, bSuccess : true}
 ].forEach(function (oFixture) {
 	[undefined, "group"].forEach(function (sGroupId) {
 		[false, true].forEach(function (bServerOnly) {
@@ -3494,9 +3495,12 @@ sap.ui.define([
 			oError = new Error(),
 			bInAllBindings = oFixture.bSuccess && !bServerOnly,
 			oModel = this.createModel("?sap-client=123"),
+			oOnDeleteError = new Error(),
 			oPromise,
 			// w/o If-Match:*, 412 must not be ignored!
-			bSuccess = oFixture.bSuccess && !(bServerOnly && oFixture.iStatus === 412);
+			bSuccess = oFixture.bSuccess && !(bServerOnly && oFixture.iStatus === 412),
+			bOverallSuccess = bSuccess
+				&& (bServerOnly || !oFixture.bOnDeleteRejects);
 
 		oError.status = oFixture.iStatus;
 		oModel.aAllBindings = aAllBindings;
@@ -3527,9 +3531,11 @@ sap.ui.define([
 			.withExactArgs("Failed to delete " + sCanonicalPath, sClassName,
 				sinon.match.same(oError));
 		this.mock(aAllBindings[0]).expects("onDelete").exactly(bInAllBindings ? 1 : 0)
-			.withExactArgs(sCanonicalPath);
+			.withExactArgs(sCanonicalPath)
+			.returns("~onDeleteResult0~");
 		this.mock(aAllBindings[1]).expects("onDelete").exactly(bInAllBindings ? 1 : 0)
-			.withExactArgs(sCanonicalPath);
+			.withExactArgs(sCanonicalPath)
+			.returns("~onDeleteResult1~");
 
 		// code under test
 		oPromise = oModel.delete(bServerOnly ? oContext : sCanonicalPath, sGroupId,
@@ -3537,11 +3543,21 @@ sap.ui.define([
 
 		assert.ok(oPromise instanceof Promise);
 
-		return oPromise.then(function () {
-				assert.ok(bSuccess);
+		// called asynchronously
+		this.mock(SyncPromise).expects("all").exactly(bInAllBindings ? 1 : 0)
+			.withExactArgs(["~onDeleteResult0~", "~onDeleteResult1~"])
+			.callsFake(() => {
+				return SyncPromise.resolve(oFixture.bOnDeleteRejects
+					? Promise.reject(oOnDeleteError)
+					: Promise.resolve("n/a"));
+			});
+
+		return oPromise.then(function (vResult) {
+				assert.ok(bOverallSuccess);
+				assert.strictEqual(vResult, undefined, "resolves without a result");
 			}, function (oResult) {
-				assert.notOk(bSuccess);
-				assert.strictEqual(oResult, oError);
+				assert.notOk(bOverallSuccess);
+				assert.strictEqual(oResult, oFixture.bOnDeleteRejects ? oOnDeleteError : oError);
 			});
 	});
 			});

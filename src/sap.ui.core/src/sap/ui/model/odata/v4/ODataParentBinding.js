@@ -1329,7 +1329,8 @@ sap.ui.define([
 				oBinding.resetChanges();
 			});
 			this.setOutdated?.("deleteWithoutGrandTotalUpdate", undefined, undefined, oContext);
-			this.delete(null, sCanonicalPath.slice(1), oContext);
+
+			return this.delete(null, sCanonicalPath.slice(1), oContext);
 		}
 	};
 
