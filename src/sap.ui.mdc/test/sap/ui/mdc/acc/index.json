@@ -15,7 +15,7 @@
 			"control" : "sap.ui.mdc.FilterBar",
 			"url" : "./filterbar/FilterBar.html",
 			"desc" : "A filter bar with several filter fields of various data types",
-			"appComponent" : "CA-UI5-MDC",
+			"appComponent" : "CA-UI5-CMP-SOF",
 			"accTest": {
 				"name": "sap.ui.mdc.FilterBar",
 				"title": "ACC test for sap.ui.mdc.FieldFilterBar",
