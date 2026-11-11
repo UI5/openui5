@@ -1673,10 +1673,10 @@ sap.ui.define([
 				displayFormat: "yyyyMMdd",
 				delimiter: "-"
 			}),
-			sExpectedErrorMsg1 = "dateValue " + oSut.getDateValue().toString() + "(value=20170101 - 20170101) does " +
+			sExpectedErrorMsg1 = "dateValue " + oSut.getDateValue().toString() + "(value=20170101) does " +
 				"not match min/max date range(" + oNewMinDate.toString() + " - " + oDefaultMaxDate.toString() + "). " +
 				"App. developers should take care to maintain dateValue/value accordingly.",
-			sExpectedErrorMsg2 = "secondDateValue " + oSut.getSecondDateValue().toString() + "(value=20170101 - 20170101) " +
+			sExpectedErrorMsg2 = "secondDateValue " + oSut.getSecondDateValue().toString() + "(value=20170101) " +
 				"does not match min/max date range(" + oNewMinDate.toString() + " - " + oDefaultMaxDate.toString() + "). " +
 				"App. developers should take care to maintain secondDateValue/value accordingly.",
 			oSpySetProperty = this.spy(oSut, "setProperty"),
@@ -1712,11 +1712,11 @@ sap.ui.define([
 				displayFormat: "yyyyMMdd",
 				delimiter: "-"
 			}),
-			sExpectedErrorMsg1 = "dateValue " + oSut.getDateValue().toString() + "(value=20170101 - 20170101) does" +
+			sExpectedErrorMsg1 = "dateValue " + oSut.getDateValue().toString() + "(value=20170101) does" +
 				" not match min/max date range(" + oDefaultMinDate.toString() + " - " +
 				UI5Date.getInstance(oNewMaxDate.setHours(23, 59, 59)).toString() + "). App. developers should take care to " +
 				"maintain dateValue/value accordingly.",
-			sExpectedErrorMsg2 = "secondDateValue " + oSut.getSecondDateValue().toString() + "(value=20170101 - 20170101) does" +
+			sExpectedErrorMsg2 = "secondDateValue " + oSut.getSecondDateValue().toString() + "(value=20170101) does" +
 				" not match min/max date range(" + oDefaultMinDate.toString() + " - " +
 				UI5Date.getInstance(oNewMaxDate.setHours(23, 59, 59)).toString() + "). App. developers should take care to " +
 				"maintain secondDateValue/value accordingly.",
