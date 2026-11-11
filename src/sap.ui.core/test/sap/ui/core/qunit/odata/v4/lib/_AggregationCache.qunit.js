@@ -1918,7 +1918,8 @@ sap.ui.define([
 			iPrefetchLength = 100,
 			that = this;
 
-		function checkResult(oResult) {
+		function checkResult(oResult, bFirstRead) {
+			assert.strictEqual(oResult["@$ui5.firstRead"], bFirstRead);
 			assert.strictEqual(oResult["@$ui5.resetCount"], "~iResetCount~");
 			assert.strictEqual(oResult.value.length, iLength);
 			assert.strictEqual(oResult.value.$count, 42);
@@ -1956,7 +1957,7 @@ sap.ui.define([
 
 				assert.strictEqual(oCache.iReadLength, iLength + iPrefetchLength);
 
-				checkResult(oResult);
+				checkResult(oResult, true);
 
 				oFirstLevelMock.expects("getCount").withExactArgs().returns(42);
 				that.mock(oGroupLock).expects("unlock").withExactArgs();
@@ -1964,7 +1965,7 @@ sap.ui.define([
 				// code under test
 				return oCache
 					.read(iIndex, iLength, iPrefetchLength, oGroupLock, "~fnDataRequested~")
-					.then(checkResult);
+					.then((oResult0) => checkResult(oResult0, false));
 			});
 
 		oCache.iResetCount = "~iResetCount~"; // simulate reset in the meantime
@@ -2770,6 +2771,7 @@ sap.ui.define([
 
 		// code under test
 		return oCache.read(1, 4, 5, oGroupLock, "~fnDataRequested~").then((oResult) => {
+			assert.strictEqual(oResult["@$ui5.firstRead"], false);
 			assert.strictEqual(oResult["@$ui5.resetCount"], "~iResetCount~");
 			assert.strictEqual(oResult.value.length, 4);
 			assert.strictEqual(oResult.value[0], oFirstLeaf);

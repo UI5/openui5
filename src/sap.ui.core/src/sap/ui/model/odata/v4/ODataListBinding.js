@@ -1973,9 +1973,8 @@ sap.ui.define([
 
 			if (oResult) {
 				oResult.$checkStillValid?.();
-				// Reset the outdated flag after the first read after #reset has been called;
-				// after #reset the length is not final and aContexts contains only created contexts
-				if (!that.bLengthFinal && that.aContexts.length === that.iCreatedContexts
+				// Reset the outdated flag after the first read after #reset has been called
+				if (oResult["@$ui5.firstRead"]
 						&& that.oHeaderContext.isOutdated() !== undefined) {
 					if (that.iActiveContexts > 0) {
 						// some persisted entries are still in the creation area, so the header

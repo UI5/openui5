@@ -1770,13 +1770,12 @@ sap.ui.define([
 [false, true].forEach(function (bAsync) {
 	[false, true].forEach(function (bGroupLock) {
 		[false, true].forEach(function (bReadGroupLock) {
-			[false, true].forEach(function (bLengthFinal) {
-				[false, true].forEach(function (bMoreContexts) {
-					[undefined, false, true].forEach(function (bOutdated) {
-						[0, 1].forEach(function (iActiveContexts) {
+			[undefined, false, true].forEach((bFirstRead) => {
+				[undefined, false, true].forEach(function (bOutdated) {
+					[0, 1].forEach(function (iActiveContexts) {
 	const sTitle = "fetchContexts: async=" + bAsync + ", groupLock=" + bGroupLock
-		+ ", readGroupLock=" + bReadGroupLock + ", lengthFinal=" + bLengthFinal
-		+ ", moreContexts=" + bMoreContexts + ", outdated=" + bOutdated
+		+ ", readGroupLock=" + bReadGroupLock + ", firstRead=" + bFirstRead
+		+ ", outdated=" + bOutdated
 		+ ", activeContexts=" + iActiveContexts;
 
 	QUnit.test(sTitle, function (assert) {
@@ -1784,11 +1783,12 @@ sap.ui.define([
 			bPending = true,
 			oPromise,
 			oReadGroupLock = bReadGroupLock ? "~oReadGroupLock~" : undefined,
-			oResult = {value : []};
+			oResult = {
+				...(bFirstRead !== undefined && {"@$ui5.firstRead" : bFirstRead}),
+				value : []
+			};
 
 		oBinding.oReadGroupLock = oReadGroupLock;
-		oBinding.bLengthFinal = bLengthFinal;
-		oBinding.aContexts = bMoreContexts ? [{}, {}] : [{}];
 		oBinding.iActiveContexts = iActiveContexts;
 		oBinding.iCreatedContexts = 1;
 
@@ -1800,9 +1800,9 @@ sap.ui.define([
 				"~fnDataRequested~")
 			.returns(SyncPromise.resolve(oResult));
 		this.mock(oBinding.oHeaderContext).expects("isOutdated").withExactArgs()
-			.exactly(bLengthFinal || bMoreContexts ? 0 : 1)
+			.exactly(bFirstRead ? 1 : 0)
 			.returns(bOutdated);
-		const bSetOutdated = !(bLengthFinal || bMoreContexts || bOutdated === undefined);
+		const bSetOutdated = bFirstRead && bOutdated !== undefined;
 		this.mock(oBinding).expects("setOutdated")
 			.exactly(bSetOutdated && iActiveContexts ? 1 : 0)
 			.withExactArgs("createActive");
@@ -1828,7 +1828,6 @@ sap.ui.define([
 
 		return oPromise;
 	});
-						});
 					});
 				});
 			});
@@ -1876,6 +1875,7 @@ sap.ui.define([
 			oError = new Error(),
 			oGroupLock = "~oGroupLock~",
 			oResponse = {
+				"@$ui5.firstRead" : true, // prerequisite for checking/updating the outdated state
 				$checkStillValid : mustBeMocked,
 				value : {}
 			};
@@ -1885,13 +1885,18 @@ sap.ui.define([
 				sinon.match.same(fnDataRequested))
 			.returns(SyncPromise.resolve(oResponse));
 		this.mock(oResponse).expects("$checkStillValid").withExactArgs().throws(oError);
+		this.mock(oBinding.oHeaderContext).expects("isOutdated").never();
+		this.mock(oBinding).expects("setOutdated").never();
+		this.mock(oBinding.oHeaderContext).expects("setOutdated").never();
+		this.mock(oBinding).expects("createContexts").never();
 
 		// code under test
 		return oBinding.fetchContexts(1, 2, 3, oGroupLock, false, fnDataRequested)
 			.then(function () {
 				assert.ok(false, "Unexpected success");
 			}, function (oResultError) {
-				assert.strictEqual(oResultError, oError);
+				assert.strictEqual(oResultError, oError,
+					"fetchContexts fails before the outdated state is updated");
 			});
 	});
 
@@ -6038,8 +6043,8 @@ sap.ui.define([
 			oContextMock.expects("fetchValue")
 				.withExactArgs("/TEAMS/1/TEAM_2_EMPLOYEES")
 				.returns(SyncPromise.resolve(aCacheResult));
-			this.mock(oBinding.oHeaderContext).expects("isOutdated").withExactArgs()
-				.returns(undefined);
+			// no _AggregationCache, no "@$ui5.firstRead"
+			this.mock(oBinding.oHeaderContext).expects("isOutdated").never();
 
 			// code under test - ensure that getContexts delivers the created context correctly
 			aContexts = oBinding.getContexts(0, 4);
@@ -8661,7 +8666,8 @@ sap.ui.define([
 				done();
 			}, 0);
 		});
-		this.mock(oBinding.oHeaderContext).expects("isOutdated").withExactArgs().returns(undefined);
+		// no _AggregationCache, no "@$ui5.firstRead"
+		this.mock(oBinding.oHeaderContext).expects("isOutdated").never();
 
 		aContexts = oBinding.getContexts(0, 50);
 		assert.strictEqual(aContexts.length, 0);

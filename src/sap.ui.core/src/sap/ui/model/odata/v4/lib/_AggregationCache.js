@@ -2064,13 +2064,14 @@ sap.ui.define([
 	 *   If no back-end request is needed, the function is not called.
 	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise to be resolved with the requested range given as an OData response object (with
-	 *   "@$ui5.resetCount" and the rows as an array in the property <code>value</code>, enhanced
-	 *   with a number property <code>$count</code> representing the element count on server-side;
-	 *   <code>$count</code> may be <code>undefined</code>, but not <code>Infinity</code>). If an
-	 *   HTTP request fails, the error from the _Requestor is returned.
-	 *   The promise is rejected if a conflicting {@link #collapse} happens before the response
-	 *   arrives, in this case the error has the property <code>canceled</code> with value
-	 *   <code>true</code>.
+	 *   "@$ui5.firstRead", "@$ui5.resetCount" and the rows as an array in the property
+	 *   <code>value</code>, enhanced with a number property <code>$count</code> representing the
+	 *   element count on server-side; <code>$count</code> may be <code>undefined</code>, but not
+	 *   <code>Infinity</code>; the optional "@$ui5.firstRead" is a boolean indicating whether this
+	 *   is the first collection read after this cache has been reset). If an HTTP request fails,
+	 *   the error from the _Requestor is returned. The promise is rejected if a conflicting
+	 *   {@link #collapse} happens before the response arrives, in this case the error has the
+	 *   property <code>canceled</code> with value <code>true</code>.
 	 * @throws {Error} If given index or length is less than 0, or if
 	 *   <code>iPrefetchLength !== 0</code> is used while reading a grand total row separately
 	 *
@@ -2114,7 +2115,8 @@ sap.ui.define([
 			});
 		}
 
-		if (this.oFirstLevel.getCount() === undefined) {
+		const bFirstRead = this.oFirstLevel.getCount() === undefined;
+		if (bFirstRead) {
 			this.iReadLength = iLength + iPrefetchLength;
 			if (bHasGrandTotalAtTop) { // account for grand total row at top
 				if (iFirstLevelIndex) {
@@ -2184,6 +2186,7 @@ sap.ui.define([
 			aElements.$count = that.aElements.length;
 
 			return {
+				"@$ui5.firstRead" : bFirstRead,
 				"@$ui5.resetCount" : that.iResetCount,
 				value : aElements
 			};

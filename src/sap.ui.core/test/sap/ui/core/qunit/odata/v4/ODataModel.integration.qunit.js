@@ -33429,6 +33429,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// JIRA: CPOUI5ODATAV4-3737
 	//
 	// ODataModel#delete and Context#delete treat subtotals equally (JIRA: CPOUI5ODATAV4-3752)
+	// A failed side-effects refresh preserves the outdated states (JIRA: CPOUI5ODATAV4-3763)
 ["setProperty", "Context#delete", "ODataModel#delete"].forEach((sScenario) => {
 	const sTitle = "Data Aggregation: isOutdated with visual grouping, " + sScenario;
 
@@ -33477,7 +33478,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		const oTable = this.oView.byId("table");
 		const oListBinding = oTable.getBinding("rows");
-		this.oView.byId("isOutdatedHeader").setBindingContext(oListBinding.getHeaderContext());
+		const oHeaderContext = oListBinding.getHeaderContext();
+		this.oView.byId("isOutdatedHeader").setBindingContext(oHeaderContext);
 
 		await this.waitForChanges(assert, "set header context");
 
@@ -33821,6 +33823,44 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		// keep a leaf context alive to avoid new cache creation when refreshing the list
 		oLeafContext.setKeepAlive(true);
+
+		assert.strictEqual(oHeaderContext.isOutdated(), true);
+
+		const oError = createErrorInsideBatch();
+		this.oLogMock.expects("error").withArgs("Failed to refresh kept-alive elements");
+		this.oLogMock.expects("error").withArgs("Failed to get contexts for"
+			+ " /aggregation/BusinessPartners with start index 0 and length 5");
+
+		this.expectRequest("#0 BusinessPartners?$select=Country,Id,Region,SalesNumber"
+				+ "&$filter=Id eq " + (bDelete ? 3 : 2), oError)
+			.expectRequest("#0 BusinessPartners?$apply=concat(aggregate(SalesNumber)"
+				+ ",groupby((Country),aggregate(SalesNumber))"
+				+ "/concat(aggregate($count as UI5__count),top(4)))", oNO_RESPONSE)
+			.expectMessages([oINTENTIONALLY_FAILED]);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3763)
+			oHeaderContext.requestSideEffects([""]).then(mustFail(assert), (oError0) => {
+				assert.strictEqual(oError0.message, oINTENTIONALLY_FAILED.message);
+			}),
+			this.waitForChanges(assert, "failed side-effects refresh restores cached data")
+		]);
+
+		assert.strictEqual(oHeaderContext.isOutdated(), true, "still outdated");
+		checkTable("after failed side-effects refresh", assert, oTable, [
+			"/BusinessPartners()",
+			oContextA,
+			"/BusinessPartners(Country='A',Region='a')",
+			"/BusinessPartners(Country='A',$isTotal=true)",
+			oContextB,
+			oLeafContext
+		], [ // isOutdated|isTotal|level|Country|Region|Id|SalesNumber
+			[bGrandTotalOutdated, true, 0, "", "", "", bDeleteViaModel ? "150" : "130"],
+			[bDelete ? undefined : true, true, 1, "A", "", "", "10"],
+			[bDelete ? undefined : true, true, 2, "A", "a", "", "10"],
+			[bDelete ? undefined : true, true, 1, "", "", "", "10"],
+			[true, true, 1, "B", "", "", "20"]
+		], (bDelete ? 12 : 13) + 4);
 
 		this.expectRequest("BusinessPartners?$select=Country,Id,Region,SalesNumber"
 				+ "&$filter=Id eq " + (bDelete ? 3 : 2), {
