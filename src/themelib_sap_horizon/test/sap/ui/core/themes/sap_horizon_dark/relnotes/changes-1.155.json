@@ -3,6 +3,16 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "6c8506469e4fb16b034894af78f107b53b22a6e6",
+        "type": "FEATURE",
+        "text": " RowActionItem: Support disabled actions"
+      },
+      {
+        "id": "eb7f8eaa730ec57ac0c30c84bfd94e526311e18b",
+        "type": "FEATURE",
+        "text": " Stylelint: introduce no-LESS-features linting infrastructure"
+      },
+      {
         "id": "df99b6042d2ddff92e5db9ee3f8fef134e2a1dd3",
         "type": "FEATURE",
         "text": " core/IconPool: add SVG icon LESS theme configuration"

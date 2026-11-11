@@ -1,0 +1,12 @@
+{
+  "1.155.0": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "eb7f8eaa730ec57ac0c30c84bfd94e526311e18b",
+        "type": "FEATURE",
+        "text": " Stylelint: introduce no-LESS-features linting infrastructure"
+      }
+    ]
+  }
+}

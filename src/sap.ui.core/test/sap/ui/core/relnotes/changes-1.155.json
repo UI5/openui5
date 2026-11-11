@@ -3,6 +3,16 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "666fbad437911b58457d89f48b07cf6953c54cfd",
+        "type": "FIX",
+        "text": " sap/ui/model/odata/v2/ODataModel: Fix type of createKey parameter"
+      },
+      {
+        "id": "eb7f8eaa730ec57ac0c30c84bfd94e526311e18b",
+        "type": "FEATURE",
+        "text": " Stylelint: introduce no-LESS-features linting infrastructure"
+      },
+      {
         "id": "b16f43a26417390c03b8b67fd1b61e4682a311e1",
         "type": "FIX",
         "text": " sap.ui.model.odata.v4.ODataMetaModel#getETags: missing URL parameters for $metadata"

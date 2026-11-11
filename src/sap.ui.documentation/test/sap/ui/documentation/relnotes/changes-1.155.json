@@ -3,6 +3,11 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "eb7f8eaa730ec57ac0c30c84bfd94e526311e18b",
+        "type": "FEATURE",
+        "text": " Stylelint: introduce no-LESS-features linting infrastructure"
+      },
+      {
         "id": "3883108f296b3ebd4790f401e2375279b6f1c888",
         "type": "FIX",
         "text": " sap.ui.documentation: fix Appearance auto-theme OPA test"

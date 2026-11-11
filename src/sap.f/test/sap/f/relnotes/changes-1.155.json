@@ -3,6 +3,21 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "8bf418b3d2dfe375b8137b3c5c61c64a90c3abb1",
+        "type": "FIX",
+        "text": " sap.f.GridContainer: Grid matrix position is now reset on direct focus"
+      },
+      {
+        "id": "eb7f8eaa730ec57ac0c30c84bfd94e526311e18b",
+        "type": "FEATURE",
+        "text": " Stylelint: introduce no-LESS-features linting infrastructure"
+      },
+      {
+        "id": "8d750b73226b6358918a993044c330d3d1a0c40b",
+        "type": "FIX",
+        "text": " sap.f.cards: Icon not announced as \"Avatar\""
+      },
+      {
         "id": "26cfa67795cad9a86f2eedf8483d1f1c02e1c48d",
         "type": "FIX",
         "text": " sap.f: fire invalidate event when rendering is suppressed"

@@ -3,6 +3,11 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "eb7f8eaa730ec57ac0c30c84bfd94e526311e18b",
+        "type": "FEATURE",
+        "text": " Stylelint: introduce no-LESS-features linting infrastructure"
+      },
+      {
         "id": "e9dbcfcfda09e8c2695af2d70bad08c0ac00af5c",
         "type": "FIX",
         "text": " Field: timezone not shown"

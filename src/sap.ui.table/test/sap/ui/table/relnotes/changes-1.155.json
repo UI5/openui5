@@ -3,6 +3,21 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "ab504c53bb523c03c3a03be19244e870e6ee76ce",
+        "type": "FEATURE",
+        "text": " ui.Table: Show Info MessageBox when column freeze is not active due to Page Size"
+      },
+      {
+        "id": "6c8506469e4fb16b034894af78f107b53b22a6e6",
+        "type": "FEATURE",
+        "text": " RowActionItem: Support disabled actions"
+      },
+      {
+        "id": "eb7f8eaa730ec57ac0c30c84bfd94e526311e18b",
+        "type": "FEATURE",
+        "text": " Stylelint: introduce no-LESS-features linting infrastructure"
+      },
+      {
         "id": "756c7460a12b2c3397bcf1f388757bcd1bfc55cb",
         "type": "FEATURE",
         "text": " Table: keyboard shortcut for navigation"

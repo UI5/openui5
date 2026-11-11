@@ -3,6 +3,31 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "3077b9ff8b7a6bfaf5f91cf2578b6c6c6d18731b",
+        "type": "FIX",
+        "text": " sap.ui.integration.editor.Editor: Guard concurrent requireFields()"
+      },
+      {
+        "id": "1c2f89b7660821ac5d8b0d79b1a333c4fd75f5e2",
+        "type": "FIX",
+        "text": " sap.ui.integration: replace Cyrillic chars in cardExplorer docs"
+      },
+      {
+        "id": "eb7f8eaa730ec57ac0c30c84bfd94e526311e18b",
+        "type": "FEATURE",
+        "text": " Stylelint: introduce no-LESS-features linting infrastructure"
+      },
+      {
+        "id": "8d750b73226b6358918a993044c330d3d1a0c40b",
+        "type": "FIX",
+        "text": " sap.f.cards: Icon not announced as \"Avatar\""
+      },
+      {
+        "id": "013d191c26e97709df49736e96d9613dcb085997",
+        "type": "FEATURE",
+        "text": " sap.ui.integration.Card: add responseStatus to request error"
+      },
+      {
         "id": "209a7ad6f6fdbddab15d66f8721ad08efc03c6fa",
         "type": "FIX",
         "text": " sap.ui.integration.cards.CalendarContent: Show past appointments in calendar cards"

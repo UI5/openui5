@@ -3,6 +3,31 @@
     "date": "November 2026",
     "notes": [
       {
+        "id": "88a99d380f653d1506481a46dea3c8a8d4615ce0",
+        "type": "FIX",
+        "text": " sap.m.DateRangeSelection: Fix formatting of the value when a delimiter is set"
+      },
+      {
+        "id": "459833a92725bcad13dab392f5d603c5a1b9863f",
+        "type": "FIX",
+        "text": " Date controls: Revert zoom feature"
+      },
+      {
+        "id": "27553ee493e5be02b3a39b67687ea987596cd2be",
+        "type": "FIX",
+        "text": " sap.m.MessagePopover - stabilize QUnit flaky tests"
+      },
+      {
+        "id": "eb7f8eaa730ec57ac0c30c84bfd94e526311e18b",
+        "type": "FEATURE",
+        "text": " Stylelint: introduce no-LESS-features linting infrastructure"
+      },
+      {
+        "id": "ddc52765356b27b58affd7ad4a9860b6c3664215",
+        "type": "FIX",
+        "text": "sap.m.Breadcrumbs: Correct styling and functionality issues"
+      },
+      {
         "id": "24ce594eb65361e7f51cccfd1890da9c57a217d7",
         "type": "FIX",
         "text": " sap.m.GenericTag: Mark press event to stop propagation to parent"
@@ -36,6 +61,11 @@
         "id": "d9b42f49fb8d817356d9222921cfa6d97539d65d",
         "type": "FIX",
         "text": " sap.m.StepInput: prevent double value change on keyboard events"
+      },
+      {
+        "id": "307217651f81e4603547b34b84bc3ac1d0b98921",
+        "type": "FIX",
+        "text": " sap.m.SinglePlanningCalendarMonthGrid: replace onmouseup with ontap for touch support"
       },
       {
         "id": "1a8daa4d34aab1ef9275cceb0c81a06872baf746",

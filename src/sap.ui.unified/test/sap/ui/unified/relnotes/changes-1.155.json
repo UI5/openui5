@@ -1,0 +1,17 @@
+{
+  "1.155.0": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "459833a92725bcad13dab392f5d603c5a1b9863f",
+        "type": "FIX",
+        "text": " Date controls: Revert zoom feature"
+      },
+      {
+        "id": "eb7f8eaa730ec57ac0c30c84bfd94e526311e18b",
+        "type": "FEATURE",
+        "text": " Stylelint: introduce no-LESS-features linting infrastructure"
+      }
+    ]
+  }
+}
