@@ -461,6 +461,9 @@ sap.ui.define([
 	 * @property {boolean} [isPublished=false] - Flag if an version is already published
 	 * @property {boolean} [importedAt] - Timestamp when a version was imported into the system or tenant
 	 * @property {boolean} [origianlTenantId] - ID of the source tenant where this version was introduced
+	 * @property {string} [sourceSystem] - ID of the system where the version was created
+	 * @property {string} [sourceClient] - Client of the system where the version was created
+	 * @property {boolean} [isFromOtherSystem] - Flag if the version originated on another system, preventing further changes
 	 * @since 1.74
 	 * @private
 	 * @ui5-restricted

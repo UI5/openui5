@@ -6,6 +6,7 @@ sap.ui.define([
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/initial/_internal/FlexConfiguration",
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
+	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/util/CancelError",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/_internal/Versions",
@@ -24,6 +25,7 @@ sap.ui.define([
 	Version,
 	FlexConfiguration,
 	FlexInfoSession,
+	Settings,
 	CancelError,
 	Storage,
 	Versions,
@@ -473,6 +475,7 @@ sap.ui.define([
 				activatedAt: "just now",
 				version: sActiveVersion,
 				isPublished: false,
+				isFromOtherSystem: false,
 				type: Version.Type.Active
 			};
 
@@ -491,6 +494,37 @@ sap.ui.define([
 				assert.equal(oResponse.getProperty("/persistedVersion"), sActiveVersion, "and the persisted version was determined correct");
 				assert.equal(oResponse.getProperty("/publishVersionEnabled"), true, "after activate a new version can be published");
 				assert.equal(oResponse.getProperty("/draftFilenames").length, 0, "and draft file name is empty");
+			});
+		});
+
+		QUnit.test("and the activated version is stamped with isFromOtherSystem based on its source information", function(assert) {
+			FlexInfoSession.setByReference({ version: Version.Number.Draft }, this.sReference);
+			const mPropertyBag = {
+				layer: Layer.CUSTOMER,
+				reference: this.sReference,
+				appComponent: this.oAppComponent
+			};
+
+			stubStorageVersionsLoad([{ version: Version.Number.Draft }]);
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({ system: "ABC", client: "100" }));
+			sandbox.stub(KeyUserConnector.versions, "activate").resolves({
+				activatedBy: "qunit",
+				activatedAt: "just now",
+				version: "1",
+				sourceSystem: "XYZ",
+				sourceClient: "200"
+			});
+
+			return Versions.initialize(mPropertyBag)
+			.then(Versions.activate.bind(undefined, mPropertyBag))
+			.then(Versions.getVersionsModel.bind(Versions, mPropertyBag))
+			.then((oResponse) => {
+				const aVersions = oResponse.getProperty("/versions");
+				assert.strictEqual(
+					aVersions[0].isFromOtherSystem,
+					true,
+					"then the activated version from another system is considered to be from another system"
+				);
 			});
 		});
 
@@ -1410,6 +1444,54 @@ sap.ui.define([
 				Version.Number.Draft,
 				"the version in FlexInfoSession is set to Draft when displayedVersion is Draft"
 			);
+		});
+	});
+
+	QUnit.module("Calculating isFromOtherSystem for each version", {
+		beforeEach() {
+			setVersioningEnabled({ CUSTOMER: true });
+		},
+		afterEach() {
+			Versions.clearInstances();
+			sandbox.restore();
+		}
+	}, function() {
+		function loadVersions(aReturnedVersions) {
+			stubStorageVersionsLoad(aReturnedVersions);
+			return Versions.initialize({
+				layer: Layer.CUSTOMER,
+				reference: "com.sap.app"
+			}).then((oVersionsModel) => oVersionsModel.getProperty("/versions"));
+		}
+
+		QUnit.test("when a version has no source system and client", async function(assert) {
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({ system: "ABC", client: "100" }));
+			const aVersions = await loadVersions([{ version: "1" }]);
+			assert.strictEqual(aVersions[0].isFromOtherSystem, false, "then the version is not considered to be from another system");
+		});
+
+		QUnit.test("when no settings instance is available", async function(assert) {
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(undefined);
+			const aVersions = await loadVersions([{ version: "1", sourceSystem: "ABC", sourceClient: "100" }]);
+			assert.strictEqual(aVersions[0].isFromOtherSystem, true, "then the version is considered to be from another system");
+		});
+
+		QUnit.test("when the settings have no system and client", async function(assert) {
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({}));
+			const aVersions = await loadVersions([{ version: "1", sourceSystem: "ABC", sourceClient: "100" }]);
+			assert.strictEqual(aVersions[0].isFromOtherSystem, false, "then the version is not considered to be from another system");
+		});
+
+		QUnit.test("when source system and client match the current system", async function(assert) {
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({ system: "ABC", client: "100" }));
+			const aVersions = await loadVersions([{ version: "1", sourceSystem: "ABC", sourceClient: "100" }]);
+			assert.strictEqual(aVersions[0].isFromOtherSystem, false, "then the version is not considered to be from another system");
+		});
+
+		QUnit.test("when source system and client differ from the current system", async function(assert) {
+			sandbox.stub(Settings, "getInstanceOrUndef").returns(new Settings({ system: "ABC", client: "100" }));
+			const aVersions = await loadVersions([{ version: "1", sourceSystem: "XYZ", sourceClient: "200" }]);
+			assert.strictEqual(aVersions[0].isFromOtherSystem, true, "then the version is considered to be from another system");
 		});
 	});
 

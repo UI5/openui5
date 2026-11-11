@@ -4,6 +4,7 @@
 
 sap.ui.define([
 	"sap/ui/fl/initial/_internal/FlexInfoSession",
+	"sap/ui/fl/initial/_internal/Settings",
 	"sap/ui/fl/initial/api/Version",
 	"sap/ui/fl/write/_internal/Storage",
 	"sap/ui/fl/write/api/FeaturesAPI",
@@ -11,6 +12,7 @@ sap.ui.define([
 	"sap/ui/model/BindingMode"
 ], function(
 	FlexInfoSession,
+	Settings,
 	Version,
 	Storage,
 	FeaturesAPI,
@@ -76,6 +78,25 @@ sap.ui.define([
 		return false;
 	}
 
+	function _isVersionFromOtherSystem(oVersion) {
+		const { sourceSystem: sSourceSystem, sourceClient: sSourceClient } = oVersion;
+		// Without source information the version was created in the current system
+		if (!sSourceSystem || !sSourceClient) {
+			return false;
+		}
+		const oSettings = Settings.getInstanceOrUndef();
+		// Without settings the origin cannot be determined, so further changes are not allowed
+		if (!oSettings) {
+			return true;
+		}
+		const sSystem = oSettings.getSystem();
+		const sClient = oSettings.getClient();
+		if (!sSystem || !sClient) {
+			return false;
+		}
+		return sSourceSystem !== sSystem || sSourceClient !== sClient;
+	}
+
 	function _prepareVersionsModel(mPropertyBag) {
 		var sPersistedBasisForDisplayedVersion;
 		var sActiveVersion = Version.Number.Original;
@@ -91,6 +112,7 @@ sap.ui.define([
 		}
 
 		aVersions.forEach(function(oVersion) {
+			oVersion.isFromOtherSystem = _isVersionFromOtherSystem(oVersion);
 			if (oVersion.version === Version.Number.Draft) {
 				oVersion.type = Version.Type.Draft;
 				oVersion.isPublished = false;
@@ -333,6 +355,7 @@ sap.ui.define([
 			});
 			oVersion.type = Version.Type.Active;
 			oVersion.isPublished = false;
+			oVersion.isFromOtherSystem = _isVersionFromOtherSystem(oVersion);
 			if (bDraftExists) {
 				aVersions.shift();
 			}

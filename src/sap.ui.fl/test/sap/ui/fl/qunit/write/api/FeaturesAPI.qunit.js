@@ -77,6 +77,15 @@ sap.ui.define([
 				assert.ok(bIsPublishAvailable, "then true is returned");
 			});
 
+			QUnit.test(`when isVersionMetadataUpdateAvailable() is called and the backend ${bValueToBeSet ? "supports" : "does not support"} it`, async function(assert) {
+				sandbox.stub(Settings, "getInstance").resolves(new Settings({
+					isVersionMetadataUpdateAvailable: bValueToBeSet
+				}));
+
+				const bIsAvailable = await FeaturesAPI.isVersionMetadataUpdateAvailable();
+				assert.strictEqual(bIsAvailable, bValueToBeSet, `then ${bValueToBeSet} is returned`);
+			});
+
 			QUnit.test(`when isSaveAsAvailable() is called for ${bValueToBeSet ? "not a" : "a"} steampunk system`, function(assert) {
 				sandbox.stub(Settings, "getInstance").resolves({
 					getIsAppVariantSaveAsEnabled() {
