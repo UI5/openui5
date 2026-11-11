@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "fingerprint": "19160f7ee6f0d69cd970f17ed5b95202b771797f39d70ef7eb2769d0208c9785",
+  "roots": {
+    "@ui5/webcomponents-geomap": "0.1.0",
+    "ui5-tooling-modules": "3.42.0"
+  }
+}

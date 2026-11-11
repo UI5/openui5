@@ -76,4 +76,60 @@
 	</build>
 
 
+	<!--**************************************************************************
+	* POM SECTION: Profile Settings
+	***************************************************************************-->
+
+	<profiles>
+
+		<!-- Verification of the @ui5/webcomponents-geomap versions are in sync -->
+		<profile>
+			<id>webcomponents.verify</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.sap.ui5.tools.maven</groupId>
+						<artifactId>node-maven-plugin</artifactId>
+						<version>2.0.16</version><!--DependencyVersion,manualChange-->
+						<configuration>
+							<nodeType>SHARED</nodeType>
+							<nodeVersion>${node.version}</nodeVersion>
+							<nodeLocation>${node.location}</nodeLocation>
+							<npmRegistry>${npm.registry}</npmRegistry>
+							<npmVersion>${npm.version}</npmVersion>
+							<forceNoProxy>${node.forceNoProxy}</forceNoProxy>
+						</configuration>
+						<executions>
+							<!-- Ensure Node.js and npm are installed before running the verify script -->
+							<execution>
+								<id>install-node-and-npm</id>
+								<phase>initialize</phase>
+								<goals>
+									<goal>install</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>verify-webcomponents-version</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<workDir>${project.basedir}</workDir>
+									<args>
+										<arg>run</arg>
+										<arg>verify-webcomponents</arg>
+									</args>
+									<!-- default allowedExitCodes=0: script exit 1 on drift fails the build -->
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
+
+
 </project>

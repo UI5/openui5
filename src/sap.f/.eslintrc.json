@@ -12,6 +12,27 @@
 			"globals": {
 				"jQuery": "off"
 			}
+		},
+
+		/*
+		 * Build / maintenance scripts under scripts/ are CommonJS Node.js modules.
+		 * Allow require, __dirname, process, etc. and module-global "use strict".
+		 */
+		{
+			"files": [
+				"scripts/**/*.js"
+			],
+			"env": {
+				"browser": false,
+				"node": true
+			},
+			"parserOptions": {
+				"sourceType": "commonjs"
+			},
+			"rules": {
+				"no-console": "off",
+				"strict": ["error", "global"]
+			}
 		}
 	]
 }
