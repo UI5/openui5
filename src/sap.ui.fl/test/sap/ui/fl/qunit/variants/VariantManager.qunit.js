@@ -117,7 +117,7 @@ sap.ui.define([
 		async beforeEach() {
 			this.oSettingsStub = sandbox.stub(Settings, "getInstanceOrUndef").callsFake(() => {
 				const oSettings = this.oSettingsStub.wrappedMethod();
-				return oSettings || { getUser: () => "test user" };
+				return oSettings || new Settings({});
 			});
 			FlQUnitUtils.stubFlexObjectsSelector(sandbox, [
 				createVariant({

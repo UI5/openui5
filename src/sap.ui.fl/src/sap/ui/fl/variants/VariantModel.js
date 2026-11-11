@@ -59,30 +59,39 @@ sap.ui.define([
 
 	const { SharingMode } = mobileLibrary;
 
-	function updatePersonalVariantPropertiesWithFlpSettings(oVariant) {
-		var oSettings = Settings.getInstanceOrUndef();
-		if (oSettings && !oSettings.getIsVariantPersonalizationEnabled()) {
-			oVariant.remove = false;
-			oVariant.rename = false;
-			oVariant.change = false;
-		}
-	}
-
-	function updatePublicVariantPropertiesWithSettings(oVariant) {
-		var oSettings = Settings.getInstanceOrUndef();
-		var bUserIsAuthorized = oSettings &&
-			(oSettings.getIsKeyUser() || (oSettings.getIsPublicFlVariantEnabled() && oVariant.instance.isUserAuthor()));
-		oVariant.remove = bUserIsAuthorized;
-		oVariant.rename = bUserIsAuthorized;
-		oVariant.change = bUserIsAuthorized;
-	}
-
 	function isVariantValidForRemove(oVariant, sVariantManagementReference, bDesignTimeModeToBeSet) {
 		var sLayer = bDesignTimeModeToBeSet ? LayerUtils.getCurrentLayer() : Layer.USER;
-		if ((oVariant.layer === sLayer) && (oVariant.key !== sVariantManagementReference)) {
-			return true;
+		return oVariant.layer === sLayer && oVariant.key !== sVariantManagementReference;
+	}
+
+	function getVariantAuthorizationProperties(oVariant, sVMReference, bDesignTimeModeToBeSet, bEditable) {
+		const bRemove = isVariantValidForRemove(oVariant, sVMReference, bDesignTimeModeToBeSet);
+		if (bDesignTimeModeToBeSet && bEditable) {
+			return { rename: true, change: true, remove: bRemove, sharing: SharingMode.Public };
 		}
-		return false;
+		if (bEditable) {
+			switch (oVariant.layer) {
+				case Layer.USER: {
+					const oSettings = Settings.getInstanceOrUndef();
+					const bPersonalizationEnabled = !oSettings || oSettings.getIsVariantPersonalizationEnabled();
+					return {
+						rename: bPersonalizationEnabled,
+						change: bPersonalizationEnabled,
+						remove: bRemove && bPersonalizationEnabled,
+						sharing: SharingMode.Private
+					};
+				}
+				case Layer.PUBLIC: {
+					const oSettings = Settings.getInstanceOrUndef();
+					const bAuthorized = !!oSettings &&
+						(oSettings.getIsKeyUser() || (oSettings.getIsPublicFlVariantEnabled() && oVariant.instance.isUserAuthor()));
+					return { rename: bAuthorized, change: bAuthorized, remove: bAuthorized, sharing: SharingMode.Public };
+				}
+				default:
+					return { rename: false, change: false, remove: false, sharing: SharingMode.Public };
+			}
+		}
+		return { rename: false, change: false, remove: false, sharing: oVariant.layer === Layer.USER ? SharingMode.Private : SharingMode.Public };
 	}
 
 	function getVariant(aVariants, sVariantKey) {
@@ -161,20 +170,18 @@ sap.ui.define([
 			const sVariantManagementKey = aVariants[0];
 			const oVariantMapEntry = { ...aVariants[1] };
 			oCurrentData[sVariantManagementKey] ||= {};
+			const oVMControl = VariantUtil.getVariantManagementControlByVMReference(sVariantManagementKey, this.oAppComponent);
+			const bDesignTimeMode = !!this._bDesignTimeMode;
+			const bEditable = oVMControl ? oVMControl.getEditable() : false;
 			oCurrentData[sVariantManagementKey].variants = oVariantMapEntry.variants.map(function(oVariant) {
 				const oCurrentVariantData = (oCurrentData[sVariantManagementKey].variants || [])
 				.find(function(oVariantToCheck) {
 					return oVariantToCheck.key === oVariant.key;
 				}) || {};
 				return {
-					// Default values
-					rename: true,
-					change: true,
-					remove: true,
-					sharing: oVariant.layer === Layer.USER ? SharingMode.Private : SharingMode.Public,
-					// Previous values
 					...oCurrentVariantData,
-					...oVariant
+					...oVariant,
+					...getVariantAuthorizationProperties(oVariant, sVariantManagementKey, bDesignTimeMode, bEditable)
 				};
 			});
 			const sOldCurrentVariant = oCurrentData[sVariantManagementKey].currentVariant;
@@ -183,7 +190,6 @@ sap.ui.define([
 			// e.g. when creating the standard variant from a source variant directly in the FlexState
 			// In such cases the switch was not triggered by a user though and thus must not be reflected in
 			// the url, making it safe to ignore
-			const oVMControl = VariantUtil.getVariantManagementControlByVMReference(sVariantManagementKey, this.oAppComponent);
 			if (
 				oVMControl
 				&& oVMControl.getUpdateVariantInURL()
@@ -305,49 +311,11 @@ sap.ui.define([
 			}
 		}
 
-		if (bDesignTimeModeToBeSet && oVMControl.getEditable()) {
-			// Key user adaptation settings
-			this.oData[sVariantManagementReference].variantsEditable = false;
-
-			// Properties for variant management control's internal model
-			this.oData[sVariantManagementReference].variants.forEach(function(oVariant) {
-				oVariant.rename = true;
-				oVariant.change = true;
-				oVariant.sharing = SharingMode.Public;
-				oVariant.remove = isVariantValidForRemove(oVariant, sVariantManagementReference, bDesignTimeModeToBeSet);
-			});
-		} else if (oVMControl.getEditable()) { // Personalization settings
-			this.oData[sVariantManagementReference].variantsEditable = true;
-
-			// Properties for variant management control's internal model
-			this.oData[sVariantManagementReference].variants.forEach(function(oVariant) {
-				oVariant.remove = isVariantValidForRemove(oVariant, sVariantManagementReference, bDesignTimeModeToBeSet);
-				// Check for end-user variant
-				switch (oVariant.layer) {
-					case Layer.USER:
-						oVariant.rename = true;
-						oVariant.change = true;
-						oVariant.sharing = SharingMode.Private;
-						updatePersonalVariantPropertiesWithFlpSettings(oVariant);
-						break;
-					case Layer.PUBLIC:
-						oVariant.sharing = SharingMode.Public;
-						updatePublicVariantPropertiesWithSettings(oVariant);
-						break;
-					default:
-						oVariant.rename = false;
-						oVariant.change = false;
-						oVariant.sharing = SharingMode.Public;
-				}
-			});
-		} else {
-			this.oData[sVariantManagementReference].variantsEditable = false;
-			this.oData[sVariantManagementReference].variants.forEach(function(oVariant) {
-				oVariant.remove = false;
-				oVariant.rename = false;
-				oVariant.change = false;
-			});
-		}
+		const bEditable = oVMControl.getEditable();
+		this.oData[sVariantManagementReference].variantsEditable = bEditable && !bDesignTimeModeToBeSet;
+		this.oData[sVariantManagementReference].variants.forEach(function(oVariant) {
+			Object.assign(oVariant, getVariantAuthorizationProperties(oVariant, sVariantManagementReference, bDesignTimeModeToBeSet, bEditable));
+		});
 	};
 
 	VariantModel.prototype.getLocalId = function(sId, oAppComponent) {
