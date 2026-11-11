@@ -7,8 +7,9 @@ sap.ui.define([
 	'sap/ui/core/Control',
 	'sap/ui/unified/library',
 	"./HeaderRenderer",
-	"sap/ui/dom/containsOrEquals"
-], function(Control, library, HeaderRenderer, containsOrEquals) {
+	"sap/ui/dom/containsOrEquals",
+	"sap/ui/events/KeyCodes"
+], function(Control, library, HeaderRenderer, containsOrEquals, KeyCodes) {
 	"use strict";
 
 	/**
@@ -422,30 +423,70 @@ sap.ui.define([
 		return this._ariaLabelButton4;
 	};
 
+	Header.prototype.onAfterRendering = function() {
+		this._bSpacePressed = false;
+		this._bPressedEscapeOrShift = false;
+	};
+
 	Header.prototype.onclick = function(oEvent){
 
 		if (oEvent.isMarked("delayedMouseEvent") ) {
 			return;
 		}
 
-		if (containsOrEquals(this.getDomRef("prev"), oEvent.target) && this.getEnabledPrevious()) {
-			this.firePressPrevious();
-		} else if (containsOrEquals(this.getDomRef("next"), oEvent.target) && this.getEnabledNext()){
-			this.firePressNext();
-		} else if (containsOrEquals(this.getDomRef("today"), oEvent.target) && this.getVisibleCurrentDateButton()){
-			this.firePressCurrentDate();
-		} else if (containsOrEquals(this.getDomRef("B0"), oEvent.target)){
-			this.firePressButton0();
-		} else if (containsOrEquals(this.getDomRef("B1"), oEvent.target)){
-			this.firePressButton1();
-		} else if (containsOrEquals(this.getDomRef("B2"), oEvent.target)){
-			this.firePressButton2();
-		} else if (containsOrEquals(this.getDomRef("B3"), oEvent.target)){
-			this.fireEvent("pressButton3");
-		} else if (containsOrEquals(this.getDomRef("B4"), oEvent.target)){
-			this.fireEvent("pressButton4");
+		// Suppress the browser-synthesized click fired on Space keyup — handled by onkeyup instead
+		if (oEvent.detail === 0 && this._bSpacePressed) {
+			return;
 		}
 
+		this._firePressForTarget(oEvent.target);
+
+	};
+
+	Header.prototype.onkeydown = function(oEvent) {
+		if (oEvent.which === KeyCodes.SPACE) {
+			this._bSpacePressed = true;
+			oEvent.preventDefault(); // prevent page scroll
+		}
+		if (this._bSpacePressed) {
+			if (oEvent.which === KeyCodes.SHIFT || oEvent.which === KeyCodes.ESCAPE) {
+				this._bPressedEscapeOrShift = true;
+			}
+		}
+	};
+
+	Header.prototype.onkeyup = function(oEvent) {
+		if (oEvent.which === KeyCodes.SPACE && this._bSpacePressed) {
+			if (!this._bPressedEscapeOrShift) {
+				this._firePressForTarget(oEvent.target);
+			}
+			this._bSpacePressed = false;
+			this._bPressedEscapeOrShift = false;
+		}
+		if (oEvent.which === KeyCodes.ESCAPE) {
+			this._bSpacePressed = false;
+			this._bPressedEscapeOrShift = false;
+		}
+	};
+
+	Header.prototype._firePressForTarget = function(oTarget) {
+		if (containsOrEquals(this.getDomRef("prev"), oTarget) && this.getEnabledPrevious()) {
+			this.firePressPrevious();
+		} else if (containsOrEquals(this.getDomRef("next"), oTarget) && this.getEnabledNext()){
+			this.firePressNext();
+		} else if (containsOrEquals(this.getDomRef("today"), oTarget) && this.getVisibleCurrentDateButton()){
+			this.firePressCurrentDate();
+		} else if (containsOrEquals(this.getDomRef("B0"), oTarget)){
+			this.firePressButton0();
+		} else if (containsOrEquals(this.getDomRef("B1"), oTarget)){
+			this.firePressButton1();
+		} else if (containsOrEquals(this.getDomRef("B2"), oTarget)){
+			this.firePressButton2();
+		} else if (containsOrEquals(this.getDomRef("B3"), oTarget)){
+			this.fireEvent("pressButton3");
+		} else if (containsOrEquals(this.getDomRef("B4"), oTarget)){
+			this.fireEvent("pressButton4");
+		}
 	};
 
 	Header.prototype.onsapnext = function(oEvent){

@@ -579,4 +579,95 @@ sap.ui.define([
 		});
 	})();
 
+	QUnit.module("Space key cancel action", {
+		beforeEach: async function () {
+			this.oMP = new MonthPicker();
+			this.oMP.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			this.oSelectSpy = this.spy(this.oMP, "fireSelect");
+			this.oItemNavigationStub = this.stub(this.oMP._oItemNavigation, "getFocusedIndex").returns(3);
+		},
+		afterEach: function () {
+			this.oMP.destroy();
+			this.oMP = null;
+		}
+	});
+
+	QUnit.test("Space keyup selects the focused month", function (assert) {
+		// act
+		this.oMP.onkeydown({ which: KeyCodes.SPACE });
+		this.oMP.onkeyup({ which: KeyCodes.SPACE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 1, "fireSelect is called once");
+		assert.equal(this.oMP.getMonth(), 3, "month 3 is selected");
+	});
+
+	QUnit.test("Space keydown alone does not select (no premature selection on keydown)", function (assert) {
+		// act
+		this.oMP.onkeydown({ which: KeyCodes.SPACE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called on keydown");
+	});
+
+	QUnit.test("Space then Escape cancels selection — case 1: Escape pressed and released before Space released", function (assert) {
+		// act: Space down, Escape down, Escape up, Space up
+		this.oMP.onkeydown({ which: KeyCodes.SPACE });
+		this.oMP.onkeydown({ which: KeyCodes.ESCAPE });
+		this.oMP.onkeyup({ which: KeyCodes.ESCAPE });
+		this.oMP.onkeyup({ which: KeyCodes.SPACE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("Space then Escape cancels selection — case 2: Escape held past Space release", function (assert) {
+		// act: Space down, Escape down, Space up, Escape up
+		this.oMP.onkeydown({ which: KeyCodes.SPACE });
+		this.oMP.onkeydown({ which: KeyCodes.ESCAPE });
+		this.oMP.onkeyup({ which: KeyCodes.SPACE });
+		this.oMP.onkeyup({ which: KeyCodes.ESCAPE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("Space then Shift cancels selection — case 1: Shift pressed and released before Space released", function (assert) {
+		// act: Space down, Shift down, Shift up, Space up
+		this.oMP.onkeydown({ which: KeyCodes.SPACE });
+		this.oMP.onkeydown({ which: KeyCodes.SHIFT });
+		this.oMP.onkeyup({ which: KeyCodes.SHIFT });
+		this.oMP.onkeyup({ which: KeyCodes.SPACE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("Space then Shift cancels selection — case 2: Shift held past Space release", function (assert) {
+		// act: Space down, Shift down, Space up, Shift up
+		this.oMP.onkeydown({ which: KeyCodes.SPACE });
+		this.oMP.onkeydown({ which: KeyCodes.SHIFT });
+		this.oMP.onkeyup({ which: KeyCodes.SPACE });
+		this.oMP.onkeyup({ which: KeyCodes.SHIFT });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("After cancelled Space press, next Space press selects normally", function (assert) {
+		// act: cancel first press
+		this.oMP.onkeydown({ which: KeyCodes.SPACE });
+		this.oMP.onkeydown({ which: KeyCodes.ESCAPE });
+		this.oMP.onkeyup({ which: KeyCodes.ESCAPE });
+		this.oMP.onkeyup({ which: KeyCodes.SPACE });
+
+		// act: second press
+		this.oMP.onkeydown({ which: KeyCodes.SPACE });
+		this.oMP.onkeyup({ which: KeyCodes.SPACE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 1, "fireSelect is called exactly once on second press");
+	});
+
 });

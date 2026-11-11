@@ -390,7 +390,8 @@ sap.ui.define([
 	};
 
 	Month.prototype.onAfterRendering = function(){
-		this.bSpaceButtonPressed = false;
+		this._bSpacePressed = false;
+		this._bPressedEscapeOrShift = false;
 		_initItemNavigation.call(this);
 
 		// check if day names are too big -> use smaller ones
@@ -1231,8 +1232,8 @@ sap.ui.define([
 	};
 
 	Month.prototype.onsapselect = function(oEvent){
-		var oParent = this.getParent();
-		if (this.bSpaceButtonPressed){
+		const oParent = this.getParent();
+		if (oEvent.which === KeyCodes.SPACE){
 			return;
 		}
 
@@ -1241,7 +1242,7 @@ sap.ui.define([
 		}
 
 		// focused item must be selected
-		var bSelected = this._selectDay(this._getSelectedDateFromEvent(oEvent));
+		const bSelected = this._selectDay(this._getSelectedDateFromEvent(oEvent));
 		if (bSelected) {
 			_fireSelect.call(this);
 		}
@@ -1257,13 +1258,33 @@ sap.ui.define([
 			this._selectedWithMouse = false;
 		}
 		if (oEvent.which === KeyCodes.SPACE){
-			this.bSpaceButtonPressed = true;
+			this._bSpacePressed = true;
+			oEvent.preventDefault();
+		}
+		if (this._bSpacePressed) {
+			if (oEvent.which === KeyCodes.SHIFT || oEvent.which === KeyCodes.ESCAPE) {
+				this._bPressedEscapeOrShift = true;
+			}
 		}
 		this._bFocusFromTouch = false;
 	};
 	Month.prototype.onkeyup = function(oEvent){
-		if (oEvent.which === KeyCodes.SPACE){
-			this.bSpaceButtonPressed = false;
+		if (oEvent.which === KeyCodes.SPACE && this._bSpacePressed) {
+			if (!this._bPressedEscapeOrShift) {
+				const oParent = this.getParent();
+				if (!oParent || !oParent._isMultiDatesSelectionHeaderAllowed || oParent._isMultiDatesSelectionHeaderAllowed()) {
+					const bSelected = this._selectDay(this._getSelectedDateFromEvent(oEvent));
+					if (bSelected) {
+						_fireSelect.call(this);
+					}
+				}
+			}
+			this._bSpacePressed = false;
+			this._bPressedEscapeOrShift = false;
+		}
+		if (oEvent.which === KeyCodes.ESCAPE) {
+			this._bSpacePressed = false;
+			this._bPressedEscapeOrShift = false;
 		}
 	};
 

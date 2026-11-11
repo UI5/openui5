@@ -1,9 +1,10 @@
-/*global QUnit */
+/*global QUnit, sinon */
 
 sap.ui.define([
 	"sap/ui/unified/calendar/Header",
-	"sap/ui/qunit/utils/nextUIUpdate"
-], function(Header, nextUIUpdate) {
+	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/events/KeyCodes"
+], function(Header, nextUIUpdate, KeyCodes) {
 	"use strict";
 
 	QUnit.module("Rendering", function (hooks) {
@@ -445,6 +446,117 @@ sap.ui.define([
 		// Fake test to have a root module with at least one test, otherwise qunit-2 will fail
 		QUnit.test("Private API module starts", function (assert) {
 			assert.ok(true, "assert ok");
+		});
+	});
+
+	QUnit.module("Space key — deferred action and cancellation", function(hooks) {
+		hooks.beforeEach(async function() {
+			this.oHeader = new Header({
+				visibleButton1: true,
+				visibleButton2: true,
+				visibleCurrentDateButton: true
+			});
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+		});
+		hooks.afterEach(function() {
+			this.oHeader.destroy();
+			this.oHeader = null;
+		});
+
+		function pressSpace(oDomRef) {
+			oDomRef.focus();
+			oDomRef.dispatchEvent(new KeyboardEvent("keydown", { which: KeyCodes.SPACE, keyCode: KeyCodes.SPACE, bubbles: true, cancelable: true }));
+			oDomRef.dispatchEvent(new KeyboardEvent("keyup",  { which: KeyCodes.SPACE, keyCode: KeyCodes.SPACE, bubbles: true }));
+		}
+
+		function pressSpaceThenCancel(oDomRef, iCancelKey) {
+			oDomRef.focus();
+			oDomRef.dispatchEvent(new KeyboardEvent("keydown", { which: KeyCodes.SPACE,  keyCode: KeyCodes.SPACE,  bubbles: true, cancelable: true }));
+			oDomRef.dispatchEvent(new KeyboardEvent("keydown", { which: iCancelKey,       keyCode: iCancelKey,       bubbles: true, cancelable: true }));
+			oDomRef.dispatchEvent(new KeyboardEvent("keyup",   { which: KeyCodes.SPACE,  keyCode: KeyCodes.SPACE,  bubbles: true }));
+		}
+
+		QUnit.test("Space on prev button fires pressPrevious on keyup", function(assert) {
+			const oSpy = sinon.spy(this.oHeader, "firePressPrevious");
+			pressSpace(this.oHeader.getDomRef("prev"));
+			assert.strictEqual(oSpy.callCount, 1, "pressPrevious fired once on Space keyup");
+			oSpy.restore();
+		});
+
+		QUnit.test("Space on next button fires pressNext on keyup", function(assert) {
+			const oSpy = sinon.spy(this.oHeader, "firePressNext");
+			pressSpace(this.oHeader.getDomRef("next"));
+			assert.strictEqual(oSpy.callCount, 1, "pressNext fired once on Space keyup");
+			oSpy.restore();
+		});
+
+		QUnit.test("Space on today button fires pressCurrentDate on keyup", function(assert) {
+			const oSpy = sinon.spy(this.oHeader, "firePressCurrentDate");
+			pressSpace(this.oHeader.getDomRef("today"));
+			assert.strictEqual(oSpy.callCount, 1, "pressCurrentDate fired once on Space keyup");
+			oSpy.restore();
+		});
+
+		QUnit.test("Space on B1 button fires pressButton1 on keyup", function(assert) {
+			const oSpy = sinon.spy(this.oHeader, "firePressButton1");
+			pressSpace(this.oHeader.getDomRef("B1"));
+			assert.strictEqual(oSpy.callCount, 1, "pressButton1 fired once on Space keyup");
+			oSpy.restore();
+		});
+
+		QUnit.test("Space + Shift cancels the action on prev button", function(assert) {
+			const oSpy = sinon.spy(this.oHeader, "firePressPrevious");
+			pressSpaceThenCancel(this.oHeader.getDomRef("prev"), KeyCodes.SHIFT);
+			assert.strictEqual(oSpy.callCount, 0, "pressPrevious not fired when Shift is held during Space");
+			oSpy.restore();
+		});
+
+		QUnit.test("Space + Escape cancels the action on prev button", function(assert) {
+			const oSpy = sinon.spy(this.oHeader, "firePressPrevious");
+			pressSpaceThenCancel(this.oHeader.getDomRef("prev"), KeyCodes.ESCAPE);
+			assert.strictEqual(oSpy.callCount, 0, "pressPrevious not fired when Escape is held during Space");
+			oSpy.restore();
+		});
+
+		QUnit.test("Space + Shift cancels the action on B1 button", function(assert) {
+			const oSpy = sinon.spy(this.oHeader, "firePressButton1");
+			pressSpaceThenCancel(this.oHeader.getDomRef("B1"), KeyCodes.SHIFT);
+			assert.strictEqual(oSpy.callCount, 0, "pressButton1 not fired when Shift is held during Space");
+			oSpy.restore();
+		});
+
+		QUnit.test("Space + Escape cancels the action on B1 button", function(assert) {
+			const oSpy = sinon.spy(this.oHeader, "firePressButton1");
+			pressSpaceThenCancel(this.oHeader.getDomRef("B1"), KeyCodes.ESCAPE);
+			assert.strictEqual(oSpy.callCount, 0, "pressButton1 not fired when Escape is held during Space");
+			oSpy.restore();
+		});
+
+		QUnit.test("Escape alone without Space does not leave flags dirty", function(assert) {
+			const oPrevBtn = this.oHeader.getDomRef("prev");
+			oPrevBtn.focus();
+			oPrevBtn.dispatchEvent(new KeyboardEvent("keydown", { which: KeyCodes.ESCAPE, keyCode: KeyCodes.ESCAPE, bubbles: true, cancelable: true }));
+			assert.strictEqual(this.oHeader._bSpacePressed, false, "_bSpacePressed remains false");
+			assert.strictEqual(this.oHeader._bPressedEscapeOrShift, false, "_bPressedEscapeOrShift remains false");
+		});
+
+		QUnit.test("Space keydown calls preventDefault to prevent page scroll", function(assert) {
+			const oPrevBtn = this.oHeader.getDomRef("prev");
+			oPrevBtn.focus();
+			const oEvent = new KeyboardEvent("keydown", { which: KeyCodes.SPACE, keyCode: KeyCodes.SPACE, bubbles: true, cancelable: true });
+			const oPreventDefaultSpy = sinon.spy(oEvent, "preventDefault");
+			oPrevBtn.dispatchEvent(oEvent);
+			assert.ok(oPreventDefaultSpy.called, "preventDefault called on Space keydown");
+		});
+
+		QUnit.test("Mouse click still fires press event regardless of Space state", function(assert) {
+			const oSpy = sinon.spy(this.oHeader, "firePressNext");
+			const oNextBtn = this.oHeader.getDomRef("next");
+			oNextBtn.focus();
+			oNextBtn.dispatchEvent(new MouseEvent("click", { detail: 1, bubbles: true }));
+			assert.strictEqual(oSpy.callCount, 1, "pressNext fires on mouse click");
+			oSpy.restore();
 		});
 	});
 });

@@ -7,9 +7,10 @@ sap.ui.define([
 	"sap/ui/unified/DateRange",
 	"sap/ui/unified/calendar/CalendarDate",
 	"sap/ui/Device",
+	"sap/ui/events/KeyCodes",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/date/UI5Date"
-], function(Library, nextUIUpdate, YearPicker, DateRange, CalendarDate, Device, jQuery, UI5Date) {
+], function(Library, nextUIUpdate, YearPicker, DateRange, CalendarDate, Device, KeyCodes, jQuery, UI5Date) {
 	"use strict";
 
 		QUnit.module("API ", {
@@ -423,5 +424,95 @@ sap.ui.define([
 			isValueInThresholdStub.restore();
 			itemNavigationStub.restore();
 		});
+
+	QUnit.module("Space key cancel action", {
+		beforeEach: async function () {
+			this.oYP = new YearPicker();
+			this.oYP.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			this.oSelectSpy = this.spy(this.oYP, "fireSelect");
+			this.oItemNavigationStub = this.stub(this.oYP._oItemNavigation, "getFocusedIndex").returns(3);
+		},
+		afterEach: function () {
+			this.oYP.destroy();
+			this.oYP = null;
+		}
+	});
+
+	QUnit.test("Space keyup selects the focused year", function (assert) {
+		// act
+		this.oYP.onkeydown({ which: KeyCodes.SPACE });
+		this.oYP.onkeyup({ which: KeyCodes.SPACE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 1, "fireSelect is called once");
+	});
+
+	QUnit.test("Space keydown alone does not select (no premature selection on keydown)", function (assert) {
+		// act
+		this.oYP.onkeydown({ which: KeyCodes.SPACE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called on keydown");
+	});
+
+	QUnit.test("Space then Escape keydown cancels selection — case 1: Escape pressed and released before Space released", function (assert) {
+		// act: Space down, Escape down, Escape up, Space up
+		this.oYP.onkeydown({ which: KeyCodes.SPACE });
+		this.oYP.onkeydown({ which: KeyCodes.ESCAPE });
+		this.oYP.onkeyup({ which: KeyCodes.ESCAPE });
+		this.oYP.onkeyup({ which: KeyCodes.SPACE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("Space then Escape keydown cancels selection — case 2: Escape held past Space release", function (assert) {
+		// act: Space down, Escape down, Space up, Escape up
+		this.oYP.onkeydown({ which: KeyCodes.SPACE });
+		this.oYP.onkeydown({ which: KeyCodes.ESCAPE });
+		this.oYP.onkeyup({ which: KeyCodes.SPACE });
+		this.oYP.onkeyup({ which: KeyCodes.ESCAPE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("Space then Shift keydown cancels selection — case 1: Shift pressed and released before Space released", function (assert) {
+		// act: Space down, Shift down, Shift up, Space up
+		this.oYP.onkeydown({ which: KeyCodes.SPACE });
+		this.oYP.onkeydown({ which: KeyCodes.SHIFT });
+		this.oYP.onkeyup({ which: KeyCodes.SHIFT });
+		this.oYP.onkeyup({ which: KeyCodes.SPACE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("Space then Shift keydown cancels selection — case 2: Shift held past Space release", function (assert) {
+		// act: Space down, Shift down, Space up, Shift up
+		this.oYP.onkeydown({ which: KeyCodes.SPACE });
+		this.oYP.onkeydown({ which: KeyCodes.SHIFT });
+		this.oYP.onkeyup({ which: KeyCodes.SPACE });
+		this.oYP.onkeyup({ which: KeyCodes.SHIFT });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("After cancelled Space press, next Space press selects normally", function (assert) {
+		// act: cancel first press
+		this.oYP.onkeydown({ which: KeyCodes.SPACE });
+		this.oYP.onkeydown({ which: KeyCodes.ESCAPE });
+		this.oYP.onkeyup({ which: KeyCodes.ESCAPE });
+		this.oYP.onkeyup({ which: KeyCodes.SPACE });
+
+		// act: second press
+		this.oYP.onkeydown({ which: KeyCodes.SPACE });
+		this.oYP.onkeyup({ which: KeyCodes.SPACE });
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 1, "fireSelect is called exactly once on second press");
+	});
 
 });
