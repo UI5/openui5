@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.Image",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Image",
+		"description": "Shows sap.m.Image in four variants: standard src binding, active state (decorative=false with press handler and ariaDetails link), SVG file, and inline SVG via mode=InlineSvg. Covers the most common Image use cases in a single view.",
+		"tags": {
+			"keywords": ["sap.m.Image", "src-binding", "active-state", "svg", "inline-svg", "mode", "decorative", "press", "aria-details"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

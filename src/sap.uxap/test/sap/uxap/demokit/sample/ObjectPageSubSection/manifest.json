@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageSubSection",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageSubSection",
+		"description": "An ObjectPageSubSection using the mode property (Expanded/Collapsed) and a moreBlocks aggregation; blocks in moreBlocks are hidden until the user expands the subsection, demonstrating the progressive-disclosure pattern for long subsections.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageSubSection", "mode", "more-blocks", "expand-collapse", "progressive-disclosure"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

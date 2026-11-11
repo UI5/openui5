@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageHeaderExpanded",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: header always expanded",
+		"description": "An ObjectPageLayout with preserveHeaderStateOnScroll=true, keeping the header permanently expanded as the user scrolls so the title and header content are always visible and never collapse into the sticky bar.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "preserve-header-state", "always-expanded", "sticky-header"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

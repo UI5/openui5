@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.SemanticPage",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Semantic Page - Master Detail",
+		"description": "Full master-detail layout using sap.m.semantic.MasterPage and DetailPage inside a SplitContainer. Demonstrates semantic action slots (addAction, positiveAction, negativeAction, forwardAction, flagAction, favoriteAction, and more), a PagingButton, PageAccessibleLandmarkInfo, and MessagePopover/MessageToast feedback when actions are pressed.",
+		"tags": { "keywords": ["sap.m.semantic.MasterPage", "sap.m.semantic.DetailPage", "split-container", "semantic-actions", "paging-button", "accessible-landmark-info"] },
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

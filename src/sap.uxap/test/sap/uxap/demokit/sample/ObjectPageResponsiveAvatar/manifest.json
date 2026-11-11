@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageResponsiveAvatar",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: responsive Avatar in snapped header",
+		"description": "An ObjectPageLayout with a DynamicHeaderTitle that shows an Avatar in the snappedHeading area; the header has breadcrumbs and showEditHeaderButton=true, and the controller handles the ObjectPageLayout breakpointChange event to resize the Avatars responsively.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "sap.uxap.ObjectPageDynamicHeaderTitle", "responsive-avatar", "snapped-heading", "breakpoint-change", "show-edit-header-button", "breadcrumbs"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

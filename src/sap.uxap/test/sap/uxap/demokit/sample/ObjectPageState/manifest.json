@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageState",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: subsection visibility state",
+		"description": "An ObjectPageLayout that listens to the subSectionVisibilityChange event to track which subsections are currently in the viewport; a dynamic sapUxAPObjectPageSubSectionFitContainer CSS class is applied to subsections containing a grid table so the table fills the available height.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "subsection-visibility-change", "fit-container", "viewport-tracking", "dynamic-css"]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

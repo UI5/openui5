@@ -3,7 +3,13 @@
  		"id": "sap.m.sample.BreadcrumbsWithCurrentPageLink",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Breadcrumbs sample with current page link",
+		"description": "Shows the currentLocation aggregation of sap.m.Breadcrumbs set to a Link instead of using the currentLocationText string property, making the current page itself a clickable link in the trail.",
+		"tags": {
+			"keywords": ["sap.m.Breadcrumbs", "current-location-aggregation", "link", "clickable-current-page"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

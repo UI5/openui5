@@ -3,7 +3,21 @@
 		"id": "sap.f.sample.ShellBarWithSplitApp",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Shell Bar with Split App",
+		"description": "A ShellBar embedded as the header of a sap.tnt.ToolPage with showMenuButton=true to toggle the side navigation; the main content is a NavContainer with multiple scroll containers, demonstrating the full ToolPage shell/master-detail layout pattern.",
+		"tags": {
+			"keywords": [
+				"sap.f.ShellBar",
+				"sap.tnt.ToolPage",
+				"side-navigation",
+				"nav-container",
+				"menu-button",
+				"tool-page",
+				"shell-layout"
+			]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

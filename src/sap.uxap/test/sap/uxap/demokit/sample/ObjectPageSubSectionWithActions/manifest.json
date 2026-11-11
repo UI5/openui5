@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageSubSectionWithActions",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageSubSection: actions aggregation",
+		"description": "A side-by-side comparison of subsections with and without an actions aggregation; buttons placed in the actions aggregation appear in the subsection header title bar, while subsections without actions show no action area.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageSubSection", "actions", "subsection-header", "action-buttons"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

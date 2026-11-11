@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageSubSectionSized",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageSubSection: explicit column sizing",
+		"description": "An ObjectPageSubSection with explicit columnLayout values (auto, 1, 2, 3, 4) on each block; toolbar buttons let the user toggle useTwoColumnsForLargeScreen and subSectionLayout (TitleOnTop/TitleOnLeft) at runtime to compare layout options.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageSubSection", "column-layout", "use-two-columns", "subsection-layout", "title-on-left"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.GenericTag",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Generic Tag",
+		"description": "Shows sap.m.GenericTag in KPI mode (with ObjectNumber showing Error/Warning/Success numeric values) and Situation mode (status tags). Demonstrates valueState for error indication, ariaLabelledBy for accessibility, and the full GenericTagDesign/GenericTagValueState property range.",
+		"tags": {
+			"keywords": ["sap.m.GenericTag", "kpi", "situation", "object-number", "value-state", "aria-labelled-by", "generic-tag-design"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

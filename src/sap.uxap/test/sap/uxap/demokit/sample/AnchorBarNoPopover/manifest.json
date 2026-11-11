@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.AnchorBarNoPopover",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: anchor bar without popover",
+		"description": "An ObjectPageLayout with showAnchorBarPopover=false, disabling the subsection popover that normally appears on hover so anchor bar buttons navigate directly to sections without an intermediate step.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "anchor-bar", "show-anchor-bar-popover", "direct-navigation"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

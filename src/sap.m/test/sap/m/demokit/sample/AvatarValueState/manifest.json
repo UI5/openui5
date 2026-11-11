@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.AvatarValueState",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Avatar with badgeValueState",
+		"description": "Demonstrates the badgeValueState property of sap.m.Avatar by showing all five values: Warning, Information, None, Success, and Error - each combined with a matching badgeIcon. Distinguishes badgeValueState from the plain badgeIconColor approach.",
+		"tags": {
+			"keywords": ["sap.m.Avatar", "badge-value-state", "value-state", "badge-icon", "warning", "success", "error", "information"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.AnchorBarWithNumbers",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: anchor bar with section numbers",
+		"description": "An ObjectPageLayout with subSectionLayout=\"TitleOnLeft\" and a large number of sections and subsections; section numbers appear in the anchor bar, demonstrating automatic numbering and multi-level anchor hierarchy.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "anchor-bar", "section-numbers", "title-on-left", "multi-section"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

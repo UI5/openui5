@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageResetSelectedSection",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: reset selected section on revisit",
+		"description": "A NavContainer with two pages - a list page and a page hosting a single ObjectPageLayout; when the user navigates to the ObjectPage with the reset option enabled, the controller resets selectedSection to the first visible section, demonstrating how to clear the scroll position on re-entry.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "selected-section", "nav-container", "reset-on-revisit", "scroll-position"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

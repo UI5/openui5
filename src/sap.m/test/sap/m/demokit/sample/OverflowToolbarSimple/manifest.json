@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.OverflowToolbarSimple",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Overflow Toolbar - layout",
+		"description": "Ten OverflowToolbars demonstrating OverflowToolbarLayoutData priorities: NeverOverflow, AlwaysOverflow, High, Low, Disappear and grouped overflow via the group property. Also shows SegmentedButton-to-Select conversion in overflow, shrinkable items with minWidth, and label-select pairing. Includes a keyboard command shortcut (Ctrl+E Share).",
+		"tags": { "keywords": ["sap.m.OverflowToolbar", "overflow-toolbar-layout-data", "priority", "grouping", "shrinkable", "keyboard-shortcut"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

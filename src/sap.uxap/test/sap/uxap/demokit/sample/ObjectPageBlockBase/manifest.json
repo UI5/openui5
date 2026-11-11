@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageBlockBase",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPage Blockbase",
+		"description": "An ObjectPage with multiple subsections demonstrating BlockBase columnLayout values (auto, 1, 2, 3), showSubSectionMore on a block, and a ConfigModel-driven subSectionLayout toggle via the header action.",
+		"tags": {
+			"keywords": ["sap.uxap.BlockBase", "sap.uxap.ObjectPageLayout", "column-layout", "subsection-layout", "show-subsection-more"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

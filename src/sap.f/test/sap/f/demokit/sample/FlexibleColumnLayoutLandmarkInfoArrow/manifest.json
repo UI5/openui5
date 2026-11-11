@@ -3,7 +3,21 @@
 		"id": "sap.f.sample.FlexibleColumnLayoutLandmarkInfoArrow",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Flexible Column Layout Landmark Info For Arrows",
+		"description": "A FlexibleColumnLayout using FlexibleColumnLayoutAccessibleLandmarkInfo to set custom accessibility labels on the column navigation arrows, with EventBus-driven column navigation and setLayout transitions.",
+		"tags": {
+			"keywords": [
+				"sap.f.FlexibleColumnLayout",
+				"accessibility",
+				"landmark-info",
+				"arrow-labels",
+				"navigation-arrows",
+				"event-bus",
+				"set-layout"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,22 @@
 		"id": "sap.m.sample.SelectValueState",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Select - Validation states",
+		"description": "Four data-bound Selects, each demonstrating one valueState - Error, Warning, Success and Information - together with valueStateText and associated labels.",
+		"tags": {
+			"keywords": [
+				"sap.m.Select",
+				"value-state",
+				"validation",
+				"value-state-text",
+				"error",
+				"warning",
+				"success",
+				"information"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

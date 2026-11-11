@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.RefreshResponsive",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Responsive Refresh",
+		"description": "Device-adaptive refresh: touch devices get a PullToRefresh control (visible only when Device.support.touch) while non-touch devices use a SearchField with showRefreshButton. The controller detects the current device range and repositions the search bar accordingly.",
+		"tags": { "keywords": ["sap.m.PullToRefresh", "device-support", "responsive", "search-field", "show-refresh-button"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

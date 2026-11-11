@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageBlockViewTypes",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: block view types and accessible landmark info",
+		"description": "An ObjectPageLayout containing blocks implemented with all four UI5 view types (XML, JS, JSON, HTML), each placed in its own section, plus an ObjectPageAccessibleLandmarkInfo that provides custom ARIA region labels for the header, footer, and each section area.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "sap.uxap.ObjectPageAccessibleLandmarkInfo", "block-view-types", "aria-landmark", "xml-view", "js-view", "accessibility"]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

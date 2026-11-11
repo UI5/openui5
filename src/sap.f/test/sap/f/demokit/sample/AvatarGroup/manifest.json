@@ -3,7 +3,20 @@
 		"id": "sap.f.sample.AvatarGroup",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Avatar Group",
+		"description": "Two data-bound AvatarGroups side by side - Individual mode opens a single-avatar detail popover, Group mode opens a list popover with NavContainer drill-down; a Slider controls container width to demonstrate overflow behavior.",
+		"tags": {
+			"keywords": [
+				"sap.f.AvatarGroup",
+				"individual-mode",
+				"group-mode",
+				"data-binding",
+				"popover",
+				"overflow"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

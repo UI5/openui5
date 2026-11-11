@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.SelectList",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "SelectList",
+		"description": "Basic SelectList bound to a data model: items are defined as sap.ui.core.Item objects with key and text.",
+		"tags": { "keywords": ["sap.m.SelectList", "item", "data-binding"] },
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

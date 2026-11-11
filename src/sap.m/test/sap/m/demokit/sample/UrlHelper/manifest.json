@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.UrlHelper",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "URL Helper",
+		"description": "Demonstrates the sap.m.URLHelper utility for triggering native device actions: phone call (triggerTel), SMS (triggerSms), email compose (triggerEmail), and general URL redirect. Each action is triggered from a DisplayListItem press handler.",
+		"tags": { "keywords": ["sap.m.URLHelper", "trigger-tel", "trigger-sms", "trigger-email", "redirect", "native-device"] },
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

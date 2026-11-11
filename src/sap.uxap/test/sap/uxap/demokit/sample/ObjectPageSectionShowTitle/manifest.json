@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageSectionShowTitle",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageSection: show/hide title",
+		"description": "An ObjectPageLayout demonstrating ObjectPageSection with subsections that have showTitle=false; a snapped heading with Avatar+title is used in the DynamicHeaderTitle, with SimpleForm blocks and a Table directly in subsections without the BlockBase abstraction.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageSection", "show-title", "simple-form", "dynamic-header-title", "snapped-heading"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

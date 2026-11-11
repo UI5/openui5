@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageFormFocusableInput",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: focusable inputs in form blocks",
+		"description": "An ObjectPageLayout where blocks contain SimpleForm controls with sap.m.Input fields, verifying that anchor bar navigation scrolls to the correct section and that focusable inputs within blocks are keyboard-accessible after navigation.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "focusable-input", "keyboard-accessibility", "simple-form", "form-blocks"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.Avatar",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Avatar",
+		"description": "Comprehensive showcase of sap.m.Avatar: image/icon/initials content types, all five predefined sizes (XS-XL) plus customDisplaySize, circle and square displayShape, Accent1-10 and special backgroundColor values (Transparent, TileIcon, Placeholder, Random), showBorder, fallbackIcon, enabled=false, and press event handling.",
+		"tags": {
+			"keywords": ["sap.m.Avatar", "display-size", "display-shape", "background-color", "initials", "icon", "image", "show-border", "fallback-icon", "press"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

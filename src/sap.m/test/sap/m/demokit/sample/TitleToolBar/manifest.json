@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.TitleToolBar",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Placing a Title in OverflowToolbar/Toolbar",
+		"description": "Shows how to place a sap.m.Title as the first item in a transparent OverflowToolbar, covering two patterns: title-only and title-with-action-buttons separated by a ToolbarSpacer.",
+		"tags": { "keywords": ["sap.m.OverflowToolbar", "sap.m.Title", "transparent-design", "toolbar-spacer"] },
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

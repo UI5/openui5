@@ -3,7 +3,19 @@
 		"id": "sap.f.sample.ShellBarWithMenuButton",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Shell Bar with menu button",
+		"description": "A ShellBar with both showMenuButton=true and showNavButton=true active simultaneously; demonstrates the dedicated hamburger menu button and back-navigation button alongside search and notifications.",
+		"tags": {
+			"keywords": [
+				"sap.f.ShellBar",
+				"menu-button",
+				"nav-button",
+				"show-menu-button",
+				"show-nav-button"
+			]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

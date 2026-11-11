@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.MessagePageWithButtons",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Message Page with Buttons",
+		"description": "sap.m.MessagePage with enableFormattedText=true (HTML in description), a warning icon, and two Buttons in the buttons aggregation, showing a richer empty-state pattern with actionable buttons below the illustrated message text.",
+		"tags": {
+			"keywords": ["sap.m.MessagePage", "enable-formatted-text", "buttons-aggregation", "empty-state", "formatted-text", "html-description"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

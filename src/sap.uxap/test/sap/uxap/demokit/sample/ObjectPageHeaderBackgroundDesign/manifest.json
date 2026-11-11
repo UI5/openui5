@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageHeaderBackgroundDesign",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: header background design",
+		"description": "An ObjectPageLayout that sets backgroundDesignAnchorBar=\"Translucent\" on the layout and backgroundDesign=\"Solid\" on the ObjectPageDynamicHeaderTitle, showing how to customize the visual background treatment of the anchor bar and header title areas.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "sap.uxap.ObjectPageDynamicHeaderTitle", "background-design", "anchor-bar-background", "translucent", "solid"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

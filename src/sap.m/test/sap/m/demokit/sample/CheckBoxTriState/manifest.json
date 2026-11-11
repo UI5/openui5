@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.CheckBoxTriState",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Tri-State Check Box",
+		"description": "Demonstrates a tri-state sap.m.CheckBox select-all pattern using expression binding: the parent checkbox's selected and partiallySelected properties are bound with expressions that reflect three child checkbox states, so it shows checked, unchecked, or partially selected as children are toggled.",
+		"tags": {
+			"keywords": ["sap.m.CheckBox", "tri-state", "partial-selection", "expression-binding", "select-all", "partially-selected"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

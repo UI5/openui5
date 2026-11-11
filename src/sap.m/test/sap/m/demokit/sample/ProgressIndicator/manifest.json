@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.ProgressIndicator",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Progress Indicator",
+		"description": "Showcases ProgressIndicator across all value states (None, Error, Success, Warning, Information) in both regular and displayOnly modes. Covers percentValue, displayValue, showValue, state, displayOnly and displayAnimation properties, plus an information popover triggered by truncated displayValue.",
+		"tags": { "keywords": ["sap.m.ProgressIndicator", "percent-value", "display-value", "value-state", "display-only", "display-animation"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

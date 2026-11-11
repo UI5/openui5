@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.SemanticPageFullScreen",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Semantic Page - Full Screen",
+		"description": "Single-page fullscreen layout using sap.m.semantic.FullscreenPage with Add, Edit, and Delete semantic action slots. Demonstrates navButtonPress navigation and how semantic slots map to the shell bar and footer bar.",
+		"tags": { "keywords": ["sap.m.semantic.FullscreenPage", "semantic-actions", "nav-button-press", "add-action", "edit-action", "delete-action"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

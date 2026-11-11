@@ -3,7 +3,11 @@
 		"id": "sap.ui.layout.sample.GridXL",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Grid - Features Demo",
+		"description": "Comprehensive Grid sample covering XL breakpoint spans, moveForward/moveBackwards cell reordering, indent, visibleM/S visibility toggles, and linebreakXL. Bound to an information.json model to demonstrate all advanced GridData layout features at once.",
+		"tags": { "keywords": ["sap.ui.layout.Grid", "sap.ui.layout.GridData", "xl-breakpoint", "move-forward", "move-backwards", "indent", "linebreak-xl", "responsive-visibility"] },
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

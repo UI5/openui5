@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageBeforeNavigate",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: beforeNavigate event",
+		"description": "An ObjectPageLayout in edit mode that uses the beforeNavigate event to intercept anchor bar navigation; when unsaved changes are present, preventDefault() stops the navigation and a confirmation Dialog lets the user save or discard before moving to the target section.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "before-navigate", "prevent-default", "edit-mode", "confirmation-dialog", "unsaved-changes"]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

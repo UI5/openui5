@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.ToolbarResponsive",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Toolbar - Responsive",
+		"description": "Responsive toolbar that adapts to Device.media range: desktop shows all buttons inline, tablet hides secondary buttons, phone moves overflow actions into an ActionSheet fragment triggered by a 'More' button. Uses visibility bindings and Device.media.attachHandler.",
+		"tags": { "keywords": ["sap.m.Toolbar", "responsive", "device-media", "action-sheet", "visibility-binding", "breakpoint"] },
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,21 @@
 		"id": "sap.f.sample.FlexibleColumnLayoutWithFullscreenPage",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Flexible Column Layout with Routing and first page in fullscreen only",
+		"description": "A routing-based FlexibleColumnLayout app where the first detail page opens fullscreen in the begin column (both initial targets use beginColumnPages) before the mid and end columns appear, using FlexibleColumnLayoutSemanticHelper and navigation-arrow URL sync.",
+		"tags": {
+			"keywords": [
+				"sap.f.FlexibleColumnLayout",
+				"routing",
+				"semantic-helper",
+				"fullscreen",
+				"one-column",
+				"layout-type",
+				"begin-column"
+			]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"config": {

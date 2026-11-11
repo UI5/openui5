@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.ImageErrorWithIllustration",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Image with Error Illustrated Message",
+		"description": "Shows how to handle sap.m.Image load/error events: on load success the Image stays visible; on error the Image is hidden and an IllustratedMessage (ErrorScreen illustration) is shown in its place. Demonstrates the load and error event handlers with model-binding visibility toggling.",
+		"tags": {
+			"keywords": ["sap.m.Image", "load-event", "error-event", "illustrated-message", "error-handling", "visibility-binding"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,21 @@
 		"id": "sap.f.sample.ShellBarWithFlexibleColumnLayout",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Shell Bar with Flexible Column Layout",
+		"description": "A sap.f.ShellBar used as the custom header above a routing-based FlexibleColumnLayout, wiring the ShellBar back navigation to the fullscreen (EndColumnFullScreen) layout state, with search, notifications, menu and avatar in the ShellBar.",
+		"tags": {
+			"keywords": [
+				"sap.f.ShellBar",
+				"sap.f.FlexibleColumnLayout",
+				"shell-bar",
+				"routing",
+				"semantic-helper",
+				"fullscreen",
+				"navigation"
+			]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"config": {

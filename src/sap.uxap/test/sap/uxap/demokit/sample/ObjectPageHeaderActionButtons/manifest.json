@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageHeaderActionButtons",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageDynamicHeaderTitle: action buttons",
+		"description": "An ObjectPageLayout with ObjectPageDynamicHeaderTitle demonstrating the actions (Edit, Delete, Copy, Add, Share) and navigationActions (slim-arrow-up/down) aggregations using ObjectPageHeaderActionButton with various type values (Emphasized, Transparent) and hideText/hideIcon settings.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageDynamicHeaderTitle", "sap.uxap.ObjectPageHeaderActionButton", "actions", "navigation-actions", "hide-text", "hide-icon"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.ImageModeBackground",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Image in Background mode",
+		"description": "Demonstrates sap.m.Image with mode=Background: shows combinations of backgroundSize (5em 5em, 2em 2em, contain), backgroundPosition (center, center center), and backgroundRepeat (repeat).",
+		"tags": {
+			"keywords": ["sap.m.Image", "background-mode", "background-size", "background-position", "background-repeat"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

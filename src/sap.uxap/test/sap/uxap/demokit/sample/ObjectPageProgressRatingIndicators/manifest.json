@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageProgressRatingIndicators",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: ProgressIndicator and RatingIndicator in header",
+		"description": "An ObjectPageLayout with a headerContent area containing header facets that include sap.m.ProgressIndicator (42% completion with state Information) and sap.m.RatingIndicator (4 out of 5 stars), demonstrating these controls used as KPI-style facets inside the Object Page header.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "sap.m.ProgressIndicator", "sap.m.RatingIndicator", "header-facets", "kpi"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

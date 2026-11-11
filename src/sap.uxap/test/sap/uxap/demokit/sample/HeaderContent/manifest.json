@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.HeaderContent",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageHeaderContent",
+		"description": "A standalone ObjectPageHeaderContent area demonstrating all supported child control types (ObjectAttribute, ObjectStatus, Label, ObjectNumber) alongside ObjectPageHeaderLayoutData used to control visibility at specific breakpoints (visibleS/M/L).",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageHeaderContent", "sap.uxap.ObjectPageHeaderLayoutData", "responsive-visibility", "object-attribute", "object-status", "breakpoints"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

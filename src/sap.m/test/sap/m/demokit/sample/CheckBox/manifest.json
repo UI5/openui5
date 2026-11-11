@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.CheckBox",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Check Box",
+		"description": "Shows sap.m.CheckBox in various states: selected/unselected, partiallySelected, required, enabled=false (disabled), valueState (Warning/Error/Information), and wrapping=true for long label text. Includes checkboxes placed inside a SimpleForm layout.",
+		"tags": {
+			"keywords": ["sap.m.CheckBox", "partially-selected", "value-state", "required", "wrapping", "enabled", "simple-form"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

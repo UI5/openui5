@@ -3,7 +3,19 @@
 		"id": "sap.f.sample.DynamicPageAnalyticalTable",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Dynamic Page with Analytical Table",
+		"description": "A DynamicPage with preserveHeaderStateOnScroll=true and fitContent=true hosting a sap.ui.table.Table in Auto rowMode; demonstrates the DynamicPage layout optimized for analytical content with a non-growing data table.",
+		"tags": {
+			"keywords": [
+				"sap.f.DynamicPage",
+				"sap.ui.table",
+				"analytical-table",
+				"preserve-header-state",
+				"fit-content"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

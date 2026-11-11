@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageLazyLoadingWithoutBlocks",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: lazy loading without blocks",
+		"description": "An ObjectPageLayout with enableLazyLoading=true where subsections contain plain form controls (SimpleForm) directly rather than BlockBase blocks, demonstrating that lazy loading works without the block abstraction.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "enable-lazy-loading", "no-blocks", "simple-form", "direct-content"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

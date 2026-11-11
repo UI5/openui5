@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageSubSectionMultiView",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageSubSection: multi-view block distribution",
+		"description": "An ObjectPageSubSection whose blocks have multiple view types (expanded/collapsed); the subsection automatically distributes blocks into columns based on block count, demonstrating how column count adapts to the number of blocks without explicit columnLayout settings.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageSubSection", "block-distribution", "multi-view-block", "auto-columns"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

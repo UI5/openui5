@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageOnJSONWithLazyLoading",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: lazy loading",
+		"description": "An ObjectPageLayout with enableLazyLoading=true and headerContentPinned=true, showing employment BlockBase blocks that are only instantiated when their section scrolls into view, improving initial render performance.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "enable-lazy-loading", "header-content-pinned", "performance", "employment-blocks"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

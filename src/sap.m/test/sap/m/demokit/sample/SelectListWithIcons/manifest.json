@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.SelectListWithIcons",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "SelectList - With Icons",
+		"description": "SelectList where each item uses sap.ui.core.ListItem (instead of plain Item) to add an icon alongside the text. Demonstrates icon-enriched selection lists.",
+		"tags": { "keywords": ["sap.m.SelectList", "list-item", "icon", "selection-change"] },
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

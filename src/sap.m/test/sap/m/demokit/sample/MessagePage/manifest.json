@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.MessagePage",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Message Page",
+		"description": "Minimal sap.m.MessagePage with showHeader=false and a custom icon (sap-icon://filter), showing how it renders a centered empty-state message without a shell bar.",
+		"tags": {
+			"keywords": ["sap.m.MessagePage", "empty-state", "show-header", "icon", "no-header"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

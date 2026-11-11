@@ -3,7 +3,21 @@
 		"id": "sap.f.sample.DynamicPageFreeStyle",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Dynamic Page Freestyle Example",
+		"description": "A DynamicPage with a pinnable DynamicPageHeader, breadcrumbs, and expandedContent/snappedContent title areas; content is a sticky sap.m.Table bound to a product list; footer toggle and DynamicPageTitle.areaShrinkRatio adjustment are demonstrated via controller actions.",
+		"tags": {
+			"keywords": [
+				"sap.f.DynamicPage",
+				"dynamic-page-title",
+				"dynamic-page-header",
+				"pinnable-header",
+				"area-shrink-ratio",
+				"breadcrumbs",
+				"sticky-table"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

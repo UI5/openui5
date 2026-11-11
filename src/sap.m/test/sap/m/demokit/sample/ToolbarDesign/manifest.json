@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.ToolbarDesign",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "OverflowToolbar - Design and styling",
+		"description": "Interactively explores the design (Auto, Info, Transparent, Solid, TagFilter) and style (Standard, Clear) properties of OverflowToolbar. Two Select dropdowns drive runtime changes via setDesign and setStyle calls.",
+		"tags": { "keywords": ["sap.m.OverflowToolbar", "design", "style", "toolbar-design", "toolbar-style"] },
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

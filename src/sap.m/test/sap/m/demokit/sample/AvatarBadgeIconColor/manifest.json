@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.AvatarBadgeIconColor",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Avatar with Badge Icon Color",
+		"description": "Shows the badgeIconColor property of sap.m.Avatar across the full Accent1-10 palette, Indication1-10 palette, and badgeValueState (Success/Information/Warning/Error). Each combination is shown as backgroundColor+badgeIconColor pairs, making it easy to compare accessible color pairings.",
+		"tags": {
+			"keywords": ["sap.m.Avatar", "badge-icon-color", "accent-color", "indication-color", "badge-value-state", "background-color", "badge-icon"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

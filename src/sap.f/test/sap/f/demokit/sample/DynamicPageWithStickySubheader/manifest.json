@@ -3,7 +3,19 @@
 		"id": "sap.f.sample.DynamicPageWithStickySubheader",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Dynamic Page with Sticky Subheader",
+		"description": "A DynamicPage using stickySubheaderProvider to keep a sap.m.IconTabBar sticky while the DynamicPageHeader collapses on scroll; demonstrates the cooperation between DynamicPage and an IconTabBar acting as a persistent subheader.",
+		"tags": {
+			"keywords": [
+				"sap.f.DynamicPage",
+				"sticky-subheader",
+				"sticky-subheader-provider",
+				"icon-tab-bar",
+				"header-collapse"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

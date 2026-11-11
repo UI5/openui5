@@ -3,7 +3,13 @@
 		"id": "sap.m.sample.DraftIndicator",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Draft Indicator",
+		"description": "Standalone sap.m.DraftIndicator with three buttons wired to its three state-transition methods: showDraftSaving (shows Saving...), showDraftSaved (shows Draft Saved), and clearDraftState (clears the indicator). Demonstrates direct programmatic control of draft state.",
+		"tags": {
+			"keywords": ["sap.m.DraftIndicator", "draft-state", "saving", "saved", "clear-draft-state"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

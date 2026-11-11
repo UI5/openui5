@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ChildObjectPage",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: child object page",
+		"description": "An ObjectPageLayout with isChildPage=true containing an ObjectPageHeader, showing the child page visual treatment (reduced header size, back-button breadcrumbs in the title area), alongside standard action buttons.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "sap.uxap.ObjectPageHeader", "child-page", "breadcrumbs", "action-buttons"]
+		},
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

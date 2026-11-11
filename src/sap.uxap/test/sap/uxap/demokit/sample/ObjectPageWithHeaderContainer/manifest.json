@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageWithHeaderContainer",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: header container with Avatar facets",
+		"description": "An ObjectPageLayout using showTitleInHeaderContent=true whose headerContent hosts an sap.m.HeaderContainer with horizontally scrollable item panels (Avatar, order and contact details, status, ratings), demonstrating the header container pattern where key attributes appear inside the header area.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "sap.m.HeaderContainer", "header-container", "show-title-in-header-content", "avatar-facet", "header-facets"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

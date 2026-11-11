@@ -3,7 +3,19 @@
 		"id": "sap.m.sample.SelectGrouping",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Select - with grouped items",
+		"description": "Two Selects showing grouped items - one with static group headers via SeparatorItem, one with dynamic groups produced by a binding sorter using group:true.",
+		"tags": {
+			"keywords": [
+				"sap.m.Select",
+				"grouping",
+				"separator-item",
+				"sorter",
+				"data-binding"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,11 @@
 		"id": "sap.m.sample.ToolbarAlignment",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "OverflowToolbar - Alignment",
+		"description": "Demonstrates left/right, centered, and multi-section horizontal alignment in OverflowToolbar using ToolbarSpacer. Shows flexible (equal sharing) vs fixed-width ToolbarSpacer, and how centering compares to Bar's built-in centering.",
+		"tags": { "keywords": ["sap.m.OverflowToolbar", "toolbar-spacer", "alignment", "centering", "layout"] },
+		"complexity": "basic"
 	},
 	"sap.ui5": {
 		"rootView": {

@@ -3,7 +3,21 @@
 		"id": "sap.f.sample.SemanticPageFreeStyle",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Semantic Page - Freestyle Sample",
+		"description": "A comprehensive sap.f.semantic.SemanticPage exercising all semantic action slots: titleMainAction, semantic title actions (add/delete/copy/edit/favorite/flag/close/fullscreen/exitFullscreen), ShareMenu (DiscussInJam/ShareInJam/Print/SendEmail/SendMessage), custom title text/icon actions, titleContent with a KPI image, titleSnappedOnMobile, and footer positive/negative/custom actions.",
+		"tags": {
+			"keywords": [
+				"sap.f.semantic.SemanticPage",
+				"semantic-actions",
+				"share-menu",
+				"fullscreen",
+				"title-content",
+				"snapped-on-mobile",
+				"footer-actions"
+			]
+		},
+		"complexity": "advanced"
 	},
 	"sap.ui5": {
 		"rootView": {

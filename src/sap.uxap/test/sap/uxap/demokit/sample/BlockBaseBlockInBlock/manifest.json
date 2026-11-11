@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.BlockBaseBlockInBlock",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Block in a block",
+		"description": "A custom BlockBase that embeds another block inside it, with a ModelMapping passing a scoped JSON model path from the outer block context to the inner block's internalModelName.",
+		"tags": {
+			"keywords": ["sap.uxap.BlockBase", "sap.uxap.ModelMapping", "nested-block", "block-in-block", "model-mapping"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

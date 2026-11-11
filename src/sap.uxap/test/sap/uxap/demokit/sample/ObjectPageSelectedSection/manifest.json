@@ -3,7 +3,13 @@
 		"id": "sap.uxap.sample.ObjectPageSelectedSection",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "ObjectPageLayout: pre-selected section",
+		"description": "An ObjectPageLayout in tab mode (useIconTabBar=true) where selectedSection is preset to a specific section ID (\"personal\") so the page opens on a particular tab rather than the default first section.",
+		"tags": {
+			"keywords": ["sap.uxap.ObjectPageLayout", "selected-section", "tab-navigation", "use-icon-tab-bar", "deep-link"]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"rootView": {

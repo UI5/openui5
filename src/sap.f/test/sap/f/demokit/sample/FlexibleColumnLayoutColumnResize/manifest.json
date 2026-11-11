@@ -3,7 +3,20 @@
 		"id": "sap.f.sample.FlexibleColumnLayoutColumnResize",
 		"applicationVersion": {
 			"version": "1.0.0"
-		}
+		},
+		"title": "Flexible Column Layout with programmatic scrolling to an item",
+		"description": "A FlexibleColumnLayout app that listens to the columnResize event and, once the begin column is fully resized in OneColumn layout, selects a specific ObjectPageLayout section from a section index carried in the route, scrolling the newly navigated column to that item.",
+		"tags": {
+			"keywords": [
+				"sap.f.FlexibleColumnLayout",
+				"column-resize",
+				"routing",
+				"semantic-helper",
+				"object-page-layout",
+				"scrolling"
+			]
+		},
+		"complexity": "intermediate"
 	},
 	"sap.ui5": {
 		"config": {
