@@ -27,14 +27,22 @@ sap.ui.define(function() {
 			}
 		},
 		tests: {
+			_coverageFilter: {
+				coverage: {
+					only: "sap/ui/test/starter/_coverageFilter"
+				},
+				module: [
+					"./_coverageFilter.qunit"
+				]
+			},
 			"SimpleTestWithQUnit1": {
-				module: './SimpleTest.qunit',
+				module: "./SimpleTest.qunit",
 				qunit: {
 					version: 1
 				}
 			},
 			"SimpleTestWithQUnit2": {
-				module: './SimpleTest.qunit',
+				module: "./SimpleTest.qunit",
 				qunit: {
 					version: 2
 				}
