@@ -1129,6 +1129,64 @@ sap.ui.define([
 		oDP.destroy();
 	});
 
+	QUnit.test("showWeekNumbers - default value", function(assert) {
+		// Prepare
+		const oDP = new DatePicker();
+
+		// Assert
+		assert.strictEqual(oDP.getShowWeekNumbers(), true, "showWeekNumbers is true by default");
+
+		// Cleanup
+		oDP.destroy();
+	});
+
+	QUnit.test("showWeekNumbers - propagated to calendar on open", async function(assert) {
+		// Prepare
+		const oDP = new DatePicker({
+				showWeekNumbers: false
+			}).placeAt("content");
+
+		await nextUIUpdate();
+		oDP.toggleOpen();
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oDP._getCalendar().getShowWeekNumbers(), false,
+			"showWeekNumbers is propagated to the calendar when the picker is opened");
+
+		// Cleanup
+		oDP.destroy();
+	});
+
+	QUnit.test("showWeekNumbers - property change is applied to the calendar on next open", async function(assert) {
+		// Prepare
+		const oDP = new DatePicker().placeAt("content");
+
+		await nextUIUpdate();
+		oDP.toggleOpen();
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oDP._getCalendar().getShowWeekNumbers(), true,
+			"showWeekNumbers is true in the calendar by default");
+
+		// Act - change the property and reopen the picker
+		oDP.toggleOpen(); // close
+		await nextUIUpdate();
+		oDP.setShowWeekNumbers(false);
+		await nextUIUpdate();
+		oDP.toggleOpen(); // reopen
+		await nextUIUpdate();
+
+		// Assert
+		assert.strictEqual(oDP.getShowWeekNumbers(), false, "property is updated");
+		assert.strictEqual(oDP._getCalendar().getShowWeekNumbers(), false,
+			"the new value is applied to the calendar when the picker is reopened");
+
+		// Cleanup
+		oDP.destroy();
+	});
+
 	QUnit.module("initialFocusedDate property", {
 		beforeEach: async function () {
 			this.oDp = new DatePicker();

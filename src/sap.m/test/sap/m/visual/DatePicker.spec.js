@@ -70,6 +70,12 @@ describe("sap.m.DatePicker", function() {
 		expect(takeScreenshot(oCalendar)).toLookAs("calendar_Jan_2014_UTC");
 	});
 
+	it("should open a DatePicker with hidden week numbers", function() {
+		element(by.id("DP17-icon")).click(); //open the picker
+		const oCalendar = element(by.css("#DP17-RP-popover"));
+		expect(takeScreenshot(oCalendar)).toLookAs("picker_without_week_numbers");
+	});
+
 	function testDP16WithTimezoneBtn(sBtnId, sTimezone) {
 		var oInput = element(by.css("#DP16")),
 			oValueHelpIcon = element(by.id("DP16-icon")),
