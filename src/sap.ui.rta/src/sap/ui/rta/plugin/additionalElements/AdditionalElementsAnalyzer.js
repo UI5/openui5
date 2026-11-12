@@ -306,9 +306,9 @@ sap.ui.define([
 		oInvisibleElement.__bindingPath = mSomeItem.name;
 
 		// oInvisibleElement.__label has the current label retrieved before in the analysis
-		if (oInvisibleElement.__label !== oInvisibleElement.__originalLabel) {
-			oInvisibleElement.__renamedLabel = true;
-		}
+		// Empty control labels (e.g. from uninitialized hidden fields) are not useful in the dialog.
+		oInvisibleElement.__label ||= oInvisibleElement.__originalLabel;
+		oInvisibleElement.__renamedLabel = oInvisibleElement.__label !== oInvisibleElement.__originalLabel;
 		if (mSomeItem.parentPropertyName) {
 			oInvisibleElement.__parentPropertyName = mSomeItem.parentPropertyName;
 		}

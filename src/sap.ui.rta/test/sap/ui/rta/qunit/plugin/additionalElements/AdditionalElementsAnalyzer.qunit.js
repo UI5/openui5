@@ -512,6 +512,36 @@ sap.ui.define([
 			});
 		});
 
+		["", undefined].forEach(function(sEmptyLabel) {
+			QUnit.test(`when a hidden field's label becomes ${JSON.stringify(sEmptyLabel)}, the metadata label is used`, async function(assert) {
+				const oGroup = this.oView.byId("GroupEntityType02");
+				const oGroupElement = this.oView.byId("ComplexBindingCase");
+				oGroupElement.setVisible(false);
+				let sLabel = "Renamed Label";
+				const oActions = {
+					aggregation: "formElements",
+					reveal: {
+						elements: [{
+							element: oGroupElement,
+							action: { getLabel: () => sLabel }
+						}]
+					},
+					addViaDelegate: {
+						delegateInfo: { delegate: this.oDelegate }
+					}
+				};
+				const [oRenamedElement] = await AdditionalElementsAnalyzer.enhanceInvisibleElements(oGroup, oActions);
+				assert.strictEqual(oRenamedElement.label, "Renamed Label", "A nonempty custom label is preserved");
+				assert.strictEqual(oRenamedElement.originalLabel, "EntityType02_Property03", "A renamed field shows its original label");
+
+				sLabel = sEmptyLabel;
+				const [oAdditionalElement] = await AdditionalElementsAnalyzer.enhanceInvisibleElements(oGroup, oActions);
+				assert.strictEqual(oAdditionalElement.label, "EntityType02_Property03", "The metadata label replaces the empty control label");
+				assert.strictEqual(oAdditionalElement.originalLabel, "", "No former label is displayed");
+				assert.strictEqual(oGroupElement.__renamedLabel, false, "The previous rename flag is cleared");
+			});
+		});
+
 		QUnit.test("when getting invisible elements of a bound group containing a removed field with absolute binding pointing to another entity", async function(assert) {
 			var oGroup = this.oView.byId("OtherGroup");
 			var oGroupElement1 = this.oView.byId("NavForm.EntityType01.Prop1");
