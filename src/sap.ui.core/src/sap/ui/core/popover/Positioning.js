@@ -121,10 +121,38 @@ sap.ui.define([
 		return bOpposite ? PopoverPhysicalSide.Top : sMoreSpace;
 	};
 
-	// Resolve the logical "start"/"end" horizontal side to a physical side,
-	// flipping for right-to-left. `start` is Left in LTR, Right in RTL.
-	const physicalStart = (bRtl) => (bRtl ? PopoverPhysicalSide.Right : PopoverPhysicalSide.Left);
-	const physicalEnd = (bRtl) => (bRtl ? PopoverPhysicalSide.Left : PopoverPhysicalSide.Right);
+	/**
+	 * Maps a physical horizontal side to the logical side the clamp and margin helpers expect,
+	 * by swapping <code>Left</code> and <code>Right</code> in RTL.
+	 *
+	 * The space-based helpers ({@link sap.ui.core.popover.Positioning.computePopoverPositionCss},
+	 * {@link sap.ui.core.popover.Positioning.getEffectiveMargins}) re-derive the
+	 * physical side from the locale, as <code>sap.m.Popover</code> feeds them a
+	 * logical side. A caller that has already resolved an actual physical side (for example, the tooltip)
+	 * must undo that re-derivation by passing the logical side this returns.
+	 * <code>Top</code> and <code>Bottom</code> sides and LTR pass through unchanged.
+	 *
+	 * @param {sap.ui.core.popover.PopoverPhysicalSide} sSide The physical side.
+	 * @returns {sap.ui.core.popover.PopoverPhysicalSide} The logical side to feed the clamp or margin helpers
+	 * @public
+	 * @since 1.154
+	 * @ui5-restricted sap.m, sap.ui.core
+	 */
+	Positioning.toLogicalSide = (sSide) => {
+		if (!Localization.getRTL()) {
+			return sSide;
+		}
+
+		if (sSide === PopoverPhysicalSide.Left) {
+			return PopoverPhysicalSide.Right;
+		}
+
+		if (sSide === PopoverPhysicalSide.Right) {
+			return PopoverPhysicalSide.Left;
+		}
+
+		return sSide;
+	};
 
 	// Resolve a horizontal (Begin/End) placement from placement + flipMode.
 	// Begin resolves to the logical start side, End to the logical end side; both
@@ -133,17 +161,13 @@ sap.ui.define([
 		const s = computeSpaces(o);
 		const iFits = o.popoverSize.width + (o.arrowSize ?? 0);
 		const bRtl = Localization.getRTL();
-		const sStart = physicalStart(bRtl);
-		const sEnd = physicalEnd(bRtl);
+		const sStart = PopoverPhysicalSide.Left;
+		const sEnd = PopoverPhysicalSide.Right;
 		const iStartSpace = bRtl ? s.right : s.left;
 		const iEndSpace = bRtl ? s.left : s.right;
 		const sRoomier = iStartSpace > iEndSpace ? sStart : sEnd;
 
 		if (o.auto) {
-			return sRoomier;
-		}
-
-		if (o.flipMode === PopoverFlipMode.PureSpace) {
 			return sRoomier;
 		}
 
@@ -205,7 +229,7 @@ sap.ui.define([
 		const fMaxV = Math.max(fTopCoverage, fBottomCoverage);
 
 		if (fMaxH > fMaxV) {
-			return (fMaxH === fStartCoverage) ? physicalStart(bRtl) : physicalEnd(bRtl);
+			return (fMaxH === fStartCoverage) ? PopoverPhysicalSide.Left : PopoverPhysicalSide.Right;
 		}
 
 		if (fMaxV > fMaxH) {
@@ -217,7 +241,7 @@ sap.ui.define([
 			return (fMaxV === fTopCoverage) ? PopoverPhysicalSide.Top : PopoverPhysicalSide.Bottom;
 		}
 
-		return (fMaxH === fStartCoverage) ? physicalStart(bRtl) : physicalEnd(bRtl);
+		return (fMaxH === fStartCoverage) ? PopoverPhysicalSide.Left : PopoverPhysicalSide.Right;
 	};
 
 	const calcAuto = (o) => {
@@ -466,10 +490,10 @@ sap.ui.define([
 		// Never: strict physical side, no measurement / flip.
 		if (oOptions.flipMode === PopoverFlipMode.Never && !oOptions.auto) {
 			if (sPlacement === PopoverPlacement.Begin) {
-				return physicalStart(Localization.getRTL());
+				return PopoverPhysicalSide.Left;
 			}
 			if (sPlacement === PopoverPlacement.End) {
-				return physicalEnd(Localization.getRTL());
+				return PopoverPhysicalSide.Right;
 			}
 			return sPlacement; // Top | Bottom pass through
 		}

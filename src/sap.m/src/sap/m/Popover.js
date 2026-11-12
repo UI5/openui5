@@ -91,8 +91,8 @@ sap.ui.define([
 			[PlacementType.Bottom]:                   { placement: PopoverPlacement.Bottom, flipMode: PopoverFlipMode.Never },
 			[PlacementType.Left]:                     { placement: PopoverPlacement.Begin,  flipMode: PopoverFlipMode.Never },
 			[PlacementType.Right]:                    { placement: PopoverPlacement.End,    flipMode: PopoverFlipMode.Never },
-			[PlacementType.Vertical]:                 { placement: PopoverPlacement.Top,    flipMode: PopoverFlipMode.PureSpace },
-			[PlacementType.Horizontal]:               { placement: PopoverPlacement.Begin,  flipMode: PopoverFlipMode.PureSpace },
+			[PlacementType.Vertical]:                 { placement: PopoverPlacement.Top,    flipMode: PopoverFlipMode.MoreSpace },
+			[PlacementType.Horizontal]:               { placement: PopoverPlacement.Begin,  flipMode: PopoverFlipMode.MoreSpace },
 			[PlacementType.VerticalPreferredTop]:     { placement: PopoverPlacement.Top,    flipMode: PopoverFlipMode.MoreSpace },
 			/**
 			 * @deprecated As of version 1.36
