@@ -3784,6 +3784,8 @@ function(
 	}
 
 	function fnAnyWordStartsWith(sQuery, sValue) {
+		// Escape RegExp special characters in the user-provided query
+		sQuery = sQuery.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 		var rAnyWordStartsWith = new RegExp(".*\\b" + sQuery + ".*");
 		return rAnyWordStartsWith.test(sValue);
 	}
