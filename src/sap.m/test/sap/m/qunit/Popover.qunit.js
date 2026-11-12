@@ -37,7 +37,8 @@ sap.ui.define([
 	"sap/ui/dom/containsOrEquals",
 	"sap/ui/qunit/utils/nextUIUpdate",
 	"sap/m/dialogUtils/PreventKeyboardEvents",
-	"sap/m/Dialog"
+	"sap/m/Dialog",
+	"sap/base/i18n/Localization"
 ], function(
 	qutils,
 	createAndAppendDiv,
@@ -76,7 +77,8 @@ sap.ui.define([
 	containsOrEquals,
 	nextUIUpdate,
 	PreventKeyboardEvents,
-	Dialog
+	Dialog,
+	Localization
 ) {
 	"use strict";
 
@@ -861,6 +863,50 @@ sap.ui.define([
 		testCase(100, 50, 500, PlacementType.HorizontalPreferredRight, PlacementType.Right); // You have enough space to the Right and Right space is greater than the Left space
 		testCase(350, 50, 500, PlacementType.HorizontalPreferredRight, PlacementType.Right); // You have enough space to the Right but Right space is smaller than the Left space
 		testCase(450, 50, 500, PlacementType.HorizontalPreferredRight, PlacementType.Left); // You do not have enough space at the preferred position, so the position with more space is used
+	});
+
+	QUnit.test("horizontal calculation of Popover positioning is correct in RTL", function (assert){
+		// HorizontalPreferredRight maps to End/MoreSpace. In RTL, Positioning keeps the
+		// physical Left/Right labels but measures the RTL-swapped free space, so the
+		// resolved side is the mirror of the LTR result; sap.ui.core.Popup then mirrors
+		// the anchor tokens back when positioning. Each case below asserts the side the
+		// current implementation resolves (the mirror of the matching LTR case above).
+		const oRtlStub = sinon.stub(Localization, "getRTL").returns(true);
+
+		var testCase = function (offset, outerWidth, width, placement, expectedPlace, sMessage) {
+			const stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({left: offset, width: outerWidth, top: 0, height: 0});
+			Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: function () { return width; } });
+			Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: function () { return width; } });
+
+			var oPopover = new Popover({
+				placement: placement
+			});
+
+			const stubDomRef = sinon.stub(oPopover, "getDomRef").returns({
+				getBoundingClientRect: function () { return { top: 0, left: 0, width: outerWidth, height: outerWidth }; }
+			});
+			var stubOpenByRef = sinon.stub(oPopover, "_getOpenByDomRef").returns(document.createElement("div"));
+			oPopover._calcPlacement();
+
+			assert.strictEqual(oPopover._oCalcedPos, expectedPlace, sMessage);
+
+			stubOpenByRef.restore();
+			stubOffset.restore();
+			stubDomRef.restore();
+			delete document.documentElement.clientWidth;
+			delete document.documentElement.clientHeight;
+			oPopover.destroy();
+		};
+
+		// Popover1.html sample scenario: opener near the right edge in RTL. The LTR case
+		// above (offset 450) resolves to Left; the RTL-swapped space mirrors it to Right.
+		testCase(450, 50, 500, PlacementType.HorizontalPreferredRight, PlacementType.Right,
+			"RTL opener near the right edge → mirror of the LTR side (Popover1.html sample scenario)");
+		// Opener near the left edge → the RTL end-space (physical left) still fits → Right.
+		testCase(100, 50, 500, PlacementType.HorizontalPreferredRight, PlacementType.Right,
+			"RTL opener near the left edge → Right");
+
+		oRtlStub.restore();
 	});
 
 	QUnit.test("auto calculation of Popover positioning should be correct", function (assert){

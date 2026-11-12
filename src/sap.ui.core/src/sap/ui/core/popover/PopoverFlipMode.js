@@ -35,14 +35,7 @@ sap.ui.define([], () => {
 		 * @private
 		 * @ui5-restricted sap.m, sap.ui.core
 		 */
-		Opposite: "Opposite",
-
-		/**
-		 * Ignore the preference; always use the side with more free space on that axis.
-		 * @private
-		 * @ui5-restricted sap.m, sap.ui.core
-		 */
-		PureSpace: "PureSpace"
+		Opposite: "Opposite"
 	};
 
 	return Object.freeze(PopoverFlipMode);

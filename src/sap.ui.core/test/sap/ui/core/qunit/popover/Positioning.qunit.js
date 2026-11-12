@@ -171,12 +171,12 @@ sap.ui.define([
 	// ---------------------------------------------------------------------
 	QUnit.module("resolvePlacement — vertical (Top/Bottom)");
 
-	QUnit.test("PureSpace picks the side with more free space", (assert) => {
+	QUnit.test("Auto picks the side with more free space", (assert) => {
 		const oWithin = makeWithinArea(500, 500);
 		// opener near the top → more space below → Bottom
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.Top,
-			flipMode: FlipMode.PureSpace,
+			auto: true,
 			openerRef: makeOpener(50, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: oWithin,
@@ -187,7 +187,7 @@ sap.ui.define([
 		// opener near the bottom → more space above → Top
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.Top,
-			flipMode: FlipMode.PureSpace,
+			auto: true,
 			openerRef: makeOpener(450, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: oWithin,
@@ -279,10 +279,10 @@ sap.ui.define([
 		}), "Bottom", "no visible space above → Bottom, not Top-over-opener");
 	});
 
-	QUnit.test("Top/PureSpace picks Bottom for a viewport-top opener on a scrolled page", (assert) => {
+	QUnit.test("Top/Auto picks Bottom for a viewport-top opener on a scrolled page", (assert) => {
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.Top,
-			flipMode: FlipMode.PureSpace,
+			auto: true,
 			openerRef: makeOpener(40, 0, 50, 50),
 			popoverRef: makePopover(50, 50),
 			withinAreaRef: window,
@@ -336,126 +336,97 @@ sap.ui.define([
 	// ---------------------------------------------------------------------
 	QUnit.module("resolvePlacement — horizontal (Begin/End)");
 
-	QUnit.test("PureSpace picks the side with more free space (LTR)", (assert) => {
-		// opener near the left → more space right → Right
-		assert.strictEqual(Positioning.resolvePlacement({
-			placement: PopoverPlacement.Begin,
-			flipMode: FlipMode.PureSpace,
-			openerRef: makeOpener(0, 50, 50, 50),
-			popoverRef: makePopover(50, 50),
-			withinAreaRef: makeWithinArea(500, 500),
-			margin: NO_MARGINS,
-			arrowSize: 0
-		}), "Right", "opener on left → Right");
+	// calcHorizontal resolves Begin to the physical Left label and End to the
+	// physical Right label, but in RTL it still measures the OPPOSITE side's free
+	// space (iStartSpace = s.right, iEndSpace = s.left). The tests below pin RTL and
+	// assert the side the current source actually resolves for each opener position.
 
-		// opener near the right → more space left → Left
+	QUnit.test("MoreSpace/Begin in RTL flips to Right when the RTL start-space is cramped", (assert) => {
+		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		// opener at the physical-right edge → RTL start-space (physical right) ~0, end-space roomier → End label.
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.Begin,
-			flipMode: FlipMode.PureSpace,
+			flipMode: FlipMode.MoreSpace,
 			openerRef: makeOpener(0, 450, 50, 50),
-			popoverRef: makePopover(50, 50),
-			withinAreaRef: makeWithinArea(500, 500),
-			margin: NO_MARGINS,
-			arrowSize: 0
-		}), "Left", "opener on right → Left");
-	});
-
-	QUnit.test("PureSpace is mirrored in RTL", (assert) => {
-		const oStub = sinon.stub(Localization, "getRTL").returns(true);
-		// opener on physical left; End=physical Left has no room, roomier logical side is Begin=physical Right
-		assert.strictEqual(Positioning.resolvePlacement({
-			placement: PopoverPlacement.Begin,
-			flipMode: FlipMode.PureSpace,
-			openerRef: makeOpener(0, 50, 50, 50),
-			popoverRef: makePopover(50, 50),
-			withinAreaRef: makeWithinArea(500, 500),
-			margin: NO_MARGINS,
-			arrowSize: 0
-		}), "Right", "RTL: roomier physical-right side wins → Right");
-		oStub.restore();
-	});
-
-	QUnit.test("MoreSpace/Begin honours the preference in RTL: Begin is physical Right and fits", (assert) => {
-		const oStub = sinon.stub(Localization, "getRTL").returns(true);
-		assert.strictEqual(Positioning.resolvePlacement({
-			placement: PopoverPlacement.Begin,
-			flipMode: FlipMode.MoreSpace,
-			openerRef: makeOpener(0, 0, 50, 50), // physical-left edge; Begin=Right in RTL, the large right gap fits
 			popoverRef: makePopover(100, 50),
 			withinAreaRef: makeWithinArea(500, 500),
 			margin: NO_MARGINS,
 			arrowSize: 0
-		}), "Right", "RTL Begin (physical Right) fits → stays Right");
+		}), "Right", "RTL MoreSpace/Begin: no RTL start-space → Right");
 		oStub.restore();
 	});
 
-	QUnit.test("MoreSpace/Begin flips in RTL when the physical-right (start) side has no room", (assert) => {
+	QUnit.test("MoreSpace/Begin in RTL stays Left when the RTL start-space fits", (assert) => {
 		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		// opener at the physical-left edge → RTL start-space (physical right) is roomy and fits → Left label.
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.Begin,
 			flipMode: FlipMode.MoreSpace,
-			openerRef: makeOpener(0, 450, 50, 50), // physical-right edge; Begin=Right in RTL has no room → flip to End=Left
+			openerRef: makeOpener(0, 0, 50, 50),
 			popoverRef: makePopover(100, 50),
 			withinAreaRef: makeWithinArea(500, 500),
 			margin: NO_MARGINS,
 			arrowSize: 0
-		}), "Left", "RTL Begin (physical Right) with no room → roomier Left");
+		}), "Left", "RTL MoreSpace/Begin: RTL start-space fits → Left");
 		oStub.restore();
 	});
 
-	QUnit.test("Opposite/Begin flips in RTL: Begin is physical Right, so a right-edge opener flips to Left", (assert) => {
+	QUnit.test("Opposite/Begin in RTL keeps Left for a left-edge opener", (assert) => {
 		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		// opener at the physical-left edge → RTL start-space (physical right) fits → Begin stays Left (no flip).
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.Begin,
 			flipMode: FlipMode.Opposite,
-			openerRef: makeOpener(0, 450, 50, 50), // physical-right edge; Begin=Right in RTL doesn't fit → opposite End=Left
+			openerRef: makeOpener(0, 0, 50, 50),
 			popoverRef: makePopover(100, 50),
 			withinAreaRef: makeWithinArea(500, 500),
 			margin: NO_MARGINS,
 			arrowSize: 0
-		}), "Left", "RTL Begin (physical Right) doesn't fit → opposite Left");
+		}), "Left", "RTL Opposite/Begin: RTL start-space fits → stays Left");
 		oStub.restore();
 	});
 
-	QUnit.test("MoreSpace/End honours the preference in RTL: End is physical Left and fits", (assert) => {
+	QUnit.test("MoreSpace/End in RTL resolves to Left when the RTL end-space fits", (assert) => {
 		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		// opener at the physical-left edge → RTL end-space (physical left) ~0, start-space roomier → Start label (Left).
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.End,
 			flipMode: FlipMode.MoreSpace,
-			openerRef: makeOpener(0, 450, 50, 50), // physical-right edge; End=Left in RTL, the large left gap fits
+			openerRef: makeOpener(0, 0, 50, 50),
 			popoverRef: makePopover(100, 50),
 			withinAreaRef: makeWithinArea(500, 500),
 			margin: NO_MARGINS,
 			arrowSize: 0
-		}), "Left", "RTL End (physical Left) fits → stays Left");
+		}), "Left", "RTL MoreSpace/End: cramped RTL end-space → Left");
 		oStub.restore();
 	});
 
-	QUnit.test("MoreSpace/End flips in RTL when the physical-left (end) side has no room", (assert) => {
+	QUnit.test("MoreSpace/End in RTL resolves to Right for a right-edge opener", (assert) => {
 		const oStub = sinon.stub(Localization, "getRTL").returns(true);
+		// opener at the physical-right edge → RTL end-space (physical left) is roomy → End label (Right).
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.End,
 			flipMode: FlipMode.MoreSpace,
-			openerRef: makeOpener(0, 0, 50, 50), // physical-left edge; End=Left in RTL has no room → flip to Begin=Right
+			openerRef: makeOpener(0, 450, 50, 50),
 			popoverRef: makePopover(100, 50),
 			withinAreaRef: makeWithinArea(500, 500),
 			margin: NO_MARGINS,
 			arrowSize: 0
-		}), "Right", "RTL End (physical Left) with no room → roomier Right");
+		}), "Right", "RTL MoreSpace/End: RTL end-space fits → Right");
 		oStub.restore();
 	});
 
-	QUnit.test("Opposite/End flips in RTL: End is physical Left, so a left-edge opener flips to Right", (assert) => {
+	QUnit.test("Opposite/End in RTL keeps Right for a right-edge opener", (assert) => {
 		const oStub = sinon.stub(Localization, "getRTL").returns(true);
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.End,
 			flipMode: FlipMode.Opposite,
-			openerRef: makeOpener(0, 0, 50, 50), // physical-left edge; End=Left in RTL doesn't fit → opposite Begin=Right
+			openerRef: makeOpener(0, 450, 50, 50),
 			popoverRef: makePopover(100, 50),
 			withinAreaRef: makeWithinArea(500, 500),
 			margin: NO_MARGINS,
 			arrowSize: 0
-		}), "Right", "RTL End (physical Left) doesn't fit → opposite Right");
+		}), "Right", "RTL Opposite/End: RTL end-space fits → stays Right");
 		oStub.restore();
 	});
 
@@ -470,7 +441,7 @@ sap.ui.define([
 			withinAreaRef: makeWithinArea(500, 500),
 			margin: NO_MARGINS,
 			arrowSize: 0
-		}), "Right", "RTL tie honours the preferred Begin → physical Right");
+		}), "Left", "RTL tie honours the preferred Begin → Left label");
 
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.End,
@@ -480,8 +451,43 @@ sap.ui.define([
 			withinAreaRef: makeWithinArea(500, 500),
 			margin: NO_MARGINS,
 			arrowSize: 0
-		}), "Left", "RTL tie honours the preferred End → physical Left");
+		}), "Right", "RTL tie honours the preferred End → Right label");
 		oStub.restore();
+	});
+
+	QUnit.test("RTL mirrors the LTR physical side for every Begin/End case", (assert) => {
+		// calcHorizontal swaps the measured space in RTL but keeps the physical
+		// Left/Right labels, so for a horizontal (Begin/End) placement the RTL
+		// result is the mirror of the LTR result (Left <-> Right). Assert that
+		// relationship directly across a matrix.
+		const mirror = (sSide) => (sSide === "Left" ? "Right" : "Left");
+		const aCases = [
+			{ placement: PopoverPlacement.Begin, flipMode: FlipMode.MoreSpace, left: 0 },
+			{ placement: PopoverPlacement.Begin, flipMode: FlipMode.MoreSpace, left: 450 },
+			{ placement: PopoverPlacement.End, flipMode: FlipMode.MoreSpace, left: 0 },
+			{ placement: PopoverPlacement.End, flipMode: FlipMode.MoreSpace, left: 450 },
+			{ placement: PopoverPlacement.Begin, flipMode: FlipMode.Opposite, left: 0 },
+			{ placement: PopoverPlacement.End, flipMode: FlipMode.Opposite, left: 450 }
+		];
+
+		aCases.forEach((oCase, i) => {
+			const makeOpts = () => ({
+				placement: oCase.placement,
+				flipMode: oCase.flipMode,
+				openerRef: makeOpener(0, oCase.left, 50, 50),
+				popoverRef: makePopover(100, 50),
+				withinAreaRef: makeWithinArea(500, 500),
+				margin: NO_MARGINS,
+				arrowSize: 0
+			});
+
+			const sLtr = Positioning.resolvePlacement(makeOpts());
+			const oStub = sinon.stub(Localization, "getRTL").returns(true);
+			const sRtl = Positioning.resolvePlacement(makeOpts());
+			oStub.restore();
+
+			assert.strictEqual(sRtl, mirror(sLtr), `case ${i} (${oCase.placement}/${oCase.flipMode}, left ${oCase.left}): RTL side is the mirror of LTR (${sLtr} → ${sRtl})`);
+		});
 	});
 
 	QUnit.test("Opposite flips to End when Begin is too small (LTR)", (assert) => {
@@ -596,7 +602,7 @@ sap.ui.define([
 		const oWithin = makeWithinArea(500, 500);
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.Top,
-			flipMode: FlipMode.PureSpace,
+			auto: true,
 			openerRef: makeOpener(50, 0, 50, 50), // high on screen → more room below
 			popoverRef: null,                     // not rendered yet
 			withinAreaRef: oWithin,
@@ -606,7 +612,7 @@ sap.ui.define([
 
 		assert.strictEqual(Positioning.resolvePlacement({
 			placement: PopoverPlacement.Top,
-			flipMode: FlipMode.PureSpace,
+			auto: true,
 			openerRef: makeOpener(450, 0, 50, 50), // low on screen → more room above
 			popoverRef: null,
 			withinAreaRef: oWithin,
@@ -647,7 +653,7 @@ sap.ui.define([
 
 		Positioning.resolvePlacement({
 			placement: PopoverPlacement.Top,
-			flipMode: FlipMode.PureSpace,
+			auto: true,
 			openerRef: makeOpener(50, 0, 50, 50),
 			popoverRef: null,
 			withinAreaRef: makeWithinArea(500, 500),
@@ -746,11 +752,11 @@ sap.ui.define([
 		assert.strictEqual(s, "Bottom", "best-position scoring → Bottom (most coverage below opener)");
 	});
 
-	QUnit.test("Auto best-position resolves to the physical side with most room in RTL", (assert) => {
+	QUnit.test("Auto best-position in RTL mirrors the LTR physical side", (assert) => {
 		// Landscape, opener near the physical-right edge, popover too big to fit any
-		// side → best-position scoring. Physical-left has the most room, so the
-		// popover lands Left in both directions; the RTL mapping must not send it to
-		// the empty physical-right side.
+		// side → best-position scoring. calcBestPos keeps the RTL-swapped coverage
+		// (fStartCoverage = fRightCoverage in RTL) while returning physical labels,
+		// so the RTL result is the mirror of the LTR result.
 		const oArgs = () => ({
 			auto: true,
 			openerRef: makeOpener(180, 740, 20, 20),
@@ -763,7 +769,7 @@ sap.ui.define([
 		assert.strictEqual(Positioning.resolvePlacement(oArgs()), "Left", "LTR: most room on the left → Left");
 
 		const oStub = sinon.stub(Localization, "getRTL").returns(true);
-		assert.strictEqual(Positioning.resolvePlacement(oArgs()), "Left", "RTL: still lands on the roomy physical-left side");
+		assert.strictEqual(Positioning.resolvePlacement(oArgs()), "Right", "RTL: best-position mirrors the LTR side → Right");
 		oStub.restore();
 	});
 

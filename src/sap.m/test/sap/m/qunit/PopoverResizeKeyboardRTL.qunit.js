@@ -305,7 +305,7 @@ sap.ui.define([
 		await nextUIUpdate();
 
 		assert.ok(popover.isResized(), "popover is marked as resized");
-		assert.ok(contentDomRef.offsetHeight > contentHeight,  "height decreased");
+		assert.ok(contentDomRef.offsetHeight < contentHeight,  "height decreased");
 	});
 
 	QUnit.test("Repeated presses accumulate", async function (assert) {
