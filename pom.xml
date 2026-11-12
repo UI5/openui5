@@ -116,7 +116,7 @@
 		<npm.registry>${xmake.import.NPM.0}</npm.registry>
 
 		<!-- Eslint tools version -->
-		<sap.ui5.eslint.tools.version>0.3.0</sap.ui5.eslint.tools.version>
+		<sap.ui5.eslint.tools.version>1.0.1</sap.ui5.eslint.tools.version>
 
 		<!-- ESLint version (for all OpenUI5 projects, to be aligned with package.json) -->
 		<sap.openui5.eslintnode.version>8.57.1</sap.openui5.eslintnode.version>
@@ -290,7 +290,7 @@
 					<plugin>
 						<groupId>com.sap.ui5.tools.maven</groupId>
 						<artifactId>eslintnode-maven-plugin</artifactId>
-						<version>0.3.2</version>
+						<version>0.3.3</version>
 						<executions>
 							<execution>
 								<phase>verify</phase>
