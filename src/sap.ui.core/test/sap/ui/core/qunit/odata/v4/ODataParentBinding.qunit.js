@@ -4600,10 +4600,12 @@ sap.ui.define([
 			.withExactArgs(null, "canonical/path", sinon.match.same(oContext))
 			.callsFake(function () {
 				assert.strictEqual(iResets, 3);
+
+				return "~oDeletePromise~";
 			});
 
 		// code under test
-		oBinding.onDelete("/canonical/path");
+		assert.strictEqual(oBinding.onDelete("/canonical/path"), "~oDeletePromise~");
 
 		if (bOutdated) {
 			// call setOutdated before the entry is deleted from the cache to be able to determine
@@ -4614,7 +4616,7 @@ sap.ui.define([
 });
 
 	//*********************************************************************************************
-	QUnit.test("onDelete: no context", function () {
+	QUnit.test("onDelete: no context", function (assert) {
 		var oBinding = new ODataParentBinding({
 				findContextForCanonicalPath : function () {},
 				setOutdated : mustBeMocked
@@ -4626,7 +4628,7 @@ sap.ui.define([
 		this.mock(oBinding).expects("setOutdated").never();
 
 		// code under test
-		oBinding.onDelete("/canonical/path");
+		assert.strictEqual(oBinding.onDelete("/canonical/path"), undefined);
 	});
 
 	//*********************************************************************************************

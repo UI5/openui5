@@ -1170,6 +1170,9 @@ sap.ui.define([
 	 *
 	 * @param {string} sCanonicalPath
 	 *   The canonical path of the entity (as a context path with the leading "/")
+	 * @returns {sap.ui.base.SyncPromise<void>|undefined}
+	 *   A promise which is resolved without a result in case of success, or rejected with an
+	 *   instance of <code>Error</code> in case of failure; no result if there is nothing to delete
 	 *
 	 * @abstract
 	 * @function
