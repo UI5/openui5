@@ -10,7 +10,8 @@ sap.ui.define([
 	'sap/ui/core/library',
 	'sap/ui/core/Icon',
 	'./TokenRenderer',
-	'sap/ui/events/KeyCodes'
+	'sap/ui/events/KeyCodes',
+	"sap/ui/core/tooltip/TooltipEnablement"
 ],
 	function(
 		library,
@@ -19,7 +20,8 @@ sap.ui.define([
 		coreLibrary,
 		Icon,
 		TokenRenderer,
-		KeyCodes
+		KeyCodes,
+		TooltipEnablement
 	) {
 	"use strict";
 
@@ -165,17 +167,37 @@ sap.ui.define([
 	Token.prototype.init = function() {
 		this._bFocusFromTouch = false;
 
+		var sIconTooltip = Library.getResourceBundleFor("sap.m").getText("TOKEN_ICON_TOOLTIP");
+		var bEnhanced = TooltipEnablement.isEnhancedTooltipEnabled();
+
 		var oDeleteIcon = new Icon({
 				id : this.getId() + "-icon",
 				src : "sap-icon://decline",
 				noTabStop: true,
 				press : this._fireDeleteToken.bind(this),
-				tooltip: Library.getResourceBundleFor("sap.m").getText("TOKEN_ICON_TOOLTIP")
+				tooltip: bEnhanced ? undefined : sIconTooltip,
+				alt: bEnhanced ? sIconTooltip : undefined
 			});
 
 		oDeleteIcon.addStyleClass("sapMTokenIcon");
 		oDeleteIcon.setUseIconTooltip(false);
 		this.setAggregation("deleteIcon", oDeleteIcon);
+
+		if (bEnhanced) {
+			this._oDeleteIconTooltip = new TooltipEnablement(this, {
+				textProvider: () => Library.getResourceBundleFor("sap.m").getText("TOKEN_ICON_TOOLTIP"),
+				domRefProvider: () => oDeleteIcon.getDomRef(),
+				focusDomRefProvider: () => oDeleteIcon.getDomRef(),
+				invisibleTooltipIdSuffix: "-deleteIconTooltip"
+			});
+		}
+	};
+
+	Token.prototype.exit = function() {
+		if (this._oDeleteIconTooltip) {
+			this._oDeleteIconTooltip.destroy();
+			this._oDeleteIconTooltip = null;
+		}
 	};
 
 	/**

@@ -8,8 +8,9 @@ sap.ui.define([
 	"sap/ui/core/InvisibleText",
 	"sap/m/Tokenizer",
 	"sap/ui/events/KeyCodes",
-	"sap/ui/qunit/utils/nextUIUpdate"
-], function(Library, qutils, createAndAppendDiv, Token, coreLibrary, InvisibleText, Tokenizer, KeyCodes, nextUIUpdate) {
+	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/core/tooltip/TooltipEnablement"
+], function(Library, qutils, createAndAppendDiv, Token, coreLibrary, InvisibleText, Tokenizer, KeyCodes, nextUIUpdate, TooltipEnablement) {
 	"use strict";
 
 	// shortcut for sap.ui.core.TextDirection
@@ -368,6 +369,35 @@ sap.ui.define([
 		// Assert
 		assert.strictEqual(oSpy.callCount, 2, "Token was selected.");
 		assert.strictEqual(oSpy.calledWith(true), true, "Correct parameter passed");
+	});
+
+	QUnit.module("Enhanced Tooltip", {
+		beforeEach: async function() {
+			this.oStub = this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oToken = new Token({ text: "MyToken" }).placeAt("qunit-fixture");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			if (this.oToken) {
+				this.oToken.destroy();
+			}
+		}
+	});
+
+	QUnit.test("delete icon tooltip is rendered with correct ARIA wiring", function(assert) {
+		var oHelper = this.oToken._oDeleteIconTooltip;
+		var sId = oHelper.getInvisibleTooltipId();
+
+		assert.ok(oHelper, "TooltipEnablement helper is created");
+		assert.ok(document.getElementById(sId), "invisible anchor span is rendered in the DOM");
+	});
+
+	QUnit.test("delete icon tooltip helper is destroyed on exit", function(assert) {
+		var oSpy = this.spy(this.oToken._oDeleteIconTooltip, "destroy");
+		this.oToken.destroy();
+		this.oToken = null;
+
+		assert.ok(oSpy.calledOnce, "TooltipEnablement helper is destroyed");
 	});
 
 });
