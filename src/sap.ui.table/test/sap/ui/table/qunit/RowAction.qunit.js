@@ -659,7 +659,7 @@ sap.ui.define([
 		const oDomRef = oIcon.getDomRef();
 		const oStyle = getComputedStyle(oDomRef);
 		assert.ok(oDomRef.classList.contains("sapUiTableActionItemDisabled"), "The disabled style is applied");
-		assert.strictEqual(oStyle.opacity, oStyle.getPropertyValue("--sapContent_DisabledOpacity").trim(),
+		assert.strictEqual(parseFloat(oStyle.opacity), parseFloat(oStyle.getPropertyValue("--sapContent_DisabledOpacity")),
 			"The theme's disabled opacity is used");
 		assert.strictEqual(oStyle.cursor, "default", "The disabled action has no pointer cursor");
 		assert.strictEqual(oStyle.pointerEvents, "none", "The disabled action is excluded from pointer hit-testing");
