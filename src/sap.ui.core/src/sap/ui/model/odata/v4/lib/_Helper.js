@@ -2270,7 +2270,7 @@ sap.ui.define([
 		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties need to be
 		 *   loaded because they may have changed due to side effects of a previous update; must not
-		 *   be empty; "*" means all structural properties
+		 *   contain an empty path; "*" means all structural properties
 		 * @param {function} fnFetchMetadata
 		 *   Function which fetches metadata for a given meta path
 		 * @param {string} sRootMetaPath
@@ -2409,7 +2409,8 @@ sap.ui.define([
 		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 		 *   "14.4.1.6 Expression edm:PropertyPath" string describing which properties may have
 		 *   changed due to an update or side effects of a previous update, see
-		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; must not be "*", but may
+		 *   end with "/*"
 		 * @returns {boolean}
 		 *   Whether the given property path is affected by the given side-effects path
 		 *

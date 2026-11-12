@@ -1720,7 +1720,7 @@ sap.ui.define([
 
 	/**
 	 * Determines the list of elements determined by the given predicates. All other elements are
-	 * turned into placeholders (lazily), except transient ones and totals.
+	 * turned into placeholders (lazily), except transient ones, (grand) totals, and group levels.
 	 *
 	 * @param {string[]} aPredicates
 	 *   The key predicates of the elements to request side effects for
@@ -1742,8 +1742,11 @@ sap.ui.define([
 		return Object.values(this.aElements.$byPredicate).filter(function (oElement) {
 			var sPredicate = _Helper.getPrivateAnnotation(oElement, "predicate");
 
-			if (!sPredicate || oElement["@$ui5.node.isTotal"]) {
-				return; // keep transient elements and totals "as is"
+			if (!sPredicate
+					|| oElement["@$ui5.node.level"] <= that.oAggregation.groupLevels?.length
+					// Note: with D.A., elements are created at level 1 - do not skip!
+					&& oElement["@$ui5.context.isTransient"] === undefined) {
+				return; // keep transient elements, (grand) totals, and group levels "as is"
 			}
 
 			if (mPredicates[sPredicate]) {
@@ -3349,7 +3352,7 @@ sap.ui.define([
 		}
 
 		if (oElement["@$ui5.context.isTransient"] === false) {
-			// Note: creation w/ groupLevels happens on root level, where there normally are no
+			// Note: creation w/ groupLevels happens on first level, where there normally are no
 			// leaves, but only subtotals
 			bLeaf = true;
 			bTotal = false;

@@ -2918,10 +2918,13 @@ sap.ui.define([
 			oListBinding.oCache.bAllSubtotalsOutdated = false;
 			oListBinding.oCache.oOutdatedSubtotals = null;
 
-			this.expectChange("isOutdatedHeader", false);
-			oListBinding.getHeaderContext().setOutdated(false);
+			const oHeaderContext = oListBinding.getHeaderContext();
+			if (oHeaderContext.isOutdated()) {
+				this.expectChange("isOutdatedHeader", false);
+				oHeaderContext.setOutdated(false);
+			}
 
-			const iIndexOfPredicate = oListBinding.getHeaderContext().getPath().length;
+			const iIndexOfPredicate = oHeaderContext.getPath().length;
 			oListBinding._getAllExistingContexts().forEach((oContext) => {
 				if (oContext.isOutdated()) {
 					this.expectChange("isOutdated", [undefined], oContext.getIndex());
@@ -25958,7 +25961,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		parameters : {
 			$$aggregation : {
 				aggregate : {
-					GrossAmount : {grandTotal : true}
+					GrossAmount : {grandTotal : true, subtotals : true}
 				},
 				grandTotalAtBottomOnly : true,
 				group : {
@@ -26200,10 +26203,12 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		await Promise.all([
 			// code under test (JIRA: CPOUI5ODATAV4-3715)
+			// Note: subtotals MUST be ignored here because there are no groupLevels!
 			oBinding.getHeaderContext().requestSideEffects(["GrossAmount"]),
 			this.waitForChanges(assert, "side effects for GrossAmount")
 		]);
 
+		oBinding.getAllCurrentContexts(); // Note: recreates grand total
 		checkTable("after side effects for GrossAmount", assert, oTable, [
 			"/SalesOrderList('42')",
 			"/SalesOrderList('42')",
@@ -29340,6 +29345,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Such deletes even work in parallel (JIRA: CPOUI5ODATAV4-3730)
 	// (Grand) parent can be collapsed before deleting a leaf (JIRA: CPOUI5ODATAV4-3729)
 	// The $count is maintained on the client side, no additional GET (JIRA: CPOUI5ODATAV4-3711)
+	// Check side effects for leaf level only w/ visual grouping (JIRA: CPOUI5ODATAV4-3751)
 	//
 	// If there are no subtotals, the @$ui5.context.isOutdated at group nodes is not set when
 	// editing or deleting a single entity.
@@ -29660,7 +29666,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					+ "&$skip=0&$top=7", {
 					"@odata.count" : "2",
 					value : [{
-						Address : {City : "Liverpool", RegionName : "England"},
+						Address : {City : "Everton", RegionName : "England"},
 						ArtistID : "1",
 						BestFriend : {
 							ArtistID : "BF4E",
@@ -29679,7 +29685,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 						// Note: think of "sendsAutographs" as a weird custom aggregate ;-)
 						sendsAutographs : false
 					}, {
-						Address : {City : "London", RegionName : "England"},
+						Address : {City : "City of London", RegionName : "England"},
 						ArtistID : "2",
 						BestFriend : {
 							ArtistID : "n/a",
@@ -29709,7 +29715,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				.expectChange("bestFriendName",
 					["B's best friend", "B's best friend", "C's best friend"], 4)
 				.expectChange("artistID", ["1", "2", null], 4)
-				.expectChange("city", ["Liverpool", "London", null], 4)
+				.expectChange("city", ["Everton", "City of London", null], 4)
 				.expectChange("sendsAutographs", [false, true, undefined], 4);
 
 			return Promise.all([
@@ -29725,7 +29731,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				"@$ui5.node.isTotal" : false,
 				"@$ui5.node.level" : 3,
 				Address : {
-					City : "Liverpool",
+					City : "Everton",
 					RegionName : "England"
 				},
 				ArtistID : "1",
@@ -29746,6 +29752,51 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				sendsAutographs : false
 			});
 
+			that.expectChangeIf(bWithSearchFilterSort, "isOutdatedHeader", true)
+				.expectRequest("Artists?$filter=ArtistID eq '1' and IsActiveEntity eq true"
+					+ " or ArtistID eq '2' and IsActiveEntity eq true"
+					+ "&$select=Address/City,ArtistID,IsActiveEntity&$top=2", {
+					value : [{
+						Address : {City : "Liverpool"},
+						ArtistID : "1",
+						IsActiveEntity : true
+					}, {
+						Address : {City : "London"},
+						ArtistID : "2",
+						IsActiveEntity : true
+					}]
+				})
+				.expectChange("city", ["Liverpool", "London"], 4);
+
+			return Promise.all([
+				// code under test (JIRA: CPOUI5ODATAV4-3751)
+				oListBinding.getHeaderContext().requestSideEffects(["Address/City"]),
+				that.waitForChanges(assert, "side effects for leaf level only")
+			]);
+		}).then(function () {
+			checkTable("after side effects for leaf level only", assert, oTable, [
+				"/Artists(IsActiveEntity=false)",
+				oIsActiveEntityTrue,
+				"/Artists(IsActiveEntity=true,Name='A')",
+				oNameB,
+				oArtist1,
+				"/Artists(ArtistID='2',IsActiveEntity=true)",
+				"/Artists(IsActiveEntity=true,Name='C')"
+			], [ // groupLevelCount|isExpanded|isOutdated|isTotal|level|isActiveEntity|...
+				// ...|inProcessByUser|name|bestFriendName|artistID|city|sendsAutographs
+				["", "false", "", "false", "1", "false", "JOHNDOE", "", "", "", "", ""],
+				["3", "true", "", "false", "1", "true", "", "", "", "", "", ""],
+				["", "false", "", "false", "2", "true", "", "A", "A's best friend", "", "", ""],
+				["2", "true", "", "false", "2", "true", "", "B", "B's best friend", "", "", ""],
+				["", "", "", "false", "3", "true", "", "B", "B's best friend", "1", "Liverpool",
+					"false"],
+				["", "", "", "false", "3", "true", "", "B", "B's best friend", "2", "London",
+					"true"],
+				["", "false", "", "false", "2", "true", "", "C", "C's best friend", "", "", ""]
+			]);
+
+			return that.resetOutdated(assert, oListBinding);
+		}).then(function () {
 			if (!bEdit) {
 				return;
 			}
@@ -30078,6 +30129,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// here w/ visual grouping. The previous count is still available while the count request is
 	// pending.
 	// JIRA: CPOUI5ODATAV4-3711
+	//
+	// Side effects for single column: no refresh (JIRA: CPOUI5ODATAV4-3715)
 [false, true].forEach(function (bWithFilter) {
 	const sTitle = "Data Aggregation: create with visual grouping; with filter = " + bWithFilter;
 
@@ -30167,12 +30220,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				Country : "A",
 				Id : 3, // Edm.Int16
 				SalesNumber : 5
-			});
-		if (!bWithFilter) {
-			this.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+			})
+			.expectRequestIf(!bWithFilter, "#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
 				value : [{SalesNumber : 35}]
 			});
-		}
 
 		// code under test
 		const oCreatedContext0 = oListBinding.create({Id : 3}, /*bSkipRefresh*/true);
@@ -30226,12 +30277,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				Country : "A",
 				Id : 4, // Edm.Int16
 				SalesNumber : 7
-			});
-		if (!bWithFilter) {
-			this.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+			})
+			.expectRequestIf(!bWithFilter, "#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
 				value : [{SalesNumber : 42}]
 			});
-		}
 
 		await Promise.all([
 			// code under test
@@ -30265,7 +30314,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					// for simplification, provide a dummy SalesNumber allowing to easily
 					// distinguish the items in checkTable
 					{Country : "A", Id : 1, SalesNumber : 8}
-					//TODO: return created entities
+					//TODO: return created entities - or use exclusive $filter?
 				]
 			})
 			.expectChange("id", [,,, "1"]);
@@ -30368,12 +30417,10 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		this.expectRequest("#0 DELETE BusinessPartners(98)")
 			.expectRequest("#0 BusinessPartners/$count?$filter="
 				+ (bWithFilter ? "(SalesNumber ge 0) and " : "")
-				+ "not (Id eq 3 or Id eq 4)", 2);
-		if (!bWithFilter) {
-			this.expectRequest("#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
+				+ "not (Id eq 3 or Id eq 4)", 2)
+			.expectRequestIf(!bWithFilter, "#0 BusinessPartners?$apply=aggregate(SalesNumber)", {
 				value : [{SalesNumber : 42}]
 			});
-		}
 
 		// code under test
 		const oDeletePromise = oKeptContext.delete();
@@ -30384,6 +30431,60 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			oDeletePromise,
 			this.waitForChanges(assert, "delete kept-alive outside w/ exclusive filter")
 		]);
+
+		this.expectRequest("BusinessPartners?$filter=Id eq 3 or Id eq 4&$select=Id&$top=2", {
+				value : [
+					{"@odata.etag" : "3", Id : 3},
+					{"@odata.etag" : "4", Id : 4}
+				]
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3751)
+			oListBinding.getHeaderContext().requestSideEffects(["Id"]),
+			this.waitForChanges(assert, "side effects for ETag ;-)")
+		]);
+
+		checkTable("after side effects for ETag ;-)", assert, oTable, [
+			oCreatedContext0,
+			oCreatedContext1,
+			oCreatedContext2,
+			"/BusinessPartners(Country='A')",
+			"/BusinessPartners(Country='B')"
+			// "/BusinessPartners()"
+		], [ // isOutdated|isTotal|level|Country|Id|SalesNumber
+			[, false, 1, "A", "3", "5"],
+			[, false, 1, "A", "4", "7"],
+			[, false, 1, "C", "", ""],
+			[true, true, 1, "A", "", "10"],
+			[true, true, 1, "B", "", "20"]
+		], 6);
+		assert.deepEqual(oCreatedContext0.getObject(), {
+			"@$ui5.context.isTransient" : false,
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 1,
+			"@odata.etag" : "3",
+			Country : "A",
+			Id : 3,
+			SalesNumber : 5
+		});
+		assert.deepEqual(oCreatedContext1.getObject(), {
+			"@$ui5.context.isInactive" : false,
+			"@$ui5.context.isTransient" : false,
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 1,
+			"@odata.etag" : "4",
+			Country : "A",
+			Id : 4,
+			SalesNumber : 7
+		});
+		assert.deepEqual(oCreatedContext2.getObject(), {
+			"@$ui5.context.isInactive" : true,
+			"@$ui5.context.isTransient" : true,
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 1,
+			Country : "C"
+		});
 
 		this.expectRequest("BusinessPartners?$apply="
 				+ (bWithFilter ? "filter(SalesNumber ge 0)/" : "")
@@ -31395,6 +31496,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 	// Paging in a group level cache with identity (JIRA: CPOUI5ODATAV4-3362)
 	// Check that auto-$expand/$select works, incl. manual $select (JIRA: CPOUI5ODATAV4-3438)
 	// Check that subtotals at bottom have "...@$ui5.noData" as needed (JIRA: CPOUI5ODATAV4-3438)
+	// Check side effects for $expand/$select w/ visual grouping (JIRA: CPOUI5ODATAV4-3751)
 	//
 	// Set subtotals only to outdated if a property used for filtering, grouping, or subtotals is
 	// modified (or requested as a side effect). If subtotals are set to outdated, the header
@@ -31598,7 +31700,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 
 		await this.waitForChanges(assert, "modify Region of Id 26");
 
-		this.expectRequest("#7 BusinessPartners?"
+		this.expectRequest("#0 BusinessPartners?"
 				+ "$select=Country,CountryText,Currency,Id,LocalCurrency,Name,Region,SalesAmount"
 					+ ",SalesNumber,myMessages"
 				+ "&$filter=Id eq 24 or Id eq 25 or Id eq 26&$top=3", {
@@ -31626,7 +31728,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					myMessages : []
 				}]
 			})
-			.expectRequest("#7 BusinessPartners"
+			.expectRequest("#0 BusinessPartners"
 				+ "?$apply=groupby((Country,CountryText),aggregate(SalesAmount,Currency))"
 				+ "&$count=true&$skip=0&$top=3", {
 				"@odata.count" : "26",
@@ -31682,7 +31784,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await Promise.all([
 			// code under test
 			oListBinding.getCurrentContexts()[0].expand(),
-			this.waitForChanges(assert, "expand Country 'A' (refreshed)")
+			this.waitForChanges(assert, "expand Country 'A'")
 		]);
 
 		assert.strictEqual(oListBinding.getCurrentContexts()[1], oContext26, "still the same");
@@ -31719,7 +31821,24 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			assert.strictEqual(sLocalCurrency, undefined, "not available here");
 		});
 
-		this.expectRequest("#9 BusinessPartners?"
+		this.expectRequest("BusinessPartners?$filter=Id eq 24 or Id eq 26&$select=Id,LocalCurrency"
+			+ "&$top=2", {
+				value : [
+					{Id : 24, LocalCurrency : "USD*"},
+					{Id : 26, LocalCurrency : "DEM*"}
+				]
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3751)
+			oListBinding.getHeaderContext().requestSideEffects(["LocalCurrency"]),
+			this.waitForChanges(assert, "side effects for $expand/$select")
+		]);
+
+		assert.strictEqual(oContext24.getProperty("LocalCurrency"), "USD*");
+		assert.strictEqual(oContext26.getProperty("LocalCurrency"), "DEM*");
+
+		this.expectRequest("#0 BusinessPartners?"
 				+ "$select=Country,CountryText,Currency,Id,LocalCurrency,Name,Region,SalesAmount"
 					+ ",SalesNumber,myMessages"
 				+ "&$filter=Id eq 24 or Id eq 26&$top=2", {
@@ -31736,7 +31855,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 					myMessages : []
 				}]
 			})
-			.expectRequest("#9 BusinessPartners"
+			.expectRequest("#0 BusinessPartners"
 				+ "?$apply=groupby((Country,CountryText),aggregate(SalesAmount,Currency))"
 				+ "&$count=true&$skip=0&$top=3", {
 				"@odata.count" : "26",
@@ -31798,8 +31917,8 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 				+ ",SalesNumber"
 				+ "&$skip=3&$top=1", {
 				value : [
-					{Country : "A", CountryText : "A Text", Id : 22, Name : "Quux",
-						Currency : "EUR", SalesAmount : "10", SalesNumber : 1}
+					{Country : "A", CountryText : "A Text", Currency : "EUR", Id : 22,
+						LocalCurrency : "DEM", Name : "Quux", SalesAmount : "10", SalesNumber : 1}
 				]
 			})
 			.expectChange("country", [,,,, "A"])
@@ -32047,7 +32166,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 		await this.waitForChanges(assert, "setProperty (SalesNumber) for Id 26 -> subtotals are not"
 			+ " outdated as SalesNumber does not contribute to grouping or subtotals");
 
-		this.expectRequest("#0 BusinessPartners?$apply=filter(Name ne '')"
+		this.expectRequest("BusinessPartners?$apply=filter(Name ne '')"
 			+ "/groupby((Country,CountryText),aggregate(SalesAmount,Currency))"
 			+ "&$count=true&$skip=0&$top=3", {
 			"@odata.count" : "26",
@@ -33259,6 +33378,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert, "side effects for SalesAmount")
 		]);
 
+		oListBinding.getAllCurrentContexts(); // Note: recreates grand total
 		checkTable("after side effects for SalesAmount", assert, oTable, [
 			oInactive,
 			"/BusinessPartners(4)",
@@ -33281,6 +33401,7 @@ constraints:{'maxLength':5},formatOptions:{'parseKeepsEmptyString':true}\
 			this.waitForChanges(assert, "side effects for Region")
 		]);
 
+		oListBinding.getAllCurrentContexts(); // Note: recreates grand total
 		checkTable("after side effects for Region", assert, oTable, [
 			oInactive,
 			"/BusinessPartners(4)",
@@ -75219,6 +75340,7 @@ make root = ${bMakeRoot}`;
 	//
 	// Check that auto-$expand/$select works, incl. manual $select (JIRA: CPOUI5ODATAV4-3438)
 	// Check that "createCompleted" and "createSent" events are fired (JIRA: CPOUI5ODATAV4-3684)
+	// Check side effects for $select w/o visual grouping (JIRA: CPOUI5ODATAV4-3751)
 ["delete", "resetChanges", "setProperty"].forEach((sMethod) => {
 	const sTitle = "Data Aggregation: setContext w/ transient; finally do " + sMethod;
 
@@ -75349,6 +75471,49 @@ make root = ${bMakeRoot}`;
 
 		await this.waitForChanges(assert, "create transient");
 
+		this.expectRequest("SalesOrderList('42')/SO_2_SOITEM"
+				+ "?$filter=SalesOrderID eq '42' and ItemPosition eq '10'"
+				+ "&$select=GrossAmount,ItemPosition,SalesOrderID", {
+				value : [{GrossAmount : "G/A", ItemPosition : "10", SalesOrderID : "42"}]
+			});
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3751)
+			oListBinding.getHeaderContext().requestSideEffects(["GrossAmount"], "$auto"),
+			this.waitForChanges(assert, "side effect for $select")
+		]);
+
+		assert.strictEqual(oListBinding.getCurrentContexts()[0].getProperty("GrossAmount"), "G/A");
+
+		this.expectRequest("SalesOrderList('42')/SO_2_SOITEM"
+				+ "?$filter=SalesOrderID eq '42' and ItemPosition eq '10'"
+				+ "&$select=GrossAmount,ItemPosition,NetAmount,SalesOrderID,TaxAmount", {
+				value : [{CurrencyCode : "USD", GrossAmount : "G./.A", ItemPosition : "10",
+						NetAmount : "N/A", SalesOrderID : "42", TaxAmount : "251.99"}]
+			})
+			.expectRequest("SalesOrderList('42')/SO_2_SOITEM"
+				+ "?$apply=aggregate(TaxAmount,CurrencyCode)", {
+					value : [{TaxAmount : "252", CurrencyCode : "USD"}]
+				})
+			.expectChange("tax", ["251.99",, "252"]);
+
+		await Promise.all([
+			// code under test (JIRA: CPOUI5ODATAV4-3751)
+			oListBinding.getHeaderContext().requestSideEffects(["*"], "$auto"),
+			this.waitForChanges(assert, "side effects for *all* of $select")
+		]);
+
+		assert.deepEqual(oListBinding.getCurrentContexts()[0].getObject(), {
+			"@$ui5.node.isTotal" : false,
+			"@$ui5.node.level" : 1,
+			CurrencyCode : "USD",
+			GrossAmount : "G./.A",
+			ItemPosition : "10",
+			NetAmount : "N/A",
+			SalesOrderID : "42",
+			TaxAmount : "251.99"
+		});
+
 		this.expectRequest(sUrl, {
 				value : [
 					{TaxAmount : "249", CurrencyCode : "USD"},
@@ -75430,7 +75595,7 @@ make root = ${bMakeRoot}`;
 				oListBinding.attachCreateSent(onCreateSent);
 
 				this.expectChange("tax", [, "81"])
-					.expectRequest("#4 POST SalesOrderList('42')/SO_2_SOITEM", {
+					.expectRequest("#0 POST SalesOrderList('42')/SO_2_SOITEM", {
 						payload : {
 							CurrencyCode : null,
 							TaxAmount : "81"
@@ -75443,7 +75608,7 @@ make root = ${bMakeRoot}`;
 						SalesOrderID : "42",
 						TaxAmount : "8.1"
 					})
-					.expectRequest("#4 SalesOrderList('42')/SO_2_SOITEM"
+					.expectRequest("#0 SalesOrderList('42')/SO_2_SOITEM"
 						+ "?$apply=aggregate(TaxAmount,CurrencyCode)", {
 							value : [{
 								TaxAmount : "257.1",
@@ -75473,7 +75638,7 @@ make root = ${bMakeRoot}`;
 						TaxAmount : "8.1"
 					});
 
-					this.expectRequest("#5 SalesOrderList('42')"
+					this.expectRequest("SalesOrderList('42')"
 							+ "/SO_2_SOITEM(SalesOrderID='42',ItemPosition='20')"
 							+ "?$select=GrossAmount", {
 								GrossAmount : "42.20"

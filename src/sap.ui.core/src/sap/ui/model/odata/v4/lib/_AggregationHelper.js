@@ -1474,17 +1474,20 @@ sap.ui.define([
 		 * @param {sap.ui.model.Filter[]} aFilters
 		 *   The binding's current filters
 		 * @param {string[]} aSideEffectPaths
-		 *   The paths to request side effects for
+		 *   The paths to request side effects for; should not contain an empty path
+		 * @param {boolean} [bGroupLevelsOnly]
+		 *   Whether to ignore the leaf level and grand total, thus looking at group levels only
 		 * @returns {boolean}
 		 *   <code>true</code> if the binding is affected
 		 *
 		 * @public
 		 */
-		isAffected : function (oAggregation, aFilters, aSideEffectPaths) {
+		isAffected : function (oAggregation, aFilters, aSideEffectPaths, bGroupLevelsOnly) {
 			return aSideEffectPaths.some(function (sSideEffectPath) {
 				// returns true if the mandatory property path is affected by the side effect path
 				function isAffected(sPropertyPath) {
-					return _Helper.isAffectedBy(sPropertyPath, sSideEffectPath)
+					return sSideEffectPath === "*" // Note: NOT handled by _Helper.isAffectedBy
+						|| _Helper.isAffectedBy(sPropertyPath, sSideEffectPath)
 						|| _Helper.hasPathPrefix(sSideEffectPath, sPropertyPath);
 				}
 
@@ -1497,15 +1500,21 @@ sap.ui.define([
 					});
 				}
 
-				return sSideEffectPath === "" || sSideEffectPath === "*"
-					|| hasAffectedFilter(aFilters)
+				return hasAffectedFilter(aFilters)
 					|| oAggregation && Object.keys(oAggregation.aggregate).some((sAlias) => {
 						const oDetails = oAggregation.aggregate[sAlias];
+						if (bGroupLevelsOnly
+								&& !(oAggregation.groupLevels.length && oDetails.subtotals)) {
+							return false; // does not affect a group level: ignore!
+						}
 
 						return isAffected(oDetails.name || sAlias)
 							|| oDetails.unit && isAffected(oDetails.unit);
 					})
 					|| oAggregation && Object.keys(oAggregation.group).some((sGroup) => {
+						if (bGroupLevelsOnly && !oAggregation.groupLevels.includes(sGroup)) {
+							return false; // not a group level: ignore!
+						}
 						return isAffected(sGroup)
 							|| oAggregation.group[sGroup].additionally
 								?.some((sPath) => isAffected(sPath));
@@ -1523,7 +1532,8 @@ sap.ui.define([
 		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
 		 *   changed due to an update or side effects of a previous update, see
-		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; must not contain an empty
+		 *   path
 		 * @returns {boolean}
 		 *   Whether the given "$orderby" system query option is affected by at least one of the
 		 *   given side-effects paths
@@ -1551,7 +1561,8 @@ sap.ui.define([
 		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
 		 *   changed due to an update or side effects of a previous update, see
-		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; must not contain an empty
+		 *   path
 		 * @param {object} [mAggregate]
 		 *   A map from aggregatable property names/aliases to details objects
 		 * @returns {boolean}
@@ -1573,7 +1584,8 @@ sap.ui.define([
 		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
 		 *   changed due to an update or side effects of a previous update, see
-		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; must not contain an empty
+		 *   path
 		 * @param {object} oAggregation
 		 *   An object holding the information needed for data aggregation but no recursive
 		 *   hierarchy; see {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}
@@ -1584,16 +1596,10 @@ sap.ui.define([
 		 * @public
 		 */
 		isUsedForGroupLevels : function (aPaths, oAggregation) {
-			// _AggregationHelper.isAffected returns true if "*" is in aPaths independent of
-			// the given aggregation, so check first whether there are group levels
-			return oAggregation.groupLevels.length > 0 && _AggregationHelper.isAffected({
-					aggregate : {},
-					// only groups that are used for visual grouping have to be considered
-					group : oAggregation.groupLevels.reduce((oGroup, sGroup) => {
-						oGroup[sGroup] = oAggregation.group[sGroup];
-						return oGroup;
-					}, /*oGroup*/{})
-				}, /*aFilters*/[], aPaths);
+			return _AggregationHelper.isAffected({
+					...oAggregation,
+					aggregate : {} // ignore subtotals
+				}, /*aFilters*/[], aPaths, /*bGroupLevelsOnly*/true);
 		},
 
 		/**
@@ -1604,7 +1610,8 @@ sap.ui.define([
 		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
 		 *   changed due to an update or side effects of a previous update, see
-		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; must not contain an empty
+		 *   path
 		 * @param {object} oAggregation
 		 *   An object holding the information needed for data aggregation but no recursive
 		 *   hierarchy; see {@link sap.ui.model.odata.v4.ODataListBinding#setAggregation}
@@ -1629,7 +1636,8 @@ sap.ui.define([
 		 *   The "14.4.1.5 Expression edm:NavigationPropertyPath" or
 		 *   "14.4.1.6 Expression edm:PropertyPath" strings describing which properties may have
 		 *   changed due to an update or side effects of a previous update, see
-		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}
+		 *   {@link sap.ui.model.odata.v4.Context#requestSideEffects}; must not contain an empty
+		 *   path
 		 * @param {object} [mAggregate]
 		 *   A map from aggregatable property names/aliases to details objects
 		 * @returns {boolean}
