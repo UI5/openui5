@@ -914,6 +914,69 @@ sap.ui.define([
 		assert.ok(oTipRect.top >= oBtnRect.bottom - 1, "tooltip top edge is at/below the opener bottom edge");
 	});
 
+	// RTL mirrors the horizontal placements: Begin docks to the physical RIGHT of
+	// the opener and End to the physical LEFT — the mirror of the LTR cases above.
+	// resolvePlacement returns a logical side (Popup mirror convention); the tooltip
+	// inverts it to the true physical side because it docks with mirror:false, so
+	// without that inversion Begin/End land on the wrong side in RTL. RTL is stubbed
+	// before the open so getRTL() is true throughout _doOpen and _applyPosition.
+	QUnit.module("Position on tooltip DOM (RTL)", {
+		beforeEach: async function() {
+			this.oRtlStub = sinon.stub(Localization, "getRTL").returns(true);
+			// Center the anchor so every strict side has room and no auto-flip.
+			this.oButton = new Button({text: "Anchor"});
+			this.oButton.placeAt("content");
+			await nextUIUpdate(this.clock);
+			Object.assign(this.oButton.getDomRef().style, {
+				position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)"
+			});
+		},
+		afterEach: async function() {
+			if (this.oTooltip) {
+				this.oTooltip.destroy();
+			}
+			this.oButton.destroy();
+			// Drain any reposition/followOf timers a real open left behind.
+			await this.clock.tickAsync(2000);
+			this.oRtlStub.restore();
+		}
+	});
+
+	QUnit.test("RTL Begin places the tooltip to the right of the opener", async function(assert) {
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.Begin, delay: 0});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		assert.strictEqual(this.oTooltip._sCalcedPos, "Right", "Begin resolves to the physical Right side in RTL");
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+		assert.ok(oTipRect.left >= oBtnRect.right - 1, "tooltip left edge is at/right of the opener right edge");
+	});
+
+	QUnit.test("RTL End places the tooltip to the left of the opener", async function(assert) {
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.End, delay: 0});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		assert.strictEqual(this.oTooltip._sCalcedPos, "Left", "End resolves to the physical Left side in RTL");
+		const oTipRect = this.oTooltip.getDomRef().getBoundingClientRect();
+		const oBtnRect = this.oButton.getDomRef().getBoundingClientRect();
+		assert.ok(oTipRect.right <= oBtnRect.left + 1, "tooltip right edge is at/left of the opener left edge");
+	});
+
+	QUnit.test("RTL Begin points the arrow at the opener from the tooltip's left edge", async function(assert) {
+		this.oTooltip = new Tooltip({text: "Hi", placement: PopoverPlacement.Begin, delay: 0});
+		await openAndWait(this.clock, this.oTooltip, this.oButton);
+
+		assert.strictEqual(this.oTooltip._sCalcedPos, "Right", "Begin resolves to the physical Right side in RTL");
+		// A right-docked tooltip has its arrow on the left edge, pointing back at the opener.
+		const oArrow = this.oTooltip.getDomRef().querySelector(".sapUiCoreTooltipArrow");
+		assert.ok(oArrow, "arrow element rendered");
+		// _applyPlacementClass emits the logical class: physical Right → -Left in RTL.
+		assert.ok(
+			this.oTooltip.getDomRef().classList.contains("sapUiCoreTooltip-Left"),
+			"physical Right maps to the logical -Left class in RTL"
+		);
+	});
+
 	QUnit.module("Overflow on tooltip DOM", {
 		beforeEach: async function() {
 			this.oButton = new Button({text: "Anchor"});
