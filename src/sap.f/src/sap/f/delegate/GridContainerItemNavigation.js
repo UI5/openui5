@@ -189,5 +189,21 @@ sap.ui.define([
 		return oItem;
 	};
 
+	/**
+	 * Sets the focus to the item with the given index.
+	 *
+	 * @param {int} iIndex Index of the item to focus
+	 * @param {jQuery.Event} oEvent Event that leads to focus change
+	 * @override
+	 * @private
+	 */
+	GridContainerItemNavigation.prototype.focusItem = function(iIndex, oEvent) {
+		if (!oEvent) {
+			this.resetFocusPosition();
+		}
+
+		GridItemNavigation.prototype.focusItem.apply(this, arguments);
+	};
+
 	return GridContainerItemNavigation;
 });
