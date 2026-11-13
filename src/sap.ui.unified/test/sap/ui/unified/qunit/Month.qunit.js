@@ -1826,6 +1826,115 @@ sap.ui.define([
 
 	})();
 
+	QUnit.module("Space key cancel action", {
+		beforeEach: async function () {
+			this.oM = new Month();
+			this.oM.placeAt("qunit-fixture");
+			await nextUIUpdate();
+			this.oSelectSpy = this.spy(this.oM, "fireSelect");
+			this.oTarget = this.oM.getDomRef().querySelector(".sapUiCalItem");
+		},
+		afterEach: function () {
+			this.oM.destroy();
+			this.oM = null;
+		}
+	});
+
+	QUnit.test("Space keyup selects the focused day", function (assert) {
+		var oMockEvent = { which: KeyCodes.SPACE, target: this.oTarget, preventDefault: function () {} };
+
+		// act
+		this.oM.onkeydown(oMockEvent);
+		this.oM.onkeyup(oMockEvent);
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 1, "fireSelect is called once");
+	});
+
+	QUnit.test("Space keydown alone does not select (no premature selection on keydown)", function (assert) {
+		var oMockEvent = { which: KeyCodes.SPACE, target: this.oTarget, preventDefault: function () {} };
+
+		// act
+		this.oM.onkeydown(oMockEvent);
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called on keydown");
+	});
+
+	QUnit.test("Space then Escape cancels selection — case 1: Escape pressed and released before Space released", function (assert) {
+		var oSpaceEvent = { which: KeyCodes.SPACE, target: this.oTarget, preventDefault: function () {} };
+		var oEscapeEvent = { which: KeyCodes.ESCAPE };
+
+		// act: Space down, Escape down, Escape up, Space up
+		this.oM.onkeydown(oSpaceEvent);
+		this.oM.onkeydown(oEscapeEvent);
+		this.oM.onkeyup(oEscapeEvent);
+		this.oM.onkeyup(oSpaceEvent);
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("Space then Escape cancels selection — case 2: Escape held past Space release", function (assert) {
+		var oSpaceEvent = { which: KeyCodes.SPACE, target: this.oTarget, preventDefault: function () {} };
+		var oEscapeEvent = { which: KeyCodes.ESCAPE };
+
+		// act: Space down, Escape down, Space up, Escape up
+		this.oM.onkeydown(oSpaceEvent);
+		this.oM.onkeydown(oEscapeEvent);
+		this.oM.onkeyup(oSpaceEvent);
+		this.oM.onkeyup(oEscapeEvent);
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("Space then Shift cancels selection — case 1: Shift pressed and released before Space released", function (assert) {
+		var oSpaceEvent = { which: KeyCodes.SPACE, target: this.oTarget, preventDefault: function () {} };
+		var oShiftEvent = { which: KeyCodes.SHIFT };
+
+		// act: Space down, Shift down, Shift up, Space up
+		this.oM.onkeydown(oSpaceEvent);
+		this.oM.onkeydown(oShiftEvent);
+		this.oM.onkeyup(oShiftEvent);
+		this.oM.onkeyup(oSpaceEvent);
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("Space then Shift cancels selection — case 2: Shift held past Space release", function (assert) {
+		var oSpaceEvent = { which: KeyCodes.SPACE, target: this.oTarget, preventDefault: function () {} };
+		var oShiftEvent = { which: KeyCodes.SHIFT };
+
+		// act: Space down, Shift down, Space up, Shift up
+		this.oM.onkeydown(oSpaceEvent);
+		this.oM.onkeydown(oShiftEvent);
+		this.oM.onkeyup(oSpaceEvent);
+		this.oM.onkeyup(oShiftEvent);
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 0, "fireSelect is not called");
+	});
+
+	QUnit.test("After cancelled Space press, next Space press selects normally", function (assert) {
+		var oSpaceEvent = { which: KeyCodes.SPACE, target: this.oTarget, preventDefault: function () {} };
+		var oEscapeEvent = { which: KeyCodes.ESCAPE };
+
+		// act: cancel first press
+		this.oM.onkeydown(oSpaceEvent);
+		this.oM.onkeydown(oEscapeEvent);
+		this.oM.onkeyup(oEscapeEvent);
+		this.oM.onkeyup(oSpaceEvent);
+
+		// act: second press
+		this.oM.onkeydown(oSpaceEvent);
+		this.oM.onkeyup(oSpaceEvent);
+
+		// assert
+		assert.equal(this.oSelectSpy.callCount, 1, "fireSelect is called exactly once on second press");
+	});
+
 	QUnit.module("DatesRow Accessibility", {
 		beforeEach: async function () {
 			this.oDatesRow = new DatesRow({

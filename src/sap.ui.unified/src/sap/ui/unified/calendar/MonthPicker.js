@@ -172,6 +172,8 @@ sap.ui.define([
 	MonthPicker.prototype.init = function(){
 		this._iMinMonth = 0;
 		this._iMaxMonth = 11;
+		this._bSpacePressed = false;
+		this._bPressedEscapeOrShift = false;
 
 	};
 
@@ -412,11 +414,45 @@ sap.ui.define([
 		oEvent.preventDefault();
 	};
 
+	MonthPicker.prototype.onkeydown = function(oEvent) {
+		if (oEvent.which === KeyCodes.SPACE) {
+			this._bSpacePressed = true;
+		}
+		if (this._bSpacePressed) {
+			if (oEvent.which === KeyCodes.SHIFT || oEvent.which === KeyCodes.ESCAPE) {
+				this._bPressedEscapeOrShift = true;
+			}
+		}
+	};
+
+	MonthPicker.prototype.onkeyup = function(oEvent) {
+		if (oEvent.which === KeyCodes.SPACE && this._bSpacePressed) {
+			if (!this._bPressedEscapeOrShift) {
+				const iIndex = this._oItemNavigation.getFocusedIndex();
+				const iMonth = iIndex + this.getStartMonth();
+				if (iMonth >= this._iMinMonth && iMonth <= this._iMaxMonth) {
+					this._selectMonth(iMonth);
+					this.fireSelect();
+				}
+			}
+			this._bSpacePressed = false;
+			this._bPressedEscapeOrShift = false;
+		}
+		if (oEvent.which === KeyCodes.ESCAPE) {
+			this._bSpacePressed = false;
+			this._bPressedEscapeOrShift = false;
+		}
+	};
+
 	MonthPicker.prototype.onsapselect = function(oEvent){
 
+		if (oEvent.which === KeyCodes.SPACE) {
+			return;
+		}
+
 		// focused item must be selected
-		var iIndex = this._oItemNavigation.getFocusedIndex();
-		var iMonth = iIndex + this.getStartMonth();
+		const iIndex = this._oItemNavigation.getFocusedIndex();
+		const iMonth = iIndex + this.getStartMonth();
 
 		if (iMonth >= this._iMinMonth && iMonth <= this._iMaxMonth) {
 			this._selectMonth(iMonth);

@@ -177,6 +177,8 @@ sap.ui.define([
 
 		this._oMinDate = CalendarUtils._minDate(this._getPrimaryCalendarType());
 		this._oMaxDate = CalendarUtils._maxDate(this._getPrimaryCalendarType());
+		this._bSpacePressed = false;
+		this._bPressedEscapeOrShift = false;
 	};
 
 	YearPicker.prototype.onBeforeRendering = function() {
@@ -426,12 +428,45 @@ sap.ui.define([
 		oEvent.preventDefault();
 	};
 
+	YearPicker.prototype.onkeydown = function(oEvent) {
+		if (oEvent.which === KeyCodes.SPACE) {
+			this._bSpacePressed = true;
+		}
+		if (this._bSpacePressed) {
+			if (oEvent.which === KeyCodes.SHIFT || oEvent.which === KeyCodes.ESCAPE) {
+				this._bPressedEscapeOrShift = true;
+			}
+		}
+	};
+
+	YearPicker.prototype.onkeyup = function(oEvent) {
+		if (oEvent.which === KeyCodes.SPACE && this._bSpacePressed) {
+			if (!this._bPressedEscapeOrShift) {
+				const iIndex = this._oItemNavigation.getFocusedIndex();
+				const bSelected = this._selectYear(iIndex);
+				if (bSelected) {
+					this.fireSelect();
+				}
+			}
+			this._bSpacePressed = false;
+			this._bPressedEscapeOrShift = false;
+		}
+		if (oEvent.which === KeyCodes.ESCAPE) {
+			this._bSpacePressed = false;
+			this._bPressedEscapeOrShift = false;
+		}
+	};
+
 	YearPicker.prototype.onsapselect = function(oEvent){
 
-		// focused item must be selected
-		var iIndex = this._oItemNavigation.getFocusedIndex();
+		if (oEvent.which === KeyCodes.SPACE) {
+			return;
+		}
 
-		var bSelected = this._selectYear(iIndex);
+		// focused item must be selected
+		const iIndex = this._oItemNavigation.getFocusedIndex();
+
+		const bSelected = this._selectYear(iIndex);
 		if (bSelected) {
 			this.fireSelect();
 		}

@@ -1323,6 +1323,20 @@ sap.ui.define([
 	};
 
 	Calendar.prototype.onsapescape = function(oEvent) {
+		let oPicker;
+		if (this._iMode === 1) {
+			oPicker = this._getMonthPicker();
+		} else if (this._iMode === 2) {
+			oPicker = this._getYearPicker();
+		} else if (this._iMode === 3) {
+			oPicker = this._getYearRangePicker();
+		}
+		if (oPicker?._bSpacePressed) {
+			return;
+		}
+		if (this._getHeader?.()?._bSpacePressed) {
+			return;
+		}
 
 		this.fireCancel();
 		this._closePickers();
