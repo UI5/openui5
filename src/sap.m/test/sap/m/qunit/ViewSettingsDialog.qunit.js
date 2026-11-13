@@ -1988,6 +1988,22 @@ sap.ui.define([
 		assert.ok(!fnStringFilter("ou", "mousepad mousepad"), "'anywordstartswith' does not match strings in the middle of the second word");
 	});
 
+	QUnit.test("StringFilter 'AnyWordStartsWith' handles special characters in the query", function (assert) {
+		this.oVSD.setFilterSearchOperator(StringFilterOperator.AnyWordStartsWith);
+		var fnStringFilter = this.oVSD._getStringFilter();
+
+		// A query containing special characters is handled gracefully.
+		assert.strictEqual(typeof fnStringFilter("(", "(bracketed) value"), "boolean",
+			"a query with an unbalanced parenthesis returns a boolean result");
+
+		// Special characters in the query are treated as literal text.
+		assert.strictEqual(fnStringFilter("(a+)+$", "aaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+			false, "a query with special characters is matched literally");
+
+		assert.ok(fnStringFilter("c++", "c++ programming"), "a query with special characters matches the corresponding value literally");
+		assert.ok(!fnStringFilter("c++", "java programming"), "a literal query does not match an unrelated value");
+	});
+
 	QUnit.test("setFilterSearchCallback", function (assert) {
 		var done = assert.async(),
 			oCallbackSpy = {
