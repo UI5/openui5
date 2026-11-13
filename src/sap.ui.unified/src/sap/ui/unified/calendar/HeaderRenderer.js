@@ -6,8 +6,9 @@ sap.ui.define([
 	"sap/base/i18n/Localization",
 	"sap/ui/core/Lib",
 	"sap/ui/core/Locale",
+	"sap/ui/core/tooltip/TooltipEnablement",
 	"sap/ui/core/IconPool" // side effect: required when calling RenderManager.icon
-], function(Localization, Library, Locale) {
+], function(Localization, Library, Locale, TooltipEnablement) {
 	"use strict";
 
 
@@ -97,6 +98,7 @@ sap.ui.define([
 			sNextBtnMainLabel = oRB.getText("CALENDAR_BTN_NEXT_YEAR_RANGE_TITLE");
 			sPrevBtnMainLabel = oRB.getText("CALENDAR_BTN_PREV_YEAR_RANGE_TITLE");
 		}
+
 		const sNextBtnTitle = `${sNextBtnMainLabel} (${sNextBtnShortCut})`;
 		const sPrevBtnTitle = `${sPrevBtnMainLabel} (${sPrevBtnShortCut})`;
 
@@ -115,12 +117,19 @@ sap.ui.define([
 		oRm.openEnd(); // div element
 
 		oRm.openStart("button", sId + '-prev');
-		oRm.attr("title", sPrevBtnTitle);
-		oRm.accessibilityState(null, {
-			label: sPrevBtnMainLabel,
-			description: sPrevBtnMainLabel,
-			keyshortcuts: sPrevBtnShortCut
-		});
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			oRm.accessibilityState(null, {
+				label: sPrevBtnMainLabel,
+				keyshortcuts: sPrevBtnShortCut
+			});
+		} else {
+			oRm.attr("title", sPrevBtnTitle);
+			oRm.accessibilityState(null, {
+				label: sPrevBtnMainLabel,
+				keyshortcuts: sPrevBtnShortCut,
+				description: sPrevBtnMainLabel
+			});
+		}
 
 		const isPrevBtnEnabled = oHead.getEnabledPrevious();
 		oRm.class("sapUiCalHeadPrev");
@@ -217,9 +226,14 @@ sap.ui.define([
 		// Today button
 		if (oHead.getVisibleCurrentDateButton()) {
 			oRm.openStart("button", sId + '-today');
-			oRm.attr("title", sLabelToday);
-			oRm.accessibilityState(null, { label: sLabelToday});
-
+			if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+				oRm.accessibilityState(null, {
+					label: sLabelToday
+				});
+			} else {
+				oRm.attr("title", sLabelToday);
+				oRm.accessibilityState(null, { label: sLabelToday, description: sLabelToday });
+			}
 			oRm.class("sapUiCalHeadB");
 			oRm.class("sapUiCalHeadToday");
 			oRm.openEnd(); // button element
@@ -229,12 +243,19 @@ sap.ui.define([
 
 		// Next button
 		oRm.openStart("button", sId + '-next');
-		oRm.attr("title", sNextBtnTitle);
-		oRm.accessibilityState(null, {
-			label: sNextBtnMainLabel,
-			description: sNextBtnMainLabel,
-			keyshortcuts: sNextBtnShortCut
-		});
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			oRm.accessibilityState(null, {
+				label: sNextBtnMainLabel,
+				keyshortcuts: sNextBtnShortCut
+			});
+		} else {
+			oRm.attr("title", sNextBtnTitle);
+			oRm.accessibilityState(null, {
+				label: sNextBtnMainLabel,
+				keyshortcuts: sNextBtnShortCut,
+				description: sNextBtnMainLabel
+			});
+		}
 
 		const isNextBtnEnabled = oHead.getEnabledNext();
 		oRm.class("sapUiCalHeadNext");
@@ -268,12 +289,14 @@ sap.ui.define([
 				mAccProps["label"] = this.getAriaLabelButton(oHead, i);
 			}
 
-			// Set descriptions and keyboard shortcuts from private properties using helper functions
-			this._setAccessibilityDescription(oHead, i, mAccProps);
+			// Set keyboard shortcuts from private properties using helper function
 			this._setAccessibilityKeyShortcuts(oHead, i, mAccProps);
-
-			if (this.getTooltipButton(oHead, i)) {
-				oRm.attr("title", this.getTooltipButton(oHead, i));
+			var sTooltip = this.getTooltipButton(oHead, i);
+			if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+				// tooltip handled externally; no describedby needed
+			} else if (sTooltip) {
+				oRm.attr("title", sTooltip);
+				this._setAccessibilityDescription(oHead, i, mAccProps);
 			}
 			oRm.attr("tabindex", "0");
 			oRm.accessibilityState(null, mAccProps);

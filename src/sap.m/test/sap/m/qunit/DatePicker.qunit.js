@@ -41,6 +41,8 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/Element",
 	"sap/ui/core/date/UI5Date",
+	"sap/ui/core/ShortcutHintsMixin",
+	"sap/ui/core/tooltip/TooltipEnablement",
 	// load all required calendars in advance
 	"sap/ui/core/date/Buddhist",
 	"sap/ui/core/date/Gregorian",
@@ -88,7 +90,9 @@ sap.ui.define([
 	deepEqual,
 	jQuery,
 	Element,
-	UI5Date
+	UI5Date,
+	ShortcutHintsMixin,
+	TooltipEnablement
 ) {
 	"use strict";
 
@@ -3679,6 +3683,135 @@ sap.ui.define([
 		await nextUIUpdate();
 		var oIcon = this.oDP._getValueHelpIcon();
 		assert.strictEqual(oIcon.getVisible(), true, "icon is visible at normal zoom");
+	});
+
+	const oRB = Library.getResourceBundleFor("sap.m");
+
+	// ----------------------------------------------------------------
+	// DatePicker — Initialization
+	// ----------------------------------------------------------------
+	QUnit.module("DatePicker — TooltipEnablement — Initialization", {
+		beforeEach: function() {
+			this.oFlagStub = this.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+		},
+		afterEach: function() {
+			this.oPicker.destroy();
+		}
+	});
+
+	QUnit.test("_oIconTooltipEnablement is not set when feature flag is off", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(false);
+
+		// Act
+		this.oPicker = new DatePicker();
+
+		// Assert
+		assert.notOk(this.oPicker._oIconTooltipEnablement,
+			"_oIconTooltipEnablement is falsy when the feature flag is off");
+	});
+
+	QUnit.test("_oIconTooltipEnablement is created when feature flag is on", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+
+		// Act
+		this.oPicker = new DatePicker();
+
+		// Assert
+		assert.ok(this.oPicker._oIconTooltipEnablement instanceof TooltipEnablement,
+			"_oIconTooltipEnablement is a TooltipEnablement instance when the feature flag is on");
+	});
+
+	QUnit.test("ShortcutHintsMixin popup is suppressed on init when feature flag is on", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+		const oSuppressStub = this.stub(ShortcutHintsMixin, "setPopupSuppressed");
+
+		// Act
+		this.oPicker = new DatePicker();
+
+		// Assert
+		assert.ok(oSuppressStub.calledWith(this.oPicker, true),
+			"setPopupSuppressed called with true so the mixin popup is suppressed");
+	});
+
+	// ----------------------------------------------------------------
+	// DatePicker — exit — lifecycle cleanup
+	// ----------------------------------------------------------------
+	QUnit.module("DatePicker — TooltipEnablement — exit — lifecycle cleanup", {
+		beforeEach: function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oPicker = new DatePicker();
+		}
+		// no afterEach — each test destroys the picker itself
+	});
+
+	QUnit.test("destroy() calls destroy on _oIconTooltipEnablement and nulls the reference", function(assert) {
+		// Prepare
+		const oDestroySpy = this.spy(this.oPicker._oIconTooltipEnablement, "destroy");
+
+		// Act
+		this.oPicker.destroy();
+
+		// Assert
+		assert.ok(oDestroySpy.calledOnce,
+			"destroy() was called on _oIconTooltipEnablement during picker exit");
+		assert.strictEqual(this.oPicker._oIconTooltipEnablement, null,
+			"_oIconTooltipEnablement is set to null during exit so no dangling references remain");
+	});
+
+	// ----------------------------------------------------------------
+	// DatePicker — DOM rendering
+	// ----------------------------------------------------------------
+	QUnit.module("DatePicker — TooltipEnablement — DOM rendering", {
+		beforeEach: async function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oPicker = new DatePicker("dp-te");
+			this.oPicker.placeAt("qunit-fixture");
+			await nextUIUpdate(this.clock);
+		},
+		afterEach: async function() {
+			this.oPicker.destroy();
+			await nextUIUpdate(this.clock);
+		}
+	});
+
+	QUnit.test("invisible tooltip span id uses the default -invisibleTooltip suffix", function(assert) {
+		// Prepare
+		const sExpectedId = this.oPicker.getId() + "-invisibleTooltip";
+
+		// Assert
+		assert.strictEqual(this.oPicker._oIconTooltipEnablement.getInvisibleTooltipId(), sExpectedId,
+			"invisible tooltip span id uses the default -invisibleTooltip suffix");
+	});
+
+	QUnit.test("no native title attribute on the calendar icon element", function(assert) {
+		// Prepare
+		const oIconDom = this.oPicker.getDomRef().querySelector(".sapUiIcon");
+
+		// Assert
+		assert.strictEqual(oIconDom.getAttribute("title"), null,
+			"native title attribute is suppressed on the icon when enhanced tooltip is active");
+	});
+
+	QUnit.test("textProvider returns the open-picker i18n text with shortcut hint when enabled", function(assert) {
+		// Prepare
+		const oIcon = this.oPicker.getAggregation("_endIcon")[0];
+
+		// Assert
+		assert.strictEqual(this.oPicker._oIconTooltipEnablement._resolveText(),
+			ShortcutHintsMixin.getTooltipWithShortcut(oIcon, oRB.getText("OPEN_PICKER_TEXT")),
+			"textProvider resolves to the OPEN_PICKER_TEXT combined with the F4 shortcut hint");
+	});
+
+	QUnit.test("textProvider returns empty string when disabled", function(assert) {
+		// Prepare
+		this.oPicker.setEnabled(false);
+
+		// Assert
+		assert.strictEqual(this.oPicker._oIconTooltipEnablement._resolveText(), "",
+			"textProvider returns empty string for a disabled DatePicker");
 	});
 
 });

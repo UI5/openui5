@@ -30,7 +30,8 @@ sap.ui.define([
 	"sap/ui/dom/containsOrEquals",
 	"sap/base/util/deepEqual",
 	"sap/base/Log",
-	"sap/base/i18n/date/CalendarWeekNumbering"
+	"sap/base/i18n/date/CalendarWeekNumbering",
+	"sap/ui/core/tooltip/TooltipEnablement"
 ], function(
 	Formatting,
 	Localization,
@@ -59,7 +60,8 @@ sap.ui.define([
 	containsOrEquals,
 	deepEqual,
 	Log,
-	_CalendarWeekNumbering // type of `calendarWeekNumbering`
+	_CalendarWeekNumbering,
+	TooltipEnablement
 ) {
 	"use strict";
 
@@ -434,6 +436,14 @@ sap.ui.define([
 		//when used in a DatePicker, in mobile there is no cancel button
 		this._bSkipCancelButtonRendering = false;
 		this._bActionTriggeredFromSecondHeader = false;
+
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			this._oTooltipRoot = new TooltipEnablement(this, {
+				textProvider: () => this.getTooltip_AsString() || "",
+				domRefProvider: () => this.getDomRef(),
+				focusDomRefProvider: () => this.getDomRef()
+			});
+		}
 	};
 
 	Calendar.prototype.exit = function(){
@@ -458,6 +468,11 @@ sap.ui.define([
 		}
 
 		this._oSelectedMonth = null;
+
+		if (this._oTooltipRoot) {
+			this._oTooltipRoot.destroy();
+			this._oTooltipRoot = null;
+		}
 	};
 
 	Calendar.prototype._initializeHeader = function() {

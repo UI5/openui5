@@ -34,7 +34,9 @@ sap.ui.define([
 	"sap/base/i18n/date/CalendarType",
 	"sap/base/i18n/date/CalendarWeekNumbering",
 	"sap/ui/core/InvisibleText",
-	"sap/ui/dom/jquery/cursorPos"
+	"sap/ui/dom/jquery/cursorPos",
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/core/ShortcutHintsMixin"
 ],
 	function(
 		Localization,
@@ -66,7 +68,10 @@ sap.ui.define([
 		UI5Date,
 		CalendarType,
 		CalendarWeekNumbering,
-		InvisibleText
+		InvisibleText,
+		cursorPos,
+		TooltipEnablement,
+		ShortcutHintsMixin
 	) {
 	"use strict";
 
@@ -448,6 +453,19 @@ sap.ui.define([
 			alt: oResourceBundle.getText("OPEN_PICKER_TEXT")
 		});
 
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			oIcon.setTooltip("");
+			ShortcutHintsMixin.addConfig(oIcon, { shortcut: "F4" }, this);
+
+			this._oIconTooltipEnablement = new TooltipEnablement(this, {
+				textProvider: () => this._getIconTooltipTextProvider(),
+				domRefProvider: () => oIcon.getDomRef(),
+				focusDomRefProvider: () => oIcon.getDomRef()
+			});
+
+			ShortcutHintsMixin.setPopupSuppressed(this, true);
+		}
+
 		// idicates whether the picker is still open
 		this._bShouldClosePicker = false;
 
@@ -461,6 +479,23 @@ sap.ui.define([
 		oIcon.attachPress(function () {
 			this.toggleOpen(this._bShouldClosePicker);
 		}, this);
+	};
+
+	/**
+	 * Returns the tooltip text for the picker icon.
+	 * Empty when the control is disabled or read-only.
+	 *
+	 * @returns {string}
+	 * @private
+	 */
+	DatePicker.prototype._getIconTooltipTextProvider = function() {
+		if (!this.getEnabled() || !this.getEditable()) {
+			return "";
+		}
+
+		const oIcon = this.getAggregation("_endIcon")[0];
+
+		return ShortcutHintsMixin.getTooltipWithShortcut(oIcon, oResourceBundle.getText("OPEN_PICKER_TEXT"));
 	};
 
 	/**
@@ -542,8 +577,10 @@ sap.ui.define([
 			this._invisibleLabelText = null;
 		}
 
-		// Destroy explicitly — on non-phone the button is not inside any aggregation
-		// so the popup destroy does not reach it. destroy() is safe on already-destroyed objects.
+		if (this._oIconTooltipEnablement) {
+			this._oIconTooltipEnablement.destroy();
+			this._oIconTooltipEnablement = null;
+		}
 	};
 
 	DatePicker.prototype.invalidate = function(oOrigin) {

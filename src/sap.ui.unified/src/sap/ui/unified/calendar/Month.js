@@ -27,7 +27,9 @@ sap.ui.define([
 	'sap/ui/thirdparty/jquery',
 	'sap/ui/core/date/CalendarUtils',
 	'sap/ui/core/date/UI5Date',
-	'sap/base/Log'
+	'sap/base/Log',
+	'sap/ui/core/tooltip/TooltipEnablement',
+	'sap/ui/core/tooltip/Tooltip'
 ], function(
 	Formatting,
 	CalendarType,
@@ -52,7 +54,9 @@ sap.ui.define([
 	jQuery,
 	CalendarDateUtils,
 	UI5Date,
-	Log
+	Log,
+	TooltipEnablement,
+	Tooltip
 ) {
 	"use strict";
 
@@ -322,6 +326,31 @@ sap.ui.define([
 		this._bAlwaysShowSpecialDates = false;
 
 		this._oUnifiedRB = Library.getResourceBundleFor("sap.ui.unified");
+
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			this._oTooltipMonth = new TooltipEnablement(this, {
+				textProvider: () => this.getTooltip_AsString() || "",
+				domRefProvider: () => this.getDomRef(),
+				focusDomRefProvider: () => this.getDomRef()
+			});
+			this._oTooltipWeekHeader = new TooltipEnablement(this, {
+				domRefProvider: () => this.getDomRef("WH-Head"),
+				focusDomRefProvider: () => this.getDomRef("WH-Head"),
+				textProvider: () => Library.getResourceBundleFor("sap.ui.unified").getText("CALENDAR_WEEK")
+			});
+			this._oTooltipWeekHeader._ensureTooltip = function() {
+				if (!this._oTooltip) {
+					this._oTooltip = new Tooltip({
+						text: this._resolveText(),
+						placement: coreLibrary.popover.PopoverPlacement.Bottom,
+						afterOpen: () => this.fireEvent("afterOpen"),
+						afterClose: () => this.fireEvent("afterClose")
+					});
+				}
+				return this._oTooltip;
+			};
+			this._mWeekNumberTooltips = {};
+		}
 	};
 
 	Month.prototype._getAriaRole = function(){
@@ -372,10 +401,23 @@ sap.ui.define([
 		this._aVisibleDays = null;
 		this._bAlwaysShowSpecialDates = null;
 
+		if (this._oTooltipMonth) {
+			this._oTooltipMonth.destroy();
+			this._oTooltipMonth = null;
+		}
+
+		if (this._oTooltipWeekHeader) {
+			this._oTooltipWeekHeader.destroy();
+			this._oTooltipWeekHeader = null;
+		}
+
+		this._destroyWeekNumberTooltips();
+
 	};
 
 	Month.prototype.getFocusDomRef = function(){
-		return this.getDomRef() && this._oItemNavigation.getItemDomRefs()[this._oItemNavigation.getFocusedIndex()];
+		return this.getDomRef() && this._oItemNavigation
+			&& this._oItemNavigation.getItemDomRefs()[this._oItemNavigation.getFocusedIndex()];
 	};
 
 	Month.prototype.onBeforeRendering = function() {
@@ -387,6 +429,7 @@ sap.ui.define([
 		}
 
 		this._aSpecialDates = this._getSpecialDates();
+		this._destroyWeekNumberTooltips();
 	};
 
 	Month.prototype.onAfterRendering = function(){
@@ -404,6 +447,35 @@ sap.ui.define([
 				oDomRef.classList.add("sapUiCalItemFocusFromTouch");
 			}
 		}
+	};
+
+	Month.prototype._destroyWeekNumberTooltips = function() {
+		if (this._mWeekNumberTooltips) {
+			Object.values(this._mWeekNumberTooltips).forEach((oTip) => oTip.destroy());
+			this._mWeekNumberTooltips = {};
+		}
+	};
+
+	Month.prototype._createWeekNumberTooltip = function(iWeekNumber) {
+		const oTip = new TooltipEnablement(this, {
+			domRefProvider: () => this.getDomRef("WNum-" + iWeekNumber),
+			focusDomRefProvider: () => this.getDomRef("WNum-" + iWeekNumber),
+			invisibleTooltipIdSuffix: `-WNum-${iWeekNumber}-invisibleTooltip`,
+			textProvider: () => this._oUnifiedRB.getText("CALENDAR_WEEK_NUMBER", [iWeekNumber])
+		});
+		oTip._ensureTooltip = function() {
+			if (!this._oTooltip) {
+				this._oTooltip = new Tooltip({
+					text: this._resolveText(),
+					placement: coreLibrary.popover.PopoverPlacement.Bottom,
+					afterOpen: () => this.fireEvent("afterOpen"),
+					afterClose: () => this.fireEvent("afterClose")
+				});
+			}
+			return this._oTooltip;
+		};
+		this._mWeekNumberTooltips[iWeekNumber] = oTip;
+		return oTip;
 	};
 
 	Month.prototype.onmouseover = function(oEvent) {

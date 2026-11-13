@@ -24,7 +24,9 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/date/UI5Date",
-	"sap/ui/core/library"
+	"sap/ui/core/library",
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/unified/Calendar"
 ], function(
 	Localization,
 	Formatting,
@@ -49,7 +51,9 @@ sap.ui.define([
 	Device,
 	jQuery,
 	UI5Date,
-	coreLibrary
+	coreLibrary,
+	TooltipEnablement,
+	Calendar
 ) {
 	"use strict";
 
@@ -1959,6 +1963,325 @@ sap.ui.define([
 		// Assert
 		assert.ok(sDescribedBy && sDescribedBy.indexOf(sDayNameHeaderId) > -1,
 			"aria-describedby contains day name header ID: " + sDayNameHeaderId);
+	});
+
+	const oRB = Library.getResourceBundleFor("sap.ui.unified");
+	const CalendarDayType = unifiedLibrary.CalendarDayType;
+
+	// ----------------------------------------------------------------
+	// Month — Initialization
+	// ----------------------------------------------------------------
+	QUnit.module("Month — TooltipEnablement — Initialization", {
+		beforeEach: function() {
+			this.oFlagStub = this.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+		},
+		afterEach: function() {
+			this.oMonth.destroy();
+		}
+	});
+
+	QUnit.test("_oTooltipMonth and _oTooltipWeekHeader are not set when feature flag is off", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(false);
+
+		// Act
+		this.oMonth = new Month();
+
+		// Assert
+		assert.notOk(this.oMonth._oTooltipMonth,
+			"_oTooltipMonth is falsy when the feature flag is off");
+		assert.notOk(this.oMonth._oTooltipWeekHeader,
+			"_oTooltipWeekHeader is falsy when the feature flag is off");
+	});
+
+	QUnit.test("_oTooltipMonth and _oTooltipWeekHeader are created when feature flag is on", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+
+		// Act
+		this.oMonth = new Month();
+
+		// Assert
+		assert.ok(this.oMonth._oTooltipMonth instanceof TooltipEnablement,
+			"_oTooltipMonth is a TooltipEnablement instance when the feature flag is on");
+		assert.ok(this.oMonth._oTooltipWeekHeader instanceof TooltipEnablement,
+			"_oTooltipWeekHeader is a TooltipEnablement instance when the feature flag is on");
+	});
+
+	QUnit.test("_mDayCellTooltips is not initialized when feature flag is off", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(false);
+
+		// Act
+		this.oMonth = new Month();
+
+		// Assert
+		assert.notOk(this.oMonth._mDayCellTooltips,
+			"_mDayCellTooltips is not initialized when the feature flag is off");
+	});
+
+	// ----------------------------------------------------------------
+	// Month — exit — lifecycle cleanup
+	// ----------------------------------------------------------------
+	QUnit.module("Month — TooltipEnablement — exit — lifecycle cleanup", {
+		beforeEach: function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oMonth = new Month();
+		}
+		// no afterEach — each test destroys the month itself
+	});
+
+	QUnit.test("destroy() calls destroy on both tooltip instances and nulls the references", function(assert) {
+		// Prepare
+		const oMonthDestroySpy = this.spy(this.oMonth._oTooltipMonth, "destroy");
+		const oWeekHeaderDestroySpy = this.spy(this.oMonth._oTooltipWeekHeader, "destroy");
+
+		// Act
+		this.oMonth.destroy();
+
+		// Assert
+		assert.ok(oMonthDestroySpy.calledOnce,
+			"destroy() was called on _oTooltipMonth during month exit");
+		assert.strictEqual(this.oMonth._oTooltipMonth, null,
+			"_oTooltipMonth is set to null during exit");
+		assert.ok(oWeekHeaderDestroySpy.calledOnce,
+			"destroy() was called on _oTooltipWeekHeader during month exit");
+		assert.strictEqual(this.oMonth._oTooltipWeekHeader, null,
+			"_oTooltipWeekHeader is set to null during exit");
+	});
+
+	// ----------------------------------------------------------------
+	// Month — day cell tooltip
+	// ----------------------------------------------------------------
+	QUnit.module("Month — TooltipEnablement — day cell tooltip", {
+		beforeEach: function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oMonth = new Month("month-dc");
+		},
+		afterEach: function() {
+			this.oMonth.destroy();
+		}
+	});
+
+	// ----------------------------------------------------------------
+	// Month — DOM rendering
+	// ----------------------------------------------------------------
+	QUnit.module("Month — TooltipEnablement — DOM rendering", {
+		beforeEach: async function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oSpecialDate = new DateTypeRange({
+				startDate: UI5Date.getInstance(2024, 0, 15),
+				type: CalendarDayType.Type01,
+				tooltip: "Special Day"
+			});
+			this.oCal = new Calendar("cal-month-te", {
+				tooltip: "My Calendar",
+				initialFocusedDate: UI5Date.getInstance(2024, 0, 1),
+				showWeekNumbers: true,
+				showWeekNumbersHeader: true,
+				specialDates: [this.oSpecialDate]
+			});
+			this.oCal.placeAt("content");
+			await nextUIUpdate();
+			this.oMonth = this.oCal.getAggregation("month")[0];
+			this.oMonth.setTooltip("My Month");
+			await nextUIUpdate();
+		},
+		afterEach: function() {
+			this.oCal.destroy();
+		}
+	});
+
+	QUnit.test("Month invisible tooltip span is rendered in the Calendar DOM", function(assert) {
+		// Prepare
+		const sExpectedId = this.oMonth.getId() + "-invisibleTooltip";
+
+		// Act
+		const oSpan = document.getElementById(sExpectedId);
+
+		// Assert
+		assert.ok(oSpan, "Month invisible tooltip span is present in the Calendar DOM");
+		assert.strictEqual(oSpan.getAttribute("role"), "tooltip",
+			"Month invisible tooltip span has role=tooltip");
+	});
+
+	QUnit.test("Month root element has aria-describedby pointing to the invisible tooltip span", function(assert) {
+		// Prepare
+		const sExpectedId = this.oMonth._oTooltipMonth.getInvisibleTooltipId();
+
+		// Act
+		const sDescribedBy = this.oMonth.getDomRef().getAttribute("aria-describedby");
+
+		// Assert
+		assert.ok(sDescribedBy && sDescribedBy.includes(sExpectedId),
+			"Month root aria-describedby includes the invisible tooltip span id");
+	});
+
+	QUnit.test("Month textProvider resolves to the month tooltip text", function(assert) {
+		// Assert
+		assert.strictEqual(this.oMonth._oTooltipMonth._resolveText(), "My Month",
+			"Month tooltip textProvider returns the Month's tooltip property");
+	});
+
+	QUnit.test("day cell invisible tooltip span is rendered in the Calendar DOM", function(assert) {
+		// Prepare
+		const sDateKey = "20240115";
+		const sExpectedId = this.oMonth.getId() + "-" + sDateKey + "-invisibleTooltip";
+
+		// Act
+		const oSpan = document.getElementById(sExpectedId);
+
+		// Assert
+		assert.ok(oSpan, "day cell invisible tooltip span is present in the Calendar DOM");
+		assert.strictEqual(oSpan.textContent, "Special Day",
+			"day cell invisible tooltip span text matches the special date tooltip");
+	});
+
+	QUnit.test("day cell element has aria-describedby pointing to the invisible tooltip span", function(assert) {
+		// Prepare
+		const sDateKey = "20240115";
+		const sExpectedId = this.oMonth.getId() + "-" + sDateKey + "-invisibleTooltip";
+
+		// Act
+		const oDayCell = this.oMonth.getDomRef().querySelector("[data-sap-day='" + sDateKey + "']");
+		const sDescribedBy = oDayCell && oDayCell.getAttribute("aria-describedby");
+
+		// Assert
+		assert.ok(oDayCell, "day cell DOM element exists for 2024-01-15");
+		assert.ok(sDescribedBy && sDescribedBy.includes(sExpectedId),
+			"day cell aria-describedby includes the invisible tooltip span id");
+	});
+
+	// ----------------------------------------------------------------
+	// Month — week number tooltip
+	// ----------------------------------------------------------------
+	QUnit.module("Month — TooltipEnablement — week number tooltip", {
+		beforeEach: async function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oCal = new Calendar("cal-month-wn", {
+				initialFocusedDate: UI5Date.getInstance(2024, 0, 1),
+				showWeekNumbers: true,
+				intervalSelection: true
+			});
+			this.oCal.placeAt("content");
+			await nextUIUpdate();
+			this.oMonth = this.oCal.getAggregation("month")[0];
+		},
+		afterEach: function() {
+			this.oCal.destroy();
+		}
+	});
+
+	QUnit.test("_mWeekNumberTooltips is initialized as empty map when feature flag is on", function(assert) {
+		// Arrange
+		const oMonth = new Month();
+
+		// Assert
+		assert.deepEqual(oMonth._mWeekNumberTooltips, {},
+			"_mWeekNumberTooltips is initialized as an empty object when the feature flag is on");
+		oMonth.destroy();
+	});
+
+	QUnit.test("_createWeekNumberTooltip creates a TooltipEnablement with correct text", function(assert) {
+		// Act
+		const oTip = this.oMonth._createWeekNumberTooltip(3);
+
+		// Assert
+		assert.ok(oTip instanceof TooltipEnablement,
+			"_createWeekNumberTooltip returns a TooltipEnablement instance");
+		assert.strictEqual(this.oMonth._mWeekNumberTooltips[3], oTip,
+			"the tooltip is stored under the week number key");
+		assert.strictEqual(oTip._resolveText(), oRB.getText("CALENDAR_WEEK_NUMBER", [3]),
+			"textProvider returns 'Calendar Week {N}'");
+		assert.strictEqual(oTip.getInvisibleTooltipId(), this.oMonth.getId() + "-WNum-3-invisibleTooltip",
+			"invisible tooltip id uses the -WNum-{N}-invisibleTooltip suffix");
+	});
+
+	QUnit.test("week number invisible tooltip span is rendered in the DOM when intervalSelection is true", function(assert) {
+		// Prepare — week 1 of 2024 starts on Jan 1
+		const iWeekNumber = this.oMonth._calculateWeekNumber(
+			CalendarDate.fromLocalJSDate(UI5Date.getInstance(2024, 0, 1))
+		);
+		const sExpectedId = this.oMonth.getId() + "-WNum-" + iWeekNumber + "-invisibleTooltip";
+
+		// Act
+		const oSpan = document.getElementById(sExpectedId);
+
+		// Assert
+		assert.ok(oSpan, "week number invisible tooltip span is present in the DOM");
+		assert.strictEqual(oSpan.textContent, oRB.getText("CALENDAR_WEEK_NUMBER", [iWeekNumber]),
+			"week number invisible tooltip span text matches 'Calendar Week {N}'");
+	});
+
+	QUnit.test("week number cell has aria-describedby pointing to the invisible tooltip span when intervalSelection is true", function(assert) {
+		// Prepare
+		const iWeekNumber = this.oMonth._calculateWeekNumber(
+			CalendarDate.fromLocalJSDate(UI5Date.getInstance(2024, 0, 1))
+		);
+		const sExpectedId = this.oMonth.getId() + "-WNum-" + iWeekNumber + "-invisibleTooltip";
+
+		// Act
+		const oWeekCell = document.getElementById(this.oMonth.getId() + "-WNum-" + iWeekNumber);
+		const sDescribedBy = oWeekCell && oWeekCell.getAttribute("aria-describedby");
+
+		// Assert
+		assert.ok(oWeekCell, "week number cell DOM element exists");
+		assert.ok(sDescribedBy && sDescribedBy.includes(sExpectedId),
+			"week number cell aria-describedby includes the invisible tooltip span id");
+	});
+
+	QUnit.test("week number cell has no aria-describedby and no invisible span when intervalSelection is false", async function(assert) {
+		// Prepare — separate calendar without intervalSelection
+		const oCalNoInterval = new Calendar("cal-month-wn-no-interval", {
+			initialFocusedDate: UI5Date.getInstance(2024, 0, 1),
+			showWeekNumbers: true,
+			intervalSelection: false
+		});
+		oCalNoInterval.placeAt("content");
+		await nextUIUpdate();
+		const oMonth = oCalNoInterval.getAggregation("month")[0];
+
+		const iWeekNumber = oMonth._calculateWeekNumber(
+			CalendarDate.fromLocalJSDate(UI5Date.getInstance(2024, 0, 1))
+		);
+		const sInvisibleId = oMonth.getId() + "-WNum-" + iWeekNumber + "-invisibleTooltip";
+
+		// Act
+		const oWeekCell = document.getElementById(oMonth.getId() + "-WNum-" + iWeekNumber);
+		const sDescribedBy = oWeekCell && oWeekCell.getAttribute("aria-describedby");
+		const oSpan = document.getElementById(sInvisibleId);
+
+		// Assert
+		assert.notOk(sDescribedBy && sDescribedBy.includes(sInvisibleId),
+			"week number cell has no aria-describedby pointing to invisible tooltip when intervalSelection is false");
+		assert.notOk(oSpan,
+			"no invisible tooltip span is rendered when intervalSelection is false");
+
+		oCalNoInterval.destroy();
+	});
+
+	QUnit.test("sapUiCalNoIntervalSel class is added when intervalSelection is false", async function(assert) {
+		// Prepare
+		const oCalNoInterval = new Calendar("cal-month-wn-no-interval-css", {
+			initialFocusedDate: UI5Date.getInstance(2024, 0, 1),
+			showWeekNumbers: true,
+			intervalSelection: false
+		});
+		oCalNoInterval.placeAt("content");
+		await nextUIUpdate();
+		const oMonth = oCalNoInterval.getAggregation("month")[0];
+
+		// Assert
+		assert.ok(oMonth.getDomRef().classList.contains("sapUiCalNoIntervalSel"),
+			"sapUiCalNoIntervalSel class is present when intervalSelection is false");
+
+		oCalNoInterval.destroy();
+	});
+
+	QUnit.test("sapUiCalNoIntervalSel class is absent when intervalSelection is true", function(assert) {
+		// Assert — this.oMonth already uses intervalSelection: true (from beforeEach)
+		assert.notOk(this.oMonth.getDomRef().classList.contains("sapUiCalNoIntervalSel"),
+			"sapUiCalNoIntervalSel class is absent when intervalSelection is true");
 	});
 
 });

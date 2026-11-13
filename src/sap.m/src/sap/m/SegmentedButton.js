@@ -305,6 +305,15 @@ function(
 		}
 	};
 
+	SegmentedButton.prototype._disableTooltipEnablement = function () {
+		if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+			const aButtons = this.getAggregation("buttons");
+			aButtons.forEach(function(oButton) {
+				oButton._disableTooltipEnablement();
+			});
+		}
+	};
+
 	/**
 	 * Calculates and applies button width.
 	 * @private

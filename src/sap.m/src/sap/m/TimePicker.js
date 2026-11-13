@@ -34,7 +34,9 @@ sap.ui.define([
 	"./Bar",
 	"sap/ui/core/InvisibleMessage",
 	"sap/ui/core/library",
-	"./Title"
+	"./Title",
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/core/ShortcutHintsMixin"
 ],
 function(
 	InputBase,
@@ -67,7 +69,9 @@ function(
 	Bar,
 	InvisibleMessage,
 	coreLibrary,
-	Title
+	Title,
+	TooltipEnablement,
+	ShortcutHintsMixin
 ) {
 		"use strict";
 
@@ -487,11 +491,40 @@ function(
 				this.toggleOpen(this._bShouldClosePicker);
 			}, this);
 
+			if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+				oIcon.setTooltip("");
+				ShortcutHintsMixin.addConfig(oIcon, { shortcut: "F4" }, this);
+				this._oIconTooltip = new TooltipEnablement(this, {
+					domRefProvider: () => oIcon.getDomRef(),
+					focusDomRefProvider: () => oIcon.getDomRef(),
+					textProvider: () => this._getIconTooltipTextProvider()
+				});
+
+				ShortcutHintsMixin.setPopupSuppressed(this, true);
+			}
+
 			this._sMinutes = "00"; //needed for the support2400 scenario to store the minutes when changing hour to 24 and back
 			this._sSeconds = "00"; //needed for the support2400 scenario to store the seconds when changing hour to 24 and back
 			this._bShowInputs = false;
 
 			this._startZoomWatch();
+		};
+
+		/**
+		 * Returns the tooltip text for the picker icon.
+		 * Empty when the control is disabled or read-only.
+		 *
+		 * @returns {string}
+		 * @private
+		 */
+		TimePicker.prototype._getIconTooltipTextProvider = function() {
+			if (!this.getEnabled() || !this.getEditable()) {
+				return "";
+			}
+
+			const oIcon = this.getAggregation("_endIcon")[0];
+
+			return ShortcutHintsMixin.getTooltipWithShortcut(oIcon, oResourceBundle.getText("OPEN_PICKER_TEXT"));
 		};
 
 		/**
@@ -537,6 +570,11 @@ function(
 			if (this._invisibleLabelText) {
 				this._invisibleLabelText.destroy();
 				this._invisibleLabelText = null;
+			}
+
+			if (this._oIconTooltip) {
+				this._oIconTooltip.destroy();
+				this._oIconTooltip = null;
 			}
 
 			MaskEnabler.exit.apply(this, arguments);

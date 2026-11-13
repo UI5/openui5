@@ -3,8 +3,9 @@
 sap.ui.define([
 	"sap/ui/unified/calendar/Header",
 	"sap/ui/qunit/utils/nextUIUpdate",
+	"sap/ui/core/tooltip/TooltipEnablement",
 	"sap/ui/events/KeyCodes"
-], function(Header, nextUIUpdate, KeyCodes) {
+], function(Header, nextUIUpdate, TooltipEnablement, KeyCodes) {
 	"use strict";
 
 	QUnit.module("Rendering", function (hooks) {
@@ -124,8 +125,8 @@ sap.ui.define([
 				QUnit.test("should return the value from the public method with the provided index if it is defined on the Header", function (assert) {
 					// arrange
 					var sResult,
-							sExpectedValue = "Aria Label",
-							oHead = { getTextButton2: this.stub().returns(sExpectedValue), _getTextButton2: this.spy() };
+						sExpectedValue = "Aria Label",
+						oHead = { getTextButton2: this.stub().returns(sExpectedValue), _getTextButton2: this.spy() };
 
 					// act
 					sResult = this.oRenderer.getTextButton(oHead, 2);
@@ -139,8 +140,8 @@ sap.ui.define([
 				QUnit.test("should return the value from the private method with the provided index if public is not defined on the Header", function (assert) {
 					// arrange
 					var sResult,
-							sExpectedValue = "Aria Label",
-							oHead = { _getTextButton2: this.stub().returns(sExpectedValue) };
+						sExpectedValue = "Aria Label",
+						oHead = { _getTextButton2: this.stub().returns(sExpectedValue) };
 
 					// act
 					sResult = this.oRenderer.getTextButton(oHead, 2);
@@ -163,8 +164,8 @@ sap.ui.define([
 				QUnit.test("should return the value from the public method with the provided index if it is defined on the Header", function (assert) {
 					// arrange
 					var sResult,
-							sExpectedValue = "Aria Label",
-							oHead = { getAdditionalTextButton2: this.stub().returns(sExpectedValue), _getAdditionalTextButton2: this.spy() };
+						sExpectedValue = "Aria Label",
+						oHead = { getAdditionalTextButton2: this.stub().returns(sExpectedValue), _getAdditionalTextButton2: this.spy() };
 
 					// act
 					sResult = this.oRenderer.getAdditionalTextButton(oHead, 2);
@@ -178,8 +179,8 @@ sap.ui.define([
 				QUnit.test("should return the value from the private method with the provided index if public is not defined on the Header", function (assert) {
 					// arrange
 					var sResult,
-							sExpectedValue = "Aria Label",
-							oHead = { _getAdditionalTextButton2: this.stub().returns(sExpectedValue) };
+						sExpectedValue = "Aria Label",
+						oHead = { _getAdditionalTextButton2: this.stub().returns(sExpectedValue) };
 
 					// act
 					sResult = this.oRenderer.getAdditionalTextButton(oHead, 2);
@@ -446,6 +447,199 @@ sap.ui.define([
 		// Fake test to have a root module with at least one test, otherwise qunit-2 will fail
 		QUnit.test("Private API module starts", function (assert) {
 			assert.ok(true, "assert ok");
+		});
+	});
+
+	// ----------------------------------------------------------------
+	// TooltipEnablement — prev/next/today/B-buttons title attribute
+	// ----------------------------------------------------------------
+	QUnit.module("TooltipEnablement — title attributes", function(hooks) {
+		var oFlagStub;
+
+		hooks.beforeEach(function() {
+			oFlagStub = sinon.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+		});
+		hooks.afterEach(function() {
+			oFlagStub.restore();
+			if (this.oHeader) {
+				this.oHeader.destroy();
+				this.oHeader = null;
+			}
+		});
+
+		QUnit.test("prev button has native title attribute when enhanced tooltip is disabled", async function(assert) {
+			oFlagStub.returns(false);
+			this.oHeader = new Header();
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oPrevBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-prev");
+			assert.ok(oPrevBtn.getAttribute("title"), "prev button has a title attribute when enhanced tooltip is off");
+		});
+
+		QUnit.test("prev button has no title attribute when enhanced tooltip is enabled", async function(assert) {
+			oFlagStub.returns(true);
+			this.oHeader = new Header();
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oPrevBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-prev");
+			assert.strictEqual(oPrevBtn.getAttribute("title"), null,
+				"prev button has no title attribute when enhanced tooltip is on");
+		});
+
+		QUnit.test("next button has native title attribute when enhanced tooltip is disabled", async function(assert) {
+			oFlagStub.returns(false);
+			this.oHeader = new Header();
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oNextBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-next");
+			assert.ok(oNextBtn.getAttribute("title"), "next button has a title attribute when enhanced tooltip is off");
+		});
+
+		QUnit.test("next button has no title attribute when enhanced tooltip is enabled", async function(assert) {
+			oFlagStub.returns(true);
+			this.oHeader = new Header();
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oNextBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-next");
+			assert.strictEqual(oNextBtn.getAttribute("title"), null,
+				"next button has no title attribute when enhanced tooltip is on");
+		});
+
+		QUnit.test("today button has native title attribute when enhanced tooltip is disabled", async function(assert) {
+			oFlagStub.returns(false);
+			this.oHeader = new Header({ visibleCurrentDateButton: true });
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oTodayBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-today");
+			assert.ok(oTodayBtn.getAttribute("title"), "today button has a title attribute when enhanced tooltip is off");
+		});
+
+		QUnit.test("today button has no title attribute when enhanced tooltip is enabled", async function(assert) {
+			oFlagStub.returns(true);
+			this.oHeader = new Header({ visibleCurrentDateButton: true });
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oTodayBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-today");
+			assert.strictEqual(oTodayBtn.getAttribute("title"), null,
+				"today button has no title attribute when enhanced tooltip is on");
+		});
+
+		QUnit.test("B1 button has native title attribute when enhanced tooltip is disabled", async function(assert) {
+			oFlagStub.returns(false);
+			this.oHeader = new Header({ visibleButton1: true });
+			this.oHeader.setProperty("_tooltipButton1", "January");
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oB1 = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-B1");
+			assert.strictEqual(oB1.getAttribute("title"), "January",
+				"B1 button has title attribute when enhanced tooltip is off");
+		});
+
+		QUnit.test("B1 button has no title attribute when enhanced tooltip is enabled", async function(assert) {
+			oFlagStub.returns(true);
+			this.oHeader = new Header({ visibleButton1: true });
+			this.oHeader.setProperty("_tooltipButton1", "January");
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oB1 = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-B1");
+			assert.strictEqual(oB1.getAttribute("title"), null,
+				"B1 button has no title attribute when enhanced tooltip is on");
+		});
+
+		QUnit.test("prev button aria-label is set regardless of enhanced tooltip state", async function(assert) {
+			oFlagStub.returns(true);
+			this.oHeader = new Header();
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oPrevBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-prev");
+			assert.ok(oPrevBtn.getAttribute("aria-label"),
+				"prev button has aria-label even when enhanced tooltip is on");
+		});
+
+		QUnit.test("next button aria-label is set regardless of enhanced tooltip state", async function(assert) {
+			oFlagStub.returns(true);
+			this.oHeader = new Header();
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oNextBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-next");
+			assert.ok(oNextBtn.getAttribute("aria-label"),
+				"next button has aria-label even when enhanced tooltip is on");
+		});
+
+		// Native mode: aria-description is set (deduplicates SR announcement of title vs aria-label)
+
+		QUnit.test("prev button has aria-description set to label-only in native mode", async function(assert) {
+			oFlagStub.returns(false);
+			this.oHeader = new Header();
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oPrevBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-prev");
+			const sTitle = oPrevBtn.getAttribute("title");
+			const sDescription = oPrevBtn.getAttribute("aria-description");
+			assert.ok(sTitle, "prev button has a title in native mode");
+			assert.ok(sDescription, "prev button has aria-description in native mode");
+			assert.notStrictEqual(sDescription, sTitle,
+				"prev button aria-description is label-only and does not include the shortcut suffix from title");
+			assert.strictEqual(oPrevBtn.getAttribute("aria-describedby"), null,
+				"prev button has no aria-describedby in native mode");
+		});
+
+		QUnit.test("next button has aria-description set to label-only in native mode", async function(assert) {
+			oFlagStub.returns(false);
+			this.oHeader = new Header();
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oNextBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-next");
+			const sTitle = oNextBtn.getAttribute("title");
+			const sDescription = oNextBtn.getAttribute("aria-description");
+			assert.ok(sTitle, "next button has a title in native mode");
+			assert.ok(sDescription, "next button has aria-description in native mode");
+			assert.notStrictEqual(sDescription, sTitle,
+				"next button aria-description is label-only and does not include the shortcut suffix from title");
+			assert.strictEqual(oNextBtn.getAttribute("aria-describedby"), null,
+				"next button has no aria-describedby in native mode");
+		});
+
+		QUnit.test("today button has aria-description matching title in native mode", async function(assert) {
+			oFlagStub.returns(false);
+			this.oHeader = new Header({ visibleCurrentDateButton: true });
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oTodayBtn = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-today");
+			const sTitle = oTodayBtn.getAttribute("title");
+			assert.ok(sTitle, "today button has a title in native mode");
+			assert.strictEqual(oTodayBtn.getAttribute("aria-description"), sTitle,
+				"today button aria-description matches the title value");
+			assert.strictEqual(oTodayBtn.getAttribute("aria-describedby"), null,
+				"today button has no aria-describedby in native mode");
+		});
+
+		QUnit.test("B1 button has aria-description set from _descriptionButton1 in native mode", async function(assert) {
+			oFlagStub.returns(false);
+			this.oHeader = new Header({ visibleButton1: true });
+			this.oHeader.setProperty("_tooltipButton1", "Select Month (F4)");
+			this.oHeader.setProperty("_descriptionButton1", "January 2024");
+			this.oHeader.placeAt("qunit-fixture");
+			await nextUIUpdate();
+
+			const oB1 = this.oHeader.getDomRef().querySelector("#" + this.oHeader.getId() + "-B1");
+			assert.strictEqual(oB1.getAttribute("aria-description"), "January 2024",
+				"B1 button aria-description is set from _descriptionButton1 in native mode");
+			assert.strictEqual(oB1.getAttribute("aria-describedby"), null,
+				"B1 button has no aria-describedby in native mode");
 		});
 	});
 

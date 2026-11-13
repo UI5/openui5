@@ -34,6 +34,8 @@ sap.ui.define([
 	"sap/m/Link",
 	"sap/m/FormattedText",
 	"sap/m/TimePickerInputs",
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/core/ShortcutHintsMixin",
 	// provides jQuery.fn.cursorPos
 	"sap/ui/dom/jquery/cursorPos"
 ], function(
@@ -70,7 +72,9 @@ sap.ui.define([
 	nextUIUpdate,
 	Link,
 	FormattedText,
-	TimePickerInputs
+	TimePickerInputs,
+	TooltipEnablement,
+	ShortcutHintsMixin
 ) {
 	"use strict";
 
@@ -4258,6 +4262,125 @@ sap.ui.define([
 		this.oTP._closePicker();
 		assert.strictEqual(this.oTP._sMinutes, "45", "_sMinutes read from content[1]");
 		assert.strictEqual(this.oTP._sSeconds, "15", "_sSeconds read from content[1]");
+	});
+
+	const oRB = Library.getResourceBundleFor("sap.m");
+
+	// ----------------------------------------------------------------
+	// TimePicker — Initialization
+	// ----------------------------------------------------------------
+	QUnit.module("TimePicker — TooltipEnablement — Initialization", {
+		beforeEach: function() {
+			this.oFlagStub = this.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+		},
+		afterEach: function() {
+			this.oPicker.destroy();
+		}
+	});
+
+	QUnit.test("_oIconTooltip is not set when feature flag is off", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(false);
+
+		// Act
+		this.oPicker = new TimePicker();
+
+		// Assert
+		assert.notOk(this.oPicker._oIconTooltip,
+			"_oIconTooltip is falsy when the feature flag is off");
+	});
+
+	QUnit.test("_oIconTooltip is created when feature flag is on", function(assert) {
+		// Prepare
+		this.oFlagStub.returns(true);
+
+		// Act
+		this.oPicker = new TimePicker();
+
+		// Assert
+		assert.ok(this.oPicker._oIconTooltip instanceof TooltipEnablement,
+			"_oIconTooltip is a TooltipEnablement instance when the feature flag is on");
+	});
+
+	// ----------------------------------------------------------------
+	// TimePicker — exit — lifecycle cleanup
+	// ----------------------------------------------------------------
+	QUnit.module("TimePicker — TooltipEnablement — exit — lifecycle cleanup", {
+		beforeEach: function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oPicker = new TimePicker();
+		}
+		// no afterEach — each test destroys the picker itself
+	});
+
+	QUnit.test("destroy() calls destroy on _oIconTooltip and nulls the reference", function(assert) {
+		// Prepare
+		const oDestroySpy = this.spy(this.oPicker._oIconTooltip, "destroy");
+
+		// Act
+		this.oPicker.destroy();
+
+		// Assert
+		assert.ok(oDestroySpy.calledOnce,
+			"destroy() was called on _oIconTooltip during picker exit");
+		assert.strictEqual(this.oPicker._oIconTooltip, null,
+			"_oIconTooltip is set to null during exit so no dangling references remain");
+	});
+
+	// ----------------------------------------------------------------
+	// TimePicker — DOM rendering
+	// ----------------------------------------------------------------
+	QUnit.module("TimePicker — TooltipEnablement — DOM rendering", {
+		beforeEach: async function() {
+			this.stub(TooltipEnablement, "isEnhancedTooltipEnabled").returns(true);
+			this.oPicker = new TimePicker("tp-te");
+			this.oPicker.placeAt("qunit-fixture");
+			await nextUIUpdate(this.clock);
+		},
+		afterEach: async function() {
+			this.oPicker.destroy();
+			await nextUIUpdate(this.clock);
+		}
+	});
+
+	QUnit.test("invisible tooltip span id uses the default -invisibleTooltip suffix", function(assert) {
+		// Prepare
+		const sExpectedId = this.oPicker.getId() + "-invisibleTooltip";
+
+		// Act
+		const sActualId = this.oPicker._oIconTooltip.getInvisibleTooltipId();
+
+		// Assert
+		assert.strictEqual(sActualId, sExpectedId,
+			"invisible tooltip span id uses the default -invisibleTooltip suffix");
+	});
+
+	QUnit.test("no native title attribute on the clock icon element", function(assert) {
+		// Prepare
+		const oIconDom = this.oPicker.getDomRef().querySelector(".sapUiIcon");
+
+		// Assert
+		assert.strictEqual(oIconDom.getAttribute("title"), null,
+			"native title attribute is suppressed on the icon when enhanced tooltip is active");
+	});
+
+	QUnit.test("textProvider returns the open-picker i18n text with shortcut hint when enabled", function(assert) {
+		// Prepare
+		const oIcon = this.oPicker.getAggregation("_endIcon")[0];
+
+		// Assert
+		assert.strictEqual(this.oPicker._oIconTooltip._resolveText(),
+			ShortcutHintsMixin.getTooltipWithShortcut(oIcon, oRB.getText("OPEN_PICKER_TEXT")),
+			"textProvider resolves to the OPEN_PICKER_TEXT combined with the F4 shortcut hint");
+	});
+
+	QUnit.test("textProvider returns empty string when disabled", function(assert) {
+		// Prepare
+		this.oPicker.setEnabled(false);
+
+		// Assert
+		assert.strictEqual(this.oPicker._oIconTooltip._resolveText(), "",
+			"textProvider returns empty string for a disabled TimePicker");
 	});
 
 });

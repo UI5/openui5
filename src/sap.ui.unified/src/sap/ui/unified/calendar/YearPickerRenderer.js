@@ -42,13 +42,17 @@ sap.ui.define([
 			oRm.class("sapUiCalMonthSecType");
 		}
 
-		if (sTooltip) {
+		if (sTooltip && !oYP._oTooltipRoot) {
 			oRm.attr('title', sTooltip);
 		}
 
 		oRm.accessibilityState(oYP, this.getAccessibilityState(oYP));
 
 		oRm.openEnd(); // div element
+
+		if (oYP._oTooltipRoot) {
+			oYP._oTooltipRoot.renderInvisibleTooltip(oRm);
+		}
 
 		this.renderCells(oRm, oYP);
 
@@ -57,12 +61,19 @@ sap.ui.define([
 	};
 
 	YearPickerRenderer.getAccessibilityState = function(oYP) {
+		var sDescribedBy = oYP._bCalendar ? InvisibleText.getStaticId("sap.ui.unified", "CALENDAR_YEAR_RANGE_PICKER_OPEN_HINT") : "";
+		if (oYP._oTooltipRoot) {
+			const sapUiInvisibleTextId = oYP._oTooltipRoot.getInvisibleTooltipId();
+			if (sapUiInvisibleTextId) {
+				sDescribedBy = (sDescribedBy + " " + sapUiInvisibleTextId).trim();
+			}
+		}
 		return {
 			role: "grid",
 			readonly: "true",
 			multiselectable: oYP.getIntervalSelection(),
 			roledescription: Library.getResourceBundleFor("sap.ui.unified").getText("YEAR_PICKER"),
-			describedby: oYP._bCalendar ? InvisibleText.getStaticId("sap.ui.unified", "CALENDAR_YEAR_RANGE_PICKER_OPEN_HINT") : ""
+			describedby: sDescribedBy
 		};
 	};
 

@@ -90,6 +90,9 @@ sap.ui.define([], function() {
 			oRm.renderControl(oSegButton);
 		}
 		oRm.renderControl(oControl._getCurrentTimeButton());
+		if (oControl._oNowButtonInvisibleText) {
+			oRm.renderControl(oControl._oNowButtonInvisibleText);
+		}
 		oRm.close("div"); // .sapMTPSecondRow
 
 		if (oControl._bInlineActions) {

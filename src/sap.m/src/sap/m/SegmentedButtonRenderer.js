@@ -2,8 +2,8 @@
  * ${copyright}
  */
 
-sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/core/InvisibleText", "sap/m/library"],
-	function(coreLibrary, InvisibleRenderer, InvisibleText, library) {
+sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/core/InvisibleText", "sap/m/library", "sap/ui/core/tooltip/TooltipEnablement"],
+	function(coreLibrary, InvisibleRenderer, InvisibleText, library, TooltipEnablement) {
 	"use strict";
 
 	// shortcut for sap.ui.core.TextDirection
@@ -60,7 +60,7 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/c
 			oRM.style('width', oControl.getWidth());
 		}
 
-		if (sTooltip) {
+		if (sTooltip && !TooltipEnablement.isEnhancedTooltipEnabled()) {
 			oRM.attr("title", sTooltip);
 		}
 

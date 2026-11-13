@@ -16,7 +16,9 @@ sap.ui.define([
 	'sap/ui/core/library',
 	"sap/ui/thirdparty/jquery",
 	'sap/ui/core/date/UI5Date',
-	"./TimePickerInputs"
+	"./TimePickerInputs",
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/core/InvisibleText"
 ],
 	function(
 		TimePickerInternals,
@@ -32,7 +34,9 @@ sap.ui.define([
 		coreLibrary,
 		jQuery,
 		UI5Date,
-		TimePickerInputs
+		TimePickerInputs,
+		TooltipEnablement,
+		InvisibleText
 	) {
 		"use strict";
 
@@ -148,8 +152,7 @@ sap.ui.define([
 				oRm.style("min-width", "2.25rem");
 			}
 
-			// set tooltip
-			if (sTooltip) {
+			if (sTooltip && !TooltipEnablement.isEnhancedTooltipEnabled()) {
 				oRm.attr("title", sTooltip);
 			}
 
@@ -930,6 +933,11 @@ sap.ui.define([
 		TimePickerClocks.prototype._destroyControls = function() {
 			this.destroyAggregation("_buttons");
 			this.destroyAggregation("_clocks");
+			const oAmPm = this.getAggregation("_buttonAmPm");
+			if (oAmPm && oAmPm._oInvisibleTooltip) {
+				oAmPm._oInvisibleTooltip.destroy();
+				oAmPm._oInvisibleTooltip = null;
+			}
 			this.destroyAggregation("_buttonAmPm");
 			if (this._oNumInput) {
 				this._oNumInput.destroy();
@@ -1019,11 +1027,13 @@ sap.ui.define([
 				if (bSupport2400) {
 					iHoursMax++;
 				}
-				this.addAggregation("_buttons", new ToggleSpinButton(sId + "-btnH", {
+				const oBtnH = new ToggleSpinButton(sId + "-btnH", {
 					tooltip: oLabels["hours"],
 					min: iHoursMin,
 					max: iHoursMax
-				}));
+				});
+				oBtnH._disableTooltipEnablement();
+				this.addAggregation("_buttons", oBtnH);
 				this._clockIndexes.H = iIndex++;
 			}
 
@@ -1047,11 +1057,13 @@ sap.ui.define([
 					prependZero: bPrependZero
 				}));
 				// add Minutes button
-				this.addAggregation("_buttons", new ToggleSpinButton(sId + "-btnM", {
+				const oBtnM = new ToggleSpinButton(sId + "-btnM", {
 					tooltip: oLabels["minutes"],
 					min: 0,
 					max: 59
-				}));
+				});
+				oBtnM._disableTooltipEnablement();
+				this.addAggregation("_buttons", oBtnM);
 				this._clockIndexes.M = iIndex++;
 			}
 
@@ -1074,17 +1086,19 @@ sap.ui.define([
 					prependZero: bPrependZero
 				}));
 				// add Seconds button
-				this.addAggregation("_buttons", new ToggleSpinButton(sId + "-btnS", {
+				const oBtnS = new ToggleSpinButton(sId + "-btnS", {
 					tooltip: oLabels["seconds"],
 					min: 0,
 					max: 59
-				}));
+				});
+				oBtnS._disableTooltipEnablement();
+				this.addAggregation("_buttons", oBtnS);
 				this._clockIndexes.S = iIndex++;
 			}
 
 			if (sFormat.indexOf("a") !== -1 || (sFormat.indexOf("B") !== -1 && !this._isFormatSupport24())) {
 				// add AM/PM segmented button
-				this.setAggregation("_buttonAmPm", new SegmentedButton(sId + "-format", {
+				const oSegmentedButton = new SegmentedButton(sId + "-format", {
 					items: [
 						new sap.m.SegmentedButtonItem({
 							text: this._sAM,
@@ -1097,7 +1111,16 @@ sap.ui.define([
 					],
 					selectedKey: sSelectedAmPm,
 					tooltip: oLabels["ampm"]
-				}));
+				});
+				if (TooltipEnablement.isEnhancedTooltipEnabled()) {
+					oSegmentedButton._disableTooltipEnablement();
+					oSegmentedButton._oInvisibleTooltip = new InvisibleText(
+						sId + "-format-tooltip",
+						{ text: oLabels["ampm"] }
+					);
+					oSegmentedButton.addAriaDescribedBy(oSegmentedButton._oInvisibleTooltip.getId());
+				}
+				this.setAggregation("_buttonAmPm", oSegmentedButton);
 			}
 
 			if (!this.getAggregation("_nowButton")) {
