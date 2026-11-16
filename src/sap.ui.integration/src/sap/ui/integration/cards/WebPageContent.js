@@ -63,6 +63,16 @@ sap.ui.define([
 				},
 
 				/**
+				 * The accessible name of the iframe, rendered as its <code>title</code> attribute.
+				 *
+				 * @since 1.156
+				 */
+				title: {
+					type: "string",
+					bindable: true
+				},
+
+				/**
 				 * Sandbox attribute of the iframe. Full restrictions by default
 				 */
 				sandbox: {
@@ -164,6 +174,7 @@ sap.ui.define([
 
 		this.applySettings({
 			src: BindingHelper.formattedProperty(oConfiguration.src, (sValue) => this._oIconFormatter.formatSrc(sValue) ),
+			title: oConfiguration.title,
 			sandbox: oConfiguration.sandbox,
 			minHeight: oConfiguration.minHeight,
 			allow: oConfiguration.allow,

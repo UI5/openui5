@@ -35,6 +35,10 @@ sap.ui.define(["./BaseContentRenderer", "sap/ui/integration/util/BindingResolver
 
 		oRm.attr("tabindex", "0");
 
+		if (oWebPageContent.getTitle()) {
+			oRm.attr("title", oWebPageContent.getTitle());
+		}
+
 		if (!oWebPageContent.getOmitSandbox()) {
 			oRm.attr("sandbox", oWebPageContent.getSandbox());
 		}

@@ -41,6 +41,7 @@
 		},
 		"content": {
 			"src": "https://openui5.org/events",
+			"title": "OpenUI5 Events calendar",
 			"sandbox": "allow-scripts allow-popups allow-downloads",
 			"minHeight": "{parameters>/minHeight/value}",
 			"allowFullscreen": true

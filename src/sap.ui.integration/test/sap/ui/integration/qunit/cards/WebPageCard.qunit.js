@@ -561,6 +561,87 @@ sap.ui.define([
 		assert.strictEqual(oIframe.getAttribute("allowfullscreen"), "true", "The allowFullscreen property is rendered");
 	});
 
+	QUnit.module("Title (iframe accessible name)", {
+		beforeEach: function () {
+			this.oManifest = {
+				"sap.app": {
+					"id": "test.cards.webpage.testCard"
+				},
+				"sap.card": {
+					"type": "WebPage",
+					"header": {
+						"title": "WebPage Card"
+					},
+					"content": {
+						"src": "./page.html"
+					}
+				}
+			};
+			this.oCard = new Card({
+				baseUrl: BASE_URL
+			});
+			this.oCard.placeAt(DOM_RENDER_LOCATION);
+		},
+		afterEach: function () {
+			this.oCard.destroy();
+			this.oCard = null;
+		}
+	});
+
+	QUnit.test("Title set directly is rendered on the iframe", async function (assert) {
+		// Arrange
+		this.oManifest["sap.card"].content.title = "OpenUI5 Events calendar";
+
+		// Act
+		this.oCard.setManifest(this.oManifest);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oContent = this.oCard.getCardContent(),
+			oIframe = oContent.getDomRef("frame");
+
+		// Assert
+		assert.strictEqual(oContent.getTitle(), "OpenUI5 Events calendar", "The title property is correctly set");
+		assert.strictEqual(oIframe.getAttribute("title"), "OpenUI5 Events calendar", "The title attribute is rendered on the iframe");
+	});
+
+	QUnit.test("Title set with binding is rendered on the iframe", async function (assert) {
+		// Arrange
+		this.oManifest["sap.card"].content.data = {
+			json: {
+				frameTitle: "Bound frame title"
+			}
+		};
+		this.oManifest["sap.card"].content.title = "{frameTitle}";
+
+		// Act
+		this.oCard.setManifest(this.oManifest);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oContent = this.oCard.getCardContent(),
+			oIframe = oContent.getDomRef("frame");
+
+		// Assert
+		assert.strictEqual(oContent.getTitle(), "Bound frame title", "The title property is correctly resolved");
+		assert.strictEqual(oIframe.getAttribute("title"), "Bound frame title", "The title attribute is rendered on the iframe");
+	});
+
+	QUnit.test("Title attribute is not rendered when not set", async function (assert) {
+		// Act
+		this.oCard.setManifest(this.oManifest);
+
+		await nextCardReadyEvent(this.oCard);
+		await nextUIUpdate();
+
+		const oIframe = this.oCard.getCardContent().getDomRef("frame");
+
+		// Assert
+		assert.strictEqual(oIframe.getAttribute("title"), null, "The title attribute is not rendered when the property is not set");
+	});
+
 	QUnit.module("Omit sandbox");
 
 	QUnit.test("Sandbox is there by default", async function (assert) {
