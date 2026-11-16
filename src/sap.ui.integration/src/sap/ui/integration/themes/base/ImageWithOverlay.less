@@ -33,14 +33,14 @@
 	}
 
 	&.sapUiIntImageWithOverlayPaddingMediumStart .sapUiIntImgWithOverlayLayout {
-		padding-inline-start: @sapUiMarginMedium;
+		padding-inline-start: var(--sapContent_Padding_M);
 	}
 }
 
 .sapFCardObjectGroup {
 
 	.sapUiIntImageWithOverlay.sapFCardObjectImageFullWidth.sapFCardObjectImage:only-child {
-		height: ~"calc(100% + 32px)";
+		height: ~'calc(100% + 32px)';
 	}
 
 	.sapUiIntImageWithOverlay:not(.sapFCardObjectImageFullWidth):only-child .sapUiIntImgWithOverlayImg {
@@ -57,11 +57,11 @@
 
 @keyframes sapUiInImgWithOverlayFadeInAnimation {
 
-	0% {
+	from {
 		opacity: 0;
 	}
 
-	100% {
+	to {
 		opacity: 1;
 	}
 }
