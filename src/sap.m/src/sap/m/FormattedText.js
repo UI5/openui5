@@ -247,24 +247,20 @@ function(
 		 * @return {array} The sanitized attributes as a list of alternating names and values. Value <code>null</code> removes the attribute.
 		 * @private
 		 */
-		function fnSanitizeAttribs (tagName, attribs) {
-
-			var sWarning;
-			var attr,
-				value,
-				addTarget = tagName === "a";
+		FormattedText.prototype._sanitizeAttribs = function(tagName, attribs) {
+			let addTarget = tagName === "a";
 			// add UI5 specific classes when appropriate
-			var cssClass = this._renderingRules.ELEMENTS[tagName].cssClass || "";
+			let cssClass = this._renderingRules.ELEMENTS[tagName].cssClass || "";
 
-			for (var i = 0; i < attribs.length; i += 2) {
+			for (let i = 0; i < attribs.length; i += 2) {
 				// attribs[i] is the name of the tag's attribute.
 				// attribs[i+1] is its corresponding value.
 				// (i.e. <span class="foo"> -> attribs[i] = "class" | attribs[i+1] = "foo")
-				attr = attribs[i];
-				value = attribs[i + 1];
+				const attr = attribs[i];
+				const value = attribs[i + 1];
 
 				if (!this._renderingRules.ATTRIBS[attr] && !this._renderingRules.ATTRIBS[tagName + "::" + attr]) {
-					sWarning = 'FormattedText: <' + tagName + '> with attribute [' + attr + '="' + value + '"] is not allowed';
+					const sWarning = 'FormattedText: <' + tagName + '> with attribute [' + attr + '="' + value + '"] is not allowed';
 					Log.warning(sWarning, this);
 					// to remove the attribute by the sanitizer, set the value to null
 					attribs[i + 1] = null;
@@ -303,16 +299,19 @@ function(
 			}
 
 			return attribs;
-		}
+		};
 
-		function fnPolicy (tagName, attribs) {
+		/**
+		 * @private
+		 */
+		FormattedText.prototype._policy = function(tagName, attribs) {
 			if (this._renderingRules.ELEMENTS[tagName]) {
-				return fnSanitizeAttribs.call(this, tagName, attribs);
+				return this._sanitizeAttribs(tagName, attribs);
 			} else {
-				var sWarning = '<' + tagName + '> is not allowed';
+				const sWarning = '<' + tagName + '> is not allowed';
 				Log.warning(sWarning, this);
 			}
-		}
+		};
 
 		/**
 		 * Sanitizes HTML tags and attributes according to a given policy.
@@ -321,9 +320,9 @@ function(
 		 * @return {string} The sanitized HTML
 		 * @private
 		 */
-		function sanitizeHTML(sText) {
+		FormattedText.prototype._sanitizeHTML = function(sText) {
 			return sanitizeHTML0(sText, {
-				tagPolicy: fnPolicy.bind(this),
+				tagPolicy: this._policy.bind(this),
 				uriRewriter: function (sUrl) {
 					// by default, we use the URLListValidator to check the URLs
 					if (URLListValidator.validate(sUrl)) {
@@ -331,20 +330,7 @@ function(
 					}
 				}
 			});
-		}
-
-		// open links href using safe API
-		function openLink (oEvent) {
-			if (oEvent.originalEvent.defaultPrevented) {
-				return;
-			}
-			oEvent.preventDefault();
-			var oLink = Element.getElementById(oEvent.currentTarget.id);
-			if (oLink && oLink.isA('sap.m.Link') && (oLink.getAccessibleRole() === library.LinkAccessibleRole.Button || !oLink.getHref())) {
-				return;
-			}
-			openWindow(oEvent.currentTarget.href, oEvent.currentTarget.target);
-		}
+		};
 
 		FormattedText.prototype.onAfterRendering = function () {
 			this.$().find('a').on("click", openLink);
@@ -414,7 +400,7 @@ function(
 
 			sText = FormattedTextAnchorGenerator.generateAnchors(sText, sAutoGenerateLinkTags, this.getConvertedLinksDefaultTarget());
 
-			return sanitizeHTML.call(this, sText);
+			return this._sanitizeHTML(sText);
 		};
 
 		/**
@@ -424,7 +410,7 @@ function(
 		 * @public
 		 */
 		FormattedText.prototype.setHtmlText = function (sText) {
-			return this.setProperty("htmlText", sanitizeHTML.call(this, sText));
+			return this.setProperty("htmlText", this._sanitizeHTML(sText));
 		};
 
 		/**
@@ -462,6 +448,19 @@ function(
 				description: sDescription
 			};
 		};
+
+		// open links href using safe API
+		function openLink (oEvent) {
+			if (oEvent.originalEvent.defaultPrevented) {
+				return;
+			}
+			oEvent.preventDefault();
+			const oLink = Element.getElementById(oEvent.currentTarget.id);
+			if (oLink && oLink.isA('sap.m.Link') && (oLink.getAccessibleRole() === library.LinkAccessibleRole.Button || !oLink.getHref())) {
+				return;
+			}
+			openWindow(oEvent.currentTarget.href, oEvent.currentTarget.target);
+		}
 
 		return FormattedText;
 	});
