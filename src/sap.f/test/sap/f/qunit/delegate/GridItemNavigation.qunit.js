@@ -81,6 +81,52 @@ sap.ui.define([
 		assert.ok(true, "There is no error if events are called before rendering or before theme is applied.");
 	});
 
+	QUnit.module("Mousedown", {
+		beforeEach: function () {
+			this.$grid = jQuery(`
+				<div>
+					<div tabindex="0" style="height: 2000px"><input type="text" /></div>
+					<div tabindex="0" style="height: 2000px"><input type="text" /></div>
+				</div>
+			`);
+
+			this.$grid.appendTo("#" + DOM_RENDER_LOCATION);
+			this.oItemNavigation = new GridItemNavigation();
+			this.oItemNavigation.setRootDomRef(this.$grid[0]);
+			this.oItemNavigation.setItemDomRefs(this.$grid.children().get());
+		},
+		afterEach: function () {
+			this.oItemNavigation.destroy();
+			this.$grid.detach();
+		}
+	});
+
+	QUnit.test("Item root is not focused when mousedown is on a focusable child", function (assert) {
+		// Arrange
+		const oItem = this.$grid.children()[0];
+		const oInput = oItem.querySelector("input");
+		const oItemFocusSpy = this.spy(oItem, "focus");
+
+		// Act
+		this.oItemNavigation.onmousedown(new jQuery.Event("mousedown", { target: oInput }));
+
+		// Assert
+		assert.ok(oItemFocusSpy.notCalled, "Item root is not focused, so there is no scroll jump");
+		assert.strictEqual(this.oItemNavigation.getFocusedIndex(), 0, "Focused index is updated to the clicked item");
+	});
+
+	QUnit.test("Item root is focused when mousedown is on the item itself", function (assert) {
+		// Arrange
+		const oItem = this.$grid.children()[0];
+		const oItemFocusSpy = this.spy(oItem, "focus");
+
+		// Act
+		this.oItemNavigation.onmousedown(new jQuery.Event("mousedown", { target: oItem }));
+
+		// Assert
+		assert.ok(oItemFocusSpy.called, "Item root is focused when the item itself is clicked");
+	});
+
 	QUnit.module("Focus", {
 		beforeEach: function () {
 			this.$grid = jQuery(`
