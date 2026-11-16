@@ -202,9 +202,12 @@ sap.ui.define([
 	 * Handle the touch start event on the <code>GenericTag</code>.
 	 * Fires the <code>GenericTag</code> press event.
 	 *
+	 * @param {jQuery.Event} oEvent - the touch event.
 	 * @private
 	 */
-	GenericTag.prototype.ontouchstart = function(){
+	GenericTag.prototype.ontouchstart = function(oEvent){
+		// mark the event for components that needs to know if the event was handled by the GenericTag
+		oEvent.setMarked();
 		this._toggleActiveGenericTag(true);
 	};
 
