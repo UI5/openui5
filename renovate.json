@@ -46,6 +46,15 @@
         },
         {
             "matchPackageNames": [
+                "@ui5/webcomponents-geomap",
+                "ui5-tooling-modules"
+            ],
+            "matchFileNames": ["src/sap.ui.geomap/**"],
+            "groupName": "All sap.ui.geomap related devDependencies",
+            "reviewers": ["Teams_SAPUISOFIA_SAKAR"]
+        },
+        {
+            "matchPackageNames": [
                 "postcss-less",
                 "stylelint",
                 "stylelint-config-standard",
