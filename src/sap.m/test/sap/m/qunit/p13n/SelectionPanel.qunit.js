@@ -1060,4 +1060,66 @@ sap.ui.define([
 		assert.ok(aLabels.includes("Selected Redundant Item"), "Selected redundant item is visible");
 		assert.notOk(aLabels.includes("Redundant Item"), "Non-selected redundant item is hidden");
 	});
+
+	QUnit.test("Move buttons are destroyed on exit when orphaned (no stable-id leak)", async function(assert){
+		const sPanelId = "myFixedSelectionPanel";
+		const oPanel = new SelectionPanel(sPanelId);
+		oPanel.setItemFactory(function(){
+			return new VBox();
+		});
+		oPanel.placeAt("qunit-fixture");
+		await nextUIUpdate();
+
+		oPanel.setP13nData(this.getTestData());
+
+		const aItems = oPanel._oListControl.getItems();
+		const oSelectedItem = aItems[0]; //key1 -> visible/selected
+		const oUnselectedItem = aItems[3]; //key4 -> not selected
+
+		//Hover the selected row -> move buttons are moved into the row cell
+		oPanel._handleActivated(oSelectedItem);
+		assert.equal(oSelectedItem.getCells()[1].getItems().length, 5, "Move buttons have been added to the selected row cell");
+
+		//Hover an unselected row -> move buttons are removed from the cell and become orphaned
+		oPanel._handleActivated(oUnselectedItem);
+		assert.equal(oSelectedItem.getCells()[1].getItems().length, 1, "Move buttons have been removed from the cell (orphaned)");
+		assert.notOk(oPanel._getMoveTopButton().getParent(), "Move button is orphaned (no parent) before destroy");
+
+		oPanel.destroy();
+
+		assert.strictEqual(Element.getElementById(sPanelId + "-moveTopBtn"), undefined, "Move-top button has been destroyed, ID freed");
+		assert.strictEqual(Element.getElementById(sPanelId + "-moveUpBtn"), undefined, "Move-up button has been destroyed, ID freed");
+		assert.strictEqual(Element.getElementById(sPanelId + "-moveDownpBtn"), undefined, "Move-down button has been destroyed, ID freed");
+		assert.strictEqual(Element.getElementById(sPanelId + "-moveBottomBtn"), undefined, "Move-bottom button has been destroyed, ID freed");
+	});
+
+	QUnit.test("Re-opening a fixed-id SelectionPanel after orphaned move buttons does not throw a duplicate-id error", async function(assert){
+		const sPanelId = "myFixedSelectionPanel";
+
+		const oPanel = new SelectionPanel(sPanelId);
+		oPanel.setItemFactory(function(){
+			return new VBox();
+		});
+		oPanel.placeAt("qunit-fixture");
+		await nextUIUpdate();
+		oPanel.setP13nData(this.getTestData());
+
+		const aItems = oPanel._oListControl.getItems();
+		oPanel._handleActivated(aItems[0]); //hover selected -> buttons into cell
+		oPanel._handleActivated(aItems[3]); //hover unselected -> buttons orphaned
+		oPanel.destroy();
+
+		//Re-create a panel with the SAME fixed id (reproduces the "popup does not open" symptom)
+		const oPanel2 = new SelectionPanel(sPanelId);
+		oPanel2.setItemFactory(function(){
+			return new VBox();
+		});
+		assert.ok(oPanel2, "Second panel with the same fixed id has been created without a duplicate-id error");
+
+		//Trigger lazy move-button creation to prove the id is reusable
+		oPanel2._getMoveTopButton();
+		assert.ok(Element.getElementById(sPanelId + "-moveTopBtn"), "Move-top button has been re-created on the new panel");
+
+		oPanel2.destroy();
+	});
 });

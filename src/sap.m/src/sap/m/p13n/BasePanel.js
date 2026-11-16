@@ -1057,6 +1057,13 @@ sap.ui.define([
 		this._oSelectedItem = null;
 		this._oLastSelectedItem = null;
 		this._oListControl = null;
+
+		// Destroy move buttons explicitly: they may be orphaned (re-parented out of 'dependents') and thus missed by the cascade; guard against double-destroy.
+		[this._oMoveTopButton, this._oMoveUpButton, this._oMoveDownButton, this._oMoveBottomButton].forEach((oMoveButton) => {
+			if (oMoveButton && !oMoveButton.isDestroyed()) {
+				oMoveButton.destroy();
+			}
+		});
 		this._oMoveTopButton = null;
 		this._oMoveUpButton = null;
 		this._oMoveDownButton = null;
