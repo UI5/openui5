@@ -68,5 +68,30 @@
         "text": " sap.f.GridContainer: Sentinel divs now have aria-hidden=\"true\""
       }
     ]
+  },
+  "1.148.11": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "ef1917d710935233c56730e254583648498fe1dc",
+        "type": "FIX",
+        "text": " sap.f.GridContainer: Grid matrix position is now reset on direct focus"
+      },
+      {
+        "id": "fa9973cb7ca6e50fca525c88e6c46c627ab5f5e1",
+        "type": "FIX",
+        "text": " sap.f: fire invalidate event when rendering is suppressed"
+      },
+      {
+        "id": "6960d0c7361cc5f8d81e86eea822f107fa633584",
+        "type": "FIX",
+        "text": " sap.f.GridContainer: Remove sentinel divs aria-hidden=\"true\""
+      },
+      {
+        "id": "6fc908a9d538ab566a8ed9c3ef75dd7a2b779f07",
+        "type": "FIX",
+        "text": " sap.f.DynamicPageTitle: refresh accessible name on title text changes"
+      }
+    ]
   }
 }

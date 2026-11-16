@@ -208,5 +208,20 @@
         "text": " FilterBar: misaligned after saving variant"
       }
     ]
+  },
+  "1.148.11": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "239b06eb35d37723a355ad0ef530d522d7c38105",
+        "type": "FIX",
+        "text": " Field: timezone not shown"
+      },
+      {
+        "id": "44b09ef014ba0442a1e5ce676b578946bad138f5",
+        "type": "FIX",
+        "text": "mdc.FilterBar: fix wrapping issue"
+      }
+    ]
   }
 }

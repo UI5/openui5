@@ -33,5 +33,15 @@
         "text": " sap.uxap.ObjectPageLayout: no re-scroll when subSection in view"
       }
     ]
+  },
+  "1.148.11": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "6fc908a9d538ab566a8ed9c3ef75dd7a2b779f07",
+        "type": "FIX",
+        "text": " sap.f.DynamicPageTitle: refresh accessible name on title text changes"
+      }
+    ]
   }
 }

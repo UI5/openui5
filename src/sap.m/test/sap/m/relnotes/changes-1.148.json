@@ -433,5 +433,30 @@
         "text": " sap.m.ScrollPosition: fix intermittent QUnit test failures after navigation and re-render"
       }
     ]
+  },
+  "1.148.11": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "3cf9fa3571c9b5a46d9ec0ac9d0edeba31b4a706",
+        "type": "FIX",
+        "text": " sap.m.GenericTag: Mark press event to stop propagation to parent"
+      },
+      {
+        "id": "8226faa5ba88365c99006753adab7e43c1b827ed",
+        "type": "FIX",
+        "text": " sap.m.MaskInput: cut event does not clear value when editable/enabled is false"
+      },
+      {
+        "id": "453efd274677e6d73336242d6588d018842bea2b",
+        "type": "FIX",
+        "text": " sap.m.DynamicDateRange: correct calculation of calendarWeekNumbering for Calendar control"
+      },
+      {
+        "id": "9bb39b8811ad51ff47636d576d189509807310dc",
+        "type": "FIX",
+        "text": " sap.m.Dialog: Initial focus in Firefox is now fixed"
+      }
+    ]
   }
 }
