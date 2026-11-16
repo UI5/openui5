@@ -841,7 +841,7 @@ function(
 	};
 
 	ViewSettingsDialog.prototype.removeAggregation = function(sAggregationName, vObject, bSuppressInvalidate) {
-		restoreCustomTabContentAggregation.call(this, sAggregationName, vObject);
+		this._restoreCustomTabContentAggregation(sAggregationName, vObject);
 
 		var vRemovedObject = Control.prototype.removeAggregation.apply(this, arguments);
 
@@ -866,7 +866,7 @@ function(
 
 	ViewSettingsDialog.prototype.removeAllAggregation = function(sAggregationName, bSuppressInvalidate) {
 		// custom tabs aggregation needs special handling - make sure it happens
-		restoreCustomTabContentAggregation.call(this);
+		this._restoreCustomTabContentAggregation();
 
 		var vRemovedObjects = Control.prototype.removeAllAggregation.apply(this, arguments);
 
@@ -893,7 +893,7 @@ function(
 	};
 
 	ViewSettingsDialog.prototype.destroyAggregation = function(sAggregationName, bSuppressInvalidate) {
-		restoreCustomTabContentAggregation.call(this);
+		this._restoreCustomTabContentAggregation();
 
 		Control.prototype.destroyAggregation.apply(this, arguments);
 
@@ -2846,7 +2846,7 @@ function(
 	ViewSettingsDialog.prototype.setModel = function (oModel, sName) {
 		// BCP 1570030370
 		if (this._vContentPage === 3 && this._oContentItem) {
-			resetFilterPage.call(this);
+			this._resetFilterPage();
 		}
 		return Control.prototype.setModel.call(this, oModel, sName);
 	};
@@ -2872,7 +2872,7 @@ function(
 			}
 
 			if (this._oContentItem.getId() === sFilterItemId) {
-				resetFilterPage.call(this);
+				this._resetFilterPage();
 			}
 		}
 
@@ -2888,7 +2888,7 @@ function(
 	 */
 	ViewSettingsDialog.prototype.removeAllFilterItems = function () {
 		if (this._vContentPage === 3 && this._oContentItem) {
-			resetFilterPage.call(this);
+			this._resetFilterPage();
 		}
 		return this.removeAllAggregation('filterItems');
 	};
@@ -2926,8 +2926,8 @@ function(
 
 		// needed because the content aggregation is changing it's owner control from custom tab to page and vice-versa
 		// if there is existing page content and the last opened page was a custom tab
-		if (isLastPageContentCustomTab.call(this)) {
-			restoreCustomTabContentAggregation.call(this);
+		if (this._isLastPageContentCustomTab()) {
+			this._restoreCustomTabContentAggregation();
 		}
 
 		// reset controls
@@ -3380,74 +3380,11 @@ function(
 	 * and navigates to the filter page.
 	 * @private
 	 */
-	function resetFilterPage() {
+	ViewSettingsDialog.prototype._resetFilterPage = function() {
 		this._vContentPage = 2;
 		this._oContentItem = null;
 		this._navContainer.to(this._getPage1().getId(), "show");
-	}
-
-	/**
-	 * Gets an sap.m.ViewSettingsItem from a list of items by a given key.
-	 *
-	 * @param {sap.m.ViewSettingsItem[]} aViewSettingsItems The list of sap.m.ViewSettingsItem objects to be searched
-	 * @param {string} sKey The key of the searched item
-	 * @returns {sap.m.ViewSettingsItem} The sap.m.ViewSettingsItem found in the list of items
-	 * @private
-	 */
-	function getViewSettingsItemByKey(aViewSettingsItems, sKey) {
-		var i, oItem;
-
-		// convenience, also allow strings
-		// find item with this key
-		for (i = 0; i < aViewSettingsItems.length; i++) {
-			if (aViewSettingsItems[i].getKey() === sKey) {
-				oItem = aViewSettingsItems[i];
-				break;
-			}
-		}
-
-		return oItem;
-	}
-
-	/**
-	 * Finds an sap.m.ViewSettingsItem from a list of items by a given key.
-	 * If it does not succeed logs an error.
-	 *
-	 * @param {sap.m.ViewSettingsItem|string} vItemOrKey The searched item or its key
-	 * @param {sap.m.ViewSettingsItem[]} aViewSettingsItems The list of sap.m.ViewSettingsItem objects to be searched
-	 * @param {string} sErrorMessage If an error message is provided, it will be logged when the
-	 * item is not found
-	 * @returns {sap.m.ViewSettingsItem} The sap.m.ViewSettingsItem found in the list of items
-	 * @private
-	 */
-	function findViewSettingsItemByKey(vItemOrKey, aViewSettingsItems, sErrorMessage) {
-		var oItem;
-
-		// convenience, also allow strings
-		if (typeof vItemOrKey === "string") {
-			// find item with this key
-			oItem = getViewSettingsItemByKey(aViewSettingsItems, vItemOrKey);
-
-			if (!oItem && sErrorMessage) {
-				Log.error(sErrorMessage);
-			}
-		} else {
-			oItem = vItemOrKey;
-		}
-
-		return oItem;
-	}
-
-	/**
-	 * Checks if the item is an sap.m.ViewSettingsItem.
-	 *
-	 * @param {*} oItem The item to be validated
-	 * @returns {boolean} Returns true if the item is an sap.m.ViewSettingsItem
-	 * @private
-	 */
-	function validateViewSettingsItem(oItem) {
-		return oItem && BaseObject.isObjectA(oItem, "sap.m.ViewSettingsItem");
-	}
+	};
 
 	/* =========================================================== */
 	/* end: internal methods */
@@ -3655,7 +3592,7 @@ function(
 	 * @param {object} oCustomTab Custom tab instance
 	 * @private
 	 */
-	function restoreCustomTabContentAggregation(sAggregationName, oCustomTab) {
+	ViewSettingsDialog.prototype._restoreCustomTabContentAggregation = function(sAggregationName, oCustomTab) {
 		// Make sure page1 exists, as this method may be called on destroy(), after the page was destroyed
 		// Suppress creation of new page as the following logic is needed only when a page already exists
 		if (!this._getPage1(true)) {
@@ -3669,14 +3606,14 @@ function(
 				this._vContentPage === oCustomTab.getId()) {
 				/* the iContentPage property corresponds to the custom tab id - set the custom tab content aggregation
 				 back to the custom tab instance */
-				var oPage1Content = this._getPage1().getContent();
+				const oPage1Content = this._getPage1().getContent();
 				oPage1Content.forEach(function (oContent) {
 					oCustomTab.addAggregation('content', oContent, true);
 				});
 			}
 		} else if (!sAggregationName && !oCustomTab) {
 			/* when these parameters are missing, cycle through all custom tabs and detect if any needs manipulation */
-			var oPage1Content = this._getPage1().getContent();
+			const oPage1Content = this._getPage1().getContent();
 			/* the vContentPage property corresponds to a custom tab id - set the  custom tab content aggregation back
 			 to the corresponding custom tab instance, so it can be reused later */
 			this.getCustomTabs().forEach(function (oCustomTab) {
@@ -3688,16 +3625,16 @@ function(
 			}, this);
 		}
 
-	}
+	};
 
 	/**
 	 * Determine if the last opened page has custom tab contents
 	 * @private
 	 * @returns {boolean} Whether the last opened page has custom tab contents
 	 */
-	function isLastPageContentCustomTab() {
+	ViewSettingsDialog.prototype._isLastPageContentCustomTab = function() {
 		// ToDo: make this into enumeration
-		var aPageIds = [
+		const aPageIds = [
 			-1, // not set
 			0,  // sort
 			1,  // group
@@ -3705,7 +3642,7 @@ function(
 			3   // filter detail
 		];
 		return (this._getPage1().getContent().length && aPageIds.indexOf(this._vContentPage) === -1);
-	}
+	};
 
 	/**
 	 * Forward the busy state setting to the internal dialog instance.
@@ -3788,6 +3725,69 @@ function(
 		sQuery = sQuery.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 		var rAnyWordStartsWith = new RegExp(".*\\b" + sQuery + ".*");
 		return rAnyWordStartsWith.test(sValue);
+	}
+
+	/**
+	 * Gets an sap.m.ViewSettingsItem from a list of items by a given key.
+	 *
+	 * @param {sap.m.ViewSettingsItem[]} aViewSettingsItems The list of sap.m.ViewSettingsItem objects to be searched
+	 * @param {string} sKey The key of the searched item
+	 * @returns {sap.m.ViewSettingsItem} The sap.m.ViewSettingsItem found in the list of items
+	 * @private
+	 */
+	function getViewSettingsItemByKey(aViewSettingsItems, sKey) {
+		let i, oItem;
+
+		// convenience, also allow strings
+		// find item with this key
+		for (i = 0; i < aViewSettingsItems.length; i++) {
+			if (aViewSettingsItems[i].getKey() === sKey) {
+				oItem = aViewSettingsItems[i];
+				break;
+			}
+		}
+
+		return oItem;
+	}
+
+	/**
+	 * Finds an sap.m.ViewSettingsItem from a list of items by a given key.
+	 * If it does not succeed logs an error.
+	 *
+	 * @param {sap.m.ViewSettingsItem|string} vItemOrKey The searched item or its key
+	 * @param {sap.m.ViewSettingsItem[]} aViewSettingsItems The list of sap.m.ViewSettingsItem objects to be searched
+	 * @param {string} sErrorMessage If an error message is provided, it will be logged when the
+	 * item is not found
+	 * @returns {sap.m.ViewSettingsItem} The sap.m.ViewSettingsItem found in the list of items
+	 * @private
+	 */
+	function findViewSettingsItemByKey(vItemOrKey, aViewSettingsItems, sErrorMessage) {
+		let oItem;
+
+		// convenience, also allow strings
+		if (typeof vItemOrKey === "string") {
+			// find item with this key
+			oItem = getViewSettingsItemByKey(aViewSettingsItems, vItemOrKey);
+
+			if (!oItem && sErrorMessage) {
+				Log.error(sErrorMessage);
+			}
+		} else {
+			oItem = vItemOrKey;
+		}
+
+		return oItem;
+	}
+
+	/**
+	 * Checks if the item is an sap.m.ViewSettingsItem.
+	 *
+	 * @param {*} oItem The item to be validated
+	 * @returns {boolean} Returns true if the item is an sap.m.ViewSettingsItem
+	 * @private
+	 */
+	function validateViewSettingsItem(oItem) {
+		return oItem && BaseObject.isObjectA(oItem, "sap.m.ViewSettingsItem");
 	}
 
 	return ViewSettingsDialog;
