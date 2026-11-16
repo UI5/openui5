@@ -2958,6 +2958,17 @@
           "description": "URL of the web page to be embedded",
           "type": "string"
         },
+        "title": {
+          "description": "The accessible name of the iframe, rendered as its 'title' attribute",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/$defs/simpleBinding"
+            }
+          ]
+        },
         "sandbox": {
           "description": "Sandbox attribute of the iframe",
           "type": "string"
