@@ -23,7 +23,6 @@
 				"test/sap/ui/core/demokit/sample/common/**/*.js",
 				"test/sap/ui/core/demokit/sample/odata/v4/**/*.js",
 				"test/sap/ui/core/demokit/sample/ViewTemplate/**/*.js",
-				"test/sap/ui/core/demokit/tutorial/odatav4/**/*.js",
 				"test/sap/ui/core/qunit/odata/v4/**/*.js",
 				"test/sap/ui/core/qunit/util/SyncPromise.qunit.js",
 				"test/sap/ui/core/qunit/util/XMLPreprocessor.qunit.js",
@@ -126,7 +125,6 @@
 				"test/sap/ui/core/demokit/sample/common/**/*.js",
 				"test/sap/ui/core/demokit/sample/odata/v4/**/*.js",
 				"test/sap/ui/core/demokit/sample/ViewTemplate/**/*.js",
-				"test/sap/ui/core/demokit/tutorial/odatav4/??/webapp/test/**/*.js",
 				"test/sap/ui/core/qunit/odata/v4/**/*.js",
 				"test/sap/ui/core/qunit/util/SyncPromise.qunit.js",
 				"test/sap/ui/core/qunit/util/XMLPreprocessor.qunit.js"
@@ -159,14 +157,6 @@
 			],
 			"rules": {
 				"max-len": "off"
-			}
-		},
-		{
-			"files": [
-				"test/sap/ui/core/demokit/tutorial/odatav4/**"
-			],
-			"rules": {
-				"no-inner-declarations": ["error", "functions"]
 			}
 		}
 	]

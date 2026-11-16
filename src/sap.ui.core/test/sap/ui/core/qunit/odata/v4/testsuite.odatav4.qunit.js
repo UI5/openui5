@@ -151,17 +151,6 @@ sap.ui.define(function () {
 			"OPA.Sticky" : {
 				module : ["sap/ui/core/sample/odata/v4/Sticky/Opa.qunit"],
 				realOData : false // requires stable test data
-			},
-			"OPA.Tutorial.11" : {
-				module : ["sap/ui/core/tutorial/odatav4/test/integration/opaTests.qunit"],
-				realOData : false, // cannot run w/o its mock server!
-				loader : {
-					paths : {
-						"sap/ui/core/tutorial/odatav4"
-							: "test-resources/sap/ui/core/demokit/tutorial/odatav4/11/webapp"
-					}
-				},
-				$app : "test-resources/sap/ui/core/demokit/tutorial/odatav4/11/webapp/index.html"
 			}
 		}
 	};
