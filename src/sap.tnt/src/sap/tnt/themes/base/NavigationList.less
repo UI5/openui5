@@ -189,7 +189,6 @@
 		height: 100%;
 		text-decoration: none;
 		outline: none;
-		background: inherit;
 		border-radius: inherit;
 		transition: @_sap_tnt_NavigationList_ItemTransition;
 		display: flex;
@@ -214,6 +213,8 @@
 	.sapTntNLI a {
 		justify-content: center;
 		transition: none;
+		/* Opaque background for the collapsed pop-out; in expanded mode the item/zones provide it. */
+		background: inherit;
 	}
 }
 
@@ -291,10 +292,21 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.5rem;
+}
 
-	&:not(:has(+ .sapUiIcon)) {
-		padding-inline-end: 0.5rem;
-	}
+/*
+ * Trailing padding when the text/tag container is the item's last child (no following icon, no tag).
+ * Excluded only for unselectable parent items, which render the expander outside the anchor and must
+ * not keep this padding; other items (incl. the unselectable "More items" overflow) keep it.
+ */
+.sapTntNLI:not(.sapTntNLIUnselectable.sapTntNLIWithExpander) .sapTntNLITextAndTagContainer:not(:has(+ .sapUiIcon)):not(:has(.sapTntNLITagContainer)) {
+	padding-inline-end: 0.5rem;
+}
+
+/* In the collapsed pop-out (item hovered/focused) the revealed text/tag needs more trailing space - with or without a tag. */
+.sapTntNLCollapsed .sapTntNLI:not(.sapTntNLIUnselectable.sapTntNLIWithExpander):hover .sapTntNLITextAndTagContainer:not(:has(+ .sapUiIcon)),
+.sapTntNLCollapsed .sapTntNLI:not(.sapTntNLIUnselectable.sapTntNLIWithExpander):focus-within .sapTntNLITextAndTagContainer:not(:has(+ .sapUiIcon)) {
+	padding-inline-end: 1rem;
 }
 
 .sapTntNLITagContainer {
@@ -312,10 +324,6 @@
 			white-space: nowrap;
 		}
 	}
-}
-
-.sapTntNL:not(.sapTntNLCollapsed):not(.sapTntNLPopup) .sapTntNLITwoClickAreas .sapTntNLITagContainer {
-	margin-inline-end: -1rem;
 }
 
 .sapTntNL.sapTntNLCollapsed:not(.sapTntNLPopup) {
@@ -390,6 +398,18 @@
 	margin-left: 1rem;
 }
 
+/* The expander icon is rendered as a sibling of the anchor (not inside it), so the */
+/* item container lays the anchor and the expander side by side. */
+.sapTntNL:not(.sapTntNLCollapsed):not(.sapTntNLPopup) .sapTntNLIFirstLevel.sapTntNLIWithExpander {
+	display: flex;
+	align-items: center;
+
+	> a {
+		min-width: 0;
+		flex: 1 1 auto;
+	}
+}
+
 .sapTntNLIItemsContainer.sapTntNLIItemsContainerHidden {
 	display: none;
 }
@@ -407,6 +427,56 @@
 	font-family: @_sap_tnt_NavigationList_ParentItemTextFontFamily;
 }
 
+/*
+ * Collapsed pop-out: pop the whole WithExpander item out as a flex row so the sibling expander shows.
+ * Driven by the item's :hover/:focus-within so hovering the expander (not a [tabindex]) keeps it open.
+ */
+.sapTntNLCollapsed .sapTntNLIFirstLevel.sapTntNLIWithExpander:not(.sapTntNLIDisabled):not(.sapTntNLIActive):not(.sapTntNLINoHoverEffect):hover,
+.sapTntNLCollapsed .sapTntNLIFirstLevel.sapTntNLIWithExpander:not(.sapTntNLIDisabled):not(.sapTntNLIActive):not(.sapTntNLINoHoverEffect):focus-within {
+	display: flex;
+	align-items: center;
+	width: max-content;
+	position: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPosition;
+	z-index: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemZIndex;
+	box-shadow: @_sap_tnt_NavigationList_Collapsed_ItemHoverBoxShadow;
+
+	> a {
+		position: static;
+		min-width: 0;
+		padding: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPadding;
+		box-shadow: none;
+		/* the item provides the (selection) background in the pop-out; keep the anchor transparent
+		   so the selection accent is not drawn twice */
+		background: none;
+	}
+
+	> .sapTntNLIExpandIcon {
+		display: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusTextDisplay;
+	}
+
+	/* the collapsed navigation indicator (::after) belongs on the item icon, not on the expander */
+	> .sapTntNLIExpandIcon::after {
+		display: none;
+	}
+
+	/* reveal the anchor content here too, so the pop-out stays complete while the expander (not a
+	   [tabindex]) is hovered and the [tabindex]:hover reveal below no longer applies */
+	.sapTntNLITextAndTagContainer,
+	.sapTntNLIText,
+	.sapTntNLIExternalLinkIcon,
+	.sapTntNLITagContainer {
+		display: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusTextDisplay;
+	}
+
+	.sapUiIcon:first-of-type::after {
+		display: none;
+	}
+
+	.sapUiIcon:first-of-type {
+		padding-left: 0;
+	}
+}
+
 .sapTntNLCollapsed {
 	.sapTntNLITextAndTagContainer,
 	.sapTntNLIText,
@@ -422,11 +492,6 @@
 			position: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPosition;
 			padding: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemPadding;
 			z-index: @_sap_tnt_NavigationList_Collapsed_HoverOrFocusItemZIndex;
-
-			.sapTntNLITextAndTagContainer:has(.sapTntNLITagContainer):not(:has(+ .sapUiIcon)),
-			.sapTntNLIText:last-child {
-				padding-inline-end: 1rem;
-			}
 
 			.sapTntNLITextAndTagContainer,
 			.sapTntNLIText,
@@ -493,7 +558,7 @@
 .sapTntNLIActive .sapTntNLIFirstLevel.sapTntNLI:not(.sapTntNLIDisabled),
 .sapTntNLCollapsed.sapTntNLIFirstLevel.sapTntNLISelected,
 .sapTntNL .sapTntNLGroup.sapTntNLI:not(.sapTntNLIDisabled):active,
-.sapTntNL .sapTntNLIFirstLevel.sapTntNLI:not(.sapTntNLIDisabled, .sapTntNLIInPopover.sapTntNLIUnselectable):not(.sapTntNLIAction):active,
+.sapTntNL .sapTntNLIFirstLevel.sapTntNLI:not(.sapTntNLIDisabled, .sapTntNLIInPopover.sapTntNLIUnselectable, .sapTntNLITwoClickAreas):not(.sapTntNLIAction):active,
 .sapTntNL .sapTntNLISecondLevel.sapTntNLI:not(.sapTntNLIDisabled):not(.sapTntNLIAction):active,
 .sapTntNL .sapTntNLISecondLevel.sapTntNLI:not(.sapTntNLIDisabled):not(.sapTntNLIAction).sapTntNLIActive {
 	background: var(--sapList_Active_Background);
@@ -550,17 +615,127 @@
 	}
 }
 
-.sapTntNLIWithExpander.sapTntNLITwoClickAreas .sapUiIcon:last-of-type {
-	height: var(--sapElement_Condensed_Height);
+.sapTntNLIWithExpander.sapTntNLITwoClickAreas .sapTntNLIExpandIcon {
+	align-self: stretch;
 	line-height: var(--sapElement_Condensed_Height);
 }
 
-.sapTntNL:not(.sapTntNLCollapsed) .sapTntNLIWithExpander.sapTntNLITwoClickAreas .sapUiIcon:last-of-type {
-	border-left: 0.0625rem solid var(--sapTextColor);
+/*
+ * Divider between the two click areas: a short gradient line on the expander itself - not on
+ * .sapUiIconTitle, which is absent for disabled items and would make the divider disappear.
+ */
+.sapTntNL:not(.sapTntNLCollapsed) .sapTntNLIWithExpander.sapTntNLITwoClickAreas .sapTntNLIExpandIcon {
+	background-image: linear-gradient(var(--sapTextColor), var(--sapTextColor));
+	background-repeat: no-repeat;
+	background-position: left center;
+	background-size: 0.0625rem var(--sapElement_Condensed_Height);
 }
 
-.sapTntNLIWithExpander.sapTntNLITwoClickAreas .sapUiIcon:last-of-type::before {
+.sapTntNLIWithExpander.sapTntNLITwoClickAreas .sapTntNLIExpandIcon::before {
 	line-height: var(--sapElement_Condensed_Height);
+}
+
+/* Two independent hover zones: link (anchor) and expander are siblings, each highlights on its own hover (expanded first-level items with an expander). */
+.sapTntNL:not(.sapTntNLCollapsed):not(.sapTntNLPopup) .sapTntNLI.sapTntNLIFirstLevel.sapTntNLIWithExpander.sapTntNLITwoClickAreas:not(.sapTntNLIDisabled) {
+
+	> a {
+		border-radius: @_sap_tnt_NavigationList_ItemBorderRadius;
+	}
+
+	/* the item is a single focus target, so draw the focus ring around the whole item (both zones),
+	   not just around the link zone (the anchor no longer spans the whole item) */
+	> a:focus::after {
+		content: none;
+	}
+
+	&:has(> a:focus)::after {
+		content: "";
+		position: absolute;
+		inset: @_sap_tnt_NavigationList_ItemFocusBorderOffset;
+		border: var(--sapContent_FocusWidth) var(--sapContent_FocusStyle) var(--sapContent_FocusColor);
+		border-radius: @_sap_tnt_NavigationList_ItemFocusBorderRadius;
+		z-index: 2;
+		pointer-events: none;
+	}
+
+	/* Expander hover highlight: a separate layer behind the icon, inset 0.25rem from the divider; isolation keeps the negative z-index above the item background. */
+	> .sapTntNLIExpandIcon {
+		isolation: isolate;
+	}
+
+	> .sapTntNLIExpandIcon:hover::after {
+		content: "";
+		position: absolute;
+		inset-block: 0.25rem;
+		inset-inline: 0.25rem 0;
+		border-radius: var(--sapButton_BorderCornerRadius);
+		background-color: var(--sapList_Hover_Background);
+		z-index: -1;
+	}
+
+	> .sapTntNLIExpandIcon:active::after {
+		background-color: var(--sapList_Active_Background);
+	}
+
+	/* On press only the pressed zone's content takes the active text color (matters where it differs, e.g. Fiori 3) - link press must not recolor the expander, and vice versa. */
+	> .sapTntNLIExpandIcon:active {
+		color: var(--sapList_Active_TextColor);
+	}
+
+	> a:active .sapMText,
+	> a:active .sapUiIcon {
+		color: var(--sapList_Active_TextColor);
+	}
+
+	&:not(.sapTntNLISelected) {
+
+		/* the whole item no longer paints on hover/active - each zone paints itself */
+		&:hover,
+		&:active {
+			background-color: var(--sapList_Background);
+		}
+
+		> a:hover {
+			background-color: var(--sapList_Hover_Background);
+		}
+
+		> a:active {
+			background-color: var(--sapList_Active_Background);
+		}
+	}
+
+	/* selected: the shared selected rule covers the whole item (link + expander); each zone still highlights on its own on hover/active. */
+	&.sapTntNLISelected {
+
+		/* Selection accent like items without children: a straight background-image bar on the link
+		   zone, so the per-zone hover/active background-color paints under it without covering it. */
+		background: var(--sapList_SelectionBackgroundColor);
+
+		> a {
+			position: relative;
+			background-image: linear-gradient(var(--sapList_SelectionBorderColor), var(--sapList_SelectionBorderColor));
+			background-repeat: no-repeat;
+			background-position: left center;
+			background-size: 0.1875rem 100%;
+		}
+
+		> a:hover {
+			background-color: var(--sapList_Hover_SelectionBackground);
+		}
+
+		> a:active {
+			background-color: var(--sapList_Active_Background);
+		}
+
+		> .sapTntNLIExpandIcon:hover::after {
+			background-color: var(--sapList_Hover_SelectionBackground);
+		}
+
+		/* pressing the expander matches pressing the link zone (active background), not the hover color */
+		> .sapTntNLIExpandIcon:active::after {
+			background-color: var(--sapList_Active_Background);
+		}
+	}
 }
 
 .sapTntNLISecondLevel .sapTntNLISelectionIndicator {
@@ -586,6 +761,11 @@
 }
 
 html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
+	background: @_sap_tnt_NavigationList_Collapsed_SelectedItemBackgroundRTL;
+}
+
+/* keep the selection accent on the right in RTL on hover too (the hover background is not RTL-aware) */
+html[dir=rtl] .sapTntNLCollapsed .sapTntNLISelected:not(.sapTntNLIDisabled):not(.sapTntNLINoHoverEffect):hover {
 	background: @_sap_tnt_NavigationList_Collapsed_SelectedItemBackgroundRTL;
 }
 
@@ -858,7 +1038,6 @@ html[dir=rtl] .sapTntNLISelected:not(.sapTntNLIDisabled) {
 	height: 100%;
 	text-decoration: none;
 	outline: none;
-	background: inherit;
 	border-radius: inherit;
 	display: flex;
 	align-items: center;

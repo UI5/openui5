@@ -106,6 +106,26 @@
 								new NavigationListItem({ selectable: false, href: "https://sap.com", text: "No Target Link", icon: "sap-icon://attachment" })
 
 							]
+						}),
+						new NavigationListItem({
+							text: "Href usage",
+							href: "https://www.sap.com",
+							icon: "sap-icon://mileage",
+							items: [
+								new NavigationListItem({ text: "Driven" }),
+								new NavigationListItem({ text: "Walked" })
+
+							]
+						}),
+						new NavigationListItem({
+							text: "Disabled",
+							icon: "sap-icon://mileage",
+							enabled: false,
+							items: [
+								new NavigationListItem({ text: "Driven" }),
+								new NavigationListItem({ text: "Walked" })
+
+							]
 						})
 					]
 				}),
