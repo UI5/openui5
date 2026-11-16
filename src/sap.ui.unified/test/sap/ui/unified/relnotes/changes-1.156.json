@@ -1,0 +1,17 @@
+{
+  "1.156.0": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "5d575e1fcb64e90dcdee21e8f216f4a3d4b17b5c",
+        "type": "FEATURE",
+        "text": " Enhanced Tooltip is integrated in sap.m.DatePicker, sap.m.DateRangeSelection, sap.m.TimePicker and sap.ui.unified.Calendar."
+      },
+      {
+        "id": "a478ebcf2ce9c7c85a28cf0dac77208035c5f59c",
+        "type": "FIX",
+        "text": " sap.ui.unified.Calendar: Space key fires selection on keyup."
+      }
+    ]
+  }
+}

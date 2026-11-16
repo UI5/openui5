@@ -1,0 +1,12 @@
+{
+  "1.156.0": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "e39b58a46d790f2cae1b80a2cb17eb6ff97377b5",
+        "type": "FIX",
+        "text": " sap.ui.core.popover.Positioning: Begin/End as physical sides are now resolved correctly in RTL"
+      }
+    ]
+  }
+}
