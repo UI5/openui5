@@ -4,7 +4,7 @@
 			"control" : "sap.ui.mdc.Field",
 			"url" : "./field/Field.html",
 			"desc" : "Fields with various data types rendering various input controls",
-			"appComponent" : "CA-UI5-MDC",
+			"appComponent" : "CA-UI5-TBL",
 			"accTest": {
 				"name": "sap.ui.mdc.Field",
 				"title": "ACC test for sap.ui.mdc.Field",
@@ -26,7 +26,7 @@
 			"control" : "sap.ui.mdc.FilterField",
 			"url" : "./filterbar/FilterBar.html",
 			"desc" : "FilterFields with various data types rendering various input controls",
-			"appComponent" : "CA-UI5-MDC",
+			"appComponent" : "CA-UI5-TBL",
 			"accTest": {
 				"name": "sap.ui.mdc.FilterField",
 				"title": "ACC test for sap.ui.mdc.FilterField",
@@ -48,7 +48,7 @@
 			"control" : "sap.ui.mdc.MultiValueField",
 			"url" : "./multivaluefield/MultiValueField.html",
 			"desc" : "Multi-value field in different state",
-			"appComponent" : "CA-UI5-MDC",
+			"appComponent" : "CA-UI5-TBL",
 			"accTest": {
 				"name": "sap.ui.mdc.MultiValueField",
 				"title": "ACC test for sap.ui.mdc.MultiValueField",
@@ -59,7 +59,7 @@
 			"control" : "sap.ui.mdc.ValueHelp",
 			"url" : "./filterbar/FilterBar.html",
 			"desc" : "Different FilterFields with a more complex value help dialog including filter and search features",
-			"appComponent" : "CA-UI5-MDC",
+			"appComponent" : "CA-UI5-TBL",
 			"accTest": {
 				"name": "sap.ui.mdc.ValueHelp",
 				"title": "ACC test for sap.ui.mdc.ValueHelp",
