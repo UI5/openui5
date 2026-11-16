@@ -310,7 +310,16 @@ sap.ui.define([
 				 * If not set, the calendar week numbering of the global configuration is used.
 				 * @since 1.108.0
 				 */
-				calendarWeekNumbering : { type : "sap.base.i18n.date.CalendarWeekNumbering", group : "Appearance", defaultValue: null}
+				calendarWeekNumbering : { type : "sap.base.i18n.date.CalendarWeekNumbering", group : "Appearance", defaultValue: null},
+
+				/**
+				 * Determines whether the week numbers in the months are displayed in the calendar popup.
+				 *
+				 * <b>Note:</b> For Islamic calendars, the week numbers are not displayed
+				 * regardless of what is set to this property.
+				 * @since 1.156
+				 */
+				showWeekNumbers : { type : "boolean", group : "Appearance", defaultValue : true}
 
 			},
 
@@ -1681,6 +1690,11 @@ sap.ui.define([
 			}
 			this._attachAfterRenderingDelegate();
 		}
+
+		// Sync the week-number visibility on every popup preparation so that
+		// changes to the property take effect the next time the picker opens
+		// (no custom setter needed - the week numbers are only visible in the popup).
+		this._getCalendar().setShowWeekNumbers(this.getShowWeekNumbers());
 	};
 
 	DatePicker.prototype._attachAfterRenderingDelegate = function()	{
