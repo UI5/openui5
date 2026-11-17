@@ -102,9 +102,12 @@ sap.ui.define([
 		async function test(sTestTitle, oDomElementToFocus, iInitialScrollLeft, bScrollPositionShouldChange) {
 			document.body.focus();
 			await oTable.qunit.scrollHSbTo(iInitialScrollLeft);
+			// The scroll listener must be registered before focusing. In Safari, focus handling finishes in a later task, so the scroll event
+			// could already have been fired by then.
+			const pHScrolled = bScrollPositionShouldChange ? oTable.qunit.hScrolled() : null;
 			await oTable.qunit.focus(oDomElementToFocus);
 			if (bScrollPositionShouldChange) {
-				await oTable.qunit.hScrolled();
+				await pHScrolled;
 				assert.notStrictEqual(getScrollLeft(), iInitialScrollLeft, sTestTitle + ": The horizontal scroll position did change");
 				assert.ok(isScrolledIntoView(oDomElementToFocus), sTestTitle + ": The focused cell is fully visible");
 			} else {
