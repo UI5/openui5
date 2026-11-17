@@ -2549,21 +2549,30 @@ sap.ui.define([
 		return this;
 	};
 
-	Calendar.prototype._updateHeadersButtonsHelper = function (bButton1, bButton2, bButton3, bButton4) {
-		var oHeader = this.getAggregation("header"),
-			oSecondMonthHeader = this.getAggregation("secondMonthHeader");
-
-		oHeader.setVisibleButton1(bButton1);
-		oHeader.setVisibleButton2(bButton2);
-		oHeader._setVisibleButton3(bButton3);
-		oHeader._setVisibleButton4(bButton4);
+	/**
+	 * Applies the given button visibility to the first header and, when it is visible, the
+	 * second month header.
+	 * @param {object} mButtonVisibility Visibility of the four header buttons
+	 * @param {boolean} mButtonVisibility.button1 Whether the (first) month button is visible
+	 * @param {boolean} mButtonVisibility.button2 Whether the (first) year button is visible
+	 * @param {boolean} mButtonVisibility.button3 Whether the second month's month button is visible
+	 * @param {boolean} mButtonVisibility.button4 Whether the second month's year button is visible
+	 * @private
+	 */
+	Calendar.prototype._updateHeadersButtonsHelper = function (mButtonVisibility) {
+		const oSecondMonthHeader = this.getAggregation("secondMonthHeader"),
+			aHeaders = [this.getAggregation("header")];
 
 		if (oSecondMonthHeader.getVisible()) {
-			oSecondMonthHeader.setVisibleButton1(bButton1);
-			oSecondMonthHeader.setVisibleButton2(bButton2);
-			oSecondMonthHeader._setVisibleButton3(bButton3);
-			oSecondMonthHeader._setVisibleButton4(bButton4);
+			aHeaders.push(oSecondMonthHeader);
 		}
+
+		aHeaders.forEach(function (oHeader) {
+			oHeader.setVisibleButton1(mButtonVisibility.button1);
+			oHeader.setVisibleButton2(mButtonVisibility.button2);
+			oHeader._setVisibleButton3(mButtonVisibility.button3);
+			oHeader._setVisibleButton4(mButtonVisibility.button4);
+		});
 	};
 
 	/**
@@ -2571,62 +2580,45 @@ sap.ui.define([
 	 * @private
 	 */
 	Calendar.prototype._updateHeadersButtons = function () {
-		var oSecondMonthHeader = this.getAggregation("secondMonthHeader"),
-			oHeader = this.getAggregation("header");
+		const oHeader = this.getAggregation("header"),
+			oSecondMonthHeader = this.getAggregation("secondMonthHeader"),
+			bTwoInOneColumn = this._isTwoMonthsInOneColumn(),
+			bTwoInTwoColumns = this._isTwoMonthsInTwoColumns(),
+			bYearRangePicker = this._iMode === 3,
+			bYearPicker = this._iMode === 2,
+			bPickerMode = this._iMode === 1 || this._iMode === 2,
+			mMonthAndYear = {button1: true,  button2: true, button3: false, button4: false},
+			mYearOnly     = {button1: false, button2: true, button3: false, button4: false};
+		let mButtons;
 
-		if (this._isTwoMonthsInOneColumn()) {
-			// Two months displayed in one column
-			// Than we need the second header
-			// and hide the third and fourth buttons of the first header
-			oSecondMonthHeader.setVisible(true);
-			oHeader.setProperty("_alignRight", "Center");
+		// The second header is shown only when two months share a single column; the primary
+		// header is right-aligned only when the two months are spread over two columns.
+		oSecondMonthHeader.setVisible(bTwoInOneColumn);
+		oHeader.setProperty("_alignRight", bTwoInTwoColumns ? "End" : "Center");
 
-			if (this._iMode === 2) {
-				this._updateHeadersButtonsHelper(false, true, false, false);
-			} else if (this._iMode === 3) {
-				this._updateHeadersButtonsHelper(false, false, false, false);
+		// Visibility of the four header buttons: button1/button2 = primary month/year,
+		// button3/button4 = the second month's month/year.
+		if (bYearRangePicker) {
+			mButtons = {button1: false, button2: false, button3: false, button4: false};
+		} else if (bTwoInTwoColumns) {
+			if (bPickerMode) {
+				// The header that opened the picker hides its own month button; the other keeps both.
+				mButtons = this._bActionTriggeredFromSecondHeader
+					? {button1: true,  button2: true,  button3: false, button4: true}
+					: {button1: false, button2: true,  button3: true,  button4: true};
 			} else {
-				this._updateHeadersButtonsHelper(true, true, false, false);
+				mButtons = {button1: true, button2: true, button3: true, button4: true};
 			}
-		} else if (this._isTwoMonthsInTwoColumns()) {
-			// Two months displayed in two columns
-			// Than we need to hide the second header
-			// and show third and fourth buttons of the first
-			oSecondMonthHeader.setVisible(false);
-			oHeader.setProperty("_alignRight", "End");
-
-			if (this._iMode === 2) {
-				this._bActionTriggeredFromSecondHeader ?
-					this._updateHeadersButtonsHelper(true, true, false, true) :
-					this._updateHeadersButtonsHelper(false, true, true, true);
-			} else if (this._iMode === 3) {
-				this._updateHeadersButtonsHelper(false, false, false, false);
-			} else if (this._iMode === 1) {
-				this._bActionTriggeredFromSecondHeader ?
-					this._updateHeadersButtonsHelper(true, true, false, true) :
-					this._updateHeadersButtonsHelper(false, true, true, true);
-			} else {
-				this._updateHeadersButtonsHelper(true, true, true, true);
-			}
+		} else if (bTwoInOneColumn) {
+			mButtons = bYearPicker ? mYearOnly : mMonthAndYear;
 		} else {
-			// Keep the other use cases untouched
-			// No second header
-			// No third and fourth button
-			oSecondMonthHeader.setVisible(false);
-			oHeader.setProperty("_alignRight", "Center");
-			if (this._iMode === 1) {
-				this._updateHeadersButtonsHelper(false, true, false, false);
-			} else if (this._iMode === 2) {
-				this._updateHeadersButtonsHelper(false, true, false, false);
-			} else if (this._iMode === 3) {
-				this._updateHeadersButtonsHelper(false, false, false, false);
-			} else {
-				this._updateHeadersButtonsHelper(true, true, false, false);
-			}
+			mButtons = bPickerMode ? mYearOnly : mMonthAndYear;
 		}
 
+		this._updateHeadersButtonsHelper(mButtons);
+
 		if (this._getSucessorsPickerPopup()) {
-			this.getAggregation("header").setVisibleButton2(false);
+			oHeader.setVisibleButton2(false);
 		}
 	};
 

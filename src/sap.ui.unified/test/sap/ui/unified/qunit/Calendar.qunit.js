@@ -2931,6 +2931,90 @@ sap.ui.define([
 		oIsTwoMonthsInOneColumnStub.restore();
 	});
 
+	QUnit.test("_updateHeadersButtons sets the header button visibility per picker mode (two months in one column)", function (assert) {
+		// arrange
+		const oCalendar = new Calendar({ months: 2 }),
+			oHeader = oCalendar.getAggregation("header");
+
+		this.stub(oCalendar, "_isTwoMonthsInOneColumn").returns(true);
+		this.stub(oCalendar, "_isTwoMonthsInTwoColumns").returns(false);
+
+		// mode -> expected [button1, button2, button3, button4] visibility
+		[
+			{ iMode: 0, aExpected: [true, true, false, false] },   // day picker
+			{ iMode: 1, aExpected: [true, true, false, false] },   // month picker
+			{ iMode: 2, aExpected: [false, true, false, false] },  // year picker
+			{ iMode: 3, aExpected: [false, false, false, false] }  // year range picker
+		].forEach(function (oCase) {
+			// act
+			oCalendar._iMode = oCase.iMode;
+			oCalendar._updateHeadersButtons();
+
+			// assert
+			assert.deepEqual(
+				[oHeader.getVisibleButton1(), oHeader.getVisibleButton2(), oHeader._getVisibleButton3(), oHeader._getVisibleButton4()],
+				oCase.aExpected,
+				"mode " + oCase.iMode + ": button visibility matches"
+			);
+		});
+
+		// cleanup
+		oCalendar.destroy();
+	});
+
+	QUnit.test("_updateHeadersButtons shows the second-month year button (button4) only outside year range mode (two months in two columns)", function (assert) {
+		// arrange
+		const oCalendar = new Calendar({ months: 2 }),
+			oHeader = oCalendar.getAggregation("header");
+
+		this.stub(oCalendar, "_isTwoMonthsInOneColumn").returns(false);
+		this.stub(oCalendar, "_isTwoMonthsInTwoColumns").returns(true);
+
+		// act + assert: day picker shows the fourth button
+		oCalendar._iMode = 0;
+		oCalendar._updateHeadersButtons();
+		assert.ok(oHeader._getVisibleButton4(), "day picker: fourth header button is visible");
+
+		// act + assert: year range picker hides it
+		oCalendar._iMode = 3;
+		oCalendar._updateHeadersButtons();
+		assert.notOk(oHeader._getVisibleButton4(), "year range picker: fourth header button is hidden");
+
+		// cleanup
+		oCalendar.destroy();
+	});
+
+	QUnit.test("_updateHeadersButtons sets the header button visibility per picker mode (single header)", function (assert) {
+		// arrange
+		const oCalendar = new Calendar(),
+			oHeader = oCalendar.getAggregation("header");
+
+		this.stub(oCalendar, "_isTwoMonthsInOneColumn").returns(false);
+		this.stub(oCalendar, "_isTwoMonthsInTwoColumns").returns(false);
+
+		// mode -> expected [button1, button2, button3, button4] visibility
+		[
+			{ iMode: 0, aExpected: [true, true, false, false] },   // day picker
+			{ iMode: 1, aExpected: [false, true, false, false] },  // month picker
+			{ iMode: 2, aExpected: [false, true, false, false] },  // year picker
+			{ iMode: 3, aExpected: [false, false, false, false] }  // year range picker
+		].forEach(function (oCase) {
+			// act
+			oCalendar._iMode = oCase.iMode;
+			oCalendar._updateHeadersButtons();
+
+			// assert
+			assert.deepEqual(
+				[oHeader.getVisibleButton1(), oHeader.getVisibleButton2(), oHeader._getVisibleButton3(), oHeader._getVisibleButton4()],
+				oCase.aExpected,
+				"mode " + oCase.iMode + ": button visibility matches"
+			);
+		});
+
+		// cleanup
+		oCalendar.destroy();
+	});
+
 	QUnit.test("_setPrimaryHeaderMonthButtonText should sets the button1 text of the header to _sFirstName value if calendar is in two columns with two months", function (assert) {
 		// arrange
 		var sExpectedText = "Text of the button",
