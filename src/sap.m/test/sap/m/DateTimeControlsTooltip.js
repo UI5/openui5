@@ -12,6 +12,8 @@ sap.ui.require([
 	"sap/ui/core/Core",
 	"sap/ui/core/ShortcutHintsMixin",
 	"sap/ui/unified/Calendar",
+	"sap/ui/unified/CalendarDateInterval",
+	"sap/ui/unified/CalendarMonthInterval",
 	"sap/ui/unified/CalendarLegend",
 	"sap/ui/unified/CalendarLegendItem",
 	"sap/ui/unified/DateTypeRange",
@@ -19,7 +21,7 @@ sap.ui.require([
 ], async function (App, Page, Panel, CheckBox, Text, FormattedText,
 		DatePicker, DateRangeSelection, DateTimePicker, TimePicker,
 		Core, ShortcutHintsMixin,
-		Calendar, CalendarLegend, CalendarLegendItem, DateTypeRange, unifiedLibrary) {
+		Calendar, CalendarDateInterval, CalendarMonthInterval, CalendarLegend, CalendarLegendItem, DateTypeRange, unifiedLibrary) {
 	"use strict";
 
 	await Core.ready();
@@ -100,6 +102,41 @@ sap.ui.require([
 		specialDates: [
 			new DateTypeRange({ startDate: dateOffset(1), type: CalendarDayType.Type01, tooltip: "Tomorrow — Type01" }),
 			new DateTypeRange({ startDate: dateOffset(3), type: CalendarDayType.Type02, tooltip: "In 3 days — Type02" })
+		]
+	});
+
+	// 7. CalendarDateInterval — DatesRow extends Month, so its cells inherit the enhanced tooltip
+	//    behavior (special-day text in aria-describedby); the header follows the enhanced buttons.
+	const oDateIntervalLegend = new CalendarLegend({
+		items: [
+			new CalendarLegendItem({ type: CalendarDayType.Type01, text: "Tomorrow — Type01" }),
+			new CalendarLegendItem({ type: CalendarDayType.Type02, text: "In 3 days — Type02" })
+		]
+	});
+	const oDateInterval = new CalendarDateInterval({
+		id: "cdi1",
+		days: 8,
+		showWeekNumbers: true,
+		legend: oDateIntervalLegend,
+		specialDates: [
+			new DateTypeRange({ startDate: dateOffset(1), type: CalendarDayType.Type01, tooltip: "Tomorrow — Type01" }),
+			new DateTypeRange({ startDate: dateOffset(3), type: CalendarDayType.Type02, tooltip: "In 3 days — Type02" })
+		]
+	});
+
+	// 8. CalendarMonthInterval — MonthsRow is Control-based with its own renderer, so its cells still
+	//    use NATIVE title tooltips (mixed with the enhanced header) — a known follow-up gap.
+	const oMonthIntervalLegend = new CalendarLegend({
+		items: [
+			new CalendarLegendItem({ type: CalendarDayType.Type01, text: "This month — Type01" })
+		]
+	});
+	const oMonthInterval = new CalendarMonthInterval({
+		id: "cmi1",
+		months: 12,
+		legend: oMonthIntervalLegend,
+		specialDates: [
+			new DateTypeRange({ startDate: oToday, type: CalendarDayType.Type01, tooltip: "This month — Type01" })
 		]
 	});
 
@@ -197,6 +234,33 @@ sap.ui.require([
 					}).addStyleClass("sapUiSmallMarginBegin sapUiSmallMarginBottom"),
 					oCalendarNoInterval,
 					oLegend2
+				]
+			}).addStyleClass("sapUiResponsiveMargin"),
+			new Panel({
+				headerText: "7. CalendarDateInterval (days: 8) — prev/next read 'Previous/Next 8 days'",
+				expandable: false,
+				width: "40rem",
+				content: [
+					new Text({
+						text: "Header prev/next buttons announce the day interval ('Next 8 days'). " +
+							"DatesRow extends Month, so special-day cells follow the enhanced behavior (tooltip text in aria-describedby, no native tooltip). " +
+							"Open the month/year pickers to see the prev/next text switch to 'Year'/'Year Range'."
+					}).addStyleClass("sapUiSmallMarginBegin sapUiSmallMarginBottom"),
+					oDateInterval,
+					oDateIntervalLegend
+				]
+			}).addStyleClass("sapUiResponsiveMargin"),
+			new Panel({
+				headerText: "8. CalendarMonthInterval (months: 12) — prev/next read 'Previous/Next 12 months'",
+				expandable: false,
+				width: "40rem",
+				content: [
+					new Text({
+						text: "Header prev/next buttons announce the month interval ('Next 12 months'); the year picker view reads 'Year Range' (bug fix). " +
+							"Note: MonthsRow is Control-based, so its special-day cells still show NATIVE title tooltips — a known follow-up gap in enhanced mode."
+					}).addStyleClass("sapUiSmallMarginBegin sapUiSmallMarginBottom"),
+					oMonthInterval,
+					oMonthIntervalLegend
 				]
 			}).addStyleClass("sapUiResponsiveMargin")
 		]
