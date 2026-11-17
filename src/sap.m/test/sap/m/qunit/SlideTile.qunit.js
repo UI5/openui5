@@ -618,7 +618,11 @@ sap.ui.define([
 	});
 
 	QUnit.test("Test for dot accessibility", function(assert) {
-		assert.equal(document.getElementsByClassName('sapMSTIndicator')[0].getAttribute('title'), oResBundle.getText("SLIDETILERADIOBUTTON"), "The tootltip for the slide radio button is present");
+		var aIndicators = document.getElementsByClassName('sapMSTIndicator');
+		for (var i = 0; i < aIndicators.length; i++) {
+			assert.equal(aIndicators[i].getAttribute('title'), oResBundle.getText("SLIDETILERADIOBUTTON", [i + 1]),
+				"The tooltip for slide radio button " + (i + 1) + " is 'Slide " + (i + 1) + "'");
+		}
 	});
 
 	QUnit.test("Tests if the number of dots is correct", function(assert) {
