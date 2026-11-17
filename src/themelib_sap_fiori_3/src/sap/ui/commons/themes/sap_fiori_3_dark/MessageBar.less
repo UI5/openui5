@@ -5,23 +5,23 @@
 
 .sapUiMsgBar {
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 	background-color: var(--sapHighlightColor);
 }
 
 /* Styling the Icons-Counters container: */
 .sapUiMsgBarSums {
-	background-color: darken(@sapUiContentForegroundColor, 10);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l - 10))';
 	background-image: none;
 	border: 1px solid var(--sapContent_ForegroundBorderColor);
 }
 
 .sapUiMsgBarOpen .sapUiMsgBarSums {
-	background-color: darken(@sapUiContentForegroundColor, 10);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l - 10))';
 	background-image: none;
 }
 
 .sapUiMsgBarHome:hover {
 	background-color: var(--sapHighlightColor);
-	border: 1px solid darken(@sapUiContentForegroundBorderColor, 25);
+	border: 1px solid ~'hsl(from var(--sapContent_ForegroundBorderColor) h s calc(l - 25))';
 }
