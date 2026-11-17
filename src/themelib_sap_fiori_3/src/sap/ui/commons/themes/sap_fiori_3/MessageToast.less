@@ -5,8 +5,8 @@
 
 .sapUiMsgToastMsg {
 	font-family: var(--sapFontFamily);
-	font-size: @sapUiDesktopFontSize;
-	background-color: lighten(@sapUiContentForegroundColor, 10);
+	font-size: var(--sapFontSmallSize);
+	background-color: ~'hsl(from var(--sapContent_ForegroundColor) h s calc(l + 10))';
 	border-color: var(--sapContent_ForegroundBorderColor);
 }
 
