@@ -1,0 +1,78 @@
+<mvc:View
+	class="sapUiSizeCompact"
+	controllerName="sap.ui.core.sample.odata.v4.SimpleNonDraft.Main"
+	xmlns="sap.m"
+	xmlns:form="sap.ui.layout.form"
+	xmlns:mvc="sap.ui.core.mvc">
+	<App>
+		<Page id="page" showHeader="false">
+			<Table growing="true" growingThreshold="10" id="salesOrderList"
+					items="{/SalesOrderList}" mode="MultiSelect">
+				<headerToolbar>
+					<Toolbar>
+						<Title text="Sales Orders"/>
+						<ToolbarSpacer/>
+						<Button icon="sap-icon://add" id="createButton" press=".onCreate"
+							text="Create" tooltip="Create a new sales order"/>
+						<Button enabled="{= %{header>$selectionCount} &gt; 0 }"
+							icon="sap-icon://delete" id="deleteButton" press=".onDelete"
+							text="Delete" tooltip="Delete the selected sales orders"/>
+						<Button icon="sap-icon://refresh" id="refreshButton" press=".onRefresh"
+							text="Refresh" tooltip="Refresh data"/>
+						<Button icon="sap-icon://save" id="saveButton" press=".onSave"
+							text="Save" tooltip="Save all pending changes" type="Emphasized"/>
+						<Button icon="sap-icon://sys-cancel" id="cancelButton" press=".onCancel"
+							text="Cancel" tooltip="Discard all pending changes"/>
+					</Toolbar>
+				</headerToolbar>
+				<columns>
+					<Column>
+						<Text text="Sales Order ID"/>
+					</Column>
+					<Column>
+						<Text text="Buyer"/>
+					</Column>
+					<Column hAlign="End">
+						<Text text="Gross Amount"/>
+					</Column>
+					<Column>
+						<Text text="Currency"/>
+					</Column>
+					<Column>
+						<Text text="Note"/>
+					</Column>
+					<Column>
+						<Text text="Lifecycle Status"/>
+					</Column>
+				</columns>
+				<ColumnListItem>
+					<Text text="{SalesOrderID}"/>
+					<Text text="{SO_2_BP/CompanyName} ({BuyerID})"/>
+					<Text text="{GrossAmount}"/>
+					<Text text="{CurrencyCode}"/>
+					<Input value="{Note}"/>
+					<Text text="{LifecycleStatusDesc}"/>
+				</ColumnListItem>
+				<dependents>
+					<Dialog busyIndicatorDelay="100" draggable="true" id="createDialog"
+							title="Create New Sales Order">
+						<form:SimpleForm backgroundDesign="Transparent" editable="true">
+							<Label labelFor="buyerIdInput" required="true" text="Buyer ID"/>
+							<Input id="buyerIdInput" value="{BuyerID}"/>
+							<Label labelFor="currencyCodeInput" required="true" text="Currency"/>
+							<Input id="currencyCodeInput" value="{CurrencyCode}"/>
+							<Label labelFor="noteInput" text="Note"/>
+							<Input id="noteInput" value="{Note}"/>
+						</form:SimpleForm>
+						<buttons>
+							<Button id="createDialogConfirmButton" press=".onCreateDialogConfirm"
+								text="Confirm" type="Emphasized"/>
+							<Button id="createDialogCancelButton" press=".onCreateDialogCancel"
+								text="Cancel"/>
+						</buttons>
+					</Dialog>
+				</dependents>
+			</Table>
+		</Page>
+	</App>
+</mvc:View>

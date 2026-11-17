@@ -95,6 +95,7 @@ sap.ui.define([
 		"HierarchyBindAction" : false,
 		"MultiLevelExpand" : true,
 		"MusicArtists" : true,
+		"SimpleNonDraft" : true,
 		"Travel_CAP" : true
 	};
 	for (const sName in mName2Sandbox) {
