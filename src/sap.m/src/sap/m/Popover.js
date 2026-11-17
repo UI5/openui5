@@ -1629,14 +1629,15 @@ sap.ui.define([
 
 			// Reconstruct the flip flags read by _getOffsetX/Y (only Preferred*OrFlip flips;
 			// strict sides and space-based placements leave both flags false).
-			const bRtl = Localization.getRTL();
+			// The resolved values from calcHorizontal are logical: "Left" = start,
+			// "Right" = end, regardless of RTL — no mirroring needed here.
 			this._bVerticalFlip = (
 				(sPlacement === PlacementType.PreferredTopOrFlip && sResolved === PlacementType.Bottom) ||
 				(sPlacement === PlacementType.PreferredBottomOrFlip && sResolved === PlacementType.Top)
 			);
 			this._bHorizontalFlip = (
-				(sPlacement === PlacementType.PreferredLeftOrFlip  && sResolved === (bRtl ? PlacementType.Left  : PlacementType.Right)) ||
-				(sPlacement === PlacementType.PreferredRightOrFlip && sResolved === (bRtl ? PlacementType.Right : PlacementType.Left))
+				(sPlacement === PlacementType.PreferredLeftOrFlip  && sResolved === PlacementType.Right) ||
+				(sPlacement === PlacementType.PreferredRightOrFlip && sResolved === PlacementType.Left)
 			);
 
 			//set flag to avoid calling _applyPosition

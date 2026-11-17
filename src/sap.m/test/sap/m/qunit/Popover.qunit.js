@@ -909,6 +909,61 @@ sap.ui.define([
 		oRtlStub.restore();
 	});
 
+	QUnit.test("_bHorizontalFlip is correct for Preferred*OrFlip in RTL", function (assert) {
+		const oRtlStub = sinon.stub(Localization, "getRTL").returns(true);
+		const iOpenerWidth = 80;
+
+		var testCase = function (offset, width, placement, bExpectedFlip, iExpectedOffsetX, sMessage) {
+			const stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({left: offset, width: iOpenerWidth, top: 0, height: 0});
+			Object.defineProperty(document.documentElement, "clientWidth", { configurable: true, get: function () { return width; } });
+			Object.defineProperty(document.documentElement, "clientHeight", { configurable: true, get: function () { return width; } });
+
+			var oPopover = new Popover({
+				placement: placement
+			});
+
+			const stubDomRef = sinon.stub(oPopover, "getDomRef").returns({
+				getBoundingClientRect: function () { return { top: 0, left: 0, width: iOpenerWidth, height: iOpenerWidth }; }
+			});
+			const oMockOpener = document.createElement("div");
+			Object.defineProperty(oMockOpener, "getBoundingClientRect", {
+				value: function () { return {left: offset, width: iOpenerWidth, top: 0, height: 0, right: offset + iOpenerWidth, bottom: 0}; }
+			});
+			var stubOpenByRef = sinon.stub(oPopover, "_getOpenByDomRef").returns(oMockOpener);
+			oPopover._calcPlacement();
+
+			assert.strictEqual(oPopover._bHorizontalFlip, bExpectedFlip, sMessage + " (_bHorizontalFlip)");
+			assert.strictEqual(oPopover._getOffsetX(), iExpectedOffsetX, sMessage + " (_getOffsetX)");
+
+			stubOpenByRef.restore();
+			stubOffset.restore();
+			stubDomRef.restore();
+			delete document.documentElement.clientWidth;
+			delete document.documentElement.clientHeight;
+			oPopover.destroy();
+		};
+
+		// PreferredRightOrFlip → End/Opposite. In RTL End = physical left.
+		// Opener at 350: physical left space = 350 → fits → no flip.
+		testCase(350, 500, PlacementType.PreferredRightOrFlip, false, 0,
+			"RTL PreferredRightOrFlip no flip");
+		// Opener at 40: physical left space = 40 → doesn't fit → flip to Begin (physical right).
+		// _getOffsetX negates in RTL, so offset = -openerWidth.
+		testCase(40, 500, PlacementType.PreferredRightOrFlip, true, -iOpenerWidth,
+			"RTL PreferredRightOrFlip flip");
+
+		// PreferredLeftOrFlip → Begin/Opposite. In RTL Begin = physical right.
+		// Opener at 100: physical right space = 350 → fits → no flip.
+		testCase(100, 500, PlacementType.PreferredLeftOrFlip, false, 0,
+			"RTL PreferredLeftOrFlip no flip");
+		// Opener at 450: physical right space = 0 → doesn't fit → flip to End (physical left).
+		// _getOffsetX negates in RTL, so offset = openerWidth.
+		testCase(450, 500, PlacementType.PreferredLeftOrFlip, true, iOpenerWidth,
+			"RTL PreferredLeftOrFlip flip");
+
+		oRtlStub.restore();
+	});
+
 	QUnit.test("auto calculation of Popover positioning should be correct", function (assert){
 		var testCase = function (offsetLeft, offsetTop, outerWidth, outerHeight, width, height, expectedPlace) {
 			const stubOffset = sinon.stub(Element.prototype, "getBoundingClientRect").returns({
