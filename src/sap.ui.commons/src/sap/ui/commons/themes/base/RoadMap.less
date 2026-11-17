@@ -12,7 +12,7 @@
 }
 
 .sapUiRoadMap:focus {
-	outline: 0px dotted transparent;
+	outline: 0 dotted transparent;
 }
 
 .sapUiRoadMapStepArea {
@@ -98,7 +98,7 @@
 }
 
 .sapUiRoadMapStepBox:focus {
-	outline: 1px dotted @sapUiBlackBorder;
+	outline: 1px dotted var(--sapContent_ForegroundBorderColor);
 }
 
 .sapUiRoadMapSubStep.sapUiRoadMapStep > .sapUiRoadMapStepBox {
@@ -112,7 +112,7 @@
 }
 
 .sapUiRoadMapDisabled > .sapUiRoadMapStepBox {
-	border: 1px solid @sapUiButtonDisabledBorderColor;
+	border: 1px solid var(--sapField_ReadOnly_BorderColor);
 	cursor: default;
 }
 
@@ -125,7 +125,7 @@
 	width: 90px;
 	overflow: hidden;
 	word-wrap: break-word;
-	height: 38px; /*double line-height*/
+	height: 38px; /* double line-height */
 }
 
 .sapUiRoadMapTitle > span::after {
@@ -154,7 +154,7 @@
 }
 
 .sapUiRoadMapDelim:focus {
-	outline: 0px dotted transparent;
+	outline: 0 dotted transparent;
 }
 
 .sapUiRoadMapStartScroll {
@@ -165,7 +165,7 @@
 	content: '<<';
 }
 
-.sapUiRoadMapStartFixed::after{
+.sapUiRoadMapStartFixed::after {
 	content: '|>';
 }
 
