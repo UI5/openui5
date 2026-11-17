@@ -651,5 +651,25 @@
         "text": " sap.ui.unified.Calendar: add tooltips for calendar legend types"
       }
     ]
+  },
+  "1.71.82": {
+    "date": "November 2026",
+    "notes": [
+      {
+        "id": "db1bf156c73471bc5e6aeda8bf2af610bfaf3828",
+        "type": "FIX",
+        "text": " sap.ui.unified.FileUploader: Invalid attribute removed",
+        "references": [
+          {
+            "type": "BCP",
+            "reference": "2070407883"
+          },
+          {
+            "type": "BCP",
+            "reference": "2280159254"
+          }
+        ]
+      }
+    ]
   }
 }
