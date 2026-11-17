@@ -4,7 +4,7 @@
 /* ======================================== */
 
 .sapUiTabStrip {
-	font-size: @sapUiDesktopFontSize;
+	font-size: var(--sapFontSmallSize);
 }
 
 .sapUiTabBar {
@@ -19,9 +19,7 @@
 .sapUiTabSel,
 .sapUiTabDsbl {
 	line-height: 18px;
-	-webkit-background-origin: padding, padding, content;
 	background-origin: padding-box, padding-box, content-box;
-	-webkit-background-size: auto auto, auto auto, 100% 28px;
 	background-size: auto auto, auto auto, 100% 28px;
 	background-repeat: no-repeat, no-repeat, no-repeat;
 	background-position: top left, top right, left top;
@@ -132,5 +130,5 @@
 }
 
 .sapUiTabStripScrollIcon:active {
-	background: @sapUiHcHighlightAltBackground;
+	background: var(--sapField_Selector_Hover_Background);
 }
