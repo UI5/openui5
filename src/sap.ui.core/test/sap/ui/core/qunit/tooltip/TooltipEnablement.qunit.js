@@ -6,11 +6,15 @@ sap.ui.define([
 	"./FakeControls",
 	"sap/ui/core/RenderManager",
 	"sap/ui/qunit/utils/nextUIUpdate",
-	"sap/ui/Device"
-], function(TooltipEnablement, TooltipManager, Tooltip, FakeControls, RenderManager, nextUIUpdate, Device) {
+	"sap/ui/Device",
+	"sap/ui/core/library"
+], function(TooltipEnablement, TooltipManager, Tooltip, FakeControls, RenderManager, nextUIUpdate, Device, coreLibrary) {
 	"use strict";
 
 	const { PlainHost, MultiTargetEnablementHost } = FakeControls;
+
+	// shortcut for sap.ui.core.popover.PopoverHorizontalAlign
+	const PopoverHorizontalAlign = coreLibrary.popover.PopoverHorizontalAlign;
 
 	// TooltipManager's open-tooltip registry is module-global; reset it per test.
 	QUnit.testDone(function() {
@@ -200,6 +204,47 @@ sap.ui.define([
 		assert.ok(sHtml.includes(">explicit<"), "explicit textProvider used");
 		assert.notOk(sHtml.includes(">host tip<"), "host tooltip ignored when explicit provider given");
 		oEnablement.destroy();
+	});
+
+	QUnit.test("horizontalAlign config is forwarded to the inner Tooltip", function(assert) {
+		// Arrange: create enablement with Begin alignment and a non-empty textProvider
+		const oEnablement = new TooltipEnablement(this.oHost, {
+			textProvider: () => "hi",
+			horizontalAlign: PopoverHorizontalAlign.Begin
+		});
+
+		// Act: stub openBy and call open() to trigger _ensureTooltip()
+		const oOpenByStub = sinon.stub(Tooltip.prototype, "openBy");
+		try {
+			oEnablement.open();
+			assert.ok(oOpenByStub.called, "openBy was called");
+			const oTooltip = oOpenByStub.thisValues[0];
+			assert.strictEqual(oTooltip.getHorizontalAlign(), "Begin",
+				"inner Tooltip was created with Begin alignment");
+		} finally {
+			oOpenByStub.restore();
+			oEnablement.destroy();
+		}
+	});
+
+	QUnit.test("horizontalAlign defaults to Center when not provided", function(assert) {
+		// Arrange: create enablement without horizontalAlign
+		const oEnablement = new TooltipEnablement(this.oHost, {
+			textProvider: () => "hi"
+		});
+
+		// Act: stub openBy and call open() to trigger _ensureTooltip()
+		const oOpenByStub = sinon.stub(Tooltip.prototype, "openBy");
+		try {
+			oEnablement.open();
+			assert.ok(oOpenByStub.called, "openBy was called");
+			const oTooltip = oOpenByStub.thisValues[0];
+			assert.strictEqual(oTooltip.getHorizontalAlign(), "Center",
+				"inner Tooltip defaults to Center alignment when horizontalAlign is omitted");
+		} finally {
+			oOpenByStub.restore();
+			oEnablement.destroy();
+		}
 	});
 
 	QUnit.module("Setters", {
