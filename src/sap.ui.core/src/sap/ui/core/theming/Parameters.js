@@ -42,7 +42,30 @@ sap.ui.define([
 
 	const parsedLibraries = new Set();
 	const aCallbackRegistry = [];
-	const rCssUrl = /url[\s]*\('?"?([^\'")]*)'?"?\)/;
+	// Matches a single CSS url() token (and nothing else). The captured group keeps any
+	// surrounding quotes, so that URLs containing parentheses (e.g. Theme Designer URLs) are
+	// not truncated. Use unwrapCssUrl() to extract the plain URL string.
+	const rCssUrl = /^\s*url\(\s*('[^']*'|"[^"]*"|[^)]*?)\s*\)\s*$/;
+
+	/**
+	 * Extracts the plain URL string from a single CSS url() token.
+	 * Returns <code>undefined</code> if the value is not a single url() token.
+	 *
+	 * @param {string} sValue the CSS value to parse
+	 * @returns {string|undefined} the unwrapped URL string, or <code>undefined</code> if no match
+	 */
+	function unwrapCssUrl(sValue) {
+		const aMatch = rCssUrl.exec(sValue);
+		if (!aMatch) {
+			return undefined;
+		}
+		let sInner = aMatch[1];
+		const sQuote = sInner.charAt(0);
+		if (sInner.length >= 2 && (sQuote === "'" || sQuote === '"') && sInner.charAt(sInner.length - 1) === sQuote) {
+			sInner = sInner.slice(1, -1);
+		}
+		return sInner;
+	}
 
 	/** @deprecated */
 	const sBootstrapOrigin = new URL(sap.ui.require.toUrl(""), document.baseURI).origin;
@@ -65,9 +88,9 @@ sap.ui.define([
 	 * @returns {string} the resolved URL in CSS URL notation
 	 */
 	function checkAndResolveRelativeUrl(sUrl, sThemeBaseUrl) {
-		const aMatch = rCssUrl.exec(sUrl);
-		if (aMatch) {
-			const oUrl = new _URL(aMatch[1], sThemeBaseUrl);
+		const sInnerUrl = unwrapCssUrl(sUrl);
+		if (sInnerUrl !== undefined) {
+			const oUrl = new _URL(sInnerUrl, sThemeBaseUrl);
 			if (!oUrl.isAbsolute()) {
 				// Rewrite relative URLs based on the theme base url
 				const sNormalizedUrl = oUrl.href;
@@ -526,7 +549,8 @@ sap.ui.define([
 			const resolveWithParameter = function () {
 				Theming.detachApplied(resolveWithParameter);
 				const vParams = this.get({ // Don't pass callback again
-					name: vName.name
+					name: vName.name,
+					_restrictedParseUrls: bParseUrls
 				});
 
 				if (!vParams || (typeof vParams === "object" && (Object.keys(vParams).length !== aNames.length))) {
@@ -582,9 +606,9 @@ sap.ui.define([
 		for (const sKey in mParams) {
 			if (Object.hasOwn(mParams, sKey)) {
 				let sValue = mParams[sKey];
-				const match = rCssUrl.exec(sValue);
-				if (match) {
-					sValue = match[1];
+				const sInnerUrl = unwrapCssUrl(sValue);
+				if (sInnerUrl !== undefined) {
+					sValue = sInnerUrl;
 				} else if (sValue === "''" || sValue === "none") {
 					sValue = null;
 				}
@@ -638,9 +662,9 @@ sap.ui.define([
 		sParamName = sParamName || "sapUiGlobalLogo";
 		let logo = Parameters.get(sParamName);
 		if (logo) {
-			const match = rCssUrl.exec(logo);
-			if (match) {
-				logo = match[1];
+			const sInnerUrl = unwrapCssUrl(logo);
+			if (sInnerUrl !== undefined) {
+				logo = sInnerUrl;
 			} else if (logo === "''" || logo === "none") {
 				logo = null;
 			}
