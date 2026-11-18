@@ -4,12 +4,14 @@ sap.ui.define([
 	"sap/ui/core/XMLTemplateProcessor",
 	"sap/ui/core/mvc/View",
 	"sap/ui/core/mvc/XMLView",
+	"sap/ui/core/mvc/Controller",
+	"sap/ui/model/json/JSONModel",
 	"sap/ui/util/XMLHelper",
 	"sap/base/future",
 	"sap/base/Log",
 	"sap/ui/base/DesignTime",
 	"sap/ui/thirdparty/jquery"
-], function (coreLibrary, XMLTemplateProcessor, View, XMLView, XMLHelper, future, Log, DesignTime, jQuery) {
+], function (coreLibrary, XMLTemplateProcessor, View, XMLView, Controller, JSONModel, XMLHelper, future, Log, DesignTime, jQuery) {
 	"use strict";
 
 	// shortcut for sap.ui.core.mvc.ViewType
@@ -898,6 +900,60 @@ sap.ui.define([
 			assert.ok(mCustomSettingsClone["sap.ui.dt"]["test"] === "testvalue","Custom Settings available for clone in namespace sap.ui.dt/test");
 			assert.ok(mCustomSettingsClone["notexisting"] === undefined,"Custom Settings available for clone with not existing namespace");
 		});
+	});
+
+	QUnit.module("sap.html inline text content (single text child shorthand)");
+
+	QUnit.test("binding with controller formatter is resolved for inline text", async function (assert) {
+		const FormatController = Controller.extend("test.html.FormatController", {
+			formatK: function (iValue) {
+				return (iValue / 1000) + "k";
+			}
+		});
+		const oController = new FormatController();
+
+		// A sap.html node whose ONLY child is a text node carrying a binding with a
+		// controller formatter. This hits the "text property shorthand" in XMLTemplateProcessor.
+		const sInlineTextView =
+			'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.html">' +
+				'<span id="inlineText">{ path: \'/linesofcode\', formatter: \'.formatK\' }</span>' +
+			'</mvc:View>';
+
+		const oView = await XMLView.create({
+			definition: sInlineTextView,
+			controller: oController
+		});
+		oView.setModel(new JSONModel({ linesofcode: 42000 }));
+
+		const oSpan = oView.byId("inlineText");
+		assert.strictEqual(oSpan.getText(), "42k",
+			"controller formatter '.formatK' was resolved and its result applied to the 'text' property");
+
+		oView.destroy();
+	});
+
+	QUnit.test("binding with a core:require formatter on the inline-text node is resolved", async function (assert) {
+		// The core:require is declared on the very node that carries the inline text. The
+		// formatter 'Capitalize' must be resolved from that require context, which means the
+		// text content has to be parsed within the resolved require-context chain (not the raw
+		// string shorthand).
+		const sInlineRequireView =
+			'<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns="sap.html">' +
+				'<span id="inlineRequireText" core:require="{Capitalize: \'sap/base/strings/capitalize\'}">' +
+					'{ path: \'/word\', formatter: \'Capitalize\' }' +
+				'</span>' +
+			'</mvc:View>';
+
+		const oView = await XMLView.create({
+			definition: sInlineRequireView
+		});
+		oView.setModel(new JSONModel({ word: "hello" }));
+
+		const oSpan = oView.byId("inlineRequireText");
+		assert.strictEqual(oSpan.getText(), "Hello",
+			"core:require formatter 'Capitalize' was resolved from the node's require context and applied to 'text'");
+
+		oView.destroy();
 	});
 
 });

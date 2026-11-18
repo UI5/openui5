@@ -1338,7 +1338,8 @@ function(
 							sName = attr.name,
 							sNamespace = attr.namespaceURI,
 							oInfo = mKnownSettings[sName],
-							sValue = attr.value;
+							sValue = attr.value,
+							sLocalName = localName(attr);
 
 						if (bViewRootNode && VIEW_SPECIAL_ATTRIBUTES.includes(sName)) {
 							continue;
@@ -1349,7 +1350,7 @@ function(
 							const sKey = sName.substring(5);
 							aCustomData.push(new CustomData({
 								key: sKey,
-								value: sValue,
+								value: parseScalarType("any", sValue, sLocalName, oView._oContainingView.oController, oRequireModules, aTypePromises, mAdditionalBindableValues),
 								writeToDom: true
 							}));
 							continue;
@@ -1406,7 +1407,6 @@ function(
 						} else if (sName.indexOf(":") > -1) {  // namespace-prefixed attribute found
 							sNamespace = attr.namespaceURI;
 							if (sNamespace === CUSTOM_DATA_NAMESPACE) {  // CustomData attribute found
-								var sLocalName = localName(attr);
 								aCustomData.push(new CustomData({
 									key: sLocalName,
 									value: parseScalarType("any", sValue, sLocalName, oView._oContainingView.oController, oRequireModules, aTypePromises, mAdditionalBindableValues)
@@ -1584,8 +1584,27 @@ function(
 					if (sTextContent) {
 						// The text-node is the only childNode -> nothing needs to be aggregated
 						if (node.childNodes?.length === 1) {
-							mSettings.text = sTextContent;
-							return;
+							// Run the text content through the same scalar-type/binding resolution as
+							// regular attributes, so that bindings with formatters and types are resolved correctly.
+							// We need to chain to pRequireContext to allow a "core:require" declared on this node to
+							// be resolved so that we can feed it as the "env" into the binding-parser (similar to the regular attribute processing loop).
+							return pRequireContext.then(function(oRequireModules) {
+								// collect async type-loading Promises (async mode only) and wait for them
+								// below, so the type classes are loaded before the control is instantiated.
+								var aTypePromises = bAsync ? [] : undefined;
+								mSettings.text = parseScalarType(
+									"string",
+									sTextContent,
+									"text",
+									oView._oContainingView.oController,
+									oRequireModules,
+									aTypePromises,
+									mAdditionalBindableValues
+								);
+								// handleChildren() gates its ".then" (where the instance is created) on
+								// this returned Promise, so the awaited types are ready in time.
+								return aTypePromises && Promise.all(aTypePromises);
+							});
 						} else {
 							// Mixed content: the text is only one of several child nodes, so it cannot
 							// be mapped to the parent's "text" property. We wrap the raw text content in a
