@@ -377,11 +377,11 @@ function(
 	};
 
 	Link.prototype.onAccKeysHighlightStart = function () {
-		setRefLabelsHighlightAccKeysRef.call(this, true);
+		this._setRefLabelsHighlightAccKeysRef(true);
 	};
 
 	Link.prototype.onAccKeysHighlightEnd = function () {
-		setRefLabelsHighlightAccKeysRef.call(this, false);
+		this._setRefLabelsHighlightAccKeysRef(false);
 	};
 
 	Link.prototype.onAfterRendering = function() {
@@ -659,11 +659,16 @@ function(
 	};
 
 
-	var setRefLabelsHighlightAccKeysRef = function (bHighlightAccKeysRef) {
-		var aLabels = this.getAriaLabelledBy();
+	/**
+	 * Sets the <code>highlightAccKeysRef</code> property on the first aria-labelledby label and updates the accesskey.
+	 * @param {boolean} bHighlightAccKeysRef whether to highlight the access keys reference
+	 * @private
+	 */
+	Link.prototype._setRefLabelsHighlightAccKeysRef = function (bHighlightAccKeysRef) {
+		const aLabels = this.getAriaLabelledBy();
 
 		if (aLabels.length) {
-			var oLabel = Element.getElementById(aLabels[0]);
+			const oLabel = Element.getElementById(aLabels[0]);
 
 			oLabel.setProperty("highlightAccKeysRef", bHighlightAccKeysRef);
 
