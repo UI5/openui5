@@ -16,6 +16,16 @@ sap.ui.define([
 		});
 	}
 
+	function hoverAndGetHorizontalAlign(oTitle) {
+		const oOpenByStub = sinon.stub(Tooltip.prototype, "openBy");
+		try {
+			oTitle.getDomRef().dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+			return oOpenByStub.called ? oOpenByStub.thisValues[0].getHorizontalAlign() : null;
+		} finally {
+			oOpenByStub.restore();
+		}
+	}
+
 	function focusAndGetTooltipText(oTitle) {
 		const oDomRef = oTitle.getDomRef();
 		const fnOrigMatches = oDomRef.matches;
@@ -423,10 +433,9 @@ sap.ui.define([
 		}
 	});
 
-	QUnit.test("Tooltip anchors to the text when the title is not truncated", async function(assert) {
-		// Short text in a wide container: the anchor is the inner text span, not the
-		// wide container. Hovering the container's empty area (outside the text) must
-		// therefore not open the tooltip - it would appear detached from the text.
+	QUnit.test("Tooltip anchors to the root element when the title is not truncated", async function(assert) {
+		// The tooltip always anchors to the top root element, so hovering anywhere in
+		// the container - including empty area of a wide container - opens the tooltip.
 		this.oTitle = new Title({
 			text: "Short",
 			tooltip: "Custom tooltip",
@@ -436,13 +445,13 @@ sap.ui.define([
 		await nextUIUpdate(this.clock);
 
 		const sText = hoverAndGetTooltipText(this.oTitle);
-		assert.strictEqual(sText, "",
-			"hovering the empty area of the wide container does not open the tooltip - it is anchored to the text, not the container");
+		assert.strictEqual(sText, "Custom tooltip",
+			"hovering the wide container opens the tooltip - it is anchored to the root element");
 	});
 
-	QUnit.test("Tooltip anchors to the container when the title is truncated", async function(assert) {
-		// Long text in a narrow container: the anchor is the container itself, so
-		// hovering it opens the tooltip (the text fills the whole container).
+	QUnit.test("Tooltip anchors to the root element when the title is truncated", async function(assert) {
+		// Long text in a narrow container: the anchor is the root element, so
+		// hovering it opens the tooltip.
 		this.oTitle = new Title({
 			text: "Very long title text that will definitely be truncated",
 			tooltip: "Custom tooltip",
@@ -453,6 +462,20 @@ sap.ui.define([
 
 		const sText = hoverAndGetTooltipText(this.oTitle);
 		assert.strictEqual(sText, "Custom tooltip",
-			"hovering the truncated title opens the tooltip - it is anchored to the container");
+			"hovering the truncated title opens the tooltip - it is anchored to the root element");
+	});
+
+	QUnit.test("Title tooltip opens with Begin horizontal alignment", async function(assert) {
+		// Title passes horizontalAlign: Begin to TooltipEnablement; assert via the openBy stub.
+		this.oTitle = new Title({
+			text: "Title with tooltip",
+			tooltip: "Custom tooltip"
+		});
+		this.oTitle.placeAt("qunit-fixture");
+		await nextUIUpdate(this.clock);
+
+		const sAlign = hoverAndGetHorizontalAlign(this.oTitle);
+		assert.strictEqual(sAlign, "Begin",
+			"Title's inner tooltip has Begin horizontal alignment");
 	});
 });

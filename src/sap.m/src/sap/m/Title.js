@@ -28,6 +28,9 @@ sap.ui.define([
 	// shortcut for sap.m.WrappingType
 	var WrappingType = library.WrappingType;
 
+	// shortcut for sap.ui.core.popover.PopoverHorizontalAlign
+	var PopoverHorizontalAlign = coreLibrary.popover.PopoverHorizontalAlign;
+
 	/**
 	 * Constructor for a new Title control.
 	 *
@@ -197,35 +200,6 @@ sap.ui.define([
 	});
 
 	/**
-	 * Returns the DOM element to use for tooltip positioning.
-	 *
-	 * This method is called ONLY on user interaction (hover/focus).
-	 * It performs DOM measurements to determine the optimal anchor element:
-	 * - If text is truncated: returns outer element (tooltip spans full width)
-	 * - If text is not truncated: returns inner element (tooltip aligns with text)
-	 *
-	 * This lazy evaluation ensures no layout thrashing during batch rendering of multiple titles.
-	 * The method is invoked via TooltipEnablement's domRefProvider callback when the tooltip opens.
-	 *
-	 * @returns {HTMLElement|null} The DOM element for tooltip positioning
-	 * @private
-	 */
-	Title.prototype._getTooltipAnchorElement = function() {
-		const oOuterDomRef = this.getDomRef();
-		const oInnerDomRef = this.getDomRef("inner");
-
-		if (!oOuterDomRef || !oInnerDomRef) {
-			return oOuterDomRef || oInnerDomRef || null;
-		}
-
-		if (oOuterDomRef.scrollWidth > oOuterDomRef.clientWidth) {
-			return oOuterDomRef;
-		}
-
-		return oInnerDomRef;
-	};
-
-	/**
 	 * Initializes the Title control.
 	 * Sets up TooltipEnablement for Enhanced Tooltip support.
 	 *
@@ -236,8 +210,8 @@ sap.ui.define([
 			this._oTooltipEnablement = new TooltipEnablement(this, {
 				textProvider: this._getEnhancedTooltipText.bind(this),
 				invisibleTextProvider: this._getTooltipText.bind(this),
-				domRefProvider: this._getTooltipAnchorElement.bind(this),
-				focusDomRefProvider: () => this.getDomRef()
+				domRefProvider: () => this.getDomRef(),
+				horizontalAlign: PopoverHorizontalAlign.Begin
 			});
 		}
 

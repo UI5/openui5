@@ -30,6 +30,7 @@ sap.ui.define([
 		 * @param {function():string} [oConfig.invisibleTextProvider] Callback that builds the text written into the invisible ARIA anchor. Falls back to <code>textProvider</code> when omitted.
 		 * @param {function():HTMLElement} [oConfig.domRefProvider] Callback that returns the DOM element for hover events (mouseenter/mouseleave) and tooltip positioning. Defaults to <code>oHost.getFocusDomRef()</code>.
 		 * @param {function():HTMLElement} [oConfig.focusDomRefProvider] Callback that returns the DOM element for focus events (focusin/focusout). Defaults to <code>domRefProvider</code>. Override this when focus events should attach to a different element than hover events.
+		 * @param {sap.ui.core.popover.PopoverHorizontalAlign} [oConfig.horizontalAlign] Horizontal alignment of the tooltip relative to its target, forwarded to the inner {@link sap.ui.core.tooltip.Tooltip#setHorizontalAlign}. Only takes effect for the <code>Top</code> and <code>Bottom</code> placements. Defaults to the <code>Tooltip</code>'s own default (<code>Center</code>).
 		 * @param {string} [oConfig.invisibleTooltipIdSuffix="-invisibleTooltip"] Suffix for the invisible ARIA anchor's id. Set a distinct value when one host owns several <code>TooltipEnablement</code>s so each anchor id stays unique.
 		 * @param {boolean} [oConfig.enableForTouchDevices=true] Whether long-press should open the tooltip on touch devices. Use this to disable it for links.
 		 *
@@ -216,6 +217,7 @@ sap.ui.define([
 				this._fnInvisibleTextProvider = oConfig.invisibleTextProvider;
 				this._fnDomRefProvider = oConfig.domRefProvider || (() => oHost.getFocusDomRef());
 				this._fnFocusDomRefProvider = oConfig.focusDomRefProvider || this._fnDomRefProvider;
+				this._sHorizontalAlign = oConfig.horizontalAlign;
 				this._sInvisibleTooltipIdSuffix = oConfig.invisibleTooltipIdSuffix || "-invisibleTooltip";
 
 				this._oTooltip = null;
@@ -445,6 +447,10 @@ sap.ui.define([
 				afterOpen: () => this.fireEvent("afterOpen"),
 				afterClose: () => this.fireEvent("afterClose")
 			});
+
+			if (this._sHorizontalAlign) {
+				this._oTooltip.setHorizontalAlign(this._sHorizontalAlign);
+			}
 
 			return this._oTooltip;
 		};
