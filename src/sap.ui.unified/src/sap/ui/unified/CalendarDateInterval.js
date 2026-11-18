@@ -793,6 +793,7 @@ sap.ui.define([
 	CalendarDateInterval.prototype._updateHeader = function(oDate){
 
 		this._setHeaderText(oDate);
+		this._updateHeaderButtonsLabels();
 		switch (this._iMode) {
 			case 0: // date picker
 				this._togglePrevNext(oDate, true);
@@ -808,6 +809,62 @@ sap.ui.define([
 			// no default
 		}
 
+	};
+
+	/**
+	 * Updates the previous/next header button labels to match the navigation step of the current view.
+	 * @private
+	 */
+	/**
+	 * Returns the singular or plural navigation-button label depending on the count.
+	 * @param {module:sap/base/i18n/ResourceBundle} oRB The resource bundle
+	 * @param {int} iCount The number of units the button navigates by
+	 * @param {string} sSingularKey The i18n key used when the count is 1
+	 * @param {string} sPluralKey The i18n key used otherwise (with a {0} placeholder)
+	 * @returns {string} The label text
+	 * @private
+	 */
+	CalendarDateInterval.prototype._getNavButtonLabel = function(oRB, iCount, sSingularKey, sPluralKey) {
+		return iCount === 1 ? oRB.getText(sSingularKey) : oRB.getText(sPluralKey, [iCount]);
+	};
+
+	/**
+	 * Updates the previous/next header button labels to match the navigation step of the current view.
+	 * @private
+	 */
+	CalendarDateInterval.prototype._updateHeaderButtonsLabels = function(){
+		var oHeader = this.getAggregation("header"),
+			oRB = this._oResourceBundle,
+			sPrev = "",
+			sNext = "",
+			iDays,
+			iMonths,
+			iYears,
+			oMonthPicker,
+			oYearPicker;
+
+		if (this._iMode === 0) {
+			iDays = this._getDays();
+			sPrev = this._getNavButtonLabel(oRB, iDays, "CALENDAR_BTN_PREV_DAYS_SINGULAR", "CALENDAR_BTN_PREV_DAYS_PLURAL");
+			sNext = this._getNavButtonLabel(oRB, iDays, "CALENDAR_BTN_NEXT_DAYS_SINGULAR", "CALENDAR_BTN_NEXT_DAYS_PLURAL");
+		} else if (this._iMode === 1) {
+			oMonthPicker = this._getMonthPicker();
+			if (oMonthPicker) {
+				iMonths = oMonthPicker.getMonths();
+				sPrev = this._getNavButtonLabel(oRB, iMonths, "CALENDAR_BTN_PREV_MONTHS_SINGULAR", "CALENDAR_BTN_PREV_MONTHS_PLURAL");
+				sNext = this._getNavButtonLabel(oRB, iMonths, "CALENDAR_BTN_NEXT_MONTHS_SINGULAR", "CALENDAR_BTN_NEXT_MONTHS_PLURAL");
+			}
+		} else if (this._iMode === 2) {
+			oYearPicker = this._getYearPicker();
+			if (oYearPicker) {
+				iYears = oYearPicker.getYears();
+				sPrev = this._getNavButtonLabel(oRB, iYears, "CALENDAR_BTN_PREV_YEARS_SINGULAR", "CALENDAR_BTN_PREV_YEARS_PLURAL");
+				sNext = this._getNavButtonLabel(oRB, iYears, "CALENDAR_BTN_NEXT_YEARS_SINGULAR", "CALENDAR_BTN_NEXT_YEARS_PLURAL");
+			}
+		}
+
+		oHeader.setProperty("_prevButtonLabel", sPrev);
+		oHeader.setProperty("_nextButtonLabel", sNext);
 	};
 
 

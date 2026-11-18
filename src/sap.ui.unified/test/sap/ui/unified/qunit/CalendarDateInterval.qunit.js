@@ -18,8 +18,10 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/date/UI5Date",
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/core/Lib",
 	"sap/ui/qunit/utils/nextUIUpdate"
-], function(Localization, Element, KeyCodes, qutils, CalendarDateInterval, CalendarType, Locale, LocaleData, DateFormat, DateRange, DateTypeRange, CalendarDate, CalendarWeekInterval, WeeksRow, Device, jQuery, UI5Date, nextUIUpdate) {
+], function(Localization, Element, KeyCodes, qutils, CalendarDateInterval, CalendarType, Locale, LocaleData, DateFormat, DateRange, DateTypeRange, CalendarDate, CalendarWeekInterval, WeeksRow, Device, jQuery, UI5Date, TooltipEnablement, Library, nextUIUpdate) {
 	"use strict";
 
 	// set language to en-US, since we have specific language strings tested
@@ -1475,6 +1477,73 @@ sap.ui.define([
 
 		//clean
 		oCDI.destroy();
+	});
+
+	QUnit.module("Header prev/next button labels", {
+		beforeEach: function() {
+			this.oFlagStub = sinon.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+			this.oRB = Library.getResourceBundleFor("sap.ui.unified");
+		},
+		afterEach: function() {
+			this.oFlagStub.restore();
+		}
+	});
+
+	function getHeaderButton(oCal, sWhich) {
+		return document.getElementById(oCal.getAggregation("header").getId() + "-" + sWhich);
+	}
+
+	QUnit.test("Labels reflect the navigation step of each view", async function(assert) {
+		this.oFlagStub.returns(false);
+		var oRB = this.oRB;
+		var oCal = new CalendarDateInterval("di-labels", { days: 8, startDate: UI5Date.getInstance(2015, 1, 2) }).placeAt("qunit-fixture");
+		await nextUIUpdate();
+		var sHeaderId = oCal.getAggregation("header").getId();
+
+		assert.strictEqual(getHeaderButton(oCal, "next").getAttribute("aria-label"), oRB.getText("CALENDAR_BTN_NEXT_DAYS_PLURAL", [8]), "dates view: label is the day interval");
+
+		qutils.triggerEvent("click", sHeaderId + "-B1"); // open month picker: ceil(8/3) = 3 months
+		await nextUIUpdate();
+		assert.strictEqual(getHeaderButton(oCal, "next").getAttribute("aria-label"), oRB.getText("CALENDAR_BTN_NEXT_MONTHS_PLURAL", [3]), "month picker: label is the month page size");
+
+		qutils.triggerEvent("click", sHeaderId + "-B2"); // open year picker: floor(8/2) = 4 years
+		await nextUIUpdate();
+		assert.strictEqual(getHeaderButton(oCal, "next").getAttribute("aria-label"), oRB.getText("CALENDAR_BTN_NEXT_YEARS_PLURAL", [4]), "year picker: label is the year page size");
+
+		oCal.destroy();
+	});
+
+	QUnit.test("Native mode sets title + aria-description, enhanced mode sets aria-label only", async function(assert) {
+		var oRB = this.oRB,
+			sLabel = oRB.getText("CALENDAR_BTN_NEXT_DAYS_PLURAL", [8]),
+			sTitle = sLabel + " (" + oRB.getText("CALENDAR_BTN_NEXT_MONTH_SHORTCUT") + ")";
+
+		this.oFlagStub.returns(false);
+		var oCal = new CalendarDateInterval("di-native", { days: 8, startDate: UI5Date.getInstance(2015, 1, 2) }).placeAt("qunit-fixture");
+		await nextUIUpdate();
+		var oNext = getHeaderButton(oCal, "next");
+		assert.strictEqual(oNext.getAttribute("aria-label"), sLabel, "native: aria-label is the interval label");
+		assert.strictEqual(oNext.getAttribute("title"), sTitle, "native: title is the label plus the shortcut");
+		assert.strictEqual(oNext.getAttribute("aria-description"), sLabel, "native: aria-description equals the label");
+		oCal.destroy();
+
+		this.oFlagStub.returns(true);
+		oCal = new CalendarDateInterval("di-enhanced", { days: 8, startDate: UI5Date.getInstance(2015, 1, 2) }).placeAt("qunit-fixture");
+		await nextUIUpdate();
+		oNext = getHeaderButton(oCal, "next");
+		assert.strictEqual(oNext.getAttribute("aria-label"), sLabel, "enhanced: aria-label is the interval label");
+		assert.strictEqual(oNext.getAttribute("title"), null, "enhanced: no title");
+		assert.strictEqual(oNext.getAttribute("aria-description"), null, "enhanced: no aria-description");
+		oCal.destroy();
+	});
+
+	QUnit.test("Single-unit intervals use the singular label", async function(assert) {
+		this.oFlagStub.returns(false);
+		var oRB = this.oRB;
+		var oCal = new CalendarDateInterval("di-single", { days: 1, startDate: UI5Date.getInstance(2015, 1, 2) }).placeAt("qunit-fixture");
+		await nextUIUpdate();
+		assert.strictEqual(getHeaderButton(oCal, "next").getAttribute("aria-label"), oRB.getText("CALENDAR_BTN_NEXT_DAYS_SINGULAR"), "single day uses the singular label");
+		oCal.destroy();
 	});
 
 });

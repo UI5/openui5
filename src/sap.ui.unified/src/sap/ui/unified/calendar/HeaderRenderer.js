@@ -99,6 +99,19 @@ sap.ui.define([
 			sPrevBtnMainLabel = oRB.getText("CALENDAR_BTN_PREV_YEAR_RANGE_TITLE");
 		}
 
+		// Interval controls override the main label per view; the year-range picker keeps its default.
+		const bApplyIntervalLabel = sPicker !== CALENDAR_PICKERS.YEAR_RANGE_PICKER;
+		if (bApplyIntervalLabel) {
+			const sPrevButtonLabelOverride = oHead.getProperty("_prevButtonLabel");
+			const sNextButtonLabelOverride = oHead.getProperty("_nextButtonLabel");
+			if (sPrevButtonLabelOverride) {
+				sPrevBtnMainLabel = sPrevButtonLabelOverride;
+			}
+			if (sNextButtonLabelOverride) {
+				sNextBtnMainLabel = sNextButtonLabelOverride;
+			}
+		}
+
 		const sNextBtnTitle = `${sNextBtnMainLabel} (${sNextBtnShortCut})`;
 		const sPrevBtnTitle = `${sPrevBtnMainLabel} (${sPrevBtnShortCut})`;
 

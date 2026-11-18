@@ -15,8 +15,10 @@ sap.ui.define([
 	"sap/ui/events/KeyCodes",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/core/Core",
-	"sap/ui/core/date/UI5Date"
-], function(Localization, Element, qutils, CalendarMonthInterval, CalendarLegend, CalendarLegendItem, DateRange, DateTypeRange, Button, unifiedLibrary, DateFormat, KeyCodes, jQuery, oCore, UI5Date) {
+	"sap/ui/core/date/UI5Date",
+	"sap/ui/core/tooltip/TooltipEnablement",
+	"sap/ui/core/Lib"
+], function(Localization, Element, qutils, CalendarMonthInterval, CalendarLegend, CalendarLegendItem, DateRange, DateTypeRange, Button, unifiedLibrary, DateFormat, KeyCodes, jQuery, oCore, UI5Date, TooltipEnablement, Library) {
 	"use strict";
 
 	// set language to en-US, since we have specific language strings tested
@@ -1129,6 +1131,35 @@ sap.ui.define([
 		var oFocusedDate = this.oMonthsRow.getProperty("_focusedDate");
 		assert.notOk(oFocusedDate,
 			"_focusedDate is NOT set on MonthsRow when intervalSelection=false");
+	});
+
+	QUnit.module("Header prev/next button labels", {
+		beforeEach: function() {
+			this.oFlagStub = sinon.stub(TooltipEnablement, "isEnhancedTooltipEnabled");
+			this.oRB = Library.getResourceBundleFor("sap.ui.unified");
+		},
+		afterEach: function() {
+			this.oFlagStub.restore();
+		}
+	});
+
+	function getHeaderButton(oCal, sWhich) {
+		return document.getElementById(oCal.getAggregation("header").getId() + "-" + sWhich);
+	}
+
+	QUnit.test("Labels reflect the navigation step of each view", function(assert) {
+		this.oFlagStub.returns(false);
+		var oRB = this.oRB;
+		var oCal = new CalendarMonthInterval("mi-labels", { months: 12, startDate: UI5Date.getInstance(2015, 2, 10) }).placeAt("qunit-fixture");
+		oCore.applyChanges();
+
+		assert.strictEqual(getHeaderButton(oCal, "next").getAttribute("aria-label"), oRB.getText("CALENDAR_BTN_NEXT_MONTHS_PLURAL", [12]), "months row: label is the month interval");
+
+		qutils.triggerEvent("click", oCal.getAggregation("header").getId() + "-B2"); // open year picker: floor(12/2) = 6 years
+		oCore.applyChanges();
+		assert.strictEqual(getHeaderButton(oCal, "next").getAttribute("aria-label"), oRB.getText("CALENDAR_BTN_NEXT_YEARS_PLURAL", [6]), "year picker: label is the year page size");
+
+		oCal.destroy();
 	});
 
 });

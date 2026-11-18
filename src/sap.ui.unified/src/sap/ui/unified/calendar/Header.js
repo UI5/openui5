@@ -203,6 +203,24 @@ sap.ui.define([
 			_currentPicker : {type : "string", group : "Appearance", visibility: "hidden"},
 
 			/**
+			 * Custom main label for the previous button, overriding the default view-based text.
+			 * Used by interval controls (e.g. CalendarDateInterval) to express the navigation step
+			 * in their own unit (e.g. "Previous 8 days"). Empty string falls back to the default. - private property
+			 * @since 1.156
+			 * @private
+			 */
+			_prevButtonLabel : {type : "string", group : "Misc", visibility: "hidden", defaultValue: ""},
+
+			/**
+			 * Custom main label for the next button, overriding the default view-based text.
+			 * Used by interval controls (e.g. CalendarDateInterval) to express the navigation step
+			 * in their own unit (e.g. "Next 8 days"). Empty string falls back to the default. - private property
+			 * @since 1.156
+			 * @private
+			 */
+			_nextButtonLabel : {type : "string", group : "Misc", visibility: "hidden", defaultValue: ""},
+
+			/**
 			 * Alignment of the left content area. Possible values: "Start", "Center", "End".
 			 * @private
 			 */
