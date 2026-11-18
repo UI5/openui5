@@ -2081,7 +2081,7 @@ sap.ui.define([
 				showWeekNumbersHeader: true,
 				specialDates: [this.oSpecialDate]
 			});
-			this.oCal.placeAt("content");
+			this.oCal.placeAt("qunit-fixture");
 			await nextUIUpdate();
 			this.oMonth = this.oCal.getAggregation("month")[0];
 			this.oMonth.setTooltip("My Month");
@@ -2163,7 +2163,7 @@ sap.ui.define([
 				showWeekNumbers: true,
 				intervalSelection: true
 			});
-			this.oCal.placeAt("content");
+			this.oCal.placeAt("qunit-fixture");
 			await nextUIUpdate();
 			this.oMonth = this.oCal.getAggregation("month")[0];
 		},
@@ -2237,7 +2237,7 @@ sap.ui.define([
 			showWeekNumbers: true,
 			intervalSelection: false
 		});
-		oCalNoInterval.placeAt("content");
+		oCalNoInterval.placeAt("qunit-fixture");
 		await nextUIUpdate();
 		const oMonth = oCalNoInterval.getAggregation("month")[0];
 
@@ -2267,7 +2267,7 @@ sap.ui.define([
 			showWeekNumbers: true,
 			intervalSelection: false
 		});
-		oCalNoInterval.placeAt("content");
+		oCalNoInterval.placeAt("qunit-fixture");
 		await nextUIUpdate();
 		const oMonth = oCalNoInterval.getAggregation("month")[0];
 

@@ -3931,7 +3931,7 @@ sap.ui.define([
 				tooltip: "My Calendar",
 				initialFocusedDate: UI5Date.getInstance(2024, 0, 1)
 			});
-			this.oCal.placeAt("content");
+			this.oCal.placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
 		afterEach: function() {

@@ -764,7 +764,7 @@ sap.ui.define([
 		//Prepare
 		var done = assert.async();
 
-		var oDTP = new DateTimePicker().placeAt("content");
+		var oDTP = new DateTimePicker().placeAt("qunit-fixture");
 		await nextUIUpdate();
 
 		oDTP._createPopup();
