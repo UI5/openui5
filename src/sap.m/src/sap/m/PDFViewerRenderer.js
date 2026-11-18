@@ -15,6 +15,10 @@ sap.ui.define(['sap/ui/Device', "sap/base/Log", "sap/base/security/URLListValida
 			"application/x-google-chrome-pdf"
 		]);
 
+		var mPDFViewerErrorType = Object.freeze({
+			PLUGIN_NOT_ENABLED: "PLUGIN_NOT_ENABLED"
+		});
+
 		/**
 		 * Pdf viewer renderer.
 		 * @namespace
@@ -161,7 +165,7 @@ sap.ui.define(['sap/ui/Device', "sap/base/Log", "sap/base/security/URLListValida
 
 			if (!PDFViewerRenderer._isPdfPluginEnabled()) {
 				Log.warning("Either Inline viewing of pdf is disabled or pdf plug-in is unavailable on this device.");
-				oControl.fireEvent("error", {}, true);
+				oControl.fireError({ target: null, errorType: mPDFViewerErrorType.PLUGIN_NOT_ENABLED });
 			}
 		};
 
