@@ -140,6 +140,17 @@ sap.ui.define(function() {
 					}
 				}
 			},
+			"IconPool-SVG": {
+				title: "sap.ui.core.IconPool SVG",
+				ui5: {
+					libs: "sap.ui.core"
+				},
+				loader: {
+					paths: {
+						"testdata/iconsvg": "test-resources/sap/ui/core/qunit/testdata/iconsvg"
+					}
+				}
+			},
 			"IconPool-custom-theme": {
 				title: "sap.ui.core.IconPool: Custom theme",
 				ui5: {

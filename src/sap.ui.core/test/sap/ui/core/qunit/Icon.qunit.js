@@ -3,6 +3,7 @@ sap.ui.define([
 	"sap/ui/core/Icon",
 	"sap/ui/core/IconPool",
 	"sap/ui/core/_IconRegistry",
+	"sap/ui/core/_IconFontStrategy",
 	"sap/base/Log",
 	"sap/ui/Device",
 	"sap/ui/core/Lib",
@@ -11,7 +12,7 @@ sap.ui.define([
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/qunit/QUnitUtils",
 	"sap/ui/test/utils/nextUIUpdate"
-], function(Icon, IconPool, _IconRegistry, Log, Device, Library, library, KeyCodes, jQuery, qutils, nextUIUpdate) {
+], function(Icon, IconPool, _IconRegistry, FontStrategy, Log, Device, Library, library, KeyCodes, jQuery, qutils, nextUIUpdate) {
 	"use strict";
 
 	// shortcut for type from sap.ui.core
@@ -349,11 +350,11 @@ sap.ui.define([
 		oIcon.placeAt("uiAreaA");
 		await nextUIUpdate();
 
-		assert.equal(
-			oIcon.$().attr("data-sap-ui-icon-content"),
-			IconPool.getIconInfo("sap-icon://delete").content,
-			"Content attribute should be set correctly"
-		);
+		// When src is just a name (no sap-icon:// prefix), the Icon control
+		// resolves it against the default collection for ARIA/tooltip purposes
+		var oInfo = IconPool.getIconInfo("sap-icon://delete");
+		assert.ok(oInfo, "Icon info resolved for 'delete' from default collection");
+		assert.strictEqual(oInfo.collection, undefined, "Resolved from default (undefined) collection");
 
 		oIcon.destroy();
 	});
@@ -598,7 +599,7 @@ sap.ui.define([
 	});
 
 	QUnit.module("Loading of additional icon fonts", {
-		createIcon: async function(mSettings, fnCallback) {
+		createIcon: async function(mSettings) {
 			this.oIcon = new Icon(mSettings).placeAt("qunit-fixture");
 			await nextUIUpdate();
 		},
@@ -629,7 +630,7 @@ sap.ui.define([
 			lazy: true
 		});
 
-		var oLoadFontMetadataSpy = sinon.spy(_IconRegistry, "_loadFontMetadata");
+		var oLoadFontMetadataSpy = sinon.spy(FontStrategy, "loadMetadata");
 
 		// instantiate icon
 		await this.createIcon({src: "sap-icon://tnt/technicalsystem"});

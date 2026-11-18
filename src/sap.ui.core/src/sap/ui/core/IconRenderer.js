@@ -1,18 +1,23 @@
 /*!
  * ${copyright}
  */
-sap.ui.define(['./_IconRegistry', './library', "sap/base/security/encodeCSS"], function(_IconRegistry, library, encodeCSS) {
+sap.ui.define([
+	'./_IconRegistry',
+	'./_IconSVGStrategy',
+	'./library',
+	'sap/base/security/encodeCSS'
+], function(_IconRegistry, SVGStrategy, library, encodeCSS) {
 	"use strict";
 
 	// shortcut for enum(s)
-	var IconColor = library.IconColor;
+	const IconColor = library.IconColor;
 
 	/**
 	 * Font-Icon renderer.
 	 * @namespace
 	 * @alias sap.ui.core.IconRenderer
 	 */
-	var IconRenderer = {
+	const IconRenderer = {
 		apiVersion: 2
 	};
 
@@ -24,17 +29,16 @@ sap.ui.define(['./_IconRegistry', './library', "sap/base/security/encodeCSS"], f
 	 */
 	IconRenderer.render = function(oRm, oControl) {
 		// write the HTML into the render manager
-		var vIconInfo = _IconRegistry.getIconInfo(oControl.getSrc(), undefined, "mixed"),
-			sWidth = oControl.getWidth(),
+		const vIconInfo = _IconRegistry.getIconInfo(oControl.getSrc(), undefined, "mixed");
+
+		const sWidth = oControl.getWidth(),
 			sHeight = oControl.getHeight(),
 			sColor = oControl.getColor(),
 			sBackgroundColor = oControl.getBackgroundColor(),
 			sSize = oControl.getSize(),
-			sTitle = oControl._getOutputTitle(vIconInfo),
-			aLabelledBy,
-			oInvisibleText,
-			oAccAttributes,
-			bIconInfo = false;
+			sTitle = oControl._getOutputTitle(vIconInfo);
+
+		let aLabelledBy, oInvisibleText, oAccAttributes, bIconInfo = false;
 
 		if (vIconInfo instanceof Promise) {
 			// if the icon info is still being loaded,
@@ -54,13 +58,37 @@ sap.ui.define(['./_IconRegistry', './library', "sap/base/security/encodeCSS"], f
 		oRm.openStart("span", oControl);
 		oRm.class("sapUiIcon");
 
+		if (bIconInfo && !vIconInfo.suppressMirroring) {
+			oRm.class("sapUiIconMirrorInRTL");
+		}
+
+		const sType = bIconInfo ? vIconInfo.type : _IconRegistry.getIconType(oControl.getSrc());
+
+		if (sType === _IconRegistry.TYPE_FONT) {
+			if (bIconInfo) {
+				oRm.attr("data-sap-ui-icon-content", vIconInfo.content);
+				oRm.style("font-family", "'" + encodeCSS(vIconInfo.fontFamily) + "'");
+			}
+		} else if (sType === _IconRegistry.TYPE_SVG) {
+			oRm.class("sapUiIconSVG");
+
+			if (bIconInfo && vIconInfo.content) {
+				oRm.attr("data-sap-ui-icon-content", vIconInfo.content);
+			}
+
+			if (bIconInfo && vIconInfo.collection) {
+				oRm.attr("data-sap-ui-icon-collection", vIconInfo.collection);
+			}
+
+			if (bIconInfo) {
+				oRm.class("sapUiIconSVGMask");
+				const sCSSVar = SVGStrategy.getCSSVarName(vIconInfo);
+				oRm.style("--sapUiIconSVGMaskUrl", "var(" + sCSSVar + ")");
+			}
+		}
+
 		if (bIconInfo) {
 			oRm.accessibilityState(oControl, oAccAttributes);
-			oRm.attr("data-sap-ui-icon-content", vIconInfo.content);
-			oRm.style("font-family", "'" + encodeCSS(vIconInfo.fontFamily) + "'");
-			if (!vIconInfo.suppressMirroring) {
-				oRm.class("sapUiIconMirrorInRTL");
-			}
 		}
 
 		if (oControl.hasListeners("press")) {

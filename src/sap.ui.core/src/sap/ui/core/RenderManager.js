@@ -2273,6 +2273,12 @@ sap.ui.define([
 				aClasses = [];
 			}
 			aClasses.push("sapUiIcon");
+
+			if (oIconInfo.type === IconPool.CollectionType.SVG) {
+				aClasses.push("sapUiIconSVG");
+				aClasses.push("sapUiIconSVGMask");
+			}
+
 			if (!oIconInfo.suppressMirroring) {
 				aClasses.push("sapUiIconMirrorInRTL");
 			}
@@ -2292,12 +2298,21 @@ sap.ui.define([
 
 		if (bIconURI) {
 			mDefaultAttributes = {
-				"data-sap-ui-icon-content": oIconInfo.content,
+				"data-sap-ui-icon-content": oIconInfo.content || null,
 				"role": "presentation",
 				"title": oIconInfo.text || null
 			};
 
-			this.style("font-family", "'" + encodeCSS(oIconInfo.fontFamily) + "'");
+			if (oIconInfo.type === IconPool.CollectionType.FONT) {
+				this.style("font-family", "'" + encodeCSS(oIconInfo.fontFamily) + "'");
+			} else if (oIconInfo.type === IconPool.CollectionType.SVG) {
+				if (oIconInfo.collection) {
+					mDefaultAttributes["data-sap-ui-icon-collection"] = oIconInfo.collection;
+				}
+				const SVGStrategy = sap.ui.require("sap/ui/core/_IconSVGStrategy");
+				const sCSSVar = SVGStrategy.getCSSVarName(oIconInfo);
+				this.style("--sapUiIconSVGMaskUrl", "var(" + sCSSVar + ")");
+			}
 		} else {
 			mDefaultAttributes = {
 				role: "presentation",

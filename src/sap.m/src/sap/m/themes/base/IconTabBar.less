@@ -819,6 +819,17 @@
 	user-select: none;
 }
 
+/*
+ * SVG icons render their ::before as position: absolute (out of flow),
+ * leaving no in-flow content in the inline-flex box. This causes the
+ * baseline to fall to the bottom margin edge, adding extra space below
+ * the icon in the line box. vertical-align: top avoids this; it is safe
+ * here because the icon is the sole inline element in .sapMITBTab.
+ */
+.sapMITBFilterIcon.sapUiIconSVG {
+	vertical-align: top;
+}
+
 .sapMITBFilterNoIcon {
 	display: inline-block;
 	height: 3rem;

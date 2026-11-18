@@ -1,5 +1,5 @@
 
-/* global QUnit, TestControlRenderer */
+/* global QUnit, sinon, TestControlRenderer */
 sap.ui.define([
 	"sap/base/future",
 	"sap/ui/Device",
@@ -1736,12 +1736,12 @@ sap.ui.define([
 		var icon1 = document.getElementById("icon1");
 		assert.ok(icon1, "icon should be rendered");
 		assert.equal(icon1.tagName.toLowerCase(), "span", "Icon URI should be rendered as a span");
-		assert.equal(icon1.style["fontFamily"].replace(/"|'/g, ""), oIconInfo.fontFamily, "Icon's font family is rendered");
-		assert.equal(icon1.getAttribute("data-sap-ui-icon-content"), oIconInfo.content, "Icon content is rendered as attribute");
 		assert.ok(icon1.classList.contains("classA"), "icon has classA as a CSS class");
 		assert.ok(icon1.classList.contains("classB"), "icon has classB as a CSS class");
 		assert.ok(icon1.classList.contains("sapUiIcon"), "icon has sapUiIcon as a CSS class");
-		assert.ok(icon1.classList.contains("sapUiIconMirrorInRTL"), "icon has sapUiIconMirrorInRTL as a CSS class");
+		assert.ok(icon1.classList.contains("sapUiIconSVG"), "icon has sapUiIconSVG as a CSS class");
+		// wrench icon has suppressMirroring=false, so sapUiIconMirrorInRTL IS added
+		assert.ok(icon1.classList.contains("sapUiIconMirrorInRTL"), "sapUiIconMirrorInRTL added for SVG icon without suppressMirroring");
 		assert.equal(icon1.getAttribute("propertyA"), "valueA", "Attribute should be set");
 		assert.equal(icon1.getAttribute("propertyB"), "valueB", "Attribute should be set");
 		assert.equal(icon1.getAttribute("aria-hidden"), "true", "Attribute 'aria-hidden' should be set");
@@ -1749,7 +1749,21 @@ sap.ui.define([
 
 		document.getElementById("area6").innerHTML = "";
 
+		// Test with font icon (suppressMirroring=false) to verify the class IS added
 		rm = new RenderManager().getInterface();
+		var fnOrigGetIconInfo = IconPool.getIconInfo;
+		var oStub = sinon.stub(IconPool, "getIconInfo").callsFake(function(sIconName) {
+			var oRes = fnOrigGetIconInfo(sIconName);
+			if (oRes) {
+				oRes = Object.assign({}, oRes, {
+					type: IconPool.CollectionType.FONT,
+					suppressMirroring: false,
+					fontFamily: "SAP-icons",
+					content: ""
+				});
+			}
+			return oRes;
+		});
 		oIconInfo = IconPool.getIconInfo("calendar");
 		rm.icon(oIconInfo.uri, ["classA", "classB"], {
 			id: "icon1",
@@ -1758,16 +1772,16 @@ sap.ui.define([
 		});
 		rm.flush(document.getElementById("area6"));
 		rm.destroy();
+		oStub.restore();
 
 		icon1 = document.getElementById("icon1");
 		assert.ok(icon1, "icon should be rendered");
 		assert.equal(icon1.tagName.toLowerCase(), "span", "Icon URI should be rendered as a span");
-		assert.equal(icon1.style["fontFamily"].replace(/"|'/g, ""), oIconInfo.fontFamily, "Icon's font family is rendered");
-		assert.equal(icon1.getAttribute("data-sap-ui-icon-content"), oIconInfo.content, "Icon content is rendered as attribute");
 		assert.ok(icon1.classList.contains("classA"), "icon has classA as a CSS class");
 		assert.ok(icon1.classList.contains("classB"), "icon has classB as a CSS class");
 		assert.ok(icon1.classList.contains("sapUiIcon"), "icon has sapUiIcon as a CSS class");
-		assert.ok(!icon1.classList.contains("sapUiIconMirrorInRTL"), "icon has sapUiIconMirrorInRTL as a CSS class");
+		assert.ok(!icon1.classList.contains("sapUiIconSVG"), "sapUiIconSVG not added for font icon");
+		assert.ok(icon1.classList.contains("sapUiIconMirrorInRTL"), "sapUiIconMirrorInRTL added for font icon with suppressMirroring=false");
 		assert.equal(icon1.getAttribute("propertyA"), "valueA", "Attribute should be set");
 		assert.equal(icon1.getAttribute("propertyB"), "valueB", "Attribute should be set");
 		assert.notEqual(icon1.getAttribute("aria-label"), undefined, "Attribute aria-label should be set");
@@ -1829,6 +1843,9 @@ sap.ui.define([
 		this.stub(IconPool, "getIconInfo").callsFake(function (sIconName) {
 			var oRes = fnOrigGetIconInfo(sIconName);
 			oRes.fontFamily = sFontFamily;
+			oRes.content = "\ue000";
+			oRes.type = IconPool.CollectionType.FONT;
+			oRes.suppressMirroring = false;
 			return oRes;
 		});
 
@@ -1849,6 +1866,69 @@ sap.ui.define([
 		assert.ok(icon1.classList.contains("sapUiIcon"), "icon has sapUiIcon as a CSS class");
 		assert.ok(icon1.classList.contains("sapUiIconMirrorInRTL"), "icon has sapUiIconMirrorInRTL as a CSS class");
 		assert.notEqual(icon1.getAttribute("aria-label"), undefined, "Attribute aria-label should be set");
+
+		document.getElementById("area6").innerHTML = "";
+	});
+
+	QUnit.test("RenderManager.prototype.icon with SVG icon always uses mask-image", function(assert) {
+		var oStub = sinon.stub(IconPool, "getIconInfo").returns({
+			name: "wrench",
+			collection: undefined,
+			type: IconPool.CollectionType.SVG,
+			uri: "sap-icon://wrench",
+			text: "Wrench",
+			suppressMirroring: true,
+			id: "sapIcon-wrench",
+			cssVarPrefix: "sapIcons"
+		});
+
+		var rm = new RenderManager().getInterface();
+		rm.icon("sap-icon://wrench", [], {
+			id: "icon1"
+		});
+		rm.flush(document.getElementById("area6"));
+		rm.destroy();
+		oStub.restore();
+
+		var icon1 = document.getElementById("icon1");
+
+		assert.ok(icon1, "icon should be rendered");
+		assert.ok(icon1.classList.contains("sapUiIconSVG"), "sapUiIconSVG class present");
+		assert.ok(icon1.classList.contains("sapUiIconSVGMask"), "sapUiIconSVGMask class present");
+		assert.ok(icon1.style.cssText.indexOf("--sapUiIconSVGMaskUrl") !== -1, "CSS custom property for mask URL applied");
+		assert.ok(icon1.style.cssText.indexOf("--sapIcons_wrench") !== -1, "CSS variable reference correct");
+		assert.notOk(icon1.querySelector("svg"), "No inner <svg> element");
+
+		document.getElementById("area6").innerHTML = "";
+	});
+
+	QUnit.test("RenderManager.prototype.icon with custom SVG collection includes data-sap-ui-icon-collection", function(assert) {
+		var oStub = sinon.stub(IconPool, "getIconInfo").returns({
+			name: "icon-alpha",
+			collection: "myCustomColl",
+			type: IconPool.CollectionType.SVG,
+			uri: "sap-icon://myCustomColl/icon-alpha",
+			text: "",
+			suppressMirroring: true,
+			id: "sapIcon-myCustomColl--icon-alpha",
+			cssVarPrefix: "myCustomColl"
+		});
+
+		var rm = new RenderManager().getInterface();
+		rm.icon("sap-icon://myCustomColl/icon-alpha", [], {
+			id: "iconCustomColl"
+		});
+		rm.flush(document.getElementById("area6"));
+		rm.destroy();
+		oStub.restore();
+
+		var oIcon = document.getElementById("iconCustomColl");
+
+		assert.ok(oIcon, "icon should be rendered");
+		assert.strictEqual(oIcon.getAttribute("data-sap-ui-icon-collection"), "myCustomColl",
+			"data-sap-ui-icon-collection attribute set for custom collection");
+		assert.ok(oIcon.style.cssText.indexOf("--myCustomColl_icon-alpha") !== -1,
+			"CSS variable uses custom collection prefix");
 
 		document.getElementById("area6").innerHTML = "";
 	});

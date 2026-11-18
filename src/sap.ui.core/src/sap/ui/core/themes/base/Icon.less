@@ -12,6 +12,73 @@
 	position: relative;
 }
 
+.sapUiIconSVG {
+	/*
+	 * Using mask-image for SVG icons makes it a non-intrinsic element, which requires
+	 * an explicit width and height set.
+	 */
+	width: 1em;
+	height: 1lh;
+	/*
+	 * Since width/height are set, the following property is needed to make the icon
+	 * behave like an intrinsic element within a flexbox Container. It's a no-op for
+	 * non-flexbox containers.
+	 */
+	flex-shrink: 0;
+}
+
+/*
+ * Mask-image rendering for SVG icons via ::before pseudo-element.
+ * The icon shape is rendered on ::before using mask-image + background-color: currentColor.
+ * This keeps the main element's background-color available for the Icon control's
+ * backgroundColor property (visible background rectangle behind the icon shape).
+ */
+.sapUiIcon.sapUiIconSVGMask::before {
+	content: "";
+	mask-image: var(--sapUiIconSVGMaskUrl);
+	mask-size: 1em 1em;
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-origin: content-box;
+	background-color: currentColor;
+	/*
+	 * Absolute positioning to survive display: table-cell overrides from other controls.
+	 * The parent .sapUiIcon has position: relative.
+	 * padding: inherit + inset: 0 stretches ::before across the parent's
+	 * padding-box while its content-box matches the parent's content-box.
+	 * mask-origin: content-box + mask-position: center then centers the
+	 * mask within the parent's content-box.
+	 * height/width: auto overrides explicit dimensions set by other controls
+	 * that would prevent inset-based stretching.
+	 */
+	position: absolute;
+	inset: 0;
+	padding: inherit;
+	height: auto;
+	width: auto;
+}
+
+/*
+ * Baseline anchor for SVG icons.
+ *
+ * Font icons have an in-flow ::before with a text glyph that establishes a
+ * baseline for the icon's inline-level box. SVG icons render their ::before
+ * as position: absolute (out of flow), leaving no in-flow content. Per CSS
+ * spec, an inline-level box with no in-flow children has its baseline at the
+ * bottom margin edge. Combined with vertical-align: baseline (from .sapUiIcon),
+ * the line box strut's descent adds extra space below the icon in inline
+ * contexts, and flex containers with align-items: baseline misalign the icon.
+ *
+ * This ::after creates a zero-width in-flow child whose inherited font metrics
+ * establish a proper text baseline — the same baseline a font glyph ::before
+ * would provide. Controls that set ::after on .sapUiIcon in specific contexts
+ * (e.g. focus rings, expander arrows) use more specific selectors and override
+ * this naturally.
+ */
+.sapUiIcon.sapUiIconSVGMask::after {
+	content: '\200B'; /* zero-width space */
+}
+
 .sapUiTableCell > .sapUiTableCellInner > .sapUiIcon,
 .sapMListTblCell > .sapUiIcon {
 	vertical-align: middle;
@@ -32,14 +99,14 @@
 	outline-offset: ~"calc(-1 * var(--sapContent_FocusWidth))";
 }
 
-.sapUiIcon::before {
+.sapUiIcon:not(.sapUiIconSVG)::before {
 	content: attr(data-sap-ui-icon-content);
 	speak: none;
 	font-weight: normal;
 	-webkit-font-smoothing: antialiased;
 }
 
-.sapUiIcon > .sapUiIconTitle {
+.sapUiIcon:not(.sapUiIconSVG) > .sapUiIconTitle {
 	position: absolute;
 	width: 100%;
 	height: 100%;
@@ -56,14 +123,20 @@
  *   in the wrong direction.
  *  3. Custom CSS style should be set on the root DOM and not the pesudo element.
  */
-html[dir='rtl'] .sapUiIconMirrorInRTL:not(.sapUiIconSuppressMirrorInRTL) {
-
+html[dir='rtl'] .sapUiIconMirrorInRTL:not(.sapUiIconSVG):not(.sapUiIconSuppressMirrorInRTL) {
 	&::before,
 	&::after /* some controls render the icon using 'after' pesudo element */ {
 		transform: scale(-1, 1);
 		display: inline-block; /* pesudo element has display: inline by default and can't apply the transform css style for RTL mode*/
 	}
 }
+
+/* SVG icons: RTL mirroring handled by :dir(rtl) in svg.css,
+ * no CSS transform needed here. */
+
+/* Note: mask-image fallback icons also do NOT need RTL transform,
+ * because the CSS custom property resolves to the RTL SVG variant
+ * via :dir(rtl) in svg.css automatically. */
 
 /**
  * The Default color and the semantic colors for Icon which always points to the variable across themes.
