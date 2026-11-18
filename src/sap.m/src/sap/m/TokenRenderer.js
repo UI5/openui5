@@ -93,6 +93,10 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleText"],
 			oRm.renderControl(oDeleteIcon);
 		}
 
+		if (oControl._oDeleteIconTooltip) {
+			oControl._oDeleteIconTooltip.renderInvisibleTooltip(oRm);
+		}
+
 		oRm.close("div");
 	};
 
