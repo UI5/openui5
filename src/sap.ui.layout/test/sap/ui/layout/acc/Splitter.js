@@ -1,11 +1,14 @@
 sap.ui.define([
+	"sap/m/App",
 	"sap/m/Button",
 	"sap/m/FlexBox",
+	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/Text",
 	"sap/m/library",
 	"sap/ui/core/library",
 	"sap/ui/layout/Splitter"
-], function(Button, FlexBox, Text, mLibrary, coreLibrary, Splitter) {
+], function(App, Button, FlexBox, Page, PageAccessibleLandmarkInfo, Text, mLibrary, coreLibrary, Splitter) {
 	"use strict";
 
 	var Orientation = coreLibrary.Orientation;
@@ -42,13 +45,23 @@ sap.ui.define([
 				})
 			]
 		});
-	oSplitter.placeAt("content");
 
-	new Button({
+	const oSwitchBtn = new Button({
 		text: "Switch Orientation",
 		press: function () {
 			var sOrientation = oSplitter.getOrientation() === Orientation.Vertical ? Orientation.Horizontal : Orientation.Vertical;
 			oSplitter.setOrientation(sOrientation);
 		}
-	}).placeAt("content");
+	});
+
+	const oApp = new App({ initialPage: "accPage" });
+	oApp.addPage(new Page("accPage", {
+		title: "Splitter Accessibility Test Page", titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None", contentRole: "Main",
+			headerRole: "Region", headerLabel: "Splitter Accessibility Test Page Header"
+		}),
+		content: [oSplitter, oSwitchBtn]
+	}));
+	oApp.placeAt("content");
 });

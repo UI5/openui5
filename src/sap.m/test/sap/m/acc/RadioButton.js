@@ -4,6 +4,7 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/m/library",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/RadioButton",
 	"sap/m/RadioButtonGroup",
 	"sap/m/Toolbar",
@@ -17,6 +18,7 @@ sap.ui.define([
 	Label,
 	mobileLibrary,
 	Page,
+	PageAccessibleLandmarkInfo,
 	RadioButton,
 	RadioButtonGroup,
 	Toolbar,
@@ -45,6 +47,13 @@ sap.ui.define([
 
 		radioBtnPage = new Page("radioBtnPage", {
 			title : "RadioButton Accessibility Test Page",
+			titleLevel: "H1",
+			landmarkInfo: new PageAccessibleLandmarkInfo({
+				rootRole: "None",
+				contentRole: "Main",
+				headerRole: "Region", headerLabel: "RadioButton Accessibility Test Page Header",
+				footerRole: "Region", footerLabel: "RadioButton Accessibility Test Page Footer"
+			}),
 			footer : new Toolbar({
 				content: [
 					new ToolbarSpacer(),

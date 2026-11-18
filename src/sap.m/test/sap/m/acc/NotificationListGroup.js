@@ -7,6 +7,7 @@ sap.ui.define([
 	"sap/m/NotificationListGroup",
 	"sap/m/NotificationListItem",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/ui/core/library"
 ], function(
 	App,
@@ -17,6 +18,7 @@ sap.ui.define([
 	NotificationListGroup,
 	NotificationListItem,
 	Page,
+	PageAccessibleLandmarkInfo,
 	coreLibrary
 ) {
 	"use strict";
@@ -216,6 +218,12 @@ sap.ui.define([
 
 	var page = new Page("page", {
 		title: "NotificationGroup Accessibility Test Page",
+		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Main",
+			headerRole: "Region", headerLabel: "NotificationListGroup Accessibility Test Page Header"
+		}),
 		content: [list]
 	});
 

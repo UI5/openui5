@@ -7,9 +7,10 @@ sap.ui.define([
 	"sap/m/Label",
 	"sap/m/library",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/Text",
 	"sap/ui/core/library"
-], function(App, IconTabBar, IconTabFilter, IconTabSeparator, Input, Label, mobileLibrary, Page, MText, coreLibrary) {
+], function(App, IconTabBar, IconTabFilter, IconTabSeparator, Input, Label, mobileLibrary, Page, PageAccessibleLandmarkInfo, MText, coreLibrary) {
 	"use strict";
 
 	// shortcut for sap.m.IconTabFilterDesign
@@ -50,6 +51,12 @@ sap.ui.define([
 	// create and add a page with icon tab bar
 	var page = new Page("tabBarPage", {
 		title:"IconTabBar",
+		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Main",
+			headerRole: "Region", headerLabel: "IconTabBar Accessibility Test Page Header"
+		}),
 		content : [
 			label3,
 			new IconTabBar("itb3", {

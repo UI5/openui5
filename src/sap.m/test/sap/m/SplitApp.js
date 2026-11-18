@@ -62,9 +62,11 @@ sap.ui.define([
 		],
 		showNavButton: Device.system.phone,
 		landmarkInfo: new PageAccessibleLandmarkInfo({
+			contentRole: "Region",
 			rootLabel: "Detail 1",
-			headerLabel: "Detail 1 Header",
-			footerLabel: "Detail 1 Footer"
+			contentLabel: "Detail 1",
+			headerRole: "Region", headerLabel: "Detail 1 Header",
+			footerRole: "Region", footerLabel: "Detail 1 Footer"
 		}),
 		navButtonPress: function() {
 			oSplitApp.backDetail();
@@ -116,8 +118,10 @@ sap.ui.define([
 	var oDetailDetailPage = new Page("detailDetail", {
 		title: "Detail Detail",
 		landmarkInfo: new PageAccessibleLandmarkInfo({
+			contentRole: "Region",
 			rootLabel: "Detail Detail",
-			headerLabel: "Detail Detail Header"
+			contentLabel: "Detail Detail",
+			headerRole: "Region", headerLabel: "Detail Detail Header"
 		}),
 		backgroundDesign: PageBackgroundDesign.Solid,
 		content: [
@@ -162,9 +166,11 @@ sap.ui.define([
 		backgroundDesign: PageBackgroundDesign.Solid,
 		showNavButton: true,
 		landmarkInfo: new PageAccessibleLandmarkInfo({
+			contentRole: "Region",
 			rootLabel: "Detail 2",
-			headerLabel: "Detail 2 Header",
-			footerLabel: "Detail 2 Footer"
+			contentLabel: "Detail 2",
+			headerRole: "Region", headerLabel: "Detail 2 Header",
+			footerRole: "Region", footerLabel: "Detail 2 Footer"
 		}),
 		navButtonPress: function() {
 			oSplitApp.backDetail();
@@ -199,9 +205,11 @@ sap.ui.define([
 	var oMasterPage = new Page("master", {
 		title: "Master",
 		landmarkInfo: new PageAccessibleLandmarkInfo({
+			contentRole: "Region",
 			rootLabel: "Master",
-			headerLabel: "Master Header",
-			footerLabel: "Master Footer"
+			contentLabel: "Master",
+			headerRole: "Region", headerLabel: "Master Header",
+			footerRole: "Region", footerLabel: "Master Footer"
 		}),
 		backgroundDesign: PageBackgroundDesign.List,
 		content: [
@@ -241,9 +249,11 @@ sap.ui.define([
 		title: "Master 2",
 		backgroundDesign: PageBackgroundDesign.List,
 		landmarkInfo: new PageAccessibleLandmarkInfo({
+			contentRole: "Region",
 			rootLabel: "Master 2",
-			headerLabel: "Master 2 Header",
-			footerLabel: "Master 2 Footer"
+			contentLabel: "Master 2",
+			headerRole: "Region", headerLabel: "Master 2 Header",
+			footerRole: "Region", footerLabel: "Master 2 Footer"
 		}),
 		showNavButton: true,
 		navButtonPress: function() {
@@ -318,7 +328,10 @@ sap.ui.define([
 		title: "SplitApp Test Page",
 		titleLevel: library.TitleLevel.H1,
 		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Region",
 			rootLabel: "SplitApp Test Page",
+			contentLabel: "SplitApp Test Page Content",
 			headerLabel: "SplitApp Test Page Header"
 		}),
 		content: oSplitApp

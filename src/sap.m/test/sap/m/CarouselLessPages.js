@@ -1,4 +1,4 @@
-sap.ui.define(["sap/m/Image", "sap/m/Carousel", "sap/m/App", "sap/m/Page", "sap/m/Title"], function(MImage, Carousel, App, Page, Title) {
+sap.ui.define(["sap/m/Image", "sap/m/Carousel", "sap/m/App", "sap/m/Page", "sap/m/PageAccessibleLandmarkInfo", "sap/m/Title"], function(MImage, Carousel, App, Page, PageAccessibleLandmarkInfo, Title) {
 	"use strict";
 
 			// Create Images
@@ -40,6 +40,12 @@ sap.ui.define(["sap/m/Image", "sap/m/Carousel", "sap/m/App", "sap/m/Page", "sap/
 
 			var carouselPage = new Page("carouselPage",
 				{title: "Carousel Test Page",
+				titleLevel: "H1",
+				landmarkInfo: new PageAccessibleLandmarkInfo({
+					rootRole: "None",
+					contentRole: "Main",
+					headerRole: "Region", headerLabel: "Carousel Accessibility Test Page Header"
+				}),
 				enableScrolling: false }
 			);
 

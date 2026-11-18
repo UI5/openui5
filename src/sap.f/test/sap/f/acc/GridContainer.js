@@ -3,9 +3,10 @@ sap.ui.define([
 	"sap/f/GridContainerItemLayoutData",
 	"sap/m/App",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/Title",
 	"sap/ui/integration/widgets/Card"
-], function(GridContainer, GridContainerItemLayoutData, App, Page, Title, Card) {
+], function(GridContainer, GridContainerItemLayoutData, App, Page, PageAccessibleLandmarkInfo, Title, Card) {
 	"use strict";
 
 	var oListCardInteractive_Manifest = {
@@ -158,6 +159,13 @@ sap.ui.define([
 		initialPage:"myPage",
 		pages: [
 			new Page("myPage", {
+				title: "GridContainer Accessibility Test Page",
+				titleLevel: "H1",
+				landmarkInfo: new PageAccessibleLandmarkInfo({
+					rootRole: "None",
+					contentRole: "Main",
+					headerRole: "Region", headerLabel: "GridContainer Accessibility Test Page Header"
+				}),
 				content: [
 					oGridContainerTitle,
 					oGridContainer

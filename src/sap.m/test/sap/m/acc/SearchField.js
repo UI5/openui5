@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/m/Bar",
 	"sap/m/SearchField",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/base/Log",
 	"sap/ui/Device"
 ], function(
@@ -14,6 +15,7 @@ sap.ui.define([
 	Bar,
 	SearchField,
 	Page,
+	PageAccessibleLandmarkInfo,
 	Log,
 	Device
 ) {
@@ -43,6 +45,12 @@ sap.ui.define([
 	var page = new Page("searchPage", {
 		enableScrolling: true,
 		title:"Mobile Search Field Control",
+		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Main",
+			headerRole: "Region", headerLabel: "SearchField Accessibility Test Page Header"
+		}),
 		customHeader: new Bar("P1Header", {
 			enableFlexBox: false,
 			contentRight: oToggleBtnCompact

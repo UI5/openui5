@@ -5,6 +5,7 @@ sap.ui.define([
 	"sap/m/FlexBox",
 	"sap/m/Label",
 	"sap/m/Page",
+	"sap/m/PageAccessibleLandmarkInfo",
 	"sap/m/RadioButton",
 	"sap/m/RadioButtonGroup",
 	"sap/ui/core/Element",
@@ -20,6 +21,7 @@ sap.ui.define([
 	FlexBox,
 	Label,
 	Page,
+	PageAccessibleLandmarkInfo,
 	RadioButton,
 	RadioButtonGroup,
 	Element,
@@ -440,6 +442,12 @@ sap.ui.define([
 
 	var page = new Page("rbg", {
 		title:"Test Page for sap.m.RadioButtonGroup",
+		titleLevel: "H1",
+		landmarkInfo: new PageAccessibleLandmarkInfo({
+			rootRole: "None",
+			contentRole: "Main",
+			headerRole: "Region", headerLabel: "RadioButtonGroup Accessibility Test Page Header"
+		}),
 		content : [
 			flexBoxRBG1,
 			flexBoxRBG1a,
