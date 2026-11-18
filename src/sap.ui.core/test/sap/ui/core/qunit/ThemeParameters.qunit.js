@@ -362,13 +362,15 @@ sap.ui.define([
 					url9: {
 						plain: "none",
 						themeImageDefault: coreBase1x1Gif
-					}
+					},
+					url10: sPath + "/testdata/libraries/themeParameters/lib4/img/logo(sap_horizon_dark).png"
 				};
 
 				const actualPlain = Parameters.get({
 					name: ["sapUiThemeParamUrl1", "sapUiThemeParamUrl2", "sapUiThemeParamUrl3",
 						   "sapUiThemeParamUrl4", "sapUiThemeParamUrl5", "sapUiThemeParamUrl6",
-						   "sapUiThemeParamUrl7", "sapUiThemeParamUrl8", "sapUiThemeParamUrl9"
+						   "sapUiThemeParamUrl7", "sapUiThemeParamUrl8", "sapUiThemeParamUrl9",
+						   "sapUiThemeParamUrl10"
 					]
 				});
 
@@ -383,11 +385,12 @@ sap.ui.define([
 				assert.equal(actualPlain["sapUiThemeParamUrl7"], "url('" + expected.url7 + "')", "Relative URL should be resolved correctly 'blob:http://example.com/6e88648c-00e1-4512-9695-5b702d8455b4'.");
 				assert.equal(actualPlain["sapUiThemeParamUrl8"], "url('" + expected.url8 + "')", "Relative URL should be resolved correctly 'data:text/plain;utf-8,foo'.");
 				assert.equal(actualPlain["sapUiThemeParamUrl9"], expected.url9.plain, "'none' should stay as defined");
+				assert.equal(actualPlain["sapUiThemeParamUrl10"], "url('" + expected.url10 + "')", "Relative URL with parentheses in the path must be resolved and must not be truncated.");
 
 				const actualParsed = Parameters.get({
 					name: ["sapUiThemeParamUrl1", "sapUiThemeParamUrl2", "sapUiThemeParamUrl3",
 						   "sapUiThemeParamUrl4", "sapUiThemeParamUrl5", "sapUiThemeParamUrl6",
-						   "sapUiThemeParamUrl7", "sapUiThemeParamUrl8"
+						   "sapUiThemeParamUrl7", "sapUiThemeParamUrl8", "sapUiThemeParamUrl10"
 					],
 					_restrictedParseUrls: true
 				});
@@ -402,6 +405,7 @@ sap.ui.define([
 				assert.equal(actualParsed["sapUiThemeParamUrl6"], expected.url6, "Theme Image value should be correct for 'sapUiThemeParamUrl6'.");
 				assert.equal(actualParsed["sapUiThemeParamUrl7"], expected.url7, "Theme Image value should be correct for 'sapUiThemeParamUrl7'.");
 				assert.equal(actualParsed["sapUiThemeParamUrl8"], expected.url8, "Theme Image value should be correct for 'sapUiThemeParamUrl8'.");
+				assert.equal(actualParsed["sapUiThemeParamUrl10"], expected.url10, "Parsed relative URL with parentheses in the path must be resolved and must not be truncated.");
 
 				// Value 'none' is parsed to <undefined>, which leads to the default value
 				const actualParsedWithDefaults = Object.assign({
@@ -514,5 +518,25 @@ sap.ui.define([
 		await Library.load({name: "testlibs.themeParameters.lib18"});
 
 		Theming.attachApplied(fnApplied);
+	});
+
+	QUnit.test("Parsed URLs are passed to the callback when parameters are not yet available", async function(assert) {
+		await Library.load({name: "testlibs.themeParameters.lib20"});
+		const sThemeFolderUrl = new URL(sap.ui.require.toUrl("testlibs/themeParameters/lib20/themes/sap_horizon_hcb/"), document.baseURI);
+
+		// When: the parameter is requested before the library CSS has been applied
+		let vSyncResult;
+		const vCallbackResult = await new Promise((resolve) => {
+			vSyncResult = Parameters.get({
+				name: "sapUiTstCallbackRelUrl",
+				_restrictedParseUrls: true,
+				callback: resolve
+			});
+		});
+
+		// Then: the callback receives the parsed URL, as the synchronous result would
+		assert.strictEqual(vSyncResult, undefined, "Precondition: parameter is not available synchronously");
+		assert.strictEqual(vCallbackResult, new URL("img/callback.png", sThemeFolderUrl).toString(),
+			"Callback receives the parsed URL");
 	});
 });

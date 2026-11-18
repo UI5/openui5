@@ -8,7 +8,8 @@
 		"sapUiThemeParamUrl6": "url(\"\")",
 		"sapUiThemeParamUrl7": "url('blob:http://example.com/6e88648c-00e1-4512-9695-5b702d8455b4')",
 		"sapUiThemeParamUrl8": "url('data:text/plain;utf-8,foo')",
-		"sapUiThemeParamUrl9": "none"
+		"sapUiThemeParamUrl9": "none",
+		"sapUiThemeParamUrl10": "url('../../img/logo(sap_horizon_dark).png')"
 	},
 	"scopes": {
 	}
